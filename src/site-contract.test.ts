@@ -77,6 +77,54 @@ describe("copy matches docs/rebuild/copy word for word", () => {
     }
   });
 
+  /** Tagged lines under one "## " heading of a copy file, split where a line holds two tags. */
+  function sectionLines(file: string, heading: string) {
+    const text = read(`docs/rebuild/copy/${file}`);
+    const start = text.indexOf(`## ${heading}`);
+    const end = text.indexOf("\n## ", start + 3);
+    return text
+      .slice(start, end === -1 ? undefined : end)
+      .split("\n")
+      .filter((line) => /^\[[A-Za-z]+\] /.test(line))
+      .flatMap((line) => line.split(/\s{2,}(?=\[[A-Za-z]+\] )/))
+      .map((part) => part.replace(/^\[[A-Za-z]+\] /, "").replace(/\s+[→←].*$/, "").replace(/\s{2,}\(.*$/, "").trim())
+      .filter(Boolean);
+  }
+  const has = (line: string) => allMessages.includes(JSON.stringify(line).slice(1, -1));
+
+  it("carries the record's words (01-home.md, Hero)", () => {
+    const skip = new Set(["Building the institutional exchange¹ for cross-border trade finance.", "¹", "Back to text"]);
+    for (const line of sectionLines("01-home.md", "Hero").filter((l) => !skip.has(l))) {
+      expect(has(line), `missing: ${line}`).toBe(true);
+    }
+  });
+
+  it("carries the standing register and programme rows (01-home.md, Standing)", () => {
+    const lines = sectionLines("01-home.md", "Standing").slice(4); // after the heading, lead and column heads
+    for (const line of lines) expect(has(line), `missing: ${line}`).toBe(true);
+  });
+
+  it("carries the technology programmes (01-home.md)", () => {
+    for (const line of sectionLines("01-home.md", "Technology programmes")) {
+      expect(has(line), `missing: ${line}`).toBe(true);
+    }
+  });
+
+  it("matches the ledger's eight states to the copy (01-home.md, Only at 768 and 390)", () => {
+    const copy = read("docs/rebuild/copy/01-home.md");
+    for (const state of messages.ledger.states) {
+      expect(copy, `state ${state.no}`).toContain(`${state.no} ${state.state}`);
+      expect(copy, `state ${state.no} what`).toContain(state.what);
+      if (state.data) expect(copy, `state ${state.no} data`).toContain(state.data);
+      if (state.money) expect(copy, `state ${state.no} money`).toContain(state.money);
+    }
+  });
+
+  it("keeps every record document with its Proves line (copy deck 4.2)", () => {
+    expect(messages.record.documents).toHaveLength(6);
+    for (const doc of messages.record.documents) expect(doc.proves.length).toBeGreaterThan(10);
+  });
+
   it("keeps the footer copyright year current", () => {
     expect(messages.footer.copyright).toBe("© {year} Kubar Protocol Private Limited");
   });

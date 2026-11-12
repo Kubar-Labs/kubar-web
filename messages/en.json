@@ -52,7 +52,19 @@
     "copyright": "© {year} Kubar Protocol Private Limited"
   },
   "home": {
-    "display": "Building the institutional exchange<marker>¹</marker> for cross-border trade finance."
+    "display": "Building the institutional exchange<marker>¹</marker> for cross-border trade finance.",
+    "subline": "Starting with the asset: export receivables an international financier can buy again and again, insured in its own name.",
+    "routes": [
+      {
+        "label": "For financial institutions",
+        "href": "/products/kubar-protocol"
+      },
+      {
+        "label": "For trade platforms",
+        "href": "/products/navdhan-sdk"
+      }
+    ],
+    "followAnchor": "Follow one receivable"
   },
   "system": {
     "notFound": {
@@ -70,5 +82,271 @@
       "display": "Something went wrong on our side.",
       "line": "Please try again in a moment. If it keeps happening, email <email>outreach@kubar.tech</email>."
     }
+  },
+  "common": {
+    "footnoteMarker": "Footnote {n}",
+    "backToText": "Back to text",
+    "illustrative": "Illustrative",
+    "illustrativeNote": "An example receivable, not a real transaction.",
+    "sending": "Sending…"
+  },
+  "footnotes": {
+    "status": "Kubar’s own ITFS registration is targeted for 2027; until then Kubar acts as the financier’s origination and servicing agent."
+  },
+  "record": {
+    "title": "Record RCV-0001",
+    "summary": "$225,000 rice invoice to a buyer in the UAE, due 75 days after shipment. 90% of face paid at purchase; the balance, less the financier’s discount and charges, when the buyer pays.",
+    "description": "Illustrative record of one export receivable: six documents filed; state 05 of 8, purchased.",
+    "columns": {
+      "no": "No.",
+      "document": "Document",
+      "source": "Source",
+      "status": "Status",
+      "proves": "Proves"
+    },
+    "documents": [
+      {
+        "no": "01",
+        "document": "Commercial invoice",
+        "source": "The exporter",
+        "status": "Filed",
+        "proves": "What was sold, to whom, for how much and when it’s due, with the instruction to pay the financier"
+      },
+      {
+        "no": "02",
+        "document": "Shipping bill",
+        "source": "Indian Customs",
+        "status": "Filed",
+        "proves": "The goods were cleared for export, as invoiced"
+      },
+      {
+        "no": "03",
+        "document": "Electronic bill of lading",
+        "source": "The carrier",
+        "status": "Filed",
+        "proves": "The goods were shipped on board"
+      },
+      {
+        "no": "04",
+        "document": "Credit-insurance cover",
+        "source": "The insurer, in the financier’s name",
+        "status": "Filed",
+        "proves": "The buyer’s credit is covered, in the financier’s name"
+      },
+      {
+        "no": "05",
+        "document": "Assignment notice, acknowledged",
+        "source": "The buyer",
+        "status": "Filed",
+        "proves": "The buyer will pay the financier’s account"
+      },
+      {
+        "no": "06",
+        "document": "Purchase confirmation",
+        "source": "The financier",
+        "status": "Filed",
+        "proves": "The financier bought the receivable, without recourse for the buyer’s credit"
+      }
+    ],
+    "provesLabel": "Proves",
+    "stateLabel": "State",
+    "counter": "05 of 08",
+    "currentState": "05 Purchased"
+  },
+  "ledger": {
+    "columns": {
+      "no": "No.",
+      "state": "State",
+      "what": "What happens",
+      "party": "Party",
+      "dataPath": "Data path: Kubar",
+      "moneyPath": "Money path: Kubar holds none"
+    },
+    "dataPathLabel": "Data path: Kubar",
+    "moneyPathLabel": "Money path",
+    "planned": "Planned",
+    "states": [
+      {
+        "no": "01",
+        "state": "Shipped",
+        "what": "The exporter ships the rice and invoices the buyer, with the instruction to pay the financier’s account.",
+        "party": "Exporter",
+        "data": "Shipment and invoice data received",
+        "money": null
+      },
+      {
+        "no": "02",
+        "state": "Documented",
+        "what": "Shipping bill, invoice and bill of lading are checked against each other and filed in one evidence package.",
+        "party": "Kubar",
+        "data": "Evidence package assembled and checked",
+        "money": null
+      },
+      {
+        "no": "03",
+        "state": "Insured",
+        "what": "The buyer’s limit with the insurer is checked; the cover is in the financier’s name.",
+        "party": "Insurer",
+        "data": "Limit and headroom confirmed",
+        "money": null
+      },
+      {
+        "no": "04",
+        "state": "Acknowledged",
+        "what": "The buyer acknowledges that it will pay the financier.",
+        "party": "Buyer",
+        "data": "Acknowledgement filed",
+        "money": null
+      },
+      {
+        "no": "05",
+        "state": "Purchased",
+        "what": "The financier buys the receivable, without recourse for the buyer’s credit.",
+        "party": "Financier",
+        "data": "Package delivered; purchase recorded",
+        "money": "The financier pays 90% of face to the exporter’s own bank"
+      },
+      {
+        "no": "06",
+        "state": "Settled",
+        "what": "On the due date the buyer pays, and the exporter’s bank closes the shipping bill.",
+        "party": "Buyer, financier, exporter’s bank",
+        "data": "Payment matched; closure tracked",
+        "money": null
+      },
+      {
+        "no": "07",
+        "state": "Recorded",
+        "what": "The outcome joins the record of how the asset performs.",
+        "party": "Kubar",
+        "data": "Added to the loss history",
+        "money": null
+      },
+      {
+        "no": "08",
+        "state": "Transferred, later",
+        "what": "On the venue, a receivable can move to another institutional financier, with a registry entry.",
+        "party": null,
+        "data": null,
+        "money": null
+      }
+    ]
+  },
+  "standing": {
+    "columns": {
+      "kind": "Kind",
+      "entry": "Entry"
+    },
+    "rows": [
+      {
+        "kind": "Sandbox",
+        "entry": "Priority entry to the IFSCA FinTech Innovation Sandbox through GIFT IFIH"
+      },
+      {
+        "kind": "Membership",
+        "entry": "Member of FACE, an RBI-recognised self-regulatory organisation for fintech"
+      },
+      {
+        "kind": "Award",
+        "entry": "FinVision Award for Most Innovative Startup in Fintech, FinTech Edge 2026, NIBM Pune"
+      },
+      {
+        "kind": "Award",
+        "entry": "Winner, Popular Choice Award, Startup Mahakumbh 2025"
+      }
+    ]
+  },
+  "programmes": {
+    "finance": [
+      {
+        "id": "gift-ifih",
+        "name": "GIFT IFIH Young Builders Program",
+        "kind": "Programme"
+      },
+      {
+        "id": "bharatnetra",
+        "name": "BharatNetra Startup Accelerator (GFTN)",
+        "kind": "Accelerator"
+      },
+      {
+        "id": "stpi-finglobe",
+        "name": "STPI FinGlobe",
+        "kind": "Incubation"
+      },
+      {
+        "id": "meity-startup-hub",
+        "name": "MeitY GENESIS Entrepreneur in Residence",
+        "kind": "Residency"
+      },
+      {
+        "id": "t-hub",
+        "name": "T-Hub, RubriX Cohort 5",
+        "kind": "Incubation"
+      },
+      {
+        "id": "pusa-krishi",
+        "name": "Pusa Krishi Incubation Programme 2026–27",
+        "kind": "Incubation"
+      }
+    ],
+    "technologyLabel": "Technology programmes, grants and credits",
+    "technology": [
+      {
+        "id": "google",
+        "name": "Google for Startups"
+      },
+      {
+        "id": "nvidia",
+        "name": "NVIDIA Inception"
+      },
+      {
+        "id": "perplexity",
+        "name": "Perplexity for Startups"
+      },
+      {
+        "id": "openai",
+        "name": "OpenAI for Startups"
+      },
+      {
+        "id": "microsoft",
+        "name": "Microsoft for Startups"
+      },
+      {
+        "id": "intel",
+        "name": "STPI-Intel PRAGATI Accelerator"
+      },
+      {
+        "id": "elevenlabs",
+        "name": "ElevenLabs Grants"
+      },
+      {
+        "id": "amplitude",
+        "name": "Amplitude for Startups"
+      },
+      {
+        "id": "polkadot-academy",
+        "name": "Polkadot Blockchain Academy"
+      },
+      {
+        "id": "uniswap",
+        "name": "Uniswap Hook Incubator"
+      },
+      {
+        "id": "sarvam",
+        "name": "Sarvam Startup Program"
+      },
+      {
+        "id": "cloudflare",
+        "name": "Cloudflare for Startups"
+      },
+      {
+        "id": "claude",
+        "name": "Claude for Startups"
+      },
+      {
+        "id": "mongodb",
+        "name": "MongoDB for Startups"
+      }
+    ]
   }
 }

@@ -1,8 +1,16 @@
 import type { Metadata } from "next";
 import { KubarLockup, KubarMark } from "@/components/brand/KubarMark";
 import { Icon, type IconName } from "@/components/icons/Icon";
-import { ButtonLink } from "@/components/ui/Button";
+import { Ledger } from "@/components/registers/Ledger";
+import { FinanceProgrammes, TechnologyProgrammes } from "@/components/registers/Programmes";
+import { Record } from "@/components/registers/Record";
+import { RouteRows, type Route } from "@/components/registers/RouteRows";
+import { Standing } from "@/components/registers/Standing";
+import { Button, ButtonLink } from "@/components/ui/Button";
+import { Footnote, FootnoteMarker } from "@/components/ui/Footnote";
+import { Illustrative } from "@/components/ui/Illustrative";
 import { TextLink } from "@/components/ui/TextLink";
+import { getTranslations } from "next-intl/server";
 
 /*
  * Type and colour specimens for the step 1 review (HANDOFF section 12).
@@ -103,7 +111,10 @@ function Pairings({ mode, set }: { mode: string; set: typeof paper }) {
   );
 }
 
-export default function Specimens() {
+export default async function Specimens() {
+  const home = await getTranslations("home");
+  const footnotes = await getTranslations("footnotes");
+  const routes = home.raw("routes") as Route[];
   return (
     <div className="page-container flex flex-col gap-(--section-space) pt-8 pb-(--section-space) lg:pt-16">
       <div className="flex flex-col gap-4">
@@ -187,6 +198,74 @@ export default function Specimens() {
               </li>
             ))}
           </ul>
+        </div>
+      </section>
+
+      <section className="border-t border-rule-strong pt-(--section-space)">
+        <SpecimenHead>Buttons: states (step 2)</SpecimenHead>
+        <div className="flex flex-col gap-6">
+          <div className="flex flex-wrap items-center gap-4">
+            <Button>Send message</Button>
+            <Button className="bg-action-hover">Hover</Button>
+            <Button className="bg-action-pressed">Pressed</Button>
+            <Button className="outline-2 outline-offset-2 outline-focus">Focus</Button>
+            <Button sending>Send message</Button>
+          </div>
+          <div className="flex flex-wrap items-center gap-4">
+            <Button variant="outline">Outline</Button>
+            <Button variant="outline" size={44}>Outline 44</Button>
+            <ButtonLink href="/how-it-works" icon="arrow-right">See how it works</ButtonLink>
+          </div>
+          <div data-ground="petrol" className="flex flex-wrap items-center gap-6 p-8">
+            <ButtonLink href="/contact">Talk to us</ButtonLink>
+            <TextLink href="/how-it-works" kind="arrow" size="large">See how it works</TextLink>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-rule-strong pt-(--section-space)">
+        <SpecimenHead>Footnotes and Illustrative (step 2)</SpecimenHead>
+        <div className="flex flex-col gap-8 lg:max-w-[628px]">
+          <p className="t-display text-ink">
+            Building the institutional exchange
+            <FootnoteMarker n={1} target="fn-specimen-1" refId="fnref-specimen-1" /> for cross-border trade finance.
+          </p>
+          <Footnote n={1} id="fn-specimen-1" backTo="fnref-specimen-1">
+            {footnotes("status")}
+          </Footnote>
+          <div className="flex items-start justify-between border-t-2 border-rule-strong pt-3">
+            <span className="t-tag text-ink">Record RCV-0001</span>
+            <Illustrative />
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-rule-strong pt-(--section-space)">
+        <SpecimenHead>Route rows and the record (step 2)</SpecimenHead>
+        <div className="flex flex-col gap-12 lg:flex-row lg:gap-20">
+          <div className="lg:w-[600px] lg:shrink-0">
+            <RouteRows routes={routes} />
+          </div>
+          <Record className="min-w-0 flex-1" />
+        </div>
+      </section>
+
+      <section className="border-t border-rule-strong pt-(--section-space)">
+        <SpecimenHead>The eight-state ledger (step 2)</SpecimenHead>
+        <Ledger footnote={{ target: "fn-specimen-ledger", refId: "fnref-specimen-ledger" }} />
+        <Footnote n={1} id="fn-specimen-ledger" backTo="fnref-specimen-ledger" className="mt-8 lg:max-w-[628px]">
+          {footnotes("status")}
+        </Footnote>
+      </section>
+
+      <section className="border-t border-rule-strong pt-(--section-space)">
+        <SpecimenHead>Standing and programmes (step 2)</SpecimenHead>
+        <div className="flex flex-col gap-16">
+          <div className="lg:ml-auto lg:w-[800px]">
+            <Standing />
+          </div>
+          <FinanceProgrammes />
+          <TechnologyProgrammes />
         </div>
       </section>
 

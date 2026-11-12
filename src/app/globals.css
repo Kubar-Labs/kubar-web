@@ -302,4 +302,88 @@
   html:has(.menu-sheet[open]) {
     overflow: hidden;
   }
+
+  /* The current row of a register (record, ledger): the inset ground, which
+     reaches 16 px into the margin, and the 6 px rani marker whose foot is cut
+     at the Kubar mark's angle (33°: 3.9 px over 6 px). Works on <tr> and on
+     block rows. */
+  .is-current {
+    position: relative;
+    background-color: var(--color-accent-soft);
+  }
+  /* A table row can't carry positioned pseudo-elements (Chrome lays them out
+     as extra cells), so at desktop, where registers are real table rows, the
+     ground's margin extension and the marker hang off the first cell. Below
+     desktop the rows are blocks or grids and keep them on the row itself. */
+  @media (min-width: 1200px) {
+    tr.is-current::before,
+    tr.is-current::after {
+      content: none;
+    }
+    tr.is-current > :first-child {
+      position: relative;
+    }
+    tr.is-current > :first-child::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: -16px;
+      width: 16px;
+      background-color: var(--color-accent-soft);
+    }
+    tr.is-current > :first-child::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: -16px;
+      width: 6px;
+      background-color: var(--color-accent);
+      clip-path: polygon(0 0, 100% 0, 100% calc(100% - 3.9px), 0 100%);
+    }
+  }
+  .is-current::before,
+  .footnote:target::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 -16px;
+    width: 16px;
+    background-color: var(--color-accent-soft);
+  }
+  .is-current::after,
+  .footnote:target::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -16px;
+    width: 6px;
+    background-color: var(--color-accent);
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 3.9px), 0 100%);
+  }
+
+  /* A footnote reached from its marker takes the current-row treatment, then
+     lets it go after 2 s over --duration-disclose. */
+  .footnote {
+    isolation: isolate;
+  }
+  .footnote:target::before {
+    inset: 0 0 0 -16px;
+    width: auto;
+    z-index: -1;
+  }
+  .footnote:target::before,
+  .footnote:target::after {
+    animation: footnote-mark calc(2000ms + var(--duration-disclose)) linear forwards;
+  }
+  @keyframes footnote-mark {
+    0%,
+    90% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
 }
