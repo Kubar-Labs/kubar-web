@@ -51,6 +51,14 @@ const nextConfig: NextConfig = {
         destination: "https://kubar.tech/:path+",
         permanent: true,
       },
+      // Short link for the investor pre-read deck. Temporary (307) so the
+      // target can be repointed when the deck is updated.
+      {
+        source: "/deck",
+        destination:
+          "https://drive.google.com/file/d/15lAsUkbesEdhr2aNZsefCe_h4Cffo20I/view?usp=sharing",
+        permanent: false,
+      },
     ];
   },
   async headers() {
