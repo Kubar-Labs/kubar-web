@@ -1,438 +1,159 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
-const publicRoutes = [
-  "/",
-  "/about",
-  "/contact",
-  "/for-platforms",
-  "/privacy",
-  "/products/kubar-protocol",
-  "/products/navdhan",
-  "/team",
-] as const;
+/*
+ * Build step 1: the routes that exist so far. Each later step adds its pages
+ * here (Home in step 3, the product pages and About in step 4, Contact and the
+ * legal pages in step 5).
+ */
+const publicRoutes = ["/"] as const;
+const OG_IMAGE = /^https:\/\/kubar\.tech\/media\/kubar-labs-og-b2add55b\.png(?:\?.*)?$/;
+
+async function expectNoAxeViolations(page: Page) {
+  const results = await new AxeBuilder({ page })
+    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
+    .analyze();
+  expect(results.violations).toEqual([]);
+}
 
 test.describe("public routes", () => {
   for (const path of publicRoutes) {
-    test(`${path} renders its primary content and canonical URL`, async ({ page }) => {
+    test(`${path} renders one h1, its canonical URL and the social image`, async ({ page }) => {
       const response = await page.goto(path);
-
       expect(response?.status()).toBe(200);
       await expect(page.locator("h1")).toHaveCount(1);
       await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
         "href",
         path === "/" ? "https://kubar.tech" : new URL(path, "https://kubar.tech").href,
       );
-      await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
-        "content",
-        /^https:\/\/kubar\.tech\/media\/kubar-labs-og-b2add55b\.png(?:\?.*)?$/,
-      );
-      await expect(page.locator('meta[name="twitter:image"]')).toHaveAttribute(
-        "content",
-        /^https:\/\/kubar\.tech\/media\/kubar-labs-og-b2add55b\.png(?:\?.*)?$/,
-      );
+      await expect(page.locator('meta[property="og:image"]')).toHaveAttribute("content", OG_IMAGE);
+      await expect(page.locator('meta[name="twitter:image"]')).toHaveAttribute("content", OG_IMAGE);
     });
 
     test(`${path} has no automated WCAG A or AA violations`, async ({ page }) => {
       await page.emulateMedia({ reducedMotion: "reduce" });
       await page.goto(path);
-      await page.waitForTimeout(1_000);
-
-      const results = await new AxeBuilder({ page })
-        .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
-        .analyze();
-
-      expect(results.violations).toEqual([]);
+      await expectNoAxeViolations(page);
     });
   }
 });
 
-test("the platform page omits the visual coming-soon badge and remains excluded from indexing", async ({ page }) => {
-  await page.goto("/for-platforms");
-
-  await expect(page.getByText("Coming soon", { exact: true })).toHaveCount(0);
-  await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
-    "content",
-    /noindex/,
-  );
-});
-
-test("the privacy page omits the Legal overline", async ({ page }) => {
-  await page.goto("/privacy");
-
-  await expect(page.getByText("Legal", { exact: true })).toHaveCount(0);
-  await expect(page.getByRole("heading", { name: "Privacy Policy", exact: true })).toBeVisible();
-});
-
-test("skip link moves keyboard focus to the primary content", async ({ page }) => {
+test("Home carries its metadata from the handoff", async ({ page }) => {
   await page.goto("/");
+  await expect(page).toHaveTitle("Kubar Labs · Building the institutional exchange for cross-border trade finance");
+  await expect(page.locator('meta[name="description"]')).toHaveAttribute(
+    "content",
+    "Starting with the asset: export receivables an international financier can buy again and again, insured in its own name.",
+  );
+  await expect(page.locator('meta[property="og:title"]')).toHaveAttribute("content", "Kubar Labs");
+});
 
-  const skipLink = page.getByRole("link", { name: /skip to (main )?content/i });
-  await skipLink.focus();
+test("an unknown address returns the 404 page with the header and footer", async ({ page }) => {
+  const response = await page.goto("/no-such-page");
+  expect(response?.status()).toBe(404);
+  await expect(page.getByRole("heading", { level: 1, name: "No record at this address." })).toBeVisible();
+  for (const name of ["Home", "Kubar Protocol", "NavDhan SDK", "How it works", "Contact"]) {
+    await expect(page.getByRole("main").getByRole("link", { name, exact: true })).toBeVisible();
+  }
+  await expect(page.getByRole("banner")).toBeVisible();
+  await expect(page.getByRole("contentinfo")).toBeVisible();
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await expectNoAxeViolations(page);
+});
+
+test("the specimen page stays out of search", async ({ page }) => {
+  await page.goto("/specimens");
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
+  const sitemap = await page.request.get("/sitemap.xml");
+  expect(await sitemap.text()).not.toContain("/specimens");
+});
+
+test("old routes redirect permanently", async ({ request }) => {
+  const cases = [
+    ["/products/navdhan", "/products/navdhan-sdk"],
+    ["/for-platforms", "/products/navdhan-sdk"],
+    ["/team", "/about#team"],
+    ["/privacy", "/legal/privacy"],
+  ];
+  for (const [from, to] of cases) {
+    const response = await request.get(from, { maxRedirects: 0 });
+    expect([301, 308]).toContain(response.status());
+    expect(response.headers()["location"]).toBe(to);
+  }
+});
+
+test("skip link is the first focusable element and moves focus to the main content", async ({ page }) => {
+  await page.goto("/");
+  await page.keyboard.press("Tab");
+  const skipLink = page.getByRole("link", { name: "Skip to content" });
+  await expect(skipLink).toBeFocused();
   await expect(skipLink).toBeVisible();
   await skipLink.press("Enter");
-
   await expect(page.locator("#main-content")).toBeFocused();
 });
 
-test("footer email CTA exposes its label and mail destination", async ({ page }) => {
-  await page.goto("/");
+test.describe("header at desktop", () => {
+  test.use({ viewport: { width: 1440, height: 900 } });
 
-  const emailCta = page.getByRole("link", { name: "partnerships@kubar.tech", exact: true });
-  await expect(emailCta).toHaveAttribute("href", "mailto:partnerships@kubar.tech");
-});
-
-test("contact form enforces required fields before making a request", async ({ page }) => {
-  let contactRequests = 0;
-  page.on("request", (request) => {
-    if (request.method() === "POST" && request.url().endsWith("/api/contact")) {
-      contactRequests += 1;
-    }
+  test("stays fixed when the page scrolls", async ({ page }) => {
+    await page.goto("/specimens");
+    await page.mouse.wheel(0, 1500);
+    await expect(page.getByRole("banner")).toBeInViewport();
+    expect(await page.getByRole("banner").evaluate((el) => el.getBoundingClientRect().top)).toBe(0);
   });
 
-  await page.goto("/contact");
-  await page.getByRole("button", { name: "Send Message" }).click();
-
-  const fullName = page.getByLabel("Full Name");
-  await expect(fullName).toBeFocused();
-  expect(await fullName.evaluate((input: HTMLInputElement) => input.validity.valueMissing)).toBe(true);
-  expect(contactRequests).toBe(0);
-});
-
-test("Home preserves its source hero and credibility sections", async ({ page }) => {
-  await page.goto("/");
-
-  await expect(page).toHaveTitle("Commerce to Capital | Kubar Labs");
-  await expect(page.locator('meta[property="og:title"]')).toHaveAttribute(
-    "content",
-    "Commerce to Capital | Kubar Labs",
-  );
-  await expect(page.getByRole("heading", { name: "Connect commerce to capital.", exact: true })).toBeVisible();
-  await expect(page.getByText("We build financial infrastructure that connects business activity to regulated capital, through NavDhan for embedded business credit and Kubar Protocol for cross-border trade finance", { exact: true })).toBeVisible();
-  await expect(page.locator(".glass-card, .glass-card-gold")).toHaveCount(3);
-  await expect(page.getByRole("region", { name: "Awards, programmes and recognitions" })).toBeAttached();
-  await expect(page.getByRole("region", { name: "Technology programmes, grants and infrastructure support" })).toBeAttached();
-  await expect(page.getByRole("region", { name: "Responsible lending, data protection and institutional recognition" })).toBeAttached();
-  await expect(page.locator(".trust-flip-card")).toHaveCount(5);
-  await expect(page.getByText("New Bharat. New Credit Rails. New Possibilities.", { exact: true })).toBeAttached();
-  await expect(page.getByText("KUBAR LABS · COMMERCE TO CAPITAL", { exact: true })).toHaveCount(0);
-  await expect(page.locator(".approved-eyebrow, .approved-product-card__eyebrow, .approved-architecture__parent > span, .approved-footer__eyebrow")).toHaveCount(0);
-  await expect(page.locator('main > #built-for-trust + .approved-tagline-wrap + section[aria-label="Technology programmes, grants and infrastructure support"]')).toHaveCount(1);
-  await expect(page.locator("#story")).toHaveCount(0);
-  await expect(page.getByText("One business context. Two financing paths", { exact: false })).toHaveCount(0);
-});
-
-test("legacy Home story bookmarks redirect to the relocated NavDhan journey", async ({ page }) => {
-  await page.goto("/#story");
-  await expect(page).toHaveURL(/\/products\/navdhan#story$/);
-  await expect(page.locator("#story")).toHaveCount(1);
-});
-
-test("NavDhan renders the exact eight-stage source journey once", async ({ page }) => {
-  const stages = [
-    ["Order Received", "Sheetal receives a ₹10 lakh bulk order through a B2B platform."],
-    ["Capital Need Identified", "She needs ₹4 lakh in working capital to fulfil it."],
-    ["Credit Intent Captured", "NavDhan captures the credit request inside the platform workflow."],
-    ["Permissioned Data Structured", "With consent, NavDhan retrieves and structures relevant platform and financial data."],
-    ["Application Pre-Qualified", "Lender-configured rules and sector-specific signals pre-qualify the application."],
-    ["Application Routed", "The lender-ready application is routed to eligible lenders."],
-    ["Lender Decision & Disbursal", "The selected regulated lender completes underwriting, pricing and disbursal."],
-    ["Order Fulfilled", "Sheetal fulfils the order without leaving the platform."],
-  ];
-
-  await page.goto("/products/navdhan");
-  await expect(page.locator(".navdhan-hero__copy > .navdhan-kicker, .navdhan-roles__copy > .navdhan-kicker, .navdhan-responsibility-card > .navdhan-kicker, .navdhan-direct-card > .navdhan-kicker, .approved-footer__eyebrow")).toHaveCount(0);
-  await expect(page.locator("#story")).toHaveCount(1);
-  await expect(page.locator(".old-way-step")).toHaveCount(4);
-  await expect(page.locator(".timeline-item")).toHaveCount(8);
-
-  for (const [title, description] of stages) {
-    await expect(page.locator(".timeline-step-title").getByText(title, { exact: true })).toHaveCount(1);
-    await expect(page.locator(".timeline-step-desc").getByText(description, { exact: true })).toHaveCount(1);
-  }
-
-  await expect(page.getByText("NavDhan by Kubar Labs", { exact: true })).toHaveCount(1);
-  await expect(page.getByRole("link", { name: "Request a Demo" })).toHaveAttribute("href", "/contact");
-});
-
-test("Protocol exposes the six approved stages and explicit maturity boundary", async ({ page }) => {
-  const stageTitles = [
-    "Begin with the trade commitment.",
-    "Connect pre-shipment finance.",
-    "Link shipment evidence.",
-    "Identify the accepted receivable.",
-    "Connect eligible financing.",
-    "Settle through the bank.",
-  ];
-
-  await page.goto("/products/kubar-protocol");
-  await expect(page.locator(".protocol-hero__copy > .protocol-kicker, .protocol-progress__intro > .protocol-kicker, .protocol-journey__context > p, .protocol-authority-card > .protocol-kicker, .approved-footer__eyebrow")).toHaveCount(0);
-  await expect(page.locator(".protocol-stage")).toHaveCount(6);
-  for (const title of stageTitles) {
-    await expect(page.getByText(title, { exact: true })).toHaveCount(1);
-  }
-  await expect(page.getByText("DEMONSTRATED PROTOTYPE", { exact: true })).toBeVisible();
-  await expect(page.getByText(/No external money moved and no live partner, bank, venue or regulator system was contacted\./)).toBeAttached();
-  await expect(page.getByText("Kubar Protocol does not become the lender, custodian, regulated venue or settlement bank.", { exact: true })).toBeAttached();
-
-  const sitemap = await page.request.get("/sitemap.xml");
-  expect(sitemap.ok()).toBe(true);
-  expect(await sitemap.text()).toContain("https://kubar.tech/products/kubar-protocol");
-});
-
-test("About retains its source narrative and navigation outside the requested removal", async ({ page }) => {
-  await page.goto("/about");
-
-  await expect(page.getByText("Building the origination layer between fragmented B2B platforms and lenders", { exact: true })).toBeAttached();
-  await expect(page.getByText(/Kubar Protocol is longer-term R&D focused on digital trade assets/)).toBeAttached();
-  await expect(page.getByRole("heading", { name: "The path so far" })).toHaveCount(0);
-  await expect(page.locator('div.w-16 img[alt="Kubar Labs"]')).toHaveCount(1);
-  await expect(page.locator(".built-status-text", { hasText: "Live" })).toHaveCount(1);
-  await expect(page.getByText("Launching", { exact: true })).toHaveCount(0);
-  await expect(page.getByRole("button", { name: "Products" })).toBeVisible();
-  await page.getByRole("button", { name: "Products" }).hover();
-  const desktopMenu = page.locator("#desktop-products-menu");
-  await expect(desktopMenu.getByRole("link", { name: /NavDhan/ })).toHaveAttribute("href", "/products/navdhan");
-  await expect(desktopMenu.getByRole("link", { name: /Kubar Protocol/ })).toHaveAttribute("href", "/products/kubar-protocol");
-  await expect(page.getByRole("button", { name: /Business Rules Engine/ })).toHaveCount(0);
-});
-
-test("Team renders only the approved current people, portraits, and profile links", async ({ page }) => {
-  const names = [
-    "Vaibhav Sharma",
-    "Rayansh Srivastava",
-    "Keshav Dudani",
-    "Manchit Sanan",
-    "Divyesh Reddy",
-    "Kavish Mahajan",
-    "Debayan Gupta",
-    "Amit Sagar",
-    "Shridhar Sethuram",
-    "Tushar Jaruhar",
-  ];
-
-  await page.goto("/team");
-
-  for (const removedLabel of [
-    "KUBAR LABS / TEAM",
-    "Kubar Labs is the parent company of NavDhan and Kubar Protocol.",
-    "HOW WE BUILD",
-    "THE TEAM",
-    "FOR PLATFORMS AND FINANCIAL INSTITUTIONS",
-  ]) {
-    await expect(page.getByText(removedLabel, { exact: true })).toHaveCount(0);
-  }
-
-  const ceoCard = page.locator(".editorial-profile").first();
-  await expect(ceoCard.getByText("CEO", { exact: true })).toHaveCount(1);
-  await expect(page.locator(".editorial-profile")).toHaveCount(10);
-  for (const name of names) {
-    await expect(page.getByRole("heading", { name, exact: true })).toHaveCount(1);
-    await expect(page.getByRole("img", { name: new RegExp(`^${name},`) })).toHaveCount(1);
-  }
-  await expect(page.locator('.editorial-profile a[href^="https://www.linkedin.com/"]')).toHaveCount(10);
-  await expect(page.locator(".editorial-profile__bio").first()).toHaveCSS("-webkit-line-clamp", "none");
-});
-
-test("Team remains complete, readable, and overflow-free at approved responsive widths", async ({ page }) => {
-  const consoleErrors: string[] = [];
-  const pageErrors: string[] = [];
-
-  page.on("console", (message) => {
-    if (message.type() === "error") consoleErrors.push(message.text());
-  });
-  page.on("pageerror", (error) => pageErrors.push(error.message));
-  await page.emulateMedia({ reducedMotion: "reduce" });
-
-  for (const width of [1440, 1280, 1024, 768, 390, 360]) {
-    await page.setViewportSize({ width, height: width <= 390 ? 844 : 900 });
-    await page.goto("/team");
-
-    expect(
-      await page.evaluate(() =>
-        document.documentElement.scrollWidth <=
-        document.documentElement.clientWidth,
-      ),
-      `horizontal overflow at ${width}px`,
-    ).toBe(true);
-    await expect(page.locator(".operating-principle")).toHaveCount(3);
-    await expect(page.locator(".editorial-profile")).toHaveCount(10);
-
-    await page.evaluate(async () => {
-      for (let y = 0; y < document.body.scrollHeight; y += innerHeight / 2) {
-        scrollTo(0, y);
-        await new Promise((resolve) => setTimeout(resolve, 20));
-      }
-    });
-
-    for (const portrait of await page.locator(".editorial-profile img").all()) {
-      expect(
-        await portrait.evaluate(
-          (image: HTMLImageElement) => image.complete && image.naturalWidth > 0,
-        ),
-        `portrait failed to load at ${width}px`,
-      ).toBe(true);
-    }
-
-    for (const card of await page.locator(".editorial-profile").all()) {
-      expect(
-        await card.evaluate((element) => element.scrollHeight <= element.clientHeight),
-        `profile content clipped at ${width}px`,
-      ).toBe(true);
-    }
-
-    await expect(page.locator(".approved-footer__inner")).toHaveCSS("opacity", "1");
-  }
-
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("/team");
-  const firstLinkedIn = page.locator(".editorial-profile a").first();
-  await firstLinkedIn.focus();
-  await expect(firstLinkedIn).toBeFocused();
-  await expect(firstLinkedIn).toHaveCSS("outline-style", "solid");
-  expect(
-    await page.evaluate(() => matchMedia("(prefers-reduced-motion: reduce)").matches),
-  ).toBe(true);
-
-  expect(consoleErrors.filter((message) => /hydration|uncaught/i.test(message))).toEqual([]);
-  expect(pageErrors).toEqual([]);
-});
-
-test("approved desktop and mobile product menus link both sibling products", async ({ page }) => {
-  const routes = [
-    "/",
-    "/about",
-    "/contact",
-    "/for-platforms",
-    "/privacy",
-    "/products/navdhan",
-    "/products/kubar-protocol",
-    "/team",
-  ];
-
-  for (const route of routes) {
-    await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto(route);
-    const productsButton = page.getByRole("button", { name: "Products" });
-    await productsButton.hover();
-    const desktopMenu = page.locator("#desktop-products-menu");
-    await expect(desktopMenu.getByRole("link", { name: /NavDhan/ })).toHaveAttribute("href", "/products/navdhan");
-    await expect(desktopMenu.getByRole("link", { name: /Kubar Protocol/ })).toHaveAttribute("href", "/products/kubar-protocol");
-    await productsButton.press("Escape");
-    await expect(desktopMenu).toHaveCount(0);
-
-    await page.setViewportSize({ width: 390, height: 844 });
-    await page.getByRole("button", { name: "Open navigation menu" }).click();
-    const mobileMenu = page.getByRole("dialog", { name: "Mobile navigation" });
-    await mobileMenu.getByRole("button", { name: "Products" }).click();
-    await expect(mobileMenu.getByRole("link", { name: /NavDhan/ })).toHaveAttribute("href", "/products/navdhan");
-    await expect(mobileMenu.getByRole("link", { name: /Kubar Protocol/ })).toHaveAttribute("href", "/products/kubar-protocol");
+  test("Products opens on click, closes on Escape and returns focus", async ({ page }) => {
+    await page.goto("/");
+    const products = page.getByRole("button", { name: "Products" });
+    await expect(products).toHaveAttribute("aria-expanded", "false");
+    await products.click();
+    await expect(products).toHaveAttribute("aria-expanded", "true");
+    const protocol = page.getByRole("link", { name: /Kubar Protocol For banks/ });
+    await expect(protocol).toBeVisible();
+    await expect(protocol).toHaveAttribute("href", "/products/kubar-protocol");
+    await expect(page.getByRole("link", { name: /NavDhan SDK For trade platforms/ })).toHaveAttribute(
+      "href",
+      "/products/navdhan-sdk",
+    );
+    await protocol.focus();
     await page.keyboard.press("Escape");
-    await expect(mobileMenu).toHaveCount(0);
-    await expect(page.getByRole("button", { name: "Open navigation menu" })).toBeFocused();
-  }
-});
-
-test("marquees and mobile trust details keep their interaction contracts", async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("/");
-
-  const awards = page.getByRole("region", { name: "Awards, programmes and recognitions" });
-  await expect(awards.getByRole("button")).toHaveCount(0);
-  await expect(awards.locator(".marquee-track > span")).toHaveCount(8);
-  await expect(awards.locator('.marquee-track > [aria-hidden="true"]')).toHaveCount(4);
-  for (const item of [
-    "FinVision 2026 Award at NIBM, Pune",
-    "Popular Choice Award at Startup MahaKumbh",
-    "Recognised in F6S FinTech rankings",
-    "IFSCA Fintech Sandbox",
-  ]) {
-    await expect(awards.getByText(item, { exact: true })).toHaveCount(2);
-  }
-  for (const removedItem of [
-    "GENESIS grant recipient",
-    "Perplexity AI Business Fellowship participant",
-    "ElevenLabs Grants recipient",
-  ]) {
-    await expect(awards.getByText(removedItem, { exact: true })).toHaveCount(0);
-  }
-  const logos = page.getByRole("region", { name: "Technology programmes, grants and infrastructure support" });
-  await expect(logos.getByRole("button")).toHaveCount(0);
-  await expect(logos.locator(".ecosystem-marquee__item")).toHaveCount(12);
-  await expect(logos.locator('[aria-hidden="true"]')).toHaveCount(0);
-  expect(
-    await logos.getByRole("img").evaluateAll((images) =>
-      [...new Set(images.map((image) => {
-        const style = getComputedStyle(image);
-        return `${style.width} by ${style.height}`;
-      }))],
-    ),
-  ).toEqual(["144px by 40px"]);
-  await expect(logos.getByRole("img", { name: "Sarvam", exact: true })).toHaveCount(1);
-  await expect(logos.getByRole("img", { name: "Cloudflare", exact: true })).toHaveCount(1);
-
-  const firstDetails = page.locator('button[aria-controls="trust-mobile-details-1"]');
-  await firstDetails.scrollIntoViewIfNeeded();
-  await firstDetails.click();
-  await expect(firstDetails).toHaveAttribute("aria-expanded", "true");
-  await expect(firstDetails).toHaveText("Hide Details");
-});
-
-async function fillContactForm(page: import("@playwright/test").Page) {
-  await page.getByLabel("Full Name").fill("Ada Lovelace");
-  await page.getByLabel("Email Address").fill("ada@example.com");
-  await page.getByLabel("Phone Number (optional)").fill("+91 98765 43210");
-  await page.getByLabel("Company Name").fill("Analytical Engines");
-  await page.getByLabel("Which category best describes your organisation?").selectOption("fintech");
-}
-
-test("Contact keeps its exact fields and handles a mocked successful submission", async ({ page }) => {
-  let finishRequest: (() => void) | undefined;
-  await page.route("**/api/contact", async (route) => {
-    await new Promise<void>((resolve) => {
-      finishRequest = resolve;
-    });
-    await route.fulfill({
-      status: 200,
-      contentType: "application/json",
-      body: JSON.stringify({ success: true, message: "Message sent successfully" }),
-    });
+    await expect(products).toHaveAttribute("aria-expanded", "false");
+    await expect(products).toBeFocused();
   });
-  await page.goto("/contact");
 
-  const fields = page.locator('form input:not([type="hidden"]), form select');
-  await expect(fields).toHaveCount(6);
-  const honeypot = page.locator('input[name="website"]');
-  await expect(honeypot).toHaveAttribute("aria-hidden", "true");
-  await expect(page.getByLabel("Which category best describes your organisation?").locator("option")).toHaveCount(8);
-  await fillContactForm(page);
+  test("Products closes on a click outside", async ({ page }) => {
+    await page.goto("/");
+    await page.getByRole("button", { name: "Products" }).click();
+    await page.mouse.click(700, 500);
+    await expect(page.getByRole("button", { name: "Products" })).toHaveAttribute("aria-expanded", "false");
+  });
 
-  const submit = page.getByRole("button", { name: "Send Message" });
-  await submit.scrollIntoViewIfNeeded();
-  await submit.click();
-  await expect(page.getByRole("button", { name: "Sending..." })).toBeDisabled();
-  finishRequest?.();
-  const dialog = page.getByRole("dialog", { name: "Message sent successfully" });
-  await expect(dialog).toBeVisible();
-  await expect(dialog.getByText("Thank you, Ada.", { exact: false })).toBeVisible();
-  await expect(page.locator("body")).toHaveCSS("overflow", "hidden");
-  await expect(dialog.getByRole("button", { name: "Close dialog" })).toBeFocused();
-  await page.keyboard.press("Escape");
-  await expect(dialog).toHaveCount(0);
-  await expect(submit).toBeFocused();
-  await expect(page.locator("body")).not.toHaveCSS("overflow", "hidden");
+  test("LinkedIn says it opens in a new tab", async ({ page }) => {
+    await page.goto("/");
+    const linkedin = page.getByRole("banner").getByRole("link", { name: "Kubar Labs on LinkedIn (opens in a new tab)" });
+    await expect(linkedin).toHaveAttribute("target", "_blank");
+    await expect(page.getByRole("banner").getByRole("link", { name: "Talk to us" })).toHaveAttribute("href", "/contact");
+  });
 });
 
-test("Contact exposes a mocked server error without making a real delivery", async ({ page }) => {
-  await page.route("**/api/contact", async (route) => {
-    await route.fulfill({
-      status: 500,
-      contentType: "application/json",
-      body: JSON.stringify({ error: "Local mocked failure" }),
-    });
+test.describe("menu sheet below desktop", () => {
+  test.use({ viewport: { width: 390, height: 844 } });
+
+  test("opens as a dialog, keeps focus inside, closes on Escape and returns focus", async ({ page }) => {
+    await page.goto("/");
+    const menu = page.getByRole("button", { name: "Menu" });
+    await menu.click();
+    const sheet = page.getByRole("dialog", { name: "Menu" });
+    await expect(sheet).toBeVisible();
+    await expect(sheet.getByRole("button", { name: "Close" })).toBeFocused();
+    expect(await page.evaluate(() => getComputedStyle(document.documentElement).overflow)).toBe("hidden");
+    for (let i = 0; i < 12; i += 1) await page.keyboard.press("Tab");
+    expect(await sheet.evaluate((el) => el.contains(document.activeElement))).toBe(true);
+    await page.keyboard.press("Escape");
+    await expect(sheet).toBeHidden();
+    await expect(menu).toBeFocused();
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await menu.click();
+    await expectNoAxeViolations(page);
   });
-  await page.goto("/contact");
-  await fillContactForm(page);
-  await page.getByRole("button", { name: "Send Message" }).click();
-  await expect(page.locator(".contact-status-error")).toHaveText(/Something went wrong\. Please try again\./);
 });

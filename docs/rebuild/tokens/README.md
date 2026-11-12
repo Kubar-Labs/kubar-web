@@ -26,7 +26,7 @@ Text styles, and the short tags used in `../copy/*.md`:
 
 | Tag | Figma style | Family, weight | Size / line height (desktop · tablet · mobile) | Tracking, case |
 |---|---|---|---|---|
-| Display | Serif/Display | Newsreader 400 | 56/60 · 64/68 · 46/50 | -0.02em |
+| Display | Serif/Display | Newsreader 400 | 56/60 · 48/52 · 46/50 | -0.02em |
 | H2 | Heading/H2 | Schibsted 500 | 44/50 · 36/42 · 30/36 | -0.01em |
 | H3 | Heading/H3 | Schibsted 500 | 28/34 · 26/32 · 24/30 | -0.005em |
 | H4 | Heading/H4 | Schibsted 500 | 22/28 · 20/26 · 19/25 | 0 |
@@ -50,7 +50,7 @@ Text styles, and the short tags used in `../copy/*.md`:
 
 No italics anywhere. Mono capitals only for State (status words in the record and ledger). Labels never carry section numbers and never sit above a heading.
 
-**Open: tablet display size.** The display token is 56 at desktop (reduced for the two-column hero on 4 Nov) but still 64 at tablet, so the headline is larger on a tablet than on a laptop. Proposal: tablet 48/52. Confirm with Vaibhav before building; tokens.css carries the Figma values (64/68) until then.
+**Tablet display size: decided.** Vaibhav chose 48/52 at tablet on 13 Nov 2026 (the Figma variable still says 64/68). tokens.css carries 48/52.
 
 ## Layout
 

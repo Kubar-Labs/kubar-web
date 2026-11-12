@@ -4,6 +4,12 @@ Extracted from Figma, Home · 1440 (frame 160:6), 13 Nov 2026. The bracketed tag
 
 ## Header
 [UI] Products            (opens a menu: Kubar Protocol, NavDhan SDK)
+  Products menu (Figma 87:46 and 87:93; added to this file 13 Nov 2026, Vaibhav's decision):
+[UI] Kubar Protocol
+[BodyS] For banks, finance companies, insurers and funds
+[UI] NavDhan SDK
+[BodyS] For trade platforms and marketplaces
+  The mobile sheet heads the two rows with [Tag] Products.
 [UI] How it works
 [UI] About
 [UI] Contact

@@ -23,13 +23,16 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 - `next-intl` is wired via the Next plugin: `createNextIntlPlugin("./src/i18n/request.ts")` in `next.config.ts`.
 - Locale is currently hardcoded to `en` in `src/i18n/request.ts`.
-- Translations are YAML loaded from `messages/en.yml` (not JSON).
-- Root provider is in `src/app/layout.tsx` using `NextIntlClientProvider` with `getMessages()`.
+- Translations are JSON, loaded from `messages/en.json` by `src/i18n/request.ts`.
+- Root provider is in `src/app/layout.tsx` (`RouteIntlProvider`, passing only the namespaces client components read).
+
+## The rebuild
+
+- `docs/rebuild/HANDOFF.md` is the brief; `docs/rebuild/copy/` holds the signed-off words. Use them exactly.
 
 ## Styling / UI Stack
 
-- Tailwind CSS v4 is enabled via CSS imports in `src/app/globals.css` (`@import "tailwindcss";`, `tw-animate-css`, `shadcn/tailwind.css`).
-- shadcn/ui is configured with `components.json`; global css path is `src/app/globals.css`.
+- Tailwind CSS v4 via `src/app/globals.css`, which imports the design tokens (`src/app/tokens.css`, a copy of `docs/rebuild/tokens/tokens.css`) and defines one utility per text style (`t-display`, `t-h2`, …). No shadcn, no icon library: icons are `src/components/icons/Icon.tsx`.
 - Utility `cn()` lives at `src/lib/utils.ts`.
 
 ## Notable Toolchain Quirks

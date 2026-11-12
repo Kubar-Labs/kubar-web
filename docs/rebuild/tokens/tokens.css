@@ -91,7 +91,7 @@
 
 @media (min-width: 768px) {
   :root {
-    --text-display: 64px; --text-display--line-height: 68px;
+    --text-display: 48px; --text-display--line-height: 52px; /* tablet 48/52: Vaibhav, 13 Nov 2026 */
     --text-h2: 36px; --text-h2--line-height: 42px;
     --text-h3: 26px; --text-h3--line-height: 32px;
     --text-h4: 20px; --text-h4--line-height: 26px;

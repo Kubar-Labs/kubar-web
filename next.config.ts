@@ -34,6 +34,11 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
+      // Old routes (HANDOFF section 5). Permanent.
+      { source: "/products/navdhan", destination: "/products/navdhan-sdk", permanent: true },
+      { source: "/for-platforms", destination: "/products/navdhan-sdk", permanent: true },
+      { source: "/team", destination: "/about#team", permanent: true },
+      { source: "/privacy", destination: "/legal/privacy", permanent: true },
       {
         source: "/opengraph-image",
         destination: "/media/kubar-labs-og-b2add55b.png",

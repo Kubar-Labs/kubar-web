@@ -1,50 +1,42 @@
 import type { Metadata, Viewport } from "next";
-import localFont from "next/font/local";
 import { getTranslations } from "next-intl/server";
-import { LenisProvider } from "@/providers/LenisProvider";
+import { Footer } from "@/components/layout/Footer";
+import { Header } from "@/components/layout/Header";
+import { SkipLink } from "@/components/layout/SkipLink";
+import { RouteIntlProvider } from "@/i18n/RouteIntlProvider";
 import { socialImage } from "@/app/page-metadata";
+import { fontVariables } from "./fonts";
 import "./globals.css";
 
-const plusJakartaSans = localFont({
-  src: "./fonts/plus-jakarta-sans-latin.woff2",
-  weight: "300 800",
-  variable: "--font-plus-jakarta",
-  display: "swap",
-});
+/** Namespaces the client components (header, error boundary) read. */
+const CLIENT_NAMESPACES = ["header", "system"] as const;
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("site");
 
   return {
     metadataBase: new URL("https://kubar.tech"),
-    title: {
-      default: t("title"),
-      template: "%s | Kubar Labs",
-    },
-    description: t("description"),
-    authors: [{ name: t("author") }],
+    title: t("homeTitle"),
+    description: t("homeDescription"),
     creator: "Kubar Labs",
     publisher: "Kubar Labs",
     alternates: { canonical: "/" },
     openGraph: {
-      title: t("og_title"),
-      description: t("og_description"),
+      title: t("socialTitle"),
+      description: t("homeDescription"),
       type: "website",
-      locale: t("locale"),
+      locale: "en_IN",
       url: "/",
       siteName: "Kubar Labs",
       images: [socialImage],
     },
     twitter: {
       card: "summary_large_image",
-      title: t("og_title"),
-      description: t("twitter_description"),
+      title: t("socialTitle"),
+      description: t("homeDescription"),
       images: [socialImage],
     },
-    robots: {
-      index: true,
-      follow: true,
-    },
+    robots: { index: true, follow: true },
   };
 }
 
@@ -52,6 +44,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
+  themeColor: "#F7F7F5",
 };
 
 export default async function RootLayout({
@@ -59,48 +52,42 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Organisation JSON-LD (HANDOFF section 5). The logo and the social image
+  // move to the new brand in build step 6; the Substack link is dropped.
   const organizationJsonLd = {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: "Kubar Labs",
+    legalName: "Kubar Protocol Private Limited",
     url: "https://kubar.tech",
-    logo: "https://kubar.tech/logo.png",
+    logo: "https://kubar.tech/icon.svg",
     email: "partnerships@kubar.tech",
-    sameAs: [
-      "https://www.linkedin.com/company/kubarlabs/",
-      "https://kubarlabs.substack.com/",
-    ],
+    sameAs: ["https://www.linkedin.com/company/kubarlabs/"],
   };
-  let agentationToolbar: React.ReactNode = null;
 
+  let agentationToolbar: React.ReactNode = null;
   if (process.env.NODE_ENV === "development") {
-    const { AgentationToolbar } = await import(
-      "@/components/agentation/AgentationToolbar"
-    );
+    const { AgentationToolbar } = await import("@/components/agentation/AgentationToolbar");
     agentationToolbar = <AgentationToolbar />;
   }
 
   return (
-    <html
-      lang="en"
-      className={`${plusJakartaSans.variable} dark`}
-      suppressHydrationWarning
-    >
-      <body className="min-h-dvh overflow-x-hidden bg-[#04040c] text-[#f0f0f0] antialiased">
-        <a className="skip-link" href="#main-content">
-          Skip to main content
-        </a>
+    <html lang="en" className={fontVariables}>
+      <body>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify(organizationJsonLd).replace(/</g, "\\u003c"),
           }}
         />
-        <LenisProvider>
-          <div id="main-content" tabIndex={-1}>
+        <RouteIntlProvider namespaces={CLIENT_NAMESPACES}>
+          <SkipLink />
+          <Header />
+          <main id="main-content" tabIndex={-1} className="pt-(--header-height) outline-none">
             {children}
-          </div>
-        </LenisProvider>
+          </main>
+          <Footer />
+        </RouteIntlProvider>
         {agentationToolbar}
       </body>
     </html>

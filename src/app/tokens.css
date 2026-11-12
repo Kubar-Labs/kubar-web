@@ -1,0 +1,174 @@
+/* Copied from docs/rebuild/tokens/tokens.css (fonts come from next/font in layout.tsx).
+   kubar.tech design tokens, exported from Figma (pFO3DEpqVzWCJdPghuq8nU) on 13 Nov 2026.
+   Variable names match the WEB code syntax set on each Figma variable.
+   Breakpoints are a proposal (see README.md): mobile < 768, tablet 768–1199, desktop >= 1200. */
+:root {
+  --petrol-950: #011B23;
+  --petrol-900: #022732;
+  --petrol-850: #163842;
+  --petrol-800: #284751;
+  --petrol-700: #35525B;
+  --petrol-650: #4E686F;
+  --petrol-600: #677D84;
+  --petrol-400: #A6B3B7;
+  --petrol-300: #CCD4D6;
+  --petrol-200: #E1E5E6;
+  --petrol-100: #F0F2F3;
+  --petrol-50: #F7F9F9;
+  --rani-600: #AD2468;
+  --rani-300: #F496BA;
+  --rani-100: #F7E9F0;
+  --paper-100: #F7F7F5;
+  --paper-200: #ECECE8;
+  --white: #FFFFFF;
+  --black: #000000;
+
+  /* Colour, Paper mode (default) */
+  --color-page: var(--paper-100); /* Page ground; petrol inside the band. */
+  --color-inset: var(--paper-200); /* Quiet inset: current row, hover fills, code. */
+  --color-raised: var(--white); /* Form fields, menus, evidence-stack cards. */
+  --color-accent-soft: var(--paper-200); /* Current row ground (now the same as inset in Paper). */
+  --color-ink: var(--petrol-900); /* Body text, headings, data. */
+  --color-ink-muted: var(--petrol-650); /* Sublines, captions, column heads, footnotes (4.5:1 on every ground). */
+  --color-on-action: var(--paper-100); /* Labels on filled buttons. */
+  --color-accent: var(--rani-600); /* Rani: footnote markers, the current state, Illustrative, errors. Never decoration, a button or the logo. */
+  --color-rule: var(--petrol-300); /* Hairlines between rows (decorative). */
+  --color-rule-strong: var(--petrol-900); /* Rules that open and close a register; section hairlines on pages. */
+  --color-rule-control: var(--petrol-600); /* Input and outline-button borders (3:1). */
+  --color-action: var(--petrol-900); /* Filled button. */
+  --color-action-hover: var(--petrol-800); /* Filled button, hover. */
+  --color-action-pressed: var(--petrol-950); /* Filled button, pressed. */
+  --color-action-soft: var(--paper-200); /* Outline button and row hover fill. */
+  --color-focus: var(--rani-600); /* Focus ring: 2 px, offset 2 px. */
+  --color-faint: var(--petrol-400); /* Decoration and placeholders only; never text. */
+  --color-mark: var(--petrol-900); /* The Kubar mark and lock-up. Never rani. */
+  --color-partner-mark: var(--black); /* Programme logos: black on paper, white on petrol. */
+
+
+  /* Type, mobile first */
+  --text-display: 46px; --text-display--line-height: 50px;
+  --text-h2: 30px; --text-h2--line-height: 36px;
+  --text-h3: 24px; --text-h3--line-height: 30px;
+  --text-h4: 19px; --text-h4--line-height: 25px;
+  --text-line: 28px; --text-line--line-height: 36px;
+  --text-lead: 22px; --text-lead--line-height: 30px;
+  --text-figure: 36px; --text-figure--line-height: 40px;
+  --text-record: 17px; --text-record--line-height: 25px;
+  --text-body-lg: 18px; --text-body-lg--line-height: 28px;
+  --text-body: 16px; --text-body--line-height: 25px;
+  --text-body-sm: 15px; --text-body-sm--line-height: 22px;
+  --text-fine: 13px; --text-fine--line-height: 20px;
+  --text-ui-lg: 17px; --text-ui-lg--line-height: 24px;
+  --text-ui: 15px; --text-ui--line-height: 20px;
+  --text-ui-sm: 13px; --text-ui-sm--line-height: 18px;
+  --text-label: 13px; --text-label--line-height: 20px;
+  --text-tag: 11px; --text-tag--line-height: 16px;
+  --text-code: 13px; --text-code--line-height: 20px;
+
+  /* Layout, mobile first */
+  --page-margin: 20px;
+  --grid-gutter: 16px;
+  --grid-columns: 4;
+  --section-space: 48px;
+  --band-space: 72px;
+  --content-max: 350px;
+  --measure: 350px;
+
+  /* Space: Tailwind's 4 px spacing unit; the scale is 0 2 4 8 12 16 20 24 32 40 48 64 80 96 128 160 */
+  --spacing: 4px;
+
+  /* Shape */
+  --rule-hairline: 1px; --rule-strong: 2px; --rule-data-path: 1.5px;
+  --focus-width: 2px; --focus-offset: 2px; --radius-none: 0; --target-min: 44px;
+
+  /* Motion */
+  --duration-hover: 120ms; --duration-disclose: 200ms; --duration-write: 320ms; --duration-scene: 600ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1); --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+}
+
+@media (min-width: 768px) {
+  :root {
+    --text-display: 48px; --text-display--line-height: 52px; /* tablet 48/52: Vaibhav, 13 Nov 2026 */
+    --text-h2: 36px; --text-h2--line-height: 42px;
+    --text-h3: 26px; --text-h3--line-height: 32px;
+    --text-h4: 20px; --text-h4--line-height: 26px;
+    --text-line: 36px; --text-line--line-height: 44px;
+    --text-lead: 26px; --text-lead--line-height: 36px;
+    --text-figure: 46px; --text-figure--line-height: 50px;
+    --text-record: 18px; --text-record--line-height: 26px;
+    --text-body-lg: 19px; --text-body-lg--line-height: 29px;
+    --text-body: 17px; --text-body--line-height: 26px;
+    --text-body-sm: 15px; --text-body-sm--line-height: 22px;
+    --text-fine: 13px; --text-fine--line-height: 20px;
+    --text-ui-lg: 18px; --text-ui-lg--line-height: 24px;
+    --text-ui: 15px; --text-ui--line-height: 20px;
+    --text-ui-sm: 13px; --text-ui-sm--line-height: 18px;
+    --text-label: 13px; --text-label--line-height: 20px;
+    --text-tag: 11px; --text-tag--line-height: 16px;
+    --text-code: 13px; --text-code--line-height: 20px;
+    --page-margin: 40px;
+    --grid-gutter: 24px;
+    --grid-columns: 8;
+    --section-space: 56px;
+    --band-space: 96px;
+    --content-max: 688px;
+    --measure: 640px;
+  }
+}
+
+@media (min-width: 1200px) {
+  :root {
+    --text-display: 56px; --text-display--line-height: 60px;
+    --text-h2: 44px; --text-h2--line-height: 50px;
+    --text-h3: 28px; --text-h3--line-height: 34px;
+    --text-h4: 22px; --text-h4--line-height: 28px;
+    --text-line: 48px; --text-line--line-height: 58px;
+    --text-lead: 30px; --text-lead--line-height: 40px;
+    --text-figure: 56px; --text-figure--line-height: 60px;
+    --text-record: 19px; --text-record--line-height: 27px;
+    --text-body-lg: 20px; --text-body-lg--line-height: 30px;
+    --text-body: 17px; --text-body--line-height: 26px;
+    --text-body-sm: 15px; --text-body-sm--line-height: 22px;
+    --text-fine: 13px; --text-fine--line-height: 20px;
+    --text-ui-lg: 18px; --text-ui-lg--line-height: 24px;
+    --text-ui: 15px; --text-ui--line-height: 20px;
+    --text-ui-sm: 13px; --text-ui-sm--line-height: 18px;
+    --text-label: 13px; --text-label--line-height: 20px;
+    --text-tag: 11px; --text-tag--line-height: 16px;
+    --text-code: 13px; --text-code--line-height: 20px;
+    --page-margin: 80px;
+    --grid-gutter: 24px;
+    --grid-columns: 12;
+    --section-space: 72px;
+    --band-space: 128px;
+    --content-max: 1280px;
+    --measure: 640px;
+  }
+}
+
+/* Petrol mode: the band. Apply to the band's container. */
+[data-ground="petrol"] {
+  --color-page: var(--petrol-900);
+  --color-inset: var(--petrol-950);
+  --color-raised: var(--petrol-850);
+  --color-accent-soft: var(--petrol-800);
+  --color-ink: var(--paper-100);
+  --color-ink-muted: var(--petrol-400);
+  --color-on-action: var(--petrol-900);
+  --color-accent: var(--rani-300);
+  --color-rule: var(--petrol-700);
+  --color-rule-strong: var(--petrol-400);
+  --color-rule-control: var(--petrol-400);
+  --color-action: var(--paper-100);
+  --color-action-hover: var(--paper-200);
+  --color-action-pressed: var(--petrol-300);
+  --color-action-soft: var(--petrol-850);
+  --color-focus: var(--rani-300);
+  --color-faint: var(--petrol-700);
+  --color-mark: var(--white);
+  --color-partner-mark: var(--white);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --duration-hover: 0ms; --duration-disclose: 0ms; --duration-write: 0ms; --duration-scene: 0ms; }
+}

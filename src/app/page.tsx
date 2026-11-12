@@ -1,42 +1,19 @@
-import { Navbar } from "@/components/layout/Navbar";
-import { HeroSection } from "@/components/home/HeroSection";
-import { PartnerMarquee } from "@/components/home/PartnerMarquee";
-import {
-  CompanyThesis,
-  NewBharatTagline,
-  ProductIntroduction,
-} from "@/components/home/ApprovedHomeSections";
-import { LegacyStoryRedirect } from "@/components/home/LegacyStoryRedirect";
-import { EcosystemPartners } from "@/components/home/EcosystemPartners";
-import { BuiltForTrustSection } from "@/components/home/BuiltForTrustSection";
-import { ApprovedFooter } from "@/components/layout/ApprovedFooter";
-import { RouteIntlProvider } from "@/i18n/RouteIntlProvider";
+import { useTranslations } from "next-intl";
 
+/*
+ * Home shell for build step 1: the page's one h1, framed by the header and
+ * footer. The hero (with the record and footnote ¹), the sections and the
+ * pinned story arrive in build step 3.
+ */
 export default function Home() {
+  const t = useTranslations("home");
   return (
-    <RouteIntlProvider
-      namespaces={[
-        "nav",
-        "hero",
-        "cards",
-        "marquee",
-        "home_current",
-        "built_by",
-        "built_for_trust",
-      ]}
-    >
-      <main className="relative">
-        <LegacyStoryRedirect />
-        <Navbar variant="approved" />
-        <HeroSection />
-        <PartnerMarquee />
-        <ProductIntroduction />
-        <CompanyThesis />
-        <BuiltForTrustSection />
-        <NewBharatTagline />
-        <EcosystemPartners />
-        <ApprovedFooter />
-      </main>
-    </RouteIntlProvider>
+    <section className="page-container pt-8 pb-(--section-space) lg:pt-16">
+      <h1 className="t-display max-w-[600px] text-ink">
+        {t.rich("display", {
+          marker: (chunks) => <span className="text-accent">{chunks}</span>,
+        })}
+      </h1>
+    </section>
   );
 }
