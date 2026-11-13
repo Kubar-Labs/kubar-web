@@ -1,5 +1,6 @@
 import { ButtonLink } from "@/components/ui/Button";
 import { TextLink } from "@/components/ui/TextLink";
+import { cn } from "@/lib/utils";
 
 /*
  * Page hero (Figma C4 91:329): the opening of every page but Home. The
@@ -15,12 +16,14 @@ type PageHeroProps = {
   button?: { label: string; href: string };
   link?: { label: string; href: string };
   children?: React.ReactNode;
+  /** A drawing set beside the words at desktop (lower right) and under them below desktop. */
+  aside?: React.ReactNode;
 };
 
-export function PageHero({ kicker, headline, sub, button, link, children }: PageHeroProps) {
+export function PageHero({ kicker, headline, sub, button, link, children, aside }: PageHeroProps) {
   return (
     <section className="border-b border-rule-strong">
-      <div className="page-container pt-8 pb-12 lg:pt-16 lg:pb-[72px]">
+      <div className={cn("page-container relative pt-8 pb-12 lg:pt-16 lg:pb-[72px]", aside && "lg:min-h-[969px]")}>
         <div className="flex flex-col lg:max-w-[1063px]">
           <div className="flex flex-col gap-5">
             {kicker ? <p className="t-label text-ink-muted">{kicker}</p> : null}
@@ -43,6 +46,7 @@ export function PageHero({ kicker, headline, sub, button, link, children }: Page
           ) : null}
           {children}
         </div>
+        {aside ? <div className="pt-10 lg:absolute lg:top-[408px] lg:right-(--page-margin) lg:pt-0">{aside}</div> : null}
       </div>
     </section>
   );

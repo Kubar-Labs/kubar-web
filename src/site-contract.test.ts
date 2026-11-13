@@ -160,6 +160,15 @@ describe("copy matches docs/rebuild/copy word for word", () => {
     }
   });
 
+  it("carries every NavDhan SDK line (03-navdhan-sdk.md)", () => {
+    const skip = new Set(["Illustrative", "Capability", "Step"]);
+    for (const line of pageFragments("03-navdhan-sdk.md")) {
+      if (skip.has(line)) continue;
+      expect(flat.includes(JSON.stringify(line).slice(1, -1)), `missing: ${line}`).toBe(true);
+    }
+    expect(allMessages).not.toMatch(/In build|Where it stands/);
+  });
+
   it("keeps every record document with its Proves line (copy deck 4.2)", () => {
     expect(messages.record.documents).toHaveLength(6);
     for (const doc of messages.record.documents) expect(doc.proves.length).toBeGreaterThan(10);

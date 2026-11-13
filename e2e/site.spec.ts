@@ -6,7 +6,7 @@ import { expect, test, type Page } from "@playwright/test";
  * here (Home in step 3, the product pages and About in step 4, Contact and the
  * legal pages in step 5).
  */
-const publicRoutes = ["/", "/products/kubar-protocol"] as const;
+const publicRoutes = ["/", "/products/kubar-protocol", "/products/navdhan-sdk"] as const;
 const OG_IMAGE = /^https:\/\/kubar\.tech\/media\/kubar-labs-og-b2add55b\.png(?:\?.*)?$/;
 
 async function expectNoAxeViolations(page: Page) {
@@ -310,6 +310,7 @@ test.describe("Home, complete (build step 3)", () => {
     await page.evaluate((y) => window.scrollTo(0, y), top);
     await page.getByRole("link", { name: "Skip the story" }).click();
     await expect(page).toHaveURL(/#closing-line$/);
+    await page.waitForTimeout(500); // let the panel's 200 ms cross-fade finish before measuring contrast
     await expectNoAxeViolations(page);
   });
 
@@ -352,6 +353,27 @@ test.describe("Kubar Protocol (build step 4)", () => {
       await page.setViewportSize({ width, height: 900 });
       await page.emulateMedia({ reducedMotion: "reduce" });
       await page.goto("/products/kubar-protocol");
+      expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
+      await expectNoAxeViolations(page);
+    }
+  });
+});
+
+test.describe("NavDhan SDK (build step 4)", () => {
+  test("carries its metadata and actions, and no status words", async ({ page }) => {
+    await page.goto("/products/navdhan-sdk");
+    await expect(page).toHaveTitle("NavDhan SDK · Kubar Labs");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Trade finance inside the software your exporters already use.");
+    await expect(page.getByRole("link", { name: "Talk about an integration" }).first()).toHaveAttribute("href", "/contact?intent=platform");
+    await expect(page.getByText(/In build|Where it stands/)).toHaveCount(0);
+    await expect(page.getByRole("link", { name: "See Kubar Protocol" })).toHaveAttribute("href", "/products/kubar-protocol");
+  });
+
+  test("at 390 and 768 nothing scrolls sideways and axe is clean", async ({ page }) => {
+    for (const width of [390, 768]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await page.goto("/products/navdhan-sdk");
       expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
       await expectNoAxeViolations(page);
     }

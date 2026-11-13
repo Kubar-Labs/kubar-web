@@ -1082,5 +1082,152 @@
       "orEmail": "Or email",
       "email": "partnerships@kubar.tech"
     }
+  },
+  "navdhanSdk": {
+    "meta": {
+      "title": "NavDhan SDK · Kubar Labs",
+      "description": "Embed NavDhan SDK so your exporters can finance their export receivables inside your platform. Financiers buy; Kubar runs the programme."
+    },
+    "hero": {
+      "kicker": "NavDhan SDK · For trade platforms and marketplaces",
+      "headline": "Trade finance inside the software your exporters already use.",
+      "sub": "Embed NavDhan SDK and your exporters can check eligibility, apply and be paid for their export receivables without leaving your platform. Financiers buy; Kubar runs the programme; you keep the relationship.",
+      "button": "Talk about an integration"
+    },
+    "sketch": {
+      "platform": "Your platform",
+      "shipment": "Shipment",
+      "records": [
+        "Booking",
+        "Invoice",
+        "Inspection report",
+        "Bill of lading"
+      ],
+      "sdk": "NavDhan SDK",
+      "eligibility": "Eligibility check",
+      "rules": [
+        "Buyer country",
+        "Terms",
+        "Size",
+        "Goods"
+      ],
+      "offer": "Indicative offer",
+      "prices": [
+        "All-in price",
+        "The exporter’s own alternative"
+      ],
+      "application": "Application and status",
+      "states": [
+        "Submission",
+        "Documents outstanding",
+        "Purchase",
+        "Settlement"
+      ],
+      "alt": "A schematic of your platform with the NavDhan SDK panel inside it: an eligibility check, an indicative offer with no figures, and the application’s four states."
+    },
+    "exporters": {
+      "heading": "Dollar finance beyond their bank limit.",
+      "lead": "Your exporters can sell their export receivables to institutional financiers, beyond the limits their own banks set, without recourse for the buyer’s credit. They keep their own bank, and their buyers keep their terms."
+    },
+    "platform": {
+      "heading": "Finance in your product, with no credit risk and no money on your books.",
+      "lead": "Your users are financed where they already book and document their shipments. You make no credit decisions and hold no money: financiers buy, insurers cover and Kubar runs the programme. Kubar is paid through the programme, not by the platform, and terms with each platform are agreed in writing."
+    },
+    "does": {
+      "heading": "What you embed.",
+      "columns": [
+        "Capability",
+        "What your exporter, or your platform, sees"
+      ],
+      "rows": [
+        [
+          "Consented onboarding",
+          "Identity and business checks, with consent recorded for each data source"
+        ],
+        [
+          "Shipment and document capture",
+          "Booking, invoice, inspection report and bill of lading, taken from your own records"
+        ],
+        [
+          "Eligibility check",
+          "Whether a shipment fits a programme’s rules: buyer country, terms, size and goods"
+        ],
+        [
+          "Indicative offer",
+          "The all-in price, shown against the exporter’s own alternative"
+        ],
+        [
+          "Application and status",
+          "Submission, documents outstanding, purchase and settlement"
+        ],
+        [
+          "Events for your product",
+          "Status updates you can show your users"
+        ]
+      ]
+    },
+    "runs": {
+      "heading": "How it runs on your platform.",
+      "columns": {
+        "step": "Step",
+        "what": "What happens"
+      },
+      "steps": [
+        "Your exporter books and documents a shipment in your platform, as it does today.",
+        "NavDhan SDK checks the shipment against the programme’s rules and shows an indicative offer.",
+        "With the exporter’s consent, the shipment data and documents go to Kubar Protocol, which assembles the evidence package.",
+        "A financier buys the receivable and pays the exporter’s own bank.",
+        "The buyer pays the financier on the due date. Your platform shows each step as it happens."
+      ],
+      "lanes": [
+        "Your platform",
+        "Kubar Protocol",
+        "The financier"
+      ],
+      "paths": {
+        "sdk": "NavDhan SDK",
+        "consent": "With the exporter’s consent",
+        "evidence": "The evidence package",
+        "status": "Each step as it happens"
+      },
+      "link": "Follow one receivable, shipment to settlement"
+    },
+    "rules": {
+      "heading": "Rules the SDK follows.",
+      "items": [
+        "Kubar never makes the credit decision, holds the money or carries the credit risk.",
+        "Consent is collected and recorded for each data source, in line with the Digital Personal Data Protection Act, 2023 and its Rules.",
+        "Offers show the all-in price and the alternative it’s measured against, with no nudge towards any one financier.",
+        "Data your platform shares is used only for the exporter’s application and its servicing."
+      ]
+    },
+    "behind": {
+      "heading": "Your exporters see NavDhan. Kubar Protocol runs behind it.",
+      "lead": "The programme, the evidence package, insurance and payment matching run on Kubar Protocol, the infrastructure Kubar presents to banks, insurers and funds.",
+      "layers": [
+        {
+          "name": "Your platform",
+          "line": "You keep the relationship"
+        },
+        {
+          "name": "NavDhan SDK",
+          "line": "What you embed"
+        },
+        {
+          "name": "Kubar Protocol",
+          "line": "The programme, the evidence package, insurance and payment matching"
+        },
+        {
+          "name": "Banks, insurers and funds",
+          "line": "Financiers buy, insurers cover"
+        }
+      ],
+      "link": "See Kubar Protocol"
+    },
+    "next": {
+      "heading": "Talk about an integration.",
+      "body": "Tell us about your platform and your exporters, and we’ll take you through what an integration involves.",
+      "button": "Talk about an integration"
+    }
   }
 }
