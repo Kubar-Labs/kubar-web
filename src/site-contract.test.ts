@@ -193,6 +193,23 @@ describe("copy matches docs/rebuild/copy word for word", () => {
     expect(JSON.stringify(messages.howItWorks)).not.toMatch(/In build/);
   });
 
+  it("carries every About line (05-about.md)", () => {
+    const skip = new Set(["Back to text", "Kind", "Entry", "Field", "Planned", "LinkedIn"]);
+    for (const line of pageFragments("05-about.md")) {
+      if (skip.has(line) || line.startsWith("Planned (") || line.startsWith("Technology programmes, grants and credits, then")) continue;
+      const expected = line.replace(/^¹ /, "").replace(/¹$/, "");
+      const parts = expected.split(" · ");
+      if (parts.length > 2) {
+        for (const part of parts) expect(flat.includes(JSON.stringify(part.replace(/ \(.*\)$/, "")).slice(1, -1)), `missing: ${part}`).toBe(true);
+        continue;
+      }
+      expect(flat.includes(JSON.stringify(expected).slice(1, -1)), `missing: ${line}`).toBe(true);
+    }
+    expect(JSON.stringify(messages.about)).not.toMatch(/Where we are|In build|In preparation/);
+    expect(messages.about.team.people).toHaveLength(6);
+    expect(messages.about.team.advisers.rows).toHaveLength(4);
+  });
+
   it("keeps every record document with its Proves line (copy deck 4.2)", () => {
     expect(messages.record.documents).toHaveLength(6);
     for (const doc of messages.record.documents) expect(doc.proves.length).toBeGreaterThan(10);

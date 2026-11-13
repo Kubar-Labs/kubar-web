@@ -6,7 +6,7 @@ import { expect, test, type Page } from "@playwright/test";
  * here (Home in step 3, the product pages and About in step 4, Contact and the
  * legal pages in step 5).
  */
-const publicRoutes = ["/", "/products/kubar-protocol", "/products/navdhan-sdk", "/how-it-works"] as const;
+const publicRoutes = ["/", "/products/kubar-protocol", "/products/navdhan-sdk", "/how-it-works", "/about"] as const;
 const OG_IMAGE = /^https:\/\/kubar\.tech\/media\/kubar-labs-og-b2add55b\.png(?:\?.*)?$/;
 
 async function expectNoAxeViolations(page: Page) {
@@ -441,6 +441,39 @@ test.describe("How it works (build step 4)", () => {
       await page.goto("/how-it-works");
       await expect(page.locator("[data-story-state]")).toHaveCount(0);
       await expect(page.getByText("Kubar is in the data path of every step and in the money path of none.")).toBeVisible();
+      expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
+      await expectNoAxeViolations(page);
+    }
+  });
+});
+
+test.describe("About (build step 4)", () => {
+  test("carries its metadata, the team anchor, both status footnotes and no removed section", async ({ page }) => {
+    await page.goto("/about");
+    await expect(page).toHaveTitle("About · Kubar Labs");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Foundations first.");
+    await expect(page.locator("#team")).toHaveCount(1);
+    await expect(page.locator("#team ul").first().locator("li")).toHaveCount(6);
+    await expect(page.getByRole("link", { name: "Rayansh Srivastava on LinkedIn (opens in a new tab)" })).toHaveAttribute("target", "_blank");
+    await expect(page.locator("#fn-1")).toHaveCount(1);
+    await expect(page.locator("#fn-1-gift")).toHaveCount(1);
+    await expect(page.getByText("Planned", { exact: true })).toHaveCount(1);
+    await expect(page.getByText("Where we are")).toHaveCount(0);
+    await expect(page.getByRole("link", { name: "Email us (partnerships@kubar.tech)" })).toHaveAttribute("href", "mailto:partnerships@kubar.tech");
+    await expect(page.getByRole("link", { name: "Follow one receivable through all five" })).toHaveAttribute("href", "/how-it-works");
+  });
+
+  test("the old /team address lands on the team", async ({ page }) => {
+    await page.goto("/team");
+    await expect(page).toHaveURL(/\/about#team$/);
+    await expect(page.getByRole("heading", { name: "The team." })).toBeInViewport();
+  });
+
+  test("at 390 and 768 nothing scrolls sideways and axe is clean", async ({ page }) => {
+    for (const width of [390, 768]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await page.goto("/about");
       expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
       await expectNoAxeViolations(page);
     }

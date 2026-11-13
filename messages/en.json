@@ -1600,5 +1600,189 @@
         }
       ]
     }
+  },
+  "about": {
+    "meta": {
+      "title": "About · Kubar Labs",
+      "description": "Kubar Labs is building the institutional exchange for cross-border trade finance, foundations first. The team and our standing."
+    },
+    "hero": {
+      "kicker": "About Kubar Labs",
+      "headline": "Foundations first.",
+      "sub": "Kubar Labs is building the institutional exchange<marker></marker> for cross-border trade finance, from GIFT City. We started with the asset: export receivables an international financier can buy again and again, insured in its own name. A venue needs something financiers will bid on, so we build that first: receivables with cover, documents, a clean payment path and a history."
+    },
+    "order": {
+      "heading": "What we’re building, in order.",
+      "label": "Five foundations, built from the bottom up",
+      "slabs": [
+        {
+          "name": "The venue",
+          "line": "An ITFS for institutional financiers only, with Kubar as its neutral operator",
+          "where": "Planned",
+          "planned": true
+        },
+        {
+          "name": "A record of performance",
+          "line": "The loss history, receivable by receivable"
+        },
+        {
+          "name": "A clean payment path",
+          "line": "Payment matching, with the money moving only between banks"
+        },
+        {
+          "name": "Standing buyers",
+          "line": "Programmes: a financier underwrites once and buys every receivable that fits"
+        },
+        {
+          "name": "A common standard for what qualifies",
+          "line": "The programme rules and the evidence package"
+        }
+      ],
+      "link": "Follow one receivable through all five"
+    },
+    "team": {
+      "heading": "The team.",
+      "people": [
+        {
+          "id": "vaibhav-sharma",
+          "name": "Vaibhav Sharma",
+          "role": "Founder and CEO",
+          "linkedin": "https://www.linkedin.com/in/fenestbuc/",
+          "line": "Leads product, institutional partnerships and regulatory work."
+        },
+        {
+          "id": "rayansh-srivastava",
+          "name": "Rayansh Srivastava",
+          "role": "Co-founder and CTO",
+          "linkedin": "https://www.linkedin.com/in/rayansh-srivastava-419951219/",
+          "line": "Runs Kubar’s technology, after five years building AI systems, including importer-side logistics at Everest and fraud detection at Oodles."
+        },
+        {
+          "id": "keshav-dudani",
+          "name": "Keshav Dudani",
+          "role": "Founding Engineer",
+          "linkedin": "https://www.linkedin.com/in/keshav-dudani-617295251/",
+          "line": "Builds the document intelligence behind the evidence package and leads exporter engagement, after building financial NLP systems for fund managers."
+        },
+        {
+          "id": "manchit-sanan",
+          "name": "Manchit Sanan",
+          "role": "Compliance Lead",
+          "linkedin": "https://www.linkedin.com/in/manchit-sanan-6b9705158/",
+          "line": "Leads compliance, with 17+ years building systems in regulated industries."
+        },
+        {
+          "id": "divyesh-reddy",
+          "name": "Divyesh Reddy",
+          "role": "Partnerships Lead",
+          "linkedin": "https://www.linkedin.com/in/divyesh-reddy/",
+          "line": "Runs partnerships with trade platforms and financiers, with a background in buyer-risk intelligence and MSME credit analytics."
+        },
+        {
+          "id": "kavish-mahajan",
+          "name": "Kavish Mahajan",
+          "role": "Creative Director",
+          "linkedin": "https://www.linkedin.com/in/koverner/",
+          "line": "Leads brand and product design, after founding and scaling a design agency."
+        }
+      ],
+      "linkedin": "LinkedIn",
+      "linkedinLabel": "{name} on LinkedIn (opens in a new tab)",
+      "advisers": {
+        "heading": "Advisers",
+        "columns": [
+          "Adviser",
+          "Background"
+        ],
+        "rows": [
+          [
+            "Tushar Jaruhar",
+            "Former pricing actuary, Zurich Insurance. Advises on insurance pricing and risk."
+          ],
+          [
+            "Shridhar Sethuram",
+            "25+ years in private equity. Advises on capital markets."
+          ],
+          [
+            "Amit Sagar",
+            "Lead System Architect, Bank of England. Advises on settlement and system architecture."
+          ],
+          [
+            "Debayan Gupta",
+            "Associate Professor of Computer Science, Ashoka University. Advises on data security."
+          ]
+        ],
+        "note": "Advisers serve in a personal capacity."
+      }
+    },
+    "standing": {
+      "heading": "Standing and memberships.",
+      "lead": "Kubar acts as the financier’s origination and servicing agent. It never holds the money or the credit risk."
+    },
+    "gift": {
+      "heading": "Why GIFT City.",
+      "lead": "GIFT City is India’s international financial services centre. Banks’ units there work in foreign currency and can buy export receivables under their own licences and credit policies, which is how Programme 1 runs. It is also home to the framework for trade-finance platforms (ITFS) under which Kubar’s own venue is planned<marker></marker>. Kubar works from an office in GIFT City."
+    },
+    "band": {
+      "line": "Kubar connects Indian trade flows to global institutional capital through GIFT City."
+    },
+    "company": {
+      "heading": "The company.",
+      "columns": [
+        "Field",
+        "Entry"
+      ],
+      "rows": [
+        [
+          "Brand",
+          "Kubar Labs"
+        ],
+        [
+          "Legal entity",
+          "Kubar Protocol Private Limited, incorporated in India"
+        ],
+        [
+          "CIN",
+          "U70200WB2024PTC274850"
+        ],
+        [
+          "Founded",
+          "2024"
+        ],
+        [
+          "Registered office",
+          "Paras Market, Station Road, Barakar, West Bengal 713324"
+        ],
+        [
+          "Office",
+          "GIFT City, Gandhinagar"
+        ],
+        [
+          "Recognition",
+          "DPIIT-recognised startup"
+        ],
+        [
+          "Products",
+          "Kubar Protocol, for institutions · NavDhan SDK, for trade platforms"
+        ]
+      ]
+    },
+    "next": {
+      "heading": "Talk to us.",
+      "links": [
+        {
+          "label": "Start a programme conversation",
+          "href": "/contact?intent=institution"
+        },
+        {
+          "label": "Talk about an integration",
+          "href": "/contact?intent=platform"
+        },
+        {
+          "label": "Email us (partnerships@kubar.tech)",
+          "href": "mailto:partnerships@kubar.tech"
+        }
+      ]
+    }
   }
 }

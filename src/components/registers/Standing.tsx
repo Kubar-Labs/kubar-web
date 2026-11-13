@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
  */
 type Row = { kind: string; entry: string };
 
-export function Standing({ className }: { className?: string }) {
+export function Standing({ className, narrowKind = false }: { className?: string; /** About: Kind takes 217 of 845, as in the company register. */ narrowKind?: boolean }) {
   const t = useTranslations("standing");
   const rows = t.raw("rows") as Row[];
   const last = rows.length - 1;
@@ -18,10 +18,10 @@ export function Standing({ className }: { className?: string }) {
     <table role="table" className={cn("w-full table-fixed border-collapse text-left max-lg:block", className)}>
       <thead role="rowgroup" className="max-lg:sr-only">
         <tr role="row" className="border-b-2 border-rule-strong">
-          <th role="columnheader" scope="col" className="t-tag w-1/2 pr-6 pb-2 font-medium text-ink-muted">
+          <th role="columnheader" scope="col" className={cn("t-tag pr-6 pb-2 font-medium text-ink-muted", narrowKind ? "lg:w-[25.68%]" : "w-1/2")}>
             {t("columns.kind")}
           </th>
-          <th role="columnheader" scope="col" className="t-tag w-1/2 pb-2 font-medium text-ink-muted">
+          <th role="columnheader" scope="col" className={cn("t-tag pb-2 font-medium text-ink-muted", !narrowKind && "w-1/2")}>
             {t("columns.entry")}
           </th>
         </tr>

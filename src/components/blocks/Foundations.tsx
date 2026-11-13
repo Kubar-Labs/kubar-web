@@ -14,7 +14,8 @@ import { cn } from "@/lib/utils";
  * footnote ¹) on top; at desktop a bottom-up arrow runs in the gutter.
  */
 export type ComparisonRow = { label: string; cells: string[]; footnoteOnLast?: boolean; accentLast?: boolean };
-export type Slab = { name: string; line: string; where: string; planned?: boolean };
+/** `where` is the state reference on Home; on About only the venue has one ("Planned"). */
+export type Slab = { name: string; line: string; where?: string; planned?: boolean };
 type FootnoteRef = (suffix: string) => { target: string; refId: string };
 
 export function ExchangeComparison({
@@ -106,11 +107,14 @@ export function FoundationsStack({
   label,
   slabs,
   footnote,
+  statusOnly = false,
   className,
 }: {
   label: string;
   slabs: Slab[];
   footnote: FootnoteRef;
+  /** About: no state references; the venue alone keeps its status word. */
+  statusOnly?: boolean;
   className?: string;
 }) {
   return (
@@ -140,10 +144,14 @@ export function FoundationsStack({
                   {slab.planned ? <FootnoteMarker n={1} {...footnote("stack-line")} /> : null}
                 </p>
               </div>
-              <p className="t-tag shrink-0 whitespace-nowrap text-ink lg:pt-[18px]">
-                {slab.where}
-                {slab.planned ? <FootnoteMarker n={1} {...footnote("stack-where")} /> : null}
-              </p>
+              {slab.where && statusOnly ? (
+                <p className="t-state shrink-0 whitespace-nowrap text-ink-muted">{slab.where}</p>
+              ) : slab.where ? (
+                <p className="t-tag shrink-0 whitespace-nowrap text-ink lg:pt-[18px]">
+                  {slab.where}
+                  {slab.planned ? <FootnoteMarker n={1} {...footnote("stack-where")} /> : null}
+                </p>
+              ) : null}
             </li>
           ))}
         </ol>
