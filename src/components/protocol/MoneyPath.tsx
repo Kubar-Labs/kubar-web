@@ -1,6 +1,7 @@
 import { KubarMark } from "@/components/brand/KubarMark";
 import { Register } from "@/components/registers/Register";
 import { MoneyArrow } from "@/components/story/LanesDiagram";
+import { cn } from "@/lib/utils";
 
 /*
  * Money path (Figma C4 120:1167), Kubar Protocol and How it works: Kubar,
@@ -20,6 +21,7 @@ export function MoneyPath({
   under,
   columns,
   alt,
+  wide = false,
   className,
 }: {
   /** Kubar, the buyer, the financier, the exporter's bank. */
@@ -30,12 +32,14 @@ export function MoneyPath({
   under: string;
   columns: { payment: string; from: string; to: string };
   alt: string;
+  /** How it works: the drawing has 845 px, so the labels on the right run to 309. */
+  wide?: boolean;
   className?: string;
 }) {
   const routes: [number, number][] = [[2, 3], [1, 2], [2, 3]];
   return (
     <div className={className}>
-      <div role="img" aria-label={`${alt} ${payments.join(". ")}. ${kubarNote}.`} className="relative hidden h-[380px] w-[800px] lg:block">
+      <div role="img" aria-label={`${alt} ${payments.join(". ")}. ${kubarNote}.`} className={cn("relative hidden h-[380px] lg:block", wide ? "w-[845px]" : "w-[800px]")}>
         {LIFELINES.map((x) => (
           <span key={x} className="absolute top-[76px] h-[264px] w-px bg-rule" style={{ left: x }} />
         ))}
@@ -56,9 +60,9 @@ export function MoneyPath({
           <MoneyArrow from={318} to={527} y={228} />
           <MoneyArrow from={529} to={738} y={308} />
         </svg>
-        <p className="t-body-sm absolute top-[118px] left-[536px] w-[264px] text-ink">{payments[0]}</p>
-        <p className="t-body-sm absolute top-[198px] left-[325px] w-[200px] text-ink">{payments[1]}</p>
-        <p className="t-body-sm absolute top-[256px] left-[536px] w-[264px] text-ink">{payments[2]}</p>
+        <p className={cn("t-body-sm absolute bottom-[240px] left-[536px] text-ink", wide ? "w-[309px]" : "w-[264px]")}>{payments[0]}</p>
+        <p className="t-body-sm absolute bottom-[160px] left-[325px] w-[200px] text-ink">{payments[1]}</p>
+        <p className={cn("t-body-sm absolute bottom-[80px] left-[536px] text-ink", wide ? "w-[309px]" : "w-[264px]")}>{payments[2]}</p>
         <p className="t-tag absolute top-[218px] left-[21px] w-[178px] text-accent">{kubarNote}</p>
       </div>
       <div className="flex flex-col gap-4 lg:hidden">

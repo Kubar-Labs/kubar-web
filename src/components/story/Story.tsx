@@ -22,7 +22,16 @@ import { cn } from "@/lib/utils";
  * every other case (and without JavaScript, and for screen readers) the
  * ledger register passed as `children` carries the same eight states.
  */
-type LedgerState = { no: string; state: string; what: string; party: string | null; data: string | null; money: string | null };
+export type LedgerState = {
+  no: string;
+  state: string;
+  what: string;
+  party: string | null;
+  data: string | null;
+  money: string | null;
+  /** How it works only: the documents behind the step. */
+  documents?: string | null;
+};
 
 const STEP = 420; // px of scroll per state
 const QUERY = "(min-width: 1200px) and (min-height: 820px) and (prefers-reduced-motion: no-preference)";
@@ -48,17 +57,24 @@ function PathLine({ kind }: { kind: "data" | "money" }) {
 export function Story({
   skipTo,
   footnote,
+  states: ownStates,
+  variant = "home",
   children,
 }: {
   /** Id of the section after the story. */
   skipTo: string;
   footnote: { target: string; refId: string };
+  /** The page's own eight states; Home's ledger when omitted. */
+  states?: LedgerState[];
+  /** "howItWorks": the sentence in Sans/Body, the documents in place of the party, no link to How it works. */
+  variant?: "home" | "howItWorks";
   /** The ledger register. */
   children: React.ReactNode;
 }) {
   const t = useTranslations("story");
   const ledger = useTranslations("ledger");
-  const states = ledger.raw("states") as LedgerState[];
+  const states = ownStates ?? (ledger.raw("states") as LedgerState[]);
+  const long = variant === "howItWorks";
   const trackRef = useRef<HTMLDivElement>(null);
   const [enabled, setEnabled] = useState(false);
   const [state, setState] = useState(1);
@@ -121,8 +137,17 @@ export function Story({
                     {planned ? <FootnoteMarker n={1} {...footnote} /> : null}
                   </span>
                 </p>
-                <p className="t-body-lg min-h-[90px] pt-4 text-ink">{current.what}</p>
-                <p className="t-tag pt-3 pb-6 text-ink-muted">{t("party", { party: planned ? t("planned") : (current.party ?? "") })}</p>
+                <p className={cn("pt-4 text-ink", long ? "t-body" : "t-body-lg min-h-[90px]")}>{current.what}</p>
+                {long && current.documents ? (
+                  <div className="flex flex-col gap-1 pt-3 pb-6">
+                    <p className="t-tag text-ink-muted">{t("documents")}</p>
+                    <p className="t-body text-ink">{current.documents}</p>
+                  </div>
+                ) : (
+                  <p className="t-tag pt-3 pb-6 text-ink-muted">
+                    {t("party", { party: long ? (current.party ?? "") : planned ? t("planned") : (current.party ?? "") })}
+                  </p>
+                )}
                 <div className="flex gap-3 border-t border-rule py-4">
                   <PathLine kind="data" />
                   <div className="flex min-w-0 flex-1 flex-col gap-2">
@@ -137,16 +162,16 @@ export function Story({
                       <span className="t-tag text-ink">{t("moneyPath")}</span>
                       <span className="t-label text-accent">{t("holdsNone")}</span>
                     </p>
-                    <p className="t-body min-h-[78px] text-ink">{money ?? "—"}</p>
+                    <p className={cn("t-body text-ink", !long && "min-h-[78px]")}>{money ?? "—"}</p>
                   </div>
                 </div>
               </div>
               <div aria-hidden="true" className="h-0.5 bg-rule-strong" />
               <div className="flex items-center gap-12 pt-8">
                 <TextLink href={`#${skipTo}`} kind="anchor">{t("skip")}</TextLink>
-                <TextLink href="/how-it-works" kind="arrow">{t("seeHow")}</TextLink>
+                {long ? null : <TextLink href="/how-it-works" kind="arrow">{t("seeHow")}</TextLink>}
               </div>
-              <ul aria-hidden="true" className="flex flex-col gap-3 pt-10">
+              <ul aria-hidden="true" className={cn("flex flex-col gap-3", long ? "pt-16" : "pt-10")}>
                 <li className="flex items-center gap-3"><PathLine kind="data" /><span className="t-tag text-ink-muted">{t("legend.data")}</span></li>
                 <li className="flex items-center gap-3"><PathLine kind="money" /><span className="t-tag text-ink-muted">{t("legend.money")}</span></li>
                 <li className="flex items-center gap-3"><span className="h-3 w-7 bg-action" /><span className="t-tag text-ink-muted">{t("legend.kubar")}</span></li>

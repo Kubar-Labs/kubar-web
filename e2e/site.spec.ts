@@ -6,7 +6,7 @@ import { expect, test, type Page } from "@playwright/test";
  * here (Home in step 3, the product pages and About in step 4, Contact and the
  * legal pages in step 5).
  */
-const publicRoutes = ["/", "/products/kubar-protocol", "/products/navdhan-sdk"] as const;
+const publicRoutes = ["/", "/products/kubar-protocol", "/products/navdhan-sdk", "/how-it-works"] as const;
 const OG_IMAGE = /^https:\/\/kubar\.tech\/media\/kubar-labs-og-b2add55b\.png(?:\?.*)?$/;
 
 async function expectNoAxeViolations(page: Page) {
@@ -374,6 +374,73 @@ test.describe("NavDhan SDK (build step 4)", () => {
       await page.setViewportSize({ width, height: 900 });
       await page.emulateMedia({ reducedMotion: "reduce" });
       await page.goto("/products/navdhan-sdk");
+      expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
+      await expectNoAxeViolations(page);
+    }
+  });
+});
+
+test.describe("How it works (build step 4)", () => {
+  test("carries its metadata, routes, glossary and one status footnote", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/how-it-works");
+    await expect(page).toHaveTitle("How it works · Kubar Labs");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("From the port to the record.");
+    await expect(page.getByRole("link", { name: "For financial institutions" })).toHaveAttribute("href", "/products/kubar-protocol");
+    await expect(page.getByRole("link", { name: "Who holds what" })).toHaveAttribute("href", "/products/kubar-protocol#who-holds-what");
+    await expect(page.getByRole("link", { name: "Talk about an integration" })).toHaveAttribute("href", "/contact?intent=platform");
+    await expect(page.locator("#fn-1")).toHaveCount(1);
+    await expect(page.locator("#term-itfs")).toContainText("targeted for 2027");
+    await expect(page.locator("[id^=term-]")).toHaveCount(19);
+    await expect(page.getByText("In build")).toHaveCount(0);
+  });
+
+  test("the anchor from Who holds what lands on Kubar Protocol's section", async ({ page }) => {
+    await page.goto("/products/kubar-protocol#who-holds-what");
+    await expect(page.locator("#who-holds-what")).toBeInViewport();
+  });
+
+  test("the rail steps through eight states with the documents line, and skips to the evidence", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/how-it-works");
+    const story = page.locator("[data-story-state]");
+    await expect(story).toHaveAttribute("data-story-state", "1");
+    await expect(page.getByRole("link", { name: "See how it works" })).toHaveCount(0);
+    const top = await story.evaluate((el) => el.getBoundingClientRect().top + window.scrollY);
+    await page.evaluate((y) => window.scrollTo(0, y), top - 105 + 420 * 5 + 100);
+    await expect(story).toHaveAttribute("data-story-state", "6");
+    await expect(story.getByText("Payment reference; closure of the shipping bill")).toBeVisible();
+    await page.evaluate((y) => window.scrollTo(0, y), top);
+    await page.getByRole("link", { name: "Skip the story" }).click();
+    await expect(page).toHaveURL(/#evidence$/);
+    // Let the evidence stack arrive (the record waits at 40% until it has), then check state 06.
+    await page.locator("#evidence ol").scrollIntoViewIfNeeded();
+    await page.waitForTimeout(1500);
+    await page.evaluate((y) => window.scrollTo(0, y), top - 105 + 420 * 5 + 100);
+    await expect(story).toHaveAttribute("data-story-state", "6");
+    await page.waitForTimeout(500);
+    await expectNoAxeViolations(page);
+  });
+
+  test("the evidence stack arrives and ends fully shown", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/how-it-works");
+    await page.locator("#evidence").scrollIntoViewIfNeeded();
+    await page.locator("#evidence ol").scrollIntoViewIfNeeded();
+    const cards = page.locator("#evidence ol > li");
+    await expect(cards).toHaveCount(8);
+    await expect(cards.last()).toContainText("The financier owns the receivable");
+    await expect(cards.last()).toHaveCSS("opacity", "1");
+    await expect(page.getByText("Record RCV-0001 · Evidence package, 8 of 8").locator("xpath=../..")).toHaveCSS("opacity", "1");
+  });
+
+  test("at 390 and 768 the ledger shows, nothing scrolls sideways and axe is clean", async ({ page }) => {
+    for (const width of [390, 768]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await page.goto("/how-it-works");
+      await expect(page.locator("[data-story-state]")).toHaveCount(0);
+      await expect(page.getByText("Kubar is in the data path of every step and in the money path of none.")).toBeVisible();
       expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
       await expectNoAxeViolations(page);
     }

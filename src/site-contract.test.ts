@@ -169,6 +169,30 @@ describe("copy matches docs/rebuild/copy word for word", () => {
     expect(allMessages).not.toMatch(/In build|Where it stands/);
   });
 
+  it("carries every How it works line (04-how-it-works.md)", () => {
+    const skip = new Set(["Back to text", "Illustrative", "Term", "Meaning", "Party", "Does", "Signs", "State", "Skip the story", "Settled", "Purchased"]);
+    const lanes = /^(Lane heads|Row numbers|Legend|Path labels)/;
+    for (const line of pageFragments("04-how-it-works.md")) {
+      if (skip.has(line) || lanes.test(line)) continue;
+      const parts = line.split(" · ");
+      if (parts.length > 2) {
+        // A row of separate labels (the record's elements, the money path's parties).
+        for (const part of parts) expect(flat.includes(JSON.stringify(part).slice(1, -1)), `missing: ${part}`).toBe(true);
+        continue;
+      }
+      const expected = line.replace(/^(\d\d) of 08$/, "{n} of 08").replace(/^¹ /, "").replace(/^Doc \d\d$/, "Doc {no}");
+      expect(flat.includes(JSON.stringify(expected).slice(1, -1)), `missing: ${line}`).toBe(true);
+    }
+    const copy = read("docs/rebuild/copy/04-how-it-works.md");
+    for (const state of messages.howItWorks.rail.states) {
+      expect(copy, `state ${state.no}`).toContain(state.what);
+      if (state.data) expect(copy, `state ${state.no} data`).toContain(state.data);
+      if (state.money) expect(copy, `state ${state.no} money`).toContain(state.money);
+    }
+    expect(messages.howItWorks.terms.rows).toHaveLength(19);
+    expect(JSON.stringify(messages.howItWorks)).not.toMatch(/In build/);
+  });
+
   it("keeps every record document with its Proves line (copy deck 4.2)", () => {
     expect(messages.record.documents).toHaveLength(6);
     for (const doc of messages.record.documents) expect(doc.proves.length).toBeGreaterThan(10);

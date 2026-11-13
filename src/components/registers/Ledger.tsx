@@ -26,6 +26,8 @@ type LedgerProps = {
   current?: string;
   /** Footnote ids for the planned state's marker. */
   footnote: { target: string; refId: string };
+  /** The page's own eight states; Home's when omitted. */
+  states?: State[];
   className?: string;
 };
 
@@ -55,9 +57,9 @@ function PathCell({ text, planned }: { text: string | null; planned?: string }) 
   );
 }
 
-export function Ledger({ current = "05", footnote, className }: LedgerProps) {
+export function Ledger({ current = "05", footnote, states: ownStates, className }: LedgerProps) {
   const t = useTranslations("ledger");
-  const states = t.raw("states") as State[];
+  const states = ownStates ?? (t.raw("states") as State[]);
   const last = states.length - 1;
   const cell = "align-baseline lg:py-4 lg:pr-4 lg:last:pr-0";
   const mobileLabel = "t-tag lg:hidden";
@@ -127,7 +129,7 @@ export function Ledger({ current = "05", footnote, className }: LedgerProps) {
                   isPlanned ? "t-state text-ink-muted" : "t-tag text-ink-muted",
                 )}
               >
-                {isPlanned ? t("planned") : row.party}
+                {isPlanned ? (row.party ?? t("planned")) : row.party}
               </td>
               <td role="cell" className={cn(cell, "max-lg:col-start-2 max-lg:flex max-lg:flex-col max-lg:gap-1")}>
                 <span aria-hidden="true" className={cn(mobileLabel, "text-accent")}>

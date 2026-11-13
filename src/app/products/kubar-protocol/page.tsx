@@ -135,7 +135,7 @@ export default function KubarProtocol() {
         <SectionHead id="loss-heading" heading={t("lossHistory.heading")} lead={t("lossHistory.lead")} />
       </Section>
 
-      <Section labelledBy="holds-heading" className="flex flex-col gap-10 lg:gap-16">
+      <Section id="who-holds-what" labelledBy="holds-heading" className="flex flex-col gap-10 lg:gap-16">
         <SectionHead id="holds-heading" heading={t("holds.heading")} layout="wide" />
         <Register
           className="lg:max-w-[1062px]"

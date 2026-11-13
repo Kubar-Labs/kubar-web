@@ -613,7 +613,8 @@
       "s6balance": "The balance",
       "s7": "Added to the loss history",
       "s8": "Registry entry, planned"
-    }
+    },
+    "documents": "Documents"
   },
   "kubarProtocol": {
     "meta": {
@@ -1228,6 +1229,376 @@
       "heading": "Talk about an integration.",
       "body": "Tell us about your platform and your exporters, and we’ll take you through what an integration involves.",
       "button": "Talk about an integration"
+    }
+  },
+  "howItWorks": {
+    "meta": {
+      "title": "How it works · Kubar Labs",
+      "description": "Follow one illustrative export receivable from shipment to settlement: who does what, the documents behind each step and where the money moves."
+    },
+    "hero": {
+      "kicker": "How it works",
+      "headline": "From the port to the record.",
+      "sub": "One illustrative receivable, followed step by step: who does what, the documents behind it and where the money moves. A $225k rice invoice to a buyer in the UAE, due 75 days after shipment.",
+      "institutions": "For financial institutions",
+      "platforms": "For trade platforms"
+    },
+    "rail": {
+      "heading": "What happens to a receivable, in order.",
+      "closing": "Kubar is in the data path of every step and in the money path of none.",
+      "states": [
+        {
+          "no": "01",
+          "state": "Shipped",
+          "what": "The exporter ships the rice and issues its invoice. The invoice carries the assignment notice: the instruction to pay the financier’s account.",
+          "party": "The exporter, and its trade platform if it uses one",
+          "data": "Shipment and invoice data received",
+          "money": null,
+          "documents": null
+        },
+        {
+          "no": "02",
+          "state": "Documented",
+          "what": "Kubar checks the shipping bill against the invoice (goods, quantity, value and buyer), checks who the exporter and the buyer are, runs the programme’s rules and files everything in one evidence package. The exporter’s bank’s no-objection is on file.",
+          "party": "Kubar",
+          "data": "Evidence package assembled and checked",
+          "money": null,
+          "documents": null
+        },
+        {
+          "no": "03",
+          "state": "Insured",
+          "what": "The buyer’s limit with the insurer is checked for headroom. The cover is in the financier’s name.",
+          "party": "The insurer",
+          "data": "Limit and headroom confirmed",
+          "money": null,
+          "documents": null
+        },
+        {
+          "no": "04",
+          "state": "Acknowledged",
+          "what": "The buyer acknowledges the notice: it will pay the financier’s account.",
+          "party": "The buyer",
+          "data": "Acknowledgement filed",
+          "money": null,
+          "documents": null
+        },
+        {
+          "no": "05",
+          "state": "Purchased",
+          "what": "The financier accepts the receivable under its programme limit, without recourse for the buyer’s credit, and pays the purchase price. The credit decision is the financier’s own.",
+          "party": "The financier",
+          "data": "Package delivered; purchase recorded",
+          "money": "The financier pays 90% of face to the exporter’s own bank",
+          "documents": "Purchase confirmation"
+        },
+        {
+          "no": "06",
+          "state": "Settled",
+          "what": "On the due date the buyer pays the financier’s collection account, quoting the receivable’s reference. Kubar matches the payment. The financier pays the exporter the balance, less its discount and charges, and the exporter’s bank closes the shipping bill. Where the exporter qualifies, the government’s interest subvention on export factoring is filed on the financier’s data and paid to the exporter.",
+          "party": "The buyer, the financier and the exporter’s bank",
+          "data": "Payment matched; closure tracked",
+          "money": "The buyer pays $225,000 to the financier; the financier pays the exporter the balance, less its discount and charges",
+          "documents": "Payment reference; closure of the shipping bill"
+        },
+        {
+          "no": "07",
+          "state": "Recorded",
+          "what": "The outcome joins the loss history, by buyer, exporter and commodity.",
+          "party": "Kubar",
+          "data": "Added to the loss history",
+          "money": null,
+          "documents": null
+        },
+        {
+          "no": "08",
+          "state": "Transferred, later",
+          "what": "Once the venue is registered, a receivable can move from one institutional financier to another, with a registry entry in place of a fresh assignment.",
+          "party": "Institutional financiers",
+          "data": null,
+          "money": null,
+          "documents": null
+        }
+      ]
+    },
+    "evidence": {
+      "heading": "Who relies on the record.",
+      "lead": "The financier buys on it. The insurer prices on it. The exporter’s bank closes the shipping bill against it. And where the exporter qualifies, the government’s interest subvention is filed on it.",
+      "docLabel": "Doc {no}",
+      "documents": [
+        {
+          "no": "01",
+          "name": "Commercial invoice"
+        },
+        {
+          "no": "02",
+          "name": "Shipping bill"
+        },
+        {
+          "no": "03",
+          "name": "Bill of lading, electronic where issued"
+        },
+        {
+          "no": "04",
+          "name": "Inspection report, where the programme requires one"
+        },
+        {
+          "no": "05",
+          "name": "Credit-insurance cover"
+        },
+        {
+          "no": "06",
+          "name": "Buyer’s acknowledgement"
+        },
+        {
+          "no": "07",
+          "name": "No-objection"
+        },
+        {
+          "no": "08",
+          "name": "Purchase confirmation"
+        }
+      ],
+      "from": "From · The financier",
+      "proves": "The financier owns the receivable",
+      "record": "Record RCV-0001 · Evidence package, 8 of 8",
+      "elements": [
+        "Commercial invoice",
+        "Shipping bill",
+        "Bill of lading",
+        "Inspection report",
+        "Credit-insurance cover",
+        "Buyer’s acknowledgement",
+        "No-objection",
+        "Purchase confirmation"
+      ],
+      "stateLabel": "State",
+      "counter": "05 of 08",
+      "stateNo": "05",
+      "state": "Purchased",
+      "after": [
+        "Each element carries its source, its time and who signed it. Any change after signing shows.",
+        "The record is built on Corda, a permissioned ledger: one shared record of each receivable, who holds which rights after the purchase, and its payment and loss history."
+      ]
+    },
+    "money": {
+      "heading": "Where the money moves.",
+      "parties": [
+        "Kubar",
+        "Buyer, UAE",
+        "Financier",
+        "Exporter’s bank"
+      ],
+      "payments": [
+        "Purchase price, at purchase (90% of face)",
+        "Face value, on the due date",
+        "Deferred purchase price: the balance, less discount and charges"
+      ],
+      "kubarNote": "No account, no payment, no release",
+      "under": "Every payment carries the receivable’s reference, and Kubar matches each one to its receivable.",
+      "columns": {
+        "payment": "Payment",
+        "from": "From",
+        "to": "To"
+      },
+      "alt": "Three payments move between the buyer, the financier and the exporter’s bank. None touches Kubar."
+    },
+    "unpaid": {
+      "heading": "If a buyer doesn’t pay, the financier claims under its own policy.",
+      "lead": "Kubar flags the late payment straight away, checks with the exporter for any dispute and sends the insurer the notices the policy requires. The financier, as the insured, lodges the claim with the evidence package behind it. The exporter answers only for its own side of the trade: disputes, returns, set-off, fraud and its warranties. Kubar holds none of the risk.",
+      "title": "If a buyer doesn’t pay",
+      "columns": {
+        "no": "No.",
+        "party": "Party",
+        "step": "Step",
+        "branch": "Where"
+      },
+      "rows": [
+        {
+          "no": "01",
+          "party": "Kubar",
+          "step": "Flags the late payment straight away",
+          "branch": null
+        },
+        {
+          "no": "02",
+          "party": "Kubar",
+          "step": "Checks with the exporter for any dispute",
+          "branch": null
+        },
+        {
+          "no": "03",
+          "party": "Kubar",
+          "step": "Sends the insurer the notices the policy requires",
+          "branch": null
+        },
+        {
+          "no": "04",
+          "party": "The financier, as the insured",
+          "step": "Lodges the claim with the evidence package behind it",
+          "branch": "No dispute"
+        },
+        {
+          "no": "05",
+          "party": "The insurer",
+          "step": "Pays claims on the covered share",
+          "branch": "No dispute"
+        },
+        {
+          "no": "06",
+          "party": "The exporter",
+          "step": "Answers only for its own side of the trade: disputes, returns, set-off, fraud and its warranties",
+          "branch": "A dispute"
+        }
+      ],
+      "none": "Kubar holds none of the risk",
+      "note": "This is how a programme runs with cover in the financier’s name. Where a programme starts on exporters’ own policies, the terms are set out before any receivable is sold."
+    },
+    "who": {
+      "heading": "Each party signs for its own part.",
+      "columns": [
+        "Party",
+        "Does",
+        "Signs"
+      ],
+      "rows": [
+        [
+          "Financier",
+          "Sets the programme limit, decides credit, buys each receivable, holds the policy and the collection account",
+          "Programme terms; the mandate to Kubar; a purchase agreement with each exporter; the insurance policy"
+        ],
+        [
+          "Insurer",
+          "Approves buyer limits; pays claims on the covered share",
+          "The policy, with the financier"
+        ],
+        [
+          "Exporter",
+          "Ships, invoices with the assignment notice, keeps its own bank",
+          "The purchase agreement; Kubar’s services agreement"
+        ],
+        [
+          "Exporter’s bank",
+          "Gives its no-objection; closes the shipping bill",
+          "Its no-objection"
+        ],
+        [
+          "Buyer",
+          "Acknowledges the notice; pays the financier’s account",
+          "Its acknowledgement"
+        ],
+        [
+          "Trade platform",
+          "Brings exporters and their shipment data through NavDhan SDK",
+          "Its agreement with Kubar"
+        ],
+        [
+          "Kubar",
+          "Designs the pool, checks and documents each receivable, matches payments, services and reports",
+          "The mandate from the financier"
+        ]
+      ],
+      "link": "Who holds what"
+    },
+    "terms": {
+      "heading": "The terms on this site.",
+      "columns": [
+        "Term",
+        "Meaning"
+      ],
+      "rows": [
+        [
+          "Receivable",
+          "The amount an overseas buyer owes an exporter under a shipped invoice."
+        ],
+        [
+          "Financier",
+          "The institution that buys the receivable: for Programme 1, a bank’s unit at GIFT City; on Kubar’s own venue<marker></marker>, other institutional financiers, in GIFT City or abroad."
+        ],
+        [
+          "Institutional financier",
+          "A bank, finance company or other institution that finances trade. Only institutional financiers buy the receivables."
+        ],
+        [
+          "Programme",
+          "One underwriting for many receivables: the financier’s limit, the rules for what qualifies, the insurance, the mandate to Kubar and the payment path."
+        ],
+        [
+          "Programme limit",
+          "The amount a financier sets for a programme. Each receivable that fits is bought inside it, without a new credit decision."
+        ],
+        [
+          "Without recourse for the buyer’s credit",
+          "If the buyer doesn’t pay, the financier can’t turn to the exporter, except for disputes, returns, set-off, fraud or the exporter’s own breach."
+        ],
+        [
+          "Purchase price",
+          "What the financier pays at purchase: 90% of face in the illustration."
+        ],
+        [
+          "Deferred purchase price",
+          "The balance, less the financier’s discount and charges, paid when the buyer pays."
+        ],
+        [
+          "Assignment notice",
+          "The instruction on the invoice telling the buyer to pay the financier’s account."
+        ],
+        [
+          "Collection account",
+          "The financier’s own account, into which the buyer pays."
+        ],
+        [
+          "Evidence package",
+          "One record per receivable that the financier buys on, the insurer prices on and the exporter’s bank closes the shipping bill against."
+        ],
+        [
+          "Shipping bill",
+          "The customs document under which goods are cleared for export from India."
+        ],
+        [
+          "EDPMS",
+          "The RBI’s Export Data Processing and Monitoring System, in which the exporter’s bank records each shipping bill until the export proceeds arrive."
+        ],
+        [
+          "AD bank",
+          "Authorised Dealer bank: the exporter’s own bank for foreign exchange."
+        ],
+        [
+          "Credit insurance",
+          "Cover against a buyer’s failure to pay, on limits the insurer sets for each buyer."
+        ],
+        [
+          "Loss history",
+          "The record of how each receivable paid, by buyer, exporter and commodity."
+        ],
+        [
+          "GIFT City",
+          "India’s international financial services centre, in Gujarat."
+        ],
+        [
+          "IFSC Banking Unit (IBU)",
+          "A bank’s unit in GIFT City, working in foreign currency."
+        ],
+        [
+          "ITFS",
+          "An International Trade Finance Service platform at GIFT City, on which several financiers can finance trade. Kubar’s own ITFS registration is targeted for 2027; until then Kubar acts as the financier’s origination and servicing agent."
+        ]
+      ]
+    },
+    "next": {
+      "label": "Next step",
+      "routes": [
+        {
+          "tag": "For financial institutions",
+          "label": "Start a programme conversation",
+          "href": "/contact?intent=institution"
+        },
+        {
+          "tag": "For trade platforms",
+          "label": "Talk about an integration",
+          "href": "/contact?intent=platform"
+        }
+      ]
     }
   }
 }
