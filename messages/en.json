@@ -440,7 +440,7 @@
         "what": "On the due date the buyer pays, and the exporter’s bank closes the shipping bill.",
         "party": "Buyer, financier, exporter’s bank",
         "data": "Payment matched; closure tracked",
-        "money": null
+        "money": "The buyer pays the financier’s collection account; the financier pays the exporter the balance, less its discount and charges"
       },
       {
         "no": "07",
@@ -593,7 +593,6 @@
       "money": "Money path: only between banks",
       "kubar": "Kubar: the one filled column"
     },
-    "settledMoney": "The buyer pays the financier’s collection account; the financier pays the exporter the balance, less its discount and charges",
     "parties": [
       "Exporter",
       "Kubar",

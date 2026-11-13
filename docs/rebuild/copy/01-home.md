@@ -236,7 +236,7 @@ The eight-state ledger (replaces the lanes and story panel at 768 and 390, and e
 03 Insured. The buyer’s limit with the insurer is checked; the cover is in the financier’s name. Data path: Limit and headroom confirmed.
 04 Acknowledged. The buyer acknowledges that it will pay the financier. Party: Buyer. Data path: Acknowledgement filed.
 05 Purchased. The financier buys the receivable, without recourse for the buyer’s credit. Party: Financier. Data path: Package delivered; purchase recorded. Money path: Kubar holds none. The financier pays 90% of face to the exporter’s own bank.
-06 Settled. On the due date the buyer pays, and the exporter’s bank closes the shipping bill. Party: Buyer, financier, exporter’s bank. Data path: Payment matched; closure tracked.
+06 Settled. On the due date the buyer pays, and the exporter’s bank closes the shipping bill. Party: Buyer, financier, exporter’s bank. Data path: Payment matched; closure tracked. Money path: The buyer pays the financier’s collection account; the financier pays the exporter the balance, less its discount and charges. (Copy deck 4.2; Vaibhav, 13 Nov 2026: the ledger and the story panel show the settlement payments the lanes diagram draws. The story panel's counter at state 08 reads "08 of 08".)
 07 Recorded. The outcome joins the record of how the asset performs. Data path: Added to the loss history.
 08 Transferred, later¹. On the venue, a receivable can move to another institutional financier, with a registry entry. [State] Planned (muted).
 

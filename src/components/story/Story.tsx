@@ -97,8 +97,7 @@ export function Story({
 
   const current = states[state - 1];
   const planned = state === 8;
-  // State 06: the lanes draw the two settlement payments, so the panel says them (copy deck 4.2).
-  const money = state === 6 ? t("settledMoney") : current.money;
+  const money = current.money;
 
   return (
     <>
@@ -112,7 +111,7 @@ export function Story({
               </div>
               <p className="flex items-center gap-3 pt-4">
                 <span className="t-tag text-ink-muted">{t("stateLabel")}</span>
-                <span className="t-label text-ink-muted">{t("counter", { n: String(planned ? 7 : state).padStart(2, "0") })}</span>
+                <span className="t-label text-ink-muted">{t("counter", { n: String(state).padStart(2, "0") })}</span>
               </p>
               <div key={state} className="story-fade flex flex-col">
                 <p className={cn("flex items-baseline gap-3 pt-4", planned ? "text-ink-muted" : "text-accent")}>

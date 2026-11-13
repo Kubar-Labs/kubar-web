@@ -134,7 +134,7 @@ Nothing else animates. In particular, from the original Phase 7 spec these are d
 
 On 768 and 390, and everywhere with `prefers-reduced-motion: reduce`: the two pinned stories are the ledger register (no pinning), the evidence stack is static with the last card open and the record at full, the bar is drawn, every duration is 0, smooth scroll is off. Screen readers always get the registers.
 
-Implementation: the repo already has GSAP (ScrollTrigger), Lenis and framer-motion. Use GSAP ScrollTrigger for the two pinned stories and CSS transitions on the tokens for everything else; drop framer-motion unless it's needed. Lenis is optional; if kept, it must be off with reduced motion and must not break anchor links or focus. The header is fixed, so give anchor targets `scroll-margin-top` equal to the header's height.
+Implementation: the repo already has GSAP, Lenis and framer-motion (all three removed during the build: the pinned stories use CSS sticky and a small scroll reader; Vaibhav, 13 Nov 2026). Use GSAP ScrollTrigger for the two pinned stories and CSS transitions on the tokens for everything else; drop framer-motion unless it's needed. Lenis is optional; if kept, it must be off with reduced motion and must not break anchor links or focus. The header is fixed, so give anchor targets `scroll-margin-top` equal to the header's height.
 
 ## 8 · Accessibility
 
