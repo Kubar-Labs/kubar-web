@@ -120,6 +120,19 @@ describe("copy matches docs/rebuild/copy word for word", () => {
     }
   });
 
+  it("carries every Home line from the gap to Contact (01-home.md)", () => {
+    const skip = new Set(["¹", "²", "³", "Back to text", "01 … 08", "Illustrative", "05", "Purchased"]);
+    for (const heading of ["The gap", "One receivable", "Band · closing line", "Foundations first", "Who takes part", "People", "Contact"]) {
+      for (let line of sectionLines("01-home.md", heading)) {
+        if (skip.has(line) || line === "—") continue;
+        line = line.replace(/[¹²³]$/, "").replace("State 08 · Planned¹", "State 08 · Planned");
+        if (line === "Party · Financier") line = "Party · {party}";
+        if (line === "05 of 08") line = "{n} of 08";
+        expect(has(line), `${heading}: missing: ${line}`).toBe(true);
+      }
+    }
+  });
+
   it("keeps every record document with its Proves line (copy deck 4.2)", () => {
     expect(messages.record.documents).toHaveLength(6);
     for (const doc of messages.record.documents) expect(doc.proves.length).toBeGreaterThan(10);

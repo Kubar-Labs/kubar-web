@@ -9,7 +9,7 @@ import { fontVariables } from "./fonts";
 import "./globals.css";
 
 /** Namespaces the client components (header, error boundary) read. */
-const CLIENT_NAMESPACES = ["header", "system", "common", "record"] as const;
+const CLIENT_NAMESPACES = ["header", "system", "common", "record", "story", "ledger"] as const;
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("site");

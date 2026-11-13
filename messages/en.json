@@ -71,6 +71,227 @@
     "standing": {
       "heading": "Standing and memberships.",
       "lead": "Kubar acts as the financier’s origination and servicing agent. It never holds the money or the credit risk."
+    },
+    "gap": {
+      "heading": "The missing piece isn’t capital.",
+      "lead": "Exporters’ paper doesn’t arrive originated, insured and documented in a form a financier can buy again and again. Kubar builds that layer.",
+      "figures": [
+        {
+          "period": "A year",
+          "figure": "About $80bn",
+          "caption": "a year of Indian SME and mid-market export receivables is financeable: Kubar’s estimate for FY 2025–26.",
+          "footnote": 2
+        },
+        {
+          "period": "In total",
+          "figure": "$126.92M",
+          "caption": "financed in total on GIFT City’s trade-finance platforms (ITFS): 2,857 transactions to June 2026.",
+          "footnote": 3
+        }
+      ],
+      "scaleNote": "Drawn to scale. $126.92M is about 0.16% of the bar above.",
+      "scaleAlt": "A bar for about $80bn a year above a hairline for $126.92M in total, drawn to the same scale.",
+      "footnote2": "Kubar’s estimate: India’s merchandise exports in FY 2025–26, $441.78bn (Ministry of Commerce and Industry), × 75% on open-account terms (Kubar’s planning assumption) × 48.55%, the share of MSME-related products in merchandise exports in 2024–25 (Ministry of MSME, in Parliament) × 50% financeable after screens for tenor, insurable buyers and related parties (Kubar’s planning assumption).",
+      "footnote3": "IFSCA Bulletin, April–June 2026: ITFS transactions in IFSC reached 2,857, with a total value of $126.92M, as of June 2026."
+    },
+    "band": {
+      "line": "Kubar is in the data path of every step and in the money path of none.",
+      "link": "See how it works"
+    },
+    "foundations": {
+      "heading": "An exchange needs more than a venue.",
+      "lead": "India already runs specialised exchanges for businesses and financial institutions, not the public. At GIFT City, cross-border trade finance has the rules for such an exchange, but not yet the asset. So Kubar builds the foundations first and the venue last.",
+      "exchangeHead": "Exchange",
+      "exchanges": [
+        "TReDS",
+        "Indian Energy Exchange",
+        "GIFT City · ITFS"
+      ],
+      "rows": [
+        {
+          "label": "On the exchange",
+          "cells": [
+            "Only banks and other financial institutions permitted by the RBI finance MSME invoices",
+            "Distribution companies, generators, traders and large consumers buy and sell electricity",
+            "Only institutional financiers would buy export receivables, on Kubar’s planned venue"
+          ],
+          "footnoteOnLast": true
+        },
+        {
+          "label": "The public",
+          "cells": [
+            "Not admitted",
+            "Not admitted",
+            "Not admitted"
+          ]
+        },
+        {
+          "label": "Today",
+          "cells": [
+            "Running",
+            "Running",
+            "The rules exist; the asset doesn’t yet"
+          ],
+          "accentLast": true
+        }
+      ],
+      "stackLabel": "Five foundations, built from the bottom up",
+      "slabs": [
+        {
+          "name": "The venue, last",
+          "line": "An ITFS for institutional financiers only, with Kubar as its neutral operator",
+          "where": "State 08 · Planned",
+          "planned": true
+        },
+        {
+          "name": "A record of performance",
+          "line": "Every receivable that settles adds to a priced loss history",
+          "where": "State 07"
+        },
+        {
+          "name": "A clean payment path",
+          "line": "The buyer pays the financier’s account; the exporter’s bank closes the shipping bill",
+          "where": "State 06"
+        },
+        {
+          "name": "Standing buyers",
+          "line": "A financier underwrites a programme once and buys every receivable that fits inside its limit",
+          "where": "State 05"
+        },
+        {
+          "name": "A common standard for what qualifies",
+          "line": "Every receivable has a shipping bill, an invoice that names the financier’s account, a buyer on an approved insurance limit and the buyer’s acknowledgement",
+          "where": "States 02 · 03 · 04"
+        }
+      ]
+    },
+    "whoTakesPart": {
+      "heading": "Who takes part, and what each one does.",
+      "lead": "Only institutional financiers buy the receivables. There is no retail access.",
+      "columns": {
+        "party": "Party",
+        "role": "Role",
+        "more": "Read more"
+      },
+      "rows": [
+        {
+          "party": "Financiers",
+          "role": "Set a programme limit once, then buy every receivable that fits, insured in their own name",
+          "link": {
+            "label": "For financial institutions",
+            "href": "/products/kubar-protocol"
+          }
+        },
+        {
+          "party": "Credit insurers",
+          "role": "Cover approved buyers in the financier’s name, with the evidence behind each receivable",
+          "link": {
+            "label": "For financial institutions",
+            "href": "/products/kubar-protocol"
+          }
+        },
+        {
+          "party": "Trade platforms",
+          "role": "Bring their exporters and shipment data through NavDhan SDK",
+          "link": {
+            "label": "For trade platforms",
+            "href": "/products/navdhan-sdk"
+          }
+        },
+        {
+          "party": "Exporters",
+          "role": "Ship, invoice and keep their own banks",
+          "link": {
+            "label": "How it works",
+            "href": "/how-it-works"
+          }
+        },
+        {
+          "party": "Buyers",
+          "role": "Pay the financier’s account, on the terms they already have",
+          "link": null
+        },
+        {
+          "party": "Kubar",
+          "role": "Runs the programme: origination, the evidence package, servicing and reporting. No money and no credit risk",
+          "link": {
+            "label": "About",
+            "href": "/about"
+          }
+        }
+      ]
+    },
+    "people": {
+      "heading": "The people building it.",
+      "link": "Meet the team and advisers",
+      "linkedinLabel": "{name} on LinkedIn (opens in a new tab)",
+      "people": [
+        {
+          "id": "vaibhav-sharma",
+          "name": "Vaibhav Sharma",
+          "role": "Founder and CEO",
+          "linkedin": "https://www.linkedin.com/in/fenestbuc/"
+        },
+        {
+          "id": "rayansh-srivastava",
+          "name": "Rayansh Srivastava",
+          "role": "Co-founder and CTO",
+          "linkedin": "https://www.linkedin.com/in/rayansh-srivastava-419951219/"
+        },
+        {
+          "id": "keshav-dudani",
+          "name": "Keshav Dudani",
+          "role": "Founding Engineer",
+          "linkedin": "https://www.linkedin.com/in/keshav-dudani-617295251/"
+        },
+        {
+          "id": "manchit-sanan",
+          "name": "Manchit Sanan",
+          "role": "Compliance Lead",
+          "linkedin": "https://www.linkedin.com/in/manchit-sanan-6b9705158/"
+        },
+        {
+          "id": "divyesh-reddy",
+          "name": "Divyesh Reddy",
+          "role": "Partnerships Lead",
+          "linkedin": "https://www.linkedin.com/in/divyesh-reddy/"
+        },
+        {
+          "id": "kavish-mahajan",
+          "name": "Kavish Mahajan",
+          "role": "Creative Director",
+          "linkedin": "https://www.linkedin.com/in/koverner/"
+        }
+      ]
+    },
+    "contact": {
+      "heading": "Start the right conversation.",
+      "columns": {
+        "who": "If you are",
+        "step": "Next step"
+      },
+      "rows": [
+        {
+          "who": "A bank, finance company, insurer or fund",
+          "step": "Start a programme conversation",
+          "href": "/contact?intent=institution"
+        },
+        {
+          "who": "A trade platform or marketplace",
+          "step": "Talk about an integration",
+          "href": "/contact?intent=platform"
+        },
+        {
+          "who": "An investor",
+          "step": "Email us",
+          "href": "mailto:partnerships@kubar.tech"
+        },
+        {
+          "who": "Press, or anything else",
+          "step": "Write to us",
+          "href": "/contact?intent=other"
+        }
+      ]
     }
   },
   "system": {
@@ -355,5 +576,44 @@
         "name": "MongoDB for Startups"
       }
     ]
+  },
+  "story": {
+    "record": "Record RCV-0001",
+    "stateLabel": "State",
+    "counter": "{n} of 08",
+    "party": "Party · {party}",
+    "planned": "Planned",
+    "dataPath": "Data path · Kubar",
+    "moneyPath": "Money path",
+    "holdsNone": "Kubar holds none",
+    "skip": "Skip the story",
+    "seeHow": "See how it works",
+    "legend": {
+      "data": "Data path: documents and records",
+      "money": "Money path: only between banks",
+      "kubar": "Kubar: the one filled column"
+    },
+    "settledMoney": "The buyer pays the financier’s collection account; the financier pays the exporter the balance, less its discount and charges",
+    "parties": [
+      "Exporter",
+      "Kubar",
+      "Insurer",
+      "Buyer, UAE",
+      "Financier",
+      "Exporter’s bank"
+    ],
+    "lanes": {
+      "s1": "Shipment, invoice",
+      "s2": "Evidence package checked",
+      "s3": "Limit and headroom",
+      "s4": "Acknowledgement",
+      "s5data": "Evidence package",
+      "s5money": "90% of face",
+      "s6": "Payment matched",
+      "s6face": "Face value",
+      "s6balance": "The balance",
+      "s7": "Added to the loss history",
+      "s8": "Registry entry, planned"
+    }
   }
 }

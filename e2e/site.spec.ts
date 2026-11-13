@@ -265,3 +265,72 @@ test.describe("Home (build step 3, in progress)", () => {
     await expectNoAxeViolations(page);
   });
 });
+
+test.describe("Home, complete (build step 3)", () => {
+  test("has every section heading once and no automated WCAG violations at 1440", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/");
+    for (const name of [
+      "The missing piece isn’t capital.",
+      "Follow one receivable from shipment to settlement.",
+      "An exchange needs more than a venue.",
+      "Who takes part, and what each one does.",
+      "Standing and memberships.",
+      "The people building it.",
+      "Start the right conversation.",
+    ]) {
+      await expect(page.getByRole("heading", { level: 2, name, exact: true })).toHaveCount(1);
+    }
+    await expect(page.getByText("Kubar is in the data path of every step and in the money path of none.")).toBeVisible();
+    await expectNoAxeViolations(page);
+  });
+
+  test("with reduced motion the ledger shows and nothing is pinned", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/");
+    await expect(page.locator("[data-story-state]")).toHaveCount(0);
+    await expect(page.getByRole("columnheader", { name: "What happens" })).toBeVisible();
+  });
+
+  test("the pinned story steps through eight states on scroll and can be skipped", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/");
+    const story = page.locator("[data-story-state]");
+    await expect(story).toHaveAttribute("data-story-state", "1");
+    // The register stays in the DOM for assistive technology.
+    await expect(page.getByRole("columnheader", { name: "What happens" })).toBeAttached();
+    const top = await story.evaluate((el) => el.getBoundingClientRect().top + window.scrollY);
+    for (const state of [3, 6, 8]) {
+      await page.evaluate((y) => window.scrollTo(0, y), top - 105 + 420 * (state - 1) + 100);
+      await expect(story).toHaveAttribute("data-story-state", String(state));
+    }
+    await expect(page.getByText("Registry entry, planned")).toBeVisible();
+    await page.evaluate((y) => window.scrollTo(0, y), top);
+    await page.getByRole("link", { name: "Skip the story" }).click();
+    await expect(page).toHaveURL(/#closing-line$/);
+    await expectNoAxeViolations(page);
+  });
+
+  test("contact routes carry their intents and people link out", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.getByRole("link", { name: "Start a programme conversation" })).toHaveAttribute("href", "/contact?intent=institution");
+    await expect(page.getByRole("link", { name: "Talk about an integration" })).toHaveAttribute("href", "/contact?intent=platform");
+    await expect(page.getByRole("link", { name: "Email us" })).toHaveAttribute("href", "mailto:partnerships@kubar.tech");
+    await expect(page.getByRole("link", { name: "Write to us" })).toHaveAttribute("href", "/contact?intent=other");
+    const card = page.getByRole("link", { name: "Vaibhav Sharma on LinkedIn (opens in a new tab)" });
+    await expect(card).toHaveAttribute("target", "_blank");
+    await expect(page.getByRole("img", { name: "Kavish Mahajan, Creative Director" })).toBeAttached();
+  });
+
+  test("at 390 and 768 nothing scrolls sideways and axe is clean", async ({ page }) => {
+    for (const width of [390, 768]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await page.goto("/");
+      expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
+      await expectNoAxeViolations(page);
+    }
+  });
+});

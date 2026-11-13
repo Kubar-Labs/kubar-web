@@ -386,4 +386,30 @@
       opacity: 0;
     }
   }
+
+  /* The pinned story. A lanes row writes in over --duration-write: its
+     words fade and its lines draw from their origin. The panel's state text
+     cross-fades over --duration-disclose. */
+  .lane-row {
+    opacity: 0;
+    transition: opacity var(--duration-write) var(--ease-standard);
+  }
+  .lane-row.is-written {
+    opacity: 1;
+  }
+  .lane-row svg {
+    clip-path: inset(0 100% 0 0);
+    transition: clip-path var(--duration-write) var(--ease-standard);
+  }
+  .lane-row.is-written svg {
+    clip-path: inset(0 0 0 0);
+  }
+  .story-fade {
+    animation: story-fade var(--duration-disclose) var(--ease-standard);
+  }
+  @keyframes story-fade {
+    from {
+      opacity: 0;
+    }
+  }
 }
