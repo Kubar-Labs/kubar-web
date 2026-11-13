@@ -4,7 +4,7 @@ import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { SkipLink } from "@/components/layout/SkipLink";
 import { RouteIntlProvider } from "@/i18n/RouteIntlProvider";
-import { socialImage } from "@/app/page-metadata";
+import { organisationLogo, socialImage } from "@/app/page-metadata";
 import { fontVariables } from "./fonts";
 import "./globals.css";
 
@@ -52,15 +52,15 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Organisation JSON-LD (HANDOFF section 5). The logo and the social image
-  // move to the new brand in build step 6; the Substack link is dropped.
+  // Organisation JSON-LD (HANDOFF section 5): the new logo, partnerships@
+  // and LinkedIn. The Substack link is dropped.
   const organizationJsonLd = {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: "Kubar Labs",
     legalName: "Kubar Protocol Private Limited",
     url: "https://kubar.tech",
-    logo: "https://kubar.tech/icon.svg",
+    logo: `https://kubar.tech${organisationLogo}`,
     email: "partnerships@kubar.tech",
     sameAs: ["https://www.linkedin.com/company/kubarlabs/"],
   };

@@ -9,15 +9,19 @@ type PageMetadataOptions = {
 
 /*
  * The social card (HANDOFF section 5): title "Kubar Labs", the Home subline,
- * and the image. The image file is still the old brand; build step 6 replaces
- * it with one drawn in the new type and colours, for Vaibhav to approve.
+ * and the image, drawn in the site's type and colours by
+ * scripts/social-image.mjs (the file name carries a hash of its contents,
+ * because /media is cached for a year).
  */
 export const socialImage = {
-  url: "/media/kubar-labs-og-b2add55b.png",
+  url: "/media/kubar-labs-social-bd9a99c9.png",
   width: 1200,
   height: 630,
   alt: "Kubar Labs: Building the institutional exchange for cross-border trade finance.",
 };
+
+/** The mark on paper, 512 px square: the Organisation logo in the JSON-LD. */
+export const organisationLogo = "/media/kubar-mark-970208af.png";
 
 /** The social card's title and description, the same on every page. */
 export const socialCard = {
@@ -44,6 +48,7 @@ export function createPageMetadata({ title, description, path, robots }: PageMet
       images: [socialImage],
     },
     twitter: { card: "summary_large_image", ...socialCard, images: [socialImage] },
-    robots,
+    // Left out unless a page sets it, so the layout's "index, follow" stands.
+    ...(robots ? { robots } : {}),
   };
 }

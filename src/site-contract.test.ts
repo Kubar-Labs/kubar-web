@@ -251,6 +251,43 @@ describe("copy matches docs/rebuild/copy word for word", () => {
   });
 });
 
+describe("metadata (HANDOFF section 5)", () => {
+  it("matches every page's title and description to the handoff table", () => {
+    const table = read("docs/rebuild/HANDOFF.md")
+      .split("\n")
+      .filter((line) => /^\| .+ \| \/\S* \| /.test(line))
+      .map((line) => line.split("|").map((cell) => cell.trim()))
+      .filter((cells) => cells[3].includes("Kubar Labs"));
+    expect(table).toHaveLength(8);
+    const metas: Record<string, { title: string; description: string }> = {
+      "/": { title: messages.site.homeTitle, description: messages.site.homeDescription },
+      "/products/kubar-protocol": messages.kubarProtocol.meta,
+      "/products/navdhan-sdk": messages.navdhanSdk.meta,
+      "/how-it-works": messages.howItWorks.meta,
+      "/about": messages.about.meta,
+      "/contact": messages.contact.meta,
+      "/legal/privacy": messages.legal.privacy.meta,
+      "/legal/terms": messages.legal.terms.meta,
+    };
+    for (const [, , route, title, description] of table) {
+      expect(metas[route].title, route).toBe(title);
+      // The handoff table types a straight apostrophe; the site sets a typographic one.
+      expect(metas[route].description.replace(/’/g, "'"), route).toBe(description);
+    }
+  });
+
+  it("points the social card and the /opengraph-image redirect at one existing file", async () => {
+    const { socialImage, socialCard, organisationLogo } = await import("./app/page-metadata");
+    const { existsSync } = await import("node:fs");
+    expect(existsSync(join(root, "public", socialImage.url))).toBe(true);
+    expect(existsSync(join(root, "public", organisationLogo))).toBe(true);
+    expect(socialCard).toEqual({ title: messages.site.socialTitle, description: messages.site.homeDescription });
+    expect(socialImage.alt).toBe(messages.site.socialImageAlt);
+    const redirects = await nextConfig.redirects!();
+    expect(redirects).toContainEqual({ source: "/opengraph-image", destination: socialImage.url, permanent: true });
+  });
+});
+
 describe("tokens", () => {
   it("keeps src/app/tokens.css in step with docs/rebuild/tokens/tokens.css (fonts aside)", () => {
     const strip = (css: string) =>

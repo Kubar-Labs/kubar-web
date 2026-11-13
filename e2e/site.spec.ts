@@ -7,7 +7,7 @@ import { expect, test, type Page } from "@playwright/test";
  * legal pages in step 5).
  */
 const publicRoutes = ["/", "/products/kubar-protocol", "/products/navdhan-sdk", "/how-it-works", "/about", "/contact", "/legal/privacy", "/legal/terms"] as const;
-const OG_IMAGE = /^https:\/\/kubar\.tech\/media\/kubar-labs-og-b2add55b\.png(?:\?.*)?$/;
+const OG_IMAGE = /^https:\/\/kubar\.tech\/media\/kubar-labs-social-bd9a99c9\.png(?:\?.*)?$/;
 
 async function expectNoAxeViolations(page: Page) {
   const results = await new AxeBuilder({ page })
@@ -678,5 +678,90 @@ test.describe("Legal pages (build step 5)", () => {
       expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
       await expectNoAxeViolations(page);
     }
+  });
+});
+
+test.describe("Metadata, social card and structured data (build step 6)", () => {
+  // HANDOFF section 5, word for word.
+  const pages: [string, string, string][] = [
+    ["/", "Kubar Labs · Building the institutional exchange for cross-border trade finance", "Starting with the asset: export receivables an international financier can buy again and again, insured in its own name."],
+    ["/products/kubar-protocol", "Kubar Protocol · Kubar Labs", "Underwrite once, then buy every export receivable that fits: without recourse for the buyer’s credit, insured in your name, with the evidence behind each one."],
+    ["/products/navdhan-sdk", "NavDhan SDK · Kubar Labs", "Embed NavDhan SDK so your exporters can finance their export receivables inside your platform. Financiers buy; Kubar runs the programme."],
+    ["/how-it-works", "How it works · Kubar Labs", "Follow one illustrative export receivable from shipment to settlement: who does what, the documents behind each step and where the money moves."],
+    ["/about", "About · Kubar Labs", "Kubar Labs is building the institutional exchange for cross-border trade finance, foundations first. The team and our standing."],
+    ["/contact", "Contact · Kubar Labs", "Talk to Kubar Labs about a programme, an integration or anything else. Tell us who you are and your message reaches the right people."],
+    ["/legal/privacy", "Privacy notice · Kubar Labs", "How Kubar Labs handles personal data collected through kubar.tech."],
+    ["/legal/terms", "Terms of use · Kubar Labs", "The terms on which kubar.tech is offered."],
+  ];
+
+  for (const [path, title, description] of pages) {
+    test(`${path} carries its title, description and the shared social card`, async ({ page }) => {
+      await page.goto(path);
+      await expect(page).toHaveTitle(title);
+      await expect(page.locator('meta[name="description"]')).toHaveAttribute("content", description);
+      await expect(page.locator('meta[property="og:title"]')).toHaveAttribute("content", "Kubar Labs");
+      await expect(page.locator('meta[property="og:description"]')).toHaveAttribute("content", pages[0][2]);
+      await expect(page.locator('meta[property="og:image:alt"]')).toHaveAttribute("content", "Kubar Labs: Building the institutional exchange for cross-border trade finance.");
+      await expect(page.locator('meta[property="og:url"]')).toHaveAttribute("content", path === "/" ? "https://kubar.tech" : `https://kubar.tech${path}`);
+      await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute("content", "summary_large_image");
+      await expect(page.locator('meta[name="twitter:title"]')).toHaveAttribute("content", "Kubar Labs");
+      await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /index, follow/);
+    });
+  }
+
+  test("the social image is a 1200 by 630 PNG, cached for a year, and /opengraph-image points at it", async ({ page, request }) => {
+    const image = await request.get("/media/kubar-labs-social-bd9a99c9.png");
+    expect(image.status()).toBe(200);
+    expect(image.headers()["content-type"]).toBe("image/png");
+    expect(image.headers()["cache-control"]).toContain("immutable");
+    const bytes = await image.body();
+    expect(bytes.readUInt32BE(16)).toBe(1200);
+    expect(bytes.readUInt32BE(20)).toBe(630);
+    await page.goto("/");
+    await expect(page.locator('meta[property="og:image:width"]')).toHaveAttribute("content", "1200");
+    const redirect = await request.get("/opengraph-image", { maxRedirects: 0 });
+    expect(redirect.status()).toBe(308);
+    expect(redirect.headers().location).toBe("/media/kubar-labs-social-bd9a99c9.png");
+    expect((await request.get("/media/kubar-labs-og-b2add55b.png")).status()).toBe(404);
+  });
+
+  test("the Organisation JSON-LD names the entity, the new logo, partnerships@ and LinkedIn only", async ({ page, request }) => {
+    await page.goto("/about");
+    const blocks = await page.locator('script[type="application/ld+json"]').allTextContents();
+    expect(blocks).toHaveLength(1);
+    const data = JSON.parse(blocks[0]);
+    expect(data).toEqual({
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      name: "Kubar Labs",
+      legalName: "Kubar Protocol Private Limited",
+      url: "https://kubar.tech",
+      logo: "https://kubar.tech/media/kubar-mark-970208af.png",
+      email: "partnerships@kubar.tech",
+      sameAs: ["https://www.linkedin.com/company/kubarlabs/"],
+    });
+    expect((await request.get("/media/kubar-mark-970208af.png")).status()).toBe(200);
+  });
+
+  test("the sitemap lists the eight routes and robots points at it", async ({ request }) => {
+    const sitemap = await (await request.get("/sitemap.xml")).text();
+    const locs = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
+    expect(locs).toEqual(pages.map(([path]) => (path === "/" ? "https://kubar.tech" : `https://kubar.tech${path}`)));
+    const robots = await (await request.get("/robots.txt")).text();
+    expect(robots).toContain("Sitemap: https://kubar.tech/sitemap.xml");
+    expect(robots).toContain("Disallow: /api/");
+  });
+
+  test("pages that are not for search say so", async ({ page }) => {
+    for (const path of ["/specimens", "/no-such-page"]) {
+      await page.goto(path);
+      await expect(page.locator('meta[name="robots"]').first()).toHaveAttribute("content", /noindex/);
+    }
+  });
+
+  test("the footer copyright carries the current year and the favicon is the mark", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.getByText(`© ${new Date().getFullYear()} Kubar Protocol Private Limited`)).toBeVisible();
+    await expect(page.locator('link[rel="icon"]')).toHaveAttribute("href", /icon\.svg/);
   });
 });
