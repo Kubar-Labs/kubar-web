@@ -1,5 +1,4 @@
 import { KubarMark } from "@/components/brand/KubarMark";
-import { Register } from "@/components/registers/Register";
 import { MoneyArrow } from "@/components/story/LanesDiagram";
 import { cn } from "@/lib/utils";
 
@@ -65,16 +64,37 @@ export function MoneyPath({
         <p className={cn("t-body-sm absolute bottom-[80px] left-[536px] text-ink", wide ? "w-[309px]" : "w-[264px]")}>{payments[2]}</p>
         <p className="t-tag absolute top-[218px] left-[21px] w-[178px] text-accent">{kubarNote}</p>
       </div>
-      <div className="flex flex-col gap-4 lg:hidden">
-        <Register
-          columns={[columns.payment, columns.from, columns.to]}
-          rows={payments.map((payment, i) => [payment, parties[routes[i][0]], parties[routes[i][1]]])}
-          stackLabels
-        />
-        <p className="t-tag text-accent">
-          {parties[0]}: {kubarNote}
-        </p>
-      </div>
+      {/* Below desktop (Figma 120:1141): the three payments as a register,
+          each with its from and to on one line. */}
+      <table role="table" className="block w-full text-left lg:hidden">
+        <thead role="rowgroup" className="sr-only">
+          <tr role="row">
+            {[columns.payment, columns.from, columns.to].map((column) => (
+              <th key={column} role="columnheader" scope="col">{column}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody role="rowgroup" className="block border-t-2 border-rule-strong">
+          {payments.map((payment, i) => (
+            <tr key={payment} role="row" className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-rule py-4">
+              <th role="rowheader" scope="row" className="t-body-sm w-full font-normal text-ink">{payment}</th>
+              <td role="cell" className="t-tag text-ink">{parties[routes[i][0]]}</td>
+              <td role="cell" className="t-tag flex items-center gap-3 text-ink">
+                <svg width="28" height="14" viewBox="0 0 28 14" aria-hidden="true" className="shrink-0 text-ink">
+                  <g fill="currentColor">
+                    <rect x="0" y="6" width="19" height="2" />
+                    <path d="M28 7L18 1.23V12.77Z" />
+                  </g>
+                </svg>
+                {parties[routes[i][1]]}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p className="t-tag border-b-2 border-rule-strong py-4 text-accent lg:hidden">
+        {parties[0]}: {kubarNote}
+      </p>
       <p className="t-body-sm pt-4 text-ink-muted lg:pt-0">{under}</p>
     </div>
   );
