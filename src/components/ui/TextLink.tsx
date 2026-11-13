@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Icon } from "@/components/icons/Icon";
-import { cn } from "@/lib/utils";
+import { cx as cn } from "@/lib/cx";
 
 /*
  * Link (Figma C1 52:113). Ink, underlined 1 px at rest and 2 px on hover, no

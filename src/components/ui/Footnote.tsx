@@ -65,7 +65,7 @@ export function Footnote({ n, id, backTo, children, className }: FootnoteProps) 
         </p>
         <a
           href={`#${backTo}`}
-          className="self-start text-ink underline decoration-1 [text-underline-position:from-font] hover:decoration-2"
+          className="inline-flex min-h-6 items-center self-start text-ink underline decoration-1 [text-underline-position:from-font] hover:decoration-2"
         >
           {t("backToText")}
         </a>

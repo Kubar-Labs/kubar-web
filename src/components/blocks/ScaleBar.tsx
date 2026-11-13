@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { cn } from "@/lib/utils";
+import { cx as cn } from "@/lib/cx";
 
 /*
  * The gap's scale drawing (Figma C4 92:332): an 8 px bar for about $80bn a

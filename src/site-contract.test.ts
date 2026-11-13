@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import nextConfig from "../next.config";
@@ -285,6 +285,43 @@ describe("metadata (HANDOFF section 5)", () => {
     expect(socialImage.alt).toBe(messages.site.socialImageAlt);
     const redirects = await nextConfig.redirects!();
     expect(redirects).toContainEqual({ source: "/opengraph-image", destination: socialImage.url, permanent: true });
+  });
+});
+
+describe("error boundaries", () => {
+  it("keeps the client-side error copy equal to the messages", async () => {
+    const { errorCopy } = await import("./app/error-copy");
+    expect(errorCopy.title).toBe(messages.system.error.title);
+    expect(errorCopy.display).toBe(messages.system.error.display);
+    expect(`${errorCopy.lineBefore}<email>${errorCopy.email}</email>${errorCopy.lineAfter}`).toBe(messages.system.error.line);
+  });
+
+  it("ships no message formatter or class merger to the browser", () => {
+    const walk = (dir: string): string[] =>
+      readdirSync(join(root, dir), { withFileTypes: true }).flatMap((entry) =>
+        entry.isDirectory() ? walk(`${dir}/${entry.name}`) : /\.tsx?$/.test(entry.name) ? [`${dir}/${entry.name}`] : [],
+      );
+    const clients = walk("src").filter((file) => read(file).startsWith('"use client"'));
+    expect(clients.length).toBeGreaterThan(8);
+    // Modules a client component imports are client code too.
+    const reachable = new Set(clients);
+    for (const file of reachable) {
+      for (const match of read(file).matchAll(/from "@\/([^"]+)"/g)) {
+        for (const ext of [".tsx", ".ts"]) {
+          try {
+            read(`src/${match[1]}${ext}`);
+            reachable.add(`src/${match[1]}${ext}`);
+          } catch {}
+        }
+      }
+    }
+    for (const file of reachable) {
+      if (file.includes("agentation")) continue; // development only
+      const source = read(file);
+      expect(source, file).not.toMatch(/from "next-intl"/);
+      expect(source, file).not.toMatch(/from "@\/lib\/utils"/);
+      expect(source, file).not.toMatch(/from "[^"]*messages\/en\.json"/);
+    }
   });
 });
 

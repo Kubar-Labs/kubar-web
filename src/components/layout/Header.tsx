@@ -2,12 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useTranslations } from "next-intl";
 import { useEffect, useId, useRef, useState } from "react";
 import { KubarLockup } from "@/components/brand/KubarMark";
 import { Icon } from "@/components/icons/Icon";
 import { ButtonLink } from "@/components/ui/Button";
-import { cn } from "@/lib/utils";
+import { reader } from "@/lib/copy";
+import { cx as cn } from "@/lib/cx";
 
 /*
  * Header (Figma C3 87:142). Fixed on scroll on every page (option B).
@@ -30,8 +30,8 @@ function DoubleRule() {
   return <div aria-hidden="true" className="h-[5px] border-y border-rule-strong" />;
 }
 
-export function Header() {
-  const t = useTranslations("header");
+export function Header({ copy }: { /** The "header" messages. */ copy: unknown }) {
+  const t = reader(copy);
   const pathname = usePathname();
   const menuId = useId();
 

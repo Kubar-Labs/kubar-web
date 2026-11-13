@@ -79,15 +79,6 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        source: "/:asset(icon\\.png|logo\\.png|nd_logo\\.png)",
-        headers: [
-          {
-            key: "Cache-Control",
-            value: "public, max-age=86400, stale-while-revalidate=604800",
-          },
-        ],
-      },
-      {
         source: "/media/:path*",
         headers: [
           {
@@ -97,7 +88,7 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        source: "/:directory(logos|team|advisors|bft_logos)/:path*",
+        source: "/:directory(people|programmes)/:path*",
         headers: [
           {
             key: "Cache-Control",

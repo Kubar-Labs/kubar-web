@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Icon, type IconName } from "@/components/icons/Icon";
-import { cn } from "@/lib/utils";
+import { cx as cn } from "@/lib/cx";
 
 /*
  * Button (Figma C1 48:89). Filled petrol for the one main action in a view;

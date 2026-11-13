@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Illustrative } from "@/components/ui/Illustrative";
-import { cn } from "@/lib/utils";
+import { cx as cn } from "@/lib/cx";
 
 /*
  * Evidence stack (Figma C4 127:2464), How it works "Who relies on the
@@ -34,7 +33,16 @@ export type EvidenceStackCopy = {
 const GAP = 80; // ms between cards
 const QUERY = "(min-width: 1200px) and (prefers-reduced-motion: no-preference)";
 
-export function EvidenceStack({ copy, className }: { copy: EvidenceStackCopy; className?: string }) {
+export function EvidenceStack({
+  copy,
+  illustrative,
+  className,
+}: {
+  copy: EvidenceStackCopy;
+  /** The Illustrative tag, rendered on the server. */
+  illustrative: React.ReactNode;
+  className?: string;
+}) {
   const ref = useRef<HTMLOListElement>(null);
   const [phase, setPhase] = useState<"shown" | "waiting" | "arriving">("shown");
   const last = copy.documents.length - 1;
@@ -101,7 +109,7 @@ export function EvidenceStack({ copy, className }: { copy: EvidenceStackCopy; cl
       >
         <div className="flex flex-col items-start gap-2 lg:flex-row lg:items-baseline lg:justify-between lg:gap-4">
           <p className="t-tag text-ink-muted">{copy.record}</p>
-          <Illustrative className="max-lg:items-start max-lg:text-left" />
+          {illustrative}
         </div>
         <ul className="flex flex-wrap gap-x-4 gap-y-2">
           {copy.elements.map((element, i) => (

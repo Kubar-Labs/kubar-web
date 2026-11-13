@@ -197,6 +197,9 @@
   text-decoration-thickness: 1px;
   text-underline-offset: 0.2em;
   transition: text-decoration-thickness var(--duration-hover) var(--ease-standard);
+  /* An inline link's target is at least 24 px tall (WCAG 2.5.8); block
+     padding on an inline box doesn't move the lines. */
+  padding-block: 4px;
   &:hover {
     text-decoration-thickness: 2px;
   }
@@ -389,7 +392,15 @@
 
   /* Abbreviation (Figma 95:438): the first use on a page. It keeps the text's
      style with a dotted underline in muted ink; the tooltip opens below. */
+  /* A footnote marker is one small figure: its target reaches 24 px with
+     padding that the negative margin takes back out of the line. */
+  .footnote-marker {
+    padding: 6px 10px;
+    margin-inline: -10px;
+  }
+
   .abbr {
+    padding-block: 4px;
     position: relative;
     cursor: help;
     text-decoration: underline dotted 1px var(--color-ink-muted);

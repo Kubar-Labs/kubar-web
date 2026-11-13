@@ -60,6 +60,7 @@ export default function HowItWorks() {
         <EvidenceStack
           className="min-w-0 flex-1"
           copy={t.raw("evidence") as EvidenceStackCopy}
+          illustrative={<Illustrative className="max-lg:items-start max-lg:text-left" />}
         />
       </Section>
 

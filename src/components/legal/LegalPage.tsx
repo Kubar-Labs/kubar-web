@@ -65,7 +65,7 @@ export function LegalPage({ copy }: { copy: LegalCopy }) {
           <ol className="flex flex-col gap-1">
             {copy.sections.map((section) => (
               <li key={section.n}>
-                <a href={`#section-${section.n}`} className="t-body-sm link-ink inline-flex min-h-6 items-center">
+                <a href={`#section-${section.n}`} className="t-body-sm inline-flex min-h-6 items-center text-ink underline decoration-1 underline-offset-[0.2em] hover:decoration-2">
                   {section.n}. {section.title}
                 </a>
               </li>

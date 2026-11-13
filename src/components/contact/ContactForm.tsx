@@ -18,7 +18,7 @@ import {
   type ContactFields,
   type Intent,
 } from "@/lib/contact";
-import { cn } from "@/lib/utils";
+import { cx as cn } from "@/lib/cx";
 
 /*
  * The contact form (Figma Contact · 1440, 174:199; Forms board 153:53;

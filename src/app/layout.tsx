@@ -4,13 +4,9 @@ import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { SkipLink } from "@/components/layout/SkipLink";
 import { AbbreviationTips } from "@/components/ui/AbbreviationTips";
-import { RouteIntlProvider } from "@/i18n/RouteIntlProvider";
 import { organisationLogo, socialImage } from "@/app/page-metadata";
 import { fontVariables } from "./fonts";
 import "./globals.css";
-
-/** Namespaces the client components (header, error boundary) read. */
-const CLIENT_NAMESPACES = ["header", "system", "common", "record", "story", "ledger"] as const;
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("site");
@@ -66,7 +62,8 @@ export default async function RootLayout({
     sameAs: ["https://www.linkedin.com/company/kubarlabs/"],
   };
 
-  const abbreviations = (await getTranslations()).raw("abbreviations") as Record<string, string>;
+  const t = await getTranslations();
+  const abbreviations = t.raw("abbreviations") as Record<string, string>;
 
   let agentationToolbar: React.ReactNode = null;
   if (process.env.NODE_ENV === "development") {
@@ -83,15 +80,15 @@ export default async function RootLayout({
             __html: JSON.stringify(organizationJsonLd).replace(/</g, "\\u003c"),
           }}
         />
-        <RouteIntlProvider namespaces={CLIENT_NAMESPACES}>
-          <SkipLink />
-          <Header />
-          <main id="main-content" tabIndex={-1} className="pt-(--header-height) outline-none">
-            {children}
-          </main>
-          <Footer />
-          <AbbreviationTips expansions={abbreviations} />
-        </RouteIntlProvider>
+        {/* Client components take their words as props, so no message
+            provider or formatter ships to the browser. */}
+        <SkipLink />
+        <Header copy={t.raw("header")} />
+        <main id="main-content" tabIndex={-1} className="pt-(--header-height) outline-none">
+          {children}
+        </main>
+        <Footer />
+        <AbbreviationTips expansions={abbreviations} />
         {agentationToolbar}
       </body>
     </html>

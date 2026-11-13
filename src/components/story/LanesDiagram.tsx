@@ -1,5 +1,5 @@
 import { KubarMark } from "@/components/brand/KubarMark";
-import { cn } from "@/lib/utils";
+import { cx as cn } from "@/lib/cx";
 
 /*
  * Lanes diagram (Figma C4 118:1470, States 01 to 08), 845 × 692, desktop only.

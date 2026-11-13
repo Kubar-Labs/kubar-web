@@ -61,13 +61,6 @@ test("an unknown address returns the 404 page with the header and footer", async
   await expectNoAxeViolations(page);
 });
 
-test("the specimen page stays out of search", async ({ page }) => {
-  await page.goto("/specimens");
-  await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
-  const sitemap = await page.request.get("/sitemap.xml");
-  expect(await sitemap.text()).not.toContain("/specimens");
-});
-
 test("old routes redirect permanently", async ({ request }) => {
   const cases = [
     ["/products/navdhan", "/products/navdhan-sdk"],
@@ -158,17 +151,11 @@ test.describe("menu sheet below desktop", () => {
   });
 });
 
-test.describe("primitives and registers (build step 2, on /specimens)", () => {
+test.describe("primitives and registers (build step 2), on Home", () => {
   test.use({ viewport: { width: 1440, height: 900 } });
 
-  test("the specimen page has no automated WCAG A or AA violations", async ({ page }) => {
-    await page.emulateMedia({ reducedMotion: "reduce" });
-    await page.goto("/specimens");
-    await expectNoAxeViolations(page);
-  });
-
   test("the record shows what each document proves on hover and focus, then returns to the current one", async ({ page }) => {
-    await page.goto("/specimens");
+    await page.goto("/");
     const record = page.locator("table").filter({ has: page.getByRole("columnheader", { name: "Document" }) });
     await expect(record.getByRole("row")).toHaveCount(7);
     const proves = page.getByText("The financier bought the receivable, without recourse for the buyer’s credit").last();
@@ -183,7 +170,7 @@ test.describe("primitives and registers (build step 2, on /specimens)", () => {
   });
 
   test("Illustrative opens its note in place and closes again", async ({ page }) => {
-    await page.goto("/specimens");
+    await page.goto("/");
     const tag = page.getByRole("button", { name: "Illustrative" }).first();
     await expect(tag).toHaveAttribute("aria-expanded", "false");
     await tag.click();
@@ -194,18 +181,19 @@ test.describe("primitives and registers (build step 2, on /specimens)", () => {
   });
 
   test("a footnote marker goes to its footnote, and Back to text returns to the marker", async ({ page }) => {
-    await page.goto("/specimens");
-    const marker = page.locator("#fnref-specimen-1");
+    await page.goto("/");
+    const marker = page.locator("#fnref-1");
     await expect(marker).toHaveAccessibleName("Footnote 1");
     await marker.click();
-    await expect(page).toHaveURL(/#fn-specimen-1$/);
-    await page.locator("#fn-specimen-1").getByRole("link", { name: "Back to text" }).click();
-    await expect(page).toHaveURL(/#fnref-specimen-1$/);
+    await expect(page).toHaveURL(/#fn-1$/);
+    await page.locator("#fn-1").getByRole("link", { name: "Back to text" }).click();
+    await expect(page).toHaveURL(/#fnref-1$/);
     await expect(marker).toBeFocused();
   });
 
   test("the ledger is a table of eight states with 05 current and 08 planned", async ({ page }) => {
-    await page.goto("/specimens");
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/");
     const ledger = page.locator("table").filter({ has: page.getByRole("columnheader", { name: "What happens" }) });
     await expect(ledger.getByRole("columnheader")).toHaveCount(6);
     await expect(ledger.getByRole("rowheader")).toHaveCount(8);
@@ -214,20 +202,11 @@ test.describe("primitives and registers (build step 2, on /specimens)", () => {
   });
 
   test("programme marks carry their programme's name", async ({ page }) => {
-    await page.goto("/specimens");
+    await page.goto("/");
     for (const name of ["GIFT IFIH Young Builders Program", "Claude for Startups", "MongoDB for Startups"]) {
       await expect(page.getByRole("img", { name, exact: true }).first()).toBeAttached();
     }
     await expect(page.getByRole("img", { name: "T-Hub, RubriX Cohort 5" }).first()).toBeAttached();
-  });
-
-  test("the sending button keeps its width", async ({ page }) => {
-    await page.goto("/specimens");
-    const idle = page.getByRole("button", { name: "Send message", exact: true }).first();
-    const sending = page.getByRole("button", { name: "Sending…", exact: true });
-    await expect(sending).toHaveAttribute("aria-disabled", "true");
-    const [idleBox, sendingBox] = [await idle.boundingBox(), await sending.boundingBox()];
-    expect(Math.round(sendingBox!.width)).toBe(Math.round(idleBox!.width));
   });
 });
 
@@ -235,7 +214,8 @@ test.describe("registers below desktop", () => {
   test.use({ viewport: { width: 390, height: 844 } });
 
   test("stack without horizontal scroll and keep their table semantics", async ({ page }) => {
-    await page.goto("/specimens");
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/");
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     expect(overflow).toBe(0);
     const ledger = page.locator("table").filter({ has: page.getByRole("columnheader", { name: "What happens" }) });
@@ -461,6 +441,18 @@ test.describe("About (build step 4)", () => {
     await expect(page.getByText("Where we are")).toHaveCount(0);
     await expect(page.getByRole("link", { name: "Email us (partnerships@kubar.tech)" })).toHaveAttribute("href", "mailto:partnerships@kubar.tech");
     await expect(page.getByRole("link", { name: "Follow one receivable through all five" })).toHaveAttribute("href", "/how-it-works");
+  });
+
+  test("portraits load through the image optimiser at the size the layout needs", async ({ page }) => {
+    await page.goto("/about");
+    const portraits = page.locator("#team img");
+    await expect(portraits).toHaveCount(6);
+    for (const img of await portraits.all()) {
+      await img.scrollIntoViewIfNeeded();
+      await expect(img).toHaveJSProperty("complete", true);
+      expect(await img.evaluate((el: HTMLImageElement) => el.naturalWidth)).toBeGreaterThan(0);
+      expect(await img.evaluate((el: HTMLImageElement) => el.currentSrc)).toMatch(/\/_next\/image\?url=%2Fpeople%2F.+&w=\d+&q=75$/);
+    }
   });
 
   test("the old /team address lands on the team", async ({ page }) => {
@@ -753,10 +745,11 @@ test.describe("Metadata, social card and structured data (build step 6)", () => 
   });
 
   test("pages that are not for search say so", async ({ page }) => {
-    for (const path of ["/specimens", "/no-such-page"]) {
-      await page.goto(path);
-      await expect(page.locator('meta[name="robots"]').first()).toHaveAttribute("content", /noindex/);
-    }
+    const response = await page.goto("/no-such-page");
+    expect(response?.status()).toBe(404);
+    await expect(page.locator('meta[name="robots"]').first()).toHaveAttribute("content", /noindex/);
+    // The build's specimen page is gone.
+    expect((await page.request.get("/specimens")).status()).toBe(404);
   });
 
   test("the footer copyright carries the current year and the favicon is the mark", async ({ page }) => {
