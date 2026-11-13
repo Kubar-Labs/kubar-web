@@ -387,6 +387,41 @@
     }
   }
 
+  /* Abbreviation (Figma 95:438): the first use on a page. It keeps the text's
+     style with a dotted underline in muted ink; the tooltip opens below. */
+  .abbr {
+    position: relative;
+    cursor: help;
+    text-decoration: underline dotted 1px var(--color-ink-muted);
+    text-underline-offset: 0.2em;
+  }
+  .abbr-tip {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    z-index: 20;
+    width: max-content;
+    max-width: min(280px, calc(100vw - 32px));
+    padding: 8px 12px;
+    border: 1px solid var(--color-rule-control);
+    background-color: var(--color-raised);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-weight: 400;
+    font-size: var(--text-fine);
+    line-height: var(--text-fine--line-height);
+    letter-spacing: 0;
+    text-transform: none;
+    text-align: left;
+    white-space: normal;
+    cursor: auto;
+    animation: story-fade var(--duration-disclose) var(--ease-standard);
+  }
+  .abbr[data-open] > .abbr-tip {
+    display: block;
+  }
+
   /* The pinned story. A lanes row writes in over --duration-write: its
      words fade and its lines draw from their origin. The panel's state text
      cross-fades over --duration-disclose. */

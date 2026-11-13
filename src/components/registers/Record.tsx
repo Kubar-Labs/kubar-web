@@ -30,7 +30,7 @@ export function Record({ className }: { className?: string }) {
   const cell = "align-baseline lg:py-3 lg:pr-4 lg:last:pr-0";
 
   return (
-    <div className={cn("flex flex-col", className)}>
+    <div data-no-abbr className={cn("flex flex-col", className)}>
       <div aria-hidden="true" className="h-0.5 bg-rule-strong" />
       <div className="flex items-baseline justify-between gap-4 pt-3 pb-2">
         <p className="t-tag text-ink">{t("title")}</p>

@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { SkipLink } from "@/components/layout/SkipLink";
+import { AbbreviationTips } from "@/components/ui/AbbreviationTips";
 import { RouteIntlProvider } from "@/i18n/RouteIntlProvider";
 import { organisationLogo, socialImage } from "@/app/page-metadata";
 import { fontVariables } from "./fonts";
@@ -65,6 +66,8 @@ export default async function RootLayout({
     sameAs: ["https://www.linkedin.com/company/kubarlabs/"],
   };
 
+  const abbreviations = (await getTranslations()).raw("abbreviations") as Record<string, string>;
+
   let agentationToolbar: React.ReactNode = null;
   if (process.env.NODE_ENV === "development") {
     const { AgentationToolbar } = await import("@/components/agentation/AgentationToolbar");
@@ -87,6 +90,7 @@ export default async function RootLayout({
             {children}
           </main>
           <Footer />
+          <AbbreviationTips expansions={abbreviations} />
         </RouteIntlProvider>
         {agentationToolbar}
       </body>

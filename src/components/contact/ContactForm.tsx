@@ -209,7 +209,7 @@ export function ContactForm({ copy }: { copy: ContactFormCopy }) {
   const messageHelp = isIntent(values.intent) ? copy.messageHelp[values.intent] : undefined;
 
   return (
-    <form noValidate onSubmit={onSubmit} aria-labelledby={`${uid}-heading`} className="flex flex-col gap-6 lg:max-w-[628px]">
+    <form data-no-abbr noValidate onSubmit={onSubmit} aria-labelledby={`${uid}-heading`} className="flex flex-col gap-6 lg:max-w-[628px]">
       <h2 id={`${uid}-heading`} className="sr-only">
         {copy.heading}
       </h2>

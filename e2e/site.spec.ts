@@ -765,3 +765,58 @@ test.describe("Metadata, social card and structured data (build step 6)", () => 
     await expect(page.locator('link[rel="icon"]')).toHaveAttribute("href", /icon\.svg/);
   });
 });
+
+test.describe("Abbreviations (HANDOFF section 8)", () => {
+  test("the first use on a page carries its expansion; later uses are plain text", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/about");
+    const itfs = page.locator('abbr[data-abbr="ITFS"]');
+    await expect(itfs).toHaveCount(1);
+    await expect(page.locator('abbr[data-abbr="GIFT City"]')).toHaveCount(1);
+    expect(await page.getByRole("main").getByText("ITFS").count()).toBeGreaterThan(1);
+    const tip = itfs.getByRole("tooltip", { includeHidden: true });
+    await expect(tip).toBeHidden();
+    await expect(itfs).toHaveAccessibleDescription("International Trade Finance Service platform");
+    // No abbreviation sits inside a link, a button, a heading or a header cell.
+    expect(await page.locator("a abbr, button abbr, h1 abbr, h2 abbr, h3 abbr, th abbr").count()).toBe(0);
+  });
+
+  test("the tooltip opens on focus and on hover, stays under the pointer and closes with Escape", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/about");
+    const itfs = page.locator('abbr[data-abbr="ITFS"]');
+    const tip = itfs.getByRole("tooltip", { includeHidden: true });
+    await itfs.focus();
+    await expect(tip).toBeVisible();
+    await expect(tip).toHaveText("International Trade Finance Service platform");
+    await page.keyboard.press("Escape");
+    await expect(tip).toBeHidden();
+    await itfs.blur();
+    await itfs.hover();
+    await expect(tip).toBeVisible();
+    await tip.hover();
+    await expect(tip).toBeVisible();
+    await expectNoAxeViolations(page);
+    await page.mouse.move(5, 5);
+    await expect(tip).toBeHidden();
+  });
+
+  test("the marks follow the page on a client navigation, and tooltips stay inside a 390 px screen", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 900 });
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/");
+    await expect(page.locator("abbr[data-abbr]").first()).toBeAttached();
+    for (const abbr of await page.locator("abbr[data-abbr]").all()) {
+      await abbr.scrollIntoViewIfNeeded();
+      await abbr.focus();
+      const box = await abbr.getByRole("tooltip").boundingBox();
+      expect(box!.x).toBeGreaterThanOrEqual(0);
+      expect(box!.x + box!.width).toBeLessThanOrEqual(390);
+    }
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
+    await page.getByRole("button", { name: "Menu" }).click();
+    await page.getByRole("dialog").getByRole("link", { name: "How it works" }).click();
+    await expect(page).toHaveURL(/\/how-it-works$/);
+    await expect(page.locator('abbr[data-abbr="RBI"]')).toHaveCount(1);
+  });
+});

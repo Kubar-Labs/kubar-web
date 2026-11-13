@@ -118,7 +118,7 @@ export function Story({
   return (
     <>
       {enabled ? (
-        <div ref={trackRef} data-story-state={state} style={{ height: 692 + STEP * 8 }}>
+        <div ref={trackRef} data-no-abbr data-story-state={state} style={{ height: 692 + STEP * 8 }}>
           <div className="sticky top-[calc(var(--header-height)+24px)] flex items-start gap-6">
             <div className="flex w-[411px] shrink-0 flex-col">
               <div className="flex items-center justify-between border-b-2 border-rule-strong pb-3">

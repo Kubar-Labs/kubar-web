@@ -2113,5 +2113,24 @@
         }
       ]
     }
+  },
+  "abbreviations": {
+    "AD bank": "Authorised Dealer bank",
+    "DPIIT": "Department for Promotion of Industry and Internal Trade",
+    "EDPMS": "Export Data Processing and Monitoring System",
+    "FACE": "Fintech Association for Consumer Empowerment",
+    "GFTN": "Global Finance & Technology Network",
+    "GIFT City": "Gujarat International Finance Tec-City",
+    "GIFT IFIH": "GIFT International Fintech Innovation Hub",
+    "IBU": "IFSC Banking Unit, a bank’s unit at GIFT City",
+    "IFSC": "International Financial Services Centre",
+    "IFSCA": "International Financial Services Centres Authority",
+    "ITFS": "International Trade Finance Service platform",
+    "MeitY": "Ministry of Electronics and Information Technology",
+    "MSME": "micro, small and medium enterprises",
+    "NIBM": "National Institute of Bank Management",
+    "RBI": "Reserve Bank of India",
+    "SME": "small and medium-sized enterprises",
+    "STPI": "Software Technology Parks of India"
   }
 }
