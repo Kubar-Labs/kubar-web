@@ -6,7 +6,7 @@ import { expect, test, type Page } from "@playwright/test";
  * here (Home in step 3, the product pages and About in step 4, Contact and the
  * legal pages in step 5).
  */
-const publicRoutes = ["/"] as const;
+const publicRoutes = ["/", "/products/kubar-protocol"] as const;
 const OG_IMAGE = /^https:\/\/kubar\.tech\/media\/kubar-labs-og-b2add55b\.png(?:\?.*)?$/;
 
 async function expectNoAxeViolations(page: Page) {
@@ -329,6 +329,29 @@ test.describe("Home, complete (build step 3)", () => {
       await page.setViewportSize({ width, height: 900 });
       await page.emulateMedia({ reducedMotion: "reduce" });
       await page.goto("/");
+      expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
+      await expectNoAxeViolations(page);
+    }
+  });
+});
+
+test.describe("Kubar Protocol (build step 4)", () => {
+  test("carries its metadata, actions and the venue footnote", async ({ page }) => {
+    await page.goto("/products/kubar-protocol");
+    await expect(page).toHaveTitle("Kubar Protocol · Kubar Labs");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Underwrite once. Buy every receivable that fits.");
+    await expect(page.getByRole("link", { name: "Start a programme conversation" }).first()).toHaveAttribute("href", "/contact?intent=institution");
+    await expect(page.getByRole("link", { name: "partnerships@kubar.tech" })).toHaveAttribute("href", "mailto:partnerships@kubar.tech");
+    await expect(page.locator("#fn-1")).toHaveCount(1);
+    await expect(page.getByText("Planned", { exact: true })).toHaveCount(1);
+    await expect(page.getByRole("heading", { level: 3 })).toHaveCount(10);
+  });
+
+  test("at 390 and 768 nothing scrolls sideways and axe is clean", async ({ page }) => {
+    for (const width of [390, 768]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await page.goto("/products/kubar-protocol");
       expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
       await expectNoAxeViolations(page);
     }

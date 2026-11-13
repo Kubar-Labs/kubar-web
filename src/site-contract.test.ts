@@ -133,6 +133,33 @@ describe("copy matches docs/rebuild/copy word for word", () => {
     }
   });
 
+  /** Every tagged fragment of a page's copy file, to check against the messages. */
+  function pageFragments(file: string) {
+    return read(`docs/rebuild/copy/${file}`)
+      .split("\n")
+      .filter((line) => /^\[[A-Za-z]+\] /.test(line))
+      .flatMap((line) => line.split(/\s{2,}(?=\[[A-Za-z]+\] )|\s+\|\s+/))
+      .map((part) =>
+        part
+          .replace(/^\[[A-Za-z]+\] /, "")
+          .replace(/^\d\d\s+\[[A-Za-z]+\] /, "")
+          .replace(/\s+[→←].*$/, "")
+          .replace(/\s{2,}\(.*$/, "")
+          .replace(/^From /, "")
+          .trim(),
+      )
+      .filter((part) => part && !/^[¹²³—]$/.test(part) && !/^\d\d$/.test(part));
+  }
+  const flat = allMessages.replace(/<marker><\/marker>/g, "¹");
+
+  it("carries every Kubar Protocol line (02-kubar-protocol.md)", () => {
+    const skip = new Set(["Back to text", "Illustrative", "Element", "Party", "Institution", "Field"]);
+    for (const line of pageFragments("02-kubar-protocol.md")) {
+      if (skip.has(line)) continue;
+      expect(flat.includes(JSON.stringify(line).slice(1, -1)), `missing: ${line}`).toBe(true);
+    }
+  });
+
   it("keeps every record document with its Proves line (copy deck 4.2)", () => {
     expect(messages.record.documents).toHaveLength(6);
     for (const doc of messages.record.documents) expect(doc.proves.length).toBeGreaterThan(10);

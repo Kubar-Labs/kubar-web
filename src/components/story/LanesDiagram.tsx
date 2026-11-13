@@ -32,7 +32,7 @@ function DataArrow({ from, to, y }: { from: number; to: number; y: number }) {
   );
 }
 
-function MoneyArrow({ from, to, y }: { from: number; to: number; y: number }) {
+export function MoneyArrow({ from, to, y }: { from: number; to: number; y: number }) {
   return (
     <g className="text-ink" fill="currentColor">
       <rect className="lane-line" x={from} y={y - 1} width={to - from - 9} height={2} />

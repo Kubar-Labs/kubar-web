@@ -614,5 +614,473 @@
       "s7": "Added to the loss history",
       "s8": "Registry entry, planned"
     }
+  },
+  "kubarProtocol": {
+    "meta": {
+      "title": "Kubar Protocol · Kubar Labs",
+      "description": "Underwrite once, then buy every export receivable that fits: without recourse for the buyer’s credit, insured in your name, with the evidence behind each one."
+    },
+    "hero": {
+      "kicker": "Kubar Protocol · For banks, finance companies, insurers and funds",
+      "headline": "Underwrite once. Buy every receivable that fits.",
+      "sub": "Kubar runs the programme around your limit: origination, the evidence package, the data your insurer needs and the matching of every payment. You buy each receivable without recourse for the buyer’s credit, insured in your own name.",
+      "button": "Start a programme conversation",
+      "link": "Follow one receivable, shipment to settlement"
+    },
+    "whatYouBuy": {
+      "heading": "An export receivable, with everything behind it.",
+      "title": "Receivable RCV-0001",
+      "columns": {
+        "field": "Field",
+        "entry": "Entry"
+      },
+      "rows": [
+        [
+          "Face value",
+          "$225,000"
+        ],
+        [
+          "Goods",
+          "Rice, shipped from India"
+        ],
+        [
+          "Buyer",
+          "An importer in the UAE, on an approved insurance limit"
+        ],
+        [
+          "Terms",
+          "Open account, due 75 days after shipment"
+        ],
+        [
+          "Purchase price",
+          "90% of face, paid at purchase to the exporter’s own bank"
+        ],
+        [
+          "Deferred purchase price",
+          "The balance, less your discount and charges, paid when the buyer pays"
+        ],
+        [
+          "Recourse",
+          "None for the buyer’s credit; the exporter answers for disputes, returns, set-off and fraud"
+        ],
+        [
+          "Cover",
+          "Credit insurance on the buyer, in your name"
+        ],
+        [
+          "Payment",
+          "The buyer pays your collection account"
+        ],
+        [
+          "Evidence",
+          "One package, with your own read access"
+        ]
+      ],
+      "under": "Illustrative: an example receivable, not a real transaction."
+    },
+    "timeline": {
+      "title": "When the money moves · your side",
+      "holdsNone": "Kubar holds none",
+      "received": "Received",
+      "paidOut": "Paid out",
+      "receivedText": "$225,000 · face value, from the buyer, into your collection account",
+      "paidText": "$202,500 · the purchase price, 90% of face, to the exporter’s bank",
+      "meanwhile": "Meanwhile you carry the buyer’s credit, insured in your name",
+      "deferred": "The deferred purchase price: the balance (10% of face), less your discount and charges, to the exporter. Its amount depends on pricing, so it has no figure.",
+      "shipment": "Shipment · day 0",
+      "purchase": "Purchase",
+      "due": "Due date · day 75",
+      "note": "Days after shipment. The purchase date is illustrative: it follows the documents, the insurer’s limit check and the buyer’s acknowledgement.",
+      "stacked": {
+        "paid": "Paid out · at purchase",
+        "meanwhile": "Meanwhile",
+        "received": "Received · day 75",
+        "later": "Paid out · later"
+      },
+      "alt": "A timeline of the financier’s payments against days after shipment: $202,500 paid out at purchase, $225,000 received on day 75, and the deferred purchase price paid out after it."
+    },
+    "programme": {
+      "heading": "How a programme runs.",
+      "setUp": "Set up once",
+      "setUpSteps": [
+        {
+          "no": "01",
+          "text": "Kubar proposes the pool and its rules",
+          "who": "Kubar, to you"
+        },
+        {
+          "no": "02",
+          "text": "You agree the terms and set a programme limit",
+          "who": "You"
+        },
+        {
+          "no": "03",
+          "text": "The insurer approves limits on the buyers, in your name",
+          "who": "The insurer"
+        },
+        {
+          "no": "04",
+          "text": "You appoint Kubar as your origination and servicing agent",
+          "who": "You, to Kubar"
+        },
+        {
+          "no": "05",
+          "text": "Exporters join: identity checks, their bank’s no-objection, a notice on their invoices",
+          "who": "Kubar and exporters"
+        },
+        {
+          "no": "06",
+          "text": "Buyers are told to pay your account, and acknowledge it",
+          "who": "Buyers"
+        }
+      ],
+      "link": "See every step in detail",
+      "each": "Then, for every receivable · limit set",
+      "eachSteps": [
+        {
+          "no": "01",
+          "text": "The exporter, or its platform, submits the shipment",
+          "who": "Exporter"
+        },
+        {
+          "no": "02",
+          "text": "Kubar checks it against the programme’s rules and assembles the evidence package",
+          "who": "Kubar"
+        },
+        {
+          "no": "03",
+          "text": "You accept it under your limit",
+          "who": "You"
+        },
+        {
+          "no": "04",
+          "text": "You pay the purchase price; the buyer pays you on the due date; you pay the exporter the balance",
+          "who": "You and the buyer"
+        },
+        {
+          "no": "05",
+          "text": "The outcome enters the loss history",
+          "who": "Kubar"
+        }
+      ],
+      "note": "The credit decision is yours; Kubar can’t override it.",
+      "noteAfter": "03",
+      "refs": "RCV-0001 · RCV-0002 · RCV-0003 · …",
+      "refsLine": "Every receivable that fits, inside your limit",
+      "columns": {
+        "no": "No.",
+        "step": "Step",
+        "who": "Who"
+      }
+    },
+    "evidence": {
+      "heading": "Every element traces to a system the exporter doesn’t control.",
+      "lead": "Financiers have lost money on paper they couldn’t verify. So each receivable comes with one record: you buy on it, the insurer prices on it, and the exporter’s bank closes the shipping bill against it.",
+      "from": "From {source}",
+      "elements": [
+        {
+          "element": "Identity of the exporter and the buyer",
+          "from": "Government registries; screening"
+        },
+        {
+          "element": "Commercial invoice, with the instruction to pay you",
+          "from": "The exporter"
+        },
+        {
+          "element": "Shipping bill",
+          "from": "Indian Customs"
+        },
+        {
+          "element": "Bill of lading, electronic where the carrier issues one",
+          "from": "The carrier"
+        },
+        {
+          "element": "Inspection report, where the programme requires one",
+          "from": "The inspection agency"
+        },
+        {
+          "element": "Insurance limit",
+          "from": "The insurer"
+        },
+        {
+          "element": "Buyer’s acknowledgement",
+          "from": "The buyer"
+        },
+        {
+          "element": "No-objection",
+          "from": "The exporter’s bank"
+        },
+        {
+          "element": "Programme checks",
+          "from": "Kubar"
+        },
+        {
+          "element": "Purchase and settlement",
+          "from": "You and the exporter’s bank"
+        }
+      ],
+      "record": "Record RCV-0001",
+      "readers": [
+        "You buy on it",
+        "The insurer prices on it",
+        "The exporter’s bank closes the shipping bill against it"
+      ],
+      "columns": [
+        "Element",
+        "From",
+        "Checked against"
+      ],
+      "rows": [
+        [
+          "Identity of the exporter and the buyer",
+          "Government registries; screening",
+          "Kubar’s checks, kept on file"
+        ],
+        [
+          "Commercial invoice, with the instruction to pay you",
+          "The exporter",
+          "The shipping bill; the e-invoice reference where one applies"
+        ],
+        [
+          "Shipping bill",
+          "Indian Customs",
+          "The invoice: goods, quantity, value and buyer"
+        ],
+        [
+          "Bill of lading, electronic where the carrier issues one",
+          "The carrier",
+          "The shipped-on-board date and vessel"
+        ],
+        [
+          "Inspection report, where the programme requires one",
+          "The inspection agency",
+          "The report’s reference"
+        ],
+        [
+          "Insurance limit",
+          "The insurer",
+          "Headroom on the buyer’s limit"
+        ],
+        [
+          "Buyer’s acknowledgement",
+          "The buyer",
+          "Signatory, date and channel"
+        ],
+        [
+          "No-objection",
+          "The exporter’s bank",
+          "The bank’s letter"
+        ],
+        [
+          "Programme checks",
+          "Kubar",
+          "Eligibility, concentration, sanctions and related-party results"
+        ],
+        [
+          "Purchase and settlement",
+          "You and the exporter’s bank",
+          "Payment references; the closure of the shipping bill"
+        ]
+      ],
+      "after": [
+        "Each element carries its source, its time and who signed it, and any change after signing shows. You and the insurer each get your own read access.",
+        "The record is built on Corda, a permissioned ledger: one shared record of each receivable, who holds which rights after the purchase, and its payment and loss history."
+      ],
+      "alt": "Ten elements of the evidence package, each from its own source, flow into one record."
+    },
+    "insurance": {
+      "heading": "Cover in your name, on approved buyers.",
+      "lead": "The credit-insurance policy is yours: you are the insured, on buyer limits the insurer approves. Kubar insures nothing. It gives the insurer what it needs to set and keep those limits: the pool, each receivable as it’s bought and how each one paid. No receivable is bought without headroom on an approved limit."
+    },
+    "payment": {
+      "heading": "The money moves only between banks.",
+      "parties": [
+        "Kubar",
+        "Buyer, UAE",
+        "Financier",
+        "Exporter’s bank"
+      ],
+      "payments": [
+        "Purchase price, at purchase (90% of face)",
+        "Face value, on the due date",
+        "Deferred purchase price: the balance, less discount and charges"
+      ],
+      "kubarNote": "No account, no payment, no release",
+      "under": "Every payment carries the receivable’s reference, and Kubar matches each one to its receivable.",
+      "columns": {
+        "payment": "Payment",
+        "from": "From",
+        "to": "To"
+      },
+      "alt": "Three payments move between the buyer, the financier and the exporter’s bank. None touches Kubar."
+    },
+    "lossHistory": {
+      "heading": "Every receivable that settles adds to a priced loss history.",
+      "lead": "Recorded by buyer, exporter and commodity, it lets an insurer price the pool, and it brings in the next financier."
+    },
+    "holds": {
+      "heading": "You hold the receivable, the policy and the account.",
+      "columns": [
+        "Party",
+        "Holds",
+        "Doesn’t hold"
+      ],
+      "rows": [
+        [
+          "You, the financier",
+          "The receivable, the collection account, the insurance policy and the buyer’s credit risk",
+          "Recourse to the exporter for the buyer’s credit"
+        ],
+        [
+          "The insurer",
+          "The buyer’s credit risk on the covered share",
+          "Dispute or fraud risk"
+        ],
+        [
+          "The exporter",
+          "Disputes, returns, set-off and fraud on its own trades",
+          "The receivable, once sold"
+        ],
+        [
+          "The exporter’s bank",
+          "Its relationship with the exporter",
+          "The receivables sold"
+        ],
+        [
+          "Kubar",
+          "Origination, the evidence package, servicing and reporting",
+          "Money or credit risk"
+        ]
+      ]
+    },
+    "questions": {
+      "heading": "Questions a credit committee asks.",
+      "items": [
+        {
+          "q": "What am I buying?",
+          "a": "An export receivable: the amount an overseas buyer owes an Indian exporter under a shipped invoice. You buy it outright, inside your programme limit, without recourse for the buyer’s credit."
+        },
+        {
+          "q": "Who carries the buyer’s credit, and who carries disputes?",
+          "a": "You carry the buyer’s credit, insured in your name. The exporter carries disputes, returns, set-off and fraud, and answers for its own warranties."
+        },
+        {
+          "q": "Is the cover in my name?",
+          "a": "Yes. In a programme the credit-insurance policy is in your name, on buyer limits the insurer approves. Until that policy is signed, a programme can start on exporters’ own policies with claims assigned to you; we say which applies before you buy anything."
+        },
+        {
+          "q": "Who holds the money?",
+          "a": "You do. The buyer pays your collection account, and you pay the exporter’s account at its own bank. Kubar never holds an account, receives a payment or releases funds."
+        },
+        {
+          "q": "How do I know the shipment and the invoice are real?",
+          "a": "Each element of the evidence package comes from a system the exporter doesn’t control: Indian Customs for the shipping bill, the carrier for the bill of lading, the insurer for the limit, the buyer for its acknowledgement and the exporter’s bank for its no-objection. Kubar checks them against each other before anything is offered to you."
+        },
+        {
+          "q": "Who is Kubar, and under what mandate does it act?",
+          "a": "Kubar Labs is the brand of Kubar Protocol Private Limited, founded in India in 2024. Under a written mandate from you, Kubar designs the pool and its rules, checks and documents each receivable, services it and reports. The purchase runs on your licence and your credit policies; Kubar never makes the credit decision, holds money or carries credit risk. Kubar’s own ITFS registration is targeted for 2027; until then Kubar acts as the financier’s origination and servicing agent."
+        },
+        {
+          "q": "What happens if a buyer doesn’t pay?",
+          "a": "Kubar flags the late payment, checks with the exporter for any dispute and sends the notices your policy requires. As the insured, you lodge the claim under your policy, with the evidence package behind it. The exporter answers only for its own side of the trade: disputes, returns, set-off, fraud and its warranties."
+        },
+        {
+          "q": "What do I sign?",
+          "a": "Programme terms on your own paper (the rules, your limit, the caps and the reporting); a mandate appointing Kubar as your origination and servicing agent; the credit-insurance policy, between you and the insurer; and a receivables purchase agreement with each exporter in the programme."
+        },
+        {
+          "q": "How is Kubar paid?",
+          "a": "By a fee from you and a fee from the exporter, for running the programme. Kubar earns nothing from holding money or credit risk."
+        },
+        {
+          "q": "Can individuals invest?",
+          "a": "No. Only institutional financiers buy the receivables. There is no retail access, and nothing on this site is an offer to the public."
+        }
+      ]
+    },
+    "fit": {
+      "heading": "Where each institution fits.",
+      "columns": [
+        "Institution",
+        "Role"
+      ],
+      "rows": [
+        [
+          "Banks’ units at GIFT City (IFSC Banking Units)",
+          "Programme financier: set a limit and buy every receivable that fits"
+        ],
+        [
+          "IFSC finance companies and factors",
+          "Programme financier; later, a lane for smaller receivables held on a finance company’s balance sheet"
+        ],
+        [
+          "Banks, factors and finance companies abroad",
+          "Bid for programmes on Kubar’s own venue once it is registered<marker></marker>, with no entity at GIFT City, if they meet its admission rules"
+        ],
+        [
+          "Credit insurers",
+          "Cover the buyers in the financier’s name, with the evidence behind every receivable and a loss history over time"
+        ],
+        [
+          "Funds",
+          "Later, buying receivables from financiers"
+        ]
+      ]
+    },
+    "programme1": {
+      "heading": "Programme 1: rice, to buyers in the UAE and the Gulf.",
+      "columns": [
+        "Field",
+        "Entry"
+      ],
+      "rows": [
+        [
+          "Exporters",
+          "Indian rice exporters"
+        ],
+        [
+          "Buyers",
+          "Importers in the UAE and the wider Gulf, on approved insurance limits"
+        ],
+        [
+          "Terms",
+          "Open account"
+        ],
+        [
+          "Financier",
+          "A bank’s unit at GIFT City. In discussions with IBUs"
+        ],
+        [
+          "Cover",
+          "Credit insurance on the buyers, in the financier’s name"
+        ],
+        [
+          "Next",
+          "Chemicals and pharmaceutical formulations, then engineering goods and auto components"
+        ]
+      ]
+    },
+    "venue": {
+      "heading": "The venue comes last.",
+      "sentence": "Kubar’s own ITFS, once registered<marker></marker>, is meant to do three things the programmes can’t:",
+      "planned": "Planned",
+      "things": [
+        "Admit institutional financiers beyond banks’ units at GIFT City, including those with no presence there",
+        "Keep a registry so a receivable can change hands without a fresh assignment each time",
+        "Give insurers, rating agencies and funds a neutral operator’s record to rely on"
+      ],
+      "under": "Like the programmes, it is for institutional financiers only.",
+      "columns": {
+        "no": "No.",
+        "thing": "What it does"
+      }
+    },
+    "next": {
+      "heading": "Start a programme conversation.",
+      "body": "Tell us what you finance today, and we’ll take you through how a programme would run for you.",
+      "button": "Start a programme conversation",
+      "orEmail": "Or email",
+      "email": "partnerships@kubar.tech"
+    }
   }
 }
