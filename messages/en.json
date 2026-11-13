@@ -1784,5 +1784,334 @@
         }
       ]
     }
+  },
+  "contact": {
+    "meta": {
+      "title": "Contact · Kubar Labs",
+      "description": "Talk to Kubar Labs about a programme, an integration or anything else. Tell us who you are and your message reaches the right people."
+    },
+    "hero": {
+      "headline": "Talk to us.",
+      "sub": "Tell us who you are and what you’d like to discuss, and your message reaches the right people."
+    },
+    "routes": {
+      "columns": {
+        "who": "If you are",
+        "step": "Next step",
+        "goesTo": "Goes to"
+      },
+      "rows": [
+        {
+          "who": "A bank, finance company, insurer or fund",
+          "step": "Start a programme conversation",
+          "href": "/contact?intent=institution#form",
+          "goesTo": "partnerships@kubar.tech"
+        },
+        {
+          "who": "A trade platform or marketplace",
+          "step": "Talk about an integration",
+          "href": "/contact?intent=platform#form",
+          "goesTo": "partnerships@kubar.tech"
+        },
+        {
+          "who": "An exporter",
+          "step": "Ask about Programme 1",
+          "href": "/contact?intent=exporter#form",
+          "goesTo": "outreach@kubar.tech"
+        },
+        {
+          "who": "An investor",
+          "step": "Email us",
+          "href": "mailto:partnerships@kubar.tech",
+          "goesTo": "partnerships@kubar.tech"
+        },
+        {
+          "who": "Press, or anything else",
+          "step": "Write to us",
+          "href": "/contact?intent=other#form",
+          "goesTo": "outreach@kubar.tech"
+        }
+      ]
+    },
+    "form": {
+      "heading": "Send message",
+      "labels": {
+        "intent": "I’m writing as",
+        "name": "Full name",
+        "email": "Work email",
+        "organisation": "Organisation",
+        "role": "Your role",
+        "message": "What would you like to discuss?",
+        "website": "Leave this field empty"
+      },
+      "optional": "(optional)",
+      "emailHelp": "We’ll reply to this address.",
+      "intents": {
+        "institution": "A bank, finance company, insurer or fund",
+        "platform": "A trade platform or marketplace",
+        "exporter": "An exporter",
+        "investor": "An investor",
+        "press": "Press",
+        "other": "Something else"
+      },
+      "messageHelp": {
+        "institution": "For example: the trade you finance today, the limits you work with, or what your credit committee will ask.",
+        "platform": "For example: your platform, the exporters on it and what you’d like them to have.",
+        "exporter": "For example: what you export, where your buyers are and how much of your bank limit you use.",
+        "investor": "For example: your fund and what you’d like to know.",
+        "press": "For example: your publication, your deadline and your question."
+      },
+      "count": "{n} of 2,000",
+      "errors": {
+        "intentRequired": "Please choose who you’re writing as.",
+        "nameRequired": "Please enter your full name.",
+        "emailRequired": "Please enter your work email.",
+        "emailInvalid": "Please enter an email address in the form name@organisation.com.",
+        "organisationRequired": "Please enter your organisation.",
+        "messageRequired": "Please tell us what you’d like to discuss.",
+        "messageTooLong": "Please keep your message under 2,000 characters."
+      },
+      "summary": "Your message didn’t send. Please check these fields.",
+      "send": "Send message",
+      "sending": "Sending…",
+      "notice": "We use these details only to reply to you and to continue the conversation you start.",
+      "privacy": "Privacy notice",
+      "sent": {
+        "heading": "Message sent.",
+        "body": "Thank you, {firstName}. Your message is with the team, and we’ll reply from a kubar.tech address.",
+        "link": "Back to the home page"
+      },
+      "failed": {
+        "server": "Your message didn’t send. Please try again, or email <email>outreach@kubar.tech</email> directly.",
+        "rate": "We’ve had several messages from this connection in a short time. Please wait a few minutes and try again, or email <email>outreach@kubar.tech</email>.",
+        "offline": "You seem to be offline. Your message is still here; send it again when you’re connected."
+      }
+    },
+    "direct": {
+      "label": "Direct",
+      "columns": [
+        "For",
+        "Write to"
+      ],
+      "rows": [
+        [
+          "Partnerships and investors",
+          "partnerships@kubar.tech"
+        ],
+        [
+          "Everything else, including press",
+          "outreach@kubar.tech"
+        ],
+        [
+          "Privacy requests and grievances",
+          "Keshav Dudani, Grievance Officer: keshav@kubar.tech"
+        ],
+        [
+          "Registered office",
+          "Paras Market, Station Road, Barakar, West Bengal 713324"
+        ]
+      ]
+    }
+  },
+  "legal": {
+    "privacy": {
+      "meta": {
+        "title": "Privacy notice · Kubar Labs",
+        "description": "How Kubar Labs handles personal data collected through kubar.tech."
+      },
+      "title": "Privacy notice",
+      "lastUpdated": "Last updated: [date]",
+      "contents": "Contents",
+      "sections": [
+        {
+          "n": "1",
+          "title": "Who we are",
+          "blocks": [
+            "Kubar Labs is the brand of Kubar Protocol Private Limited, a company incorporated in India (CIN U70200WB2024PTC274850), with its registered office at Paras Market, Station Road, Barakar, West Bengal 713324 (“Kubar”, “we”). This notice explains how we handle personal data collected through kubar.tech. We decide why and how this data is used."
+          ]
+        },
+        {
+          "n": "2",
+          "title": "What we collect",
+          "blocks": [
+            "– What you send through the contact form: your name, work email, organisation, role (if you give it), who you’re writing as and your message.",
+            "– What you send us by email.",
+            "– Technical data that our hosting provider handles to deliver and protect the site, such as your IP address, browser type and the pages you request. We use your IP address briefly to limit repeated form submissions, and we don’t store it with your message.",
+            "– Aggregate figures on how the site is used, from Cloudflare Web Analytics, which uses no cookies or local storage and doesn’t fingerprint visitors.",
+            "We don’t ask for sensitive personal data, such as passwords or financial, health or biometric information. Please don’t send it."
+          ]
+        },
+        {
+          "n": "3",
+          "title": "Cookies",
+          "blocks": [
+            "The site sets no cookies for analytics or advertising. Our hosting provider may set a strictly necessary cookie to protect the site from automated traffic."
+          ]
+        },
+        {
+          "n": "4",
+          "title": "Why we use it",
+          "blocks": [
+            "– To reply to your enquiry and to continue the conversation you start.",
+            "– To keep the site and the form secure and working.",
+            "– To understand, in aggregate, how the site is used.",
+            "We don’t sell personal data, and we don’t use it for advertising."
+          ]
+        },
+        {
+          "n": "5",
+          "title": "Who we share it with",
+          "blocks": [
+            "– Kubar staff who need it to reply to you.",
+            "– Service providers that process it for us: Cloudflare (hosting, security, form delivery and analytics) and Google (email). These providers may process data outside India.",
+            "– Authorities, where the law requires it."
+          ]
+        },
+        {
+          "n": "6",
+          "title": "How long we keep it",
+          "blocks": [
+            "We keep enquiries for [24 months] after our last exchange, unless a business relationship follows or the law requires us to keep them longer."
+          ]
+        },
+        {
+          "n": "7",
+          "title": "How we protect it",
+          "blocks": [
+            "We follow reasonable security practices: access only for staff who need it, encrypted connections, and providers that follow recognised security standards."
+          ]
+        },
+        {
+          "n": "8",
+          "title": "Your rights",
+          "blocks": [
+            "You can ask us to tell you what personal data we hold about you, to correct or update it, to delete it where we don’t need to keep it, and to stop using it by withdrawing your consent. You can nominate someone to act for you, and you can raise a grievance with our Grievance Officer. From 13 May 2027, when the remaining provisions of the Digital Personal Data Protection Act, 2023 and its Rules apply, you may also complain to the Data Protection Board of India if we haven’t resolved your grievance."
+          ]
+        },
+        {
+          "n": "9",
+          "title": "Grievance Officer",
+          "blocks": [
+            "Keshav Dudani, Grievance Officer, Kubar Protocol Private Limited, Paras Market, Station Road, Barakar, West Bengal 713324; keshav@kubar.tech. We reply within one month of receiving a grievance."
+          ]
+        },
+        {
+          "n": "10",
+          "title": "Children",
+          "blocks": [
+            "The site is for businesses and institutions, not for children, and we don’t knowingly collect children’s personal data."
+          ]
+        },
+        {
+          "n": "11",
+          "title": "Changes",
+          "blocks": [
+            "We post any change here, with the date it takes effect."
+          ]
+        }
+      ]
+    },
+    "terms": {
+      "meta": {
+        "title": "Terms of use · Kubar Labs",
+        "description": "The terms on which kubar.tech is offered."
+      },
+      "title": "Terms of use",
+      "lastUpdated": "Last updated: [date]",
+      "contents": "Contents",
+      "sections": [
+        {
+          "n": "1",
+          "title": "About these terms",
+          "blocks": [
+            "kubar.tech is run by Kubar Protocol Private Limited, a company incorporated in India (CIN U70200WB2024PTC274850), with its registered office at Paras Market, Station Road, Barakar, West Bengal 713324 (“Kubar”). By using the site, you accept these terms."
+          ]
+        },
+        {
+          "n": "2",
+          "title": "What the site is",
+          "blocks": [
+            "The site gives information about Kubar Labs and its products, for institutions and businesses. It is not an offer, an invitation or a solicitation to buy, sell or finance any receivable, security or other financial product, and nothing on it is investment, financial, legal or tax advice. Kubar’s services are for institutions only; nothing on the site is an offer to the public."
+          ]
+        },
+        {
+          "n": "3",
+          "title": "Kubar’s role",
+          "blocks": [
+            "Kubar acts as a financier’s origination and servicing agent. It doesn’t lend, hold client money or take credit risk. Any programme is governed by its own signed documents, not by this site."
+          ]
+        },
+        {
+          "n": "4",
+          "title": "Plans, status and examples",
+          "blocks": [
+            "Statements about plans, such as Kubar’s own ITFS registration, targeted for 2027, are intentions, not promises, and depend on approvals and agreements outside Kubar’s control. Status labels describe the position on the date shown. The illustrative receivable is an example, not a real transaction."
+          ]
+        },
+        {
+          "n": "5",
+          "title": "Other people’s names and marks",
+          "blocks": [
+            "Programme names and logos belong to their owners. They show programmes Kubar or its founder takes part in, and they don’t imply a partnership or an endorsement. Links to other sites are for convenience; we aren’t responsible for their content."
+          ]
+        },
+        {
+          "n": "6",
+          "title": "Our content",
+          "blocks": [
+            "The site’s text and design, the Kubar mark and the names Kubar Labs, Kubar Protocol and NavDhan belong to Kubar Protocol Private Limited. You may view and share pages for your own reference; any other use needs our written permission."
+          ]
+        },
+        {
+          "n": "7",
+          "title": "Using the site",
+          "blocks": [
+            "Don’t use the site unlawfully, interfere with its security or operation, or send it malicious code or automated requests."
+          ]
+        },
+        {
+          "n": "8",
+          "title": "No warranty",
+          "blocks": [
+            "We work to keep the site accurate, but it is provided as it is, without warranties, to the extent the law allows."
+          ]
+        },
+        {
+          "n": "9",
+          "title": "Liability",
+          "blocks": [
+            "To the extent the law allows, Kubar isn’t liable for any loss arising from use of, or reliance on, the site."
+          ]
+        },
+        {
+          "n": "10",
+          "title": "Privacy",
+          "blocks": [
+            "The <link>privacy notice</link> explains how we handle personal data."
+          ]
+        },
+        {
+          "n": "11",
+          "title": "Changes",
+          "blocks": [
+            "We may update these terms. The version on this page applies from the date shown."
+          ]
+        },
+        {
+          "n": "12",
+          "title": "Law and courts",
+          "blocks": [
+            "These terms are governed by the laws of India. Any dispute arising from them or from the use of the site is resolved by arbitration seated in GIFT City, Gandhinagar, before a sole arbitrator under the Arbitration and Conciliation Act, 1996. Subject to that, the courts at Gandhinagar, Gujarat have exclusive jurisdiction."
+          ]
+        },
+        {
+          "n": "13",
+          "title": "Contact",
+          "blocks": [
+            "outreach@kubar.tech · Paras Market, Station Road, Barakar, West Bengal 713324"
+          ]
+        }
+      ]
+    }
   }
 }

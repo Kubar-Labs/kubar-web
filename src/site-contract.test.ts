@@ -210,6 +210,37 @@ describe("copy matches docs/rebuild/copy word for word", () => {
     expect(messages.about.team.advisers.rows).toHaveLength(4);
   });
 
+  it("carries the contact form's contract word for word (06-contact.md)", () => {
+    const copy = read("docs/rebuild/copy/06-contact.md");
+    const form = messages.contact.form;
+    for (const text of [...Object.values(form.labels), ...Object.values(form.errors), ...Object.values(form.intents), ...Object.values(form.messageHelp)]) {
+      expect(copy, `not in the copy: ${text}`).toContain(text);
+    }
+    for (const text of [form.emailHelp, form.notice, form.privacy, form.send, form.sending, form.sent.heading, form.sent.link, form.sent.body.replace("{firstName}", "[first name]")]) {
+      expect(copy, `not in the copy: ${text}`).toContain(text);
+    }
+    for (const text of Object.values(form.failed)) expect(copy).toContain(text.replace(/<\/?email>/g, ""));
+    expect(Object.keys(form.intents)).toEqual(["institution", "platform", "exporter", "investor", "press", "other"]);
+    expect(form.messageHelp).not.toHaveProperty("other");
+    for (const row of messages.contact.routes.rows) {
+      expect(copy).toContain(`${row.who} | ${row.step} | ${row.goesTo}`);
+    }
+    for (const row of messages.contact.direct.rows) expect(copy).toContain(row.join(" | "));
+    expect(JSON.stringify(messages.contact)).not.toMatch(/24 hours|phone/i);
+  });
+
+  it("carries the privacy notice and terms as written (07-system-and-legal.md)", () => {
+    const copy = read("docs/rebuild/copy/07-system-and-legal.md");
+    for (const page of [messages.legal.privacy, messages.legal.terms]) {
+      for (const section of page.sections) {
+        expect(copy).toContain(`[H4] ${section.n}. ${section.title}`);
+        for (const block of section.blocks) expect(copy, `not in the copy: ${block}`).toContain(block.replace(/<\/?link>/g, ""));
+      }
+    }
+    expect(messages.legal.privacy.sections).toHaveLength(11);
+    expect(messages.legal.terms.sections).toHaveLength(13);
+  });
+
   it("keeps every record document with its Proves line (copy deck 4.2)", () => {
     expect(messages.record.documents).toHaveLength(6);
     for (const doc of messages.record.documents) expect(doc.proves.length).toBeGreaterThan(10);

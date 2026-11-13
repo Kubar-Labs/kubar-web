@@ -6,7 +6,7 @@ import { expect, test, type Page } from "@playwright/test";
  * here (Home in step 3, the product pages and About in step 4, Contact and the
  * legal pages in step 5).
  */
-const publicRoutes = ["/", "/products/kubar-protocol", "/products/navdhan-sdk", "/how-it-works", "/about"] as const;
+const publicRoutes = ["/", "/products/kubar-protocol", "/products/navdhan-sdk", "/how-it-works", "/about", "/contact", "/legal/privacy", "/legal/terms"] as const;
 const OG_IMAGE = /^https:\/\/kubar\.tech\/media\/kubar-labs-og-b2add55b\.png(?:\?.*)?$/;
 
 async function expectNoAxeViolations(page: Page) {
@@ -474,6 +474,207 @@ test.describe("About (build step 4)", () => {
       await page.setViewportSize({ width, height: 900 });
       await page.emulateMedia({ reducedMotion: "reduce" });
       await page.goto("/about");
+      expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
+      await expectNoAxeViolations(page);
+    }
+  });
+});
+
+test.describe("Contact (build step 5)", () => {
+  const fill = async (page: import("@playwright/test").Page) => {
+    await page.getByLabel("Full name").fill("Arjun Mehta");
+    await page.getByLabel("Work email").fill("arjun.mehta@bank.example");
+    await page.getByLabel("Organisation").fill("A bank’s IFSC Banking Unit");
+    await page.getByLabel("What would you like to discuss?").fill("We finance rice exporters and would like to understand how a programme would run for us.");
+  };
+  const send = (page: import("@playwright/test").Page) => page.getByRole("button", { name: "Send message" }).click();
+
+  test("carries its metadata, the routes and the direct addresses", async ({ page }) => {
+    await page.goto("/contact");
+    await expect(page).toHaveTitle("Contact · Kubar Labs");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Talk to us.");
+    await expect(page.getByRole("link", { name: "Ask about Programme 1" })).toHaveAttribute("href", "/contact?intent=exporter#form");
+    await expect(page.getByRole("link", { name: "Email us" })).toHaveAttribute("href", "mailto:partnerships@kubar.tech");
+    await expect(page.getByRole("link", { name: "keshav@kubar.tech" })).toHaveAttribute("href", "mailto:keshav@kubar.tech");
+    await expect(page.getByText(/24 hours/)).toHaveCount(0);
+    for (const label of ["Full name", "Work email", "Organisation", "Your role", "What would you like to discuss?"]) {
+      await expect(page.getByLabel(label)).toHaveValue("");
+      await expect(page.getByLabel(label)).not.toHaveAttribute("placeholder", /.+/);
+    }
+    await expect(page.getByText("0 of 2,000")).toBeVisible();
+  });
+
+  test("each ?intent= value preselects its option and sets the message help", async ({ page }) => {
+    const help: Record<string, string | null> = {
+      institution: "For example: the trade you finance today, the limits you work with, or what your credit committee will ask.",
+      platform: "For example: your platform, the exporters on it and what you’d like them to have.",
+      exporter: "For example: what you export, where your buyers are and how much of your bank limit you use.",
+      investor: "For example: your fund and what you’d like to know.",
+      press: "For example: your publication, your deadline and your question.",
+      other: null,
+    };
+    for (const [intent, line] of Object.entries(help)) {
+      await page.goto(`/contact?intent=${intent}`);
+      await expect(page.getByLabel("I’m writing as")).toHaveValue(intent);
+      if (line) await expect(page.getByText(line)).toBeVisible();
+      else await expect(page.getByText(/^For example/)).toHaveCount(0);
+    }
+    await page.goto("/contact?intent=nonsense");
+    await expect(page.getByLabel("I’m writing as")).toHaveValue("");
+  });
+
+  test("a route on the page chooses the intent without a reload", async ({ page }) => {
+    await page.goto("/contact");
+    await page.getByRole("link", { name: "Talk about an integration" }).click();
+    await expect(page.getByLabel("I’m writing as")).toHaveValue("platform");
+  });
+
+  test("sending an empty form shows every message as written, and the summary takes focus", async ({ page }) => {
+    let called = false;
+    await page.route("**/api/contact", (route) => { called = true; return route.fulfill({ status: 200, body: "{}" }); });
+    await page.goto("/contact");
+    await send(page);
+    const summary = page.getByRole("alert").filter({ hasText: "Your message didn’t send. Please check these fields." });
+    await expect(summary).toBeFocused();
+    for (const message of [
+      "Please choose who you’re writing as.",
+      "Please enter your full name.",
+      "Please enter your work email.",
+      "Please enter your organisation.",
+      "Please tell us what you’d like to discuss.",
+    ]) {
+      await expect(summary.getByRole("link", { name: message })).toBeVisible();
+      await expect(page.getByText(message)).toHaveCount(2);
+    }
+    await expect(page.getByLabel("Full name")).toHaveAttribute("aria-invalid", "true");
+    await expect(page.getByLabel("Your role")).not.toHaveAttribute("aria-invalid", "true");
+    await summary.getByRole("link", { name: "Please enter your work email." }).click();
+    await expect(page.getByLabel("Work email")).toBeFocused();
+    expect(called).toBe(false);
+    await expectNoAxeViolations(page);
+  });
+
+  test("a malformed email and an over-long message get their own messages", async ({ page }) => {
+    await page.goto("/contact?intent=press");
+    await fill(page);
+    await page.getByLabel("Work email").fill("arjun at bank");
+    await page.getByLabel("What would you like to discuss?").fill("m".repeat(2001));
+    await expect(page.getByText("2,001 of 2,000")).toBeVisible();
+    await send(page);
+    await expect(page.getByText("Please enter an email address in the form name@organisation.com.")).toHaveCount(2);
+    await expect(page.getByText("Please keep your message under 2,000 characters.")).toHaveCount(2);
+  });
+
+  test("a sent message posts the new contract and is replaced by the thanks", async ({ page }) => {
+    let body: Record<string, unknown> = {};
+    await page.route("**/api/contact", async (route) => {
+      body = route.request().postDataJSON();
+      await new Promise((resolve) => setTimeout(resolve, 400));
+      await route.fulfill({ status: 200, contentType: "application/json", body: '{"success":true}' });
+    });
+    await page.goto("/contact?intent=institution");
+    await fill(page);
+    await page.getByLabel("Your role").fill("Head of trade finance");
+    const button = page.getByRole("button", { name: "Send message" });
+    const width = (await button.boundingBox())!.width;
+    await button.click();
+    const sending = page.getByRole("button", { name: "Sending…" });
+    await expect(sending).toBeVisible();
+    await expect(sending).not.toHaveAttribute("disabled");
+    expect((await sending.boundingBox())!.width).toBe(width);
+    const heading = page.getByRole("heading", { name: "Message sent." });
+    await expect(heading).toBeFocused();
+    await expect(page.getByText("Thank you, Arjun. Your message is with the team, and we’ll reply from a kubar.tech address.")).toBeVisible();
+    await expect(page.getByRole("link", { name: "Back to the home page" })).toHaveAttribute("href", "/");
+    await expect(page.locator("form")).toHaveCount(0);
+    expect(body).toEqual({
+      intent: "institution",
+      name: "Arjun Mehta",
+      email: "arjun.mehta@bank.example",
+      organisation: "A bank’s IFSC Banking Unit",
+      role: "Head of trade finance",
+      message: "We finance rice exporters and would like to understand how a programme would run for us.",
+      website: "",
+    });
+    await expectNoAxeViolations(page);
+  });
+
+  test("server error, rate limit and offline each show their copy and keep the values", async ({ page, context }) => {
+    await page.goto("/contact?intent=exporter");
+    await fill(page);
+
+    await page.route("**/api/contact", (route) => route.fulfill({ status: 500, contentType: "application/json", body: "{}" }));
+    await send(page);
+    await expect(page.getByText("Your message didn’t send. Please try again, or email outreach@kubar.tech directly.")).toBeVisible();
+    await expect(page.locator("form").getByRole("link", { name: "outreach@kubar.tech" })).toHaveAttribute("href", "mailto:outreach@kubar.tech");
+    await expectNoAxeViolations(page);
+
+    await page.unroute("**/api/contact");
+    await page.route("**/api/contact", (route) => route.fulfill({ status: 429, contentType: "application/json", body: "{}" }));
+    await send(page);
+    await expect(
+      page.getByText("We’ve had several messages from this connection in a short time. Please wait a few minutes and try again, or email outreach@kubar.tech."),
+    ).toBeVisible();
+
+    await context.setOffline(true);
+    await send(page);
+    await expect(page.getByText("You seem to be offline. Your message is still here; send it again when you’re connected.")).toBeVisible();
+    await context.setOffline(false);
+
+    await expect(page.getByLabel("Full name")).toHaveValue("Arjun Mehta");
+    await expect(page.getByLabel("I’m writing as")).toHaveValue("exporter");
+  });
+
+  test("the honeypot is out of reach of people and assistive technology", async ({ page }) => {
+    await page.goto("/contact");
+    const trap = page.locator("#contact-website");
+    await expect(trap).toHaveAttribute("tabindex", "-1");
+    await expect(page.getByRole("textbox", { name: "Leave this field empty" })).toHaveCount(0);
+    expect((await trap.boundingBox())!.x).toBeLessThan(0);
+  });
+
+  test("the API on this server rejects cross-origin and oversize requests", async ({ request }) => {
+    const data = { intent: "other", name: "A", email: "a@b.example", organisation: "B", message: "Hello" };
+    expect((await request.post("/api/contact", { data, headers: { origin: "https://example.com" } })).status()).toBe(403);
+    expect((await request.post("/api/contact", { data: { ...data, message: "x".repeat(12_000) }, headers: { origin: "https://kubar.tech" } })).status()).toBe(413);
+  });
+
+  test("at 390 and 768 nothing scrolls sideways and axe is clean", async ({ page }) => {
+    for (const width of [390, 768]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto("/contact");
+      await send(page);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
+      await expectNoAxeViolations(page);
+    }
+  });
+});
+
+test.describe("Legal pages (build step 5)", () => {
+  test("the privacy notice has its eleven sections, contents links and the grievance address", async ({ page }) => {
+    await page.goto("/legal/privacy");
+    await expect(page).toHaveTitle("Privacy notice · Kubar Labs");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Privacy notice");
+    await expect(page.getByRole("navigation", { name: "Contents" }).getByRole("link")).toHaveCount(11);
+    await page.getByRole("link", { name: "9. Grievance Officer" }).click();
+    await expect(page).toHaveURL(/#section-9$/);
+    await expect(page.getByRole("heading", { name: "9. Grievance Officer" })).toBeInViewport();
+    await expect(page.getByRole("main").getByRole("link", { name: "keshav@kubar.tech" })).toHaveAttribute("href", "mailto:keshav@kubar.tech");
+  });
+
+  test("the terms have their thirteen sections and link to the privacy notice", async ({ page }) => {
+    await page.goto("/legal/terms");
+    await expect(page).toHaveTitle("Terms of use · Kubar Labs");
+    await expect(page.getByRole("navigation", { name: "Contents" }).getByRole("link")).toHaveCount(13);
+    await expect(page.getByRole("main").getByRole("link", { name: "privacy notice", exact: true })).toHaveAttribute("href", "/legal/privacy");
+  });
+
+  test("the old /privacy address lands on the notice, and both pages fit at 390", async ({ page }) => {
+    await page.goto("/privacy");
+    await expect(page).toHaveURL(/\/legal\/privacy$/);
+    await page.setViewportSize({ width: 390, height: 900 });
+    for (const path of ["/legal/privacy", "/legal/terms"]) {
+      await page.goto(path);
       expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
       await expectNoAxeViolations(page);
     }

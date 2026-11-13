@@ -85,3 +85,14 @@ known-good commit, install with `npm ci --ignore-scripts`, run
 `npm run release:check`, and deploy from that worktree. Do not delete either
 queue during rollback; retained messages can be replayed after the consumer is
 healthy.
+
+## Contact form routing (rebuild, step 5)
+
+The site routes institution, platform and investor messages to `partnerships@kubar.tech` and exporter, press and other messages to `outreach@kubar.tech`. The email Worker's `send_email` binding still allows only `outreach@kubar.tech` as a destination, so today a message routed to partnerships@ fails at the binding and the Worker sends the same email to the fallback, `outreach@kubar.tech` (logged as `contact_email_sent_to_fallback`). Nothing is lost and nothing waits.
+
+To switch the routing on in production:
+
+1. In the Cloudflare dashboard, verify `partnerships@kubar.tech` as an Email Routing destination address.
+2. Add it to `allowed_destination_addresses` in `workers/contact-email/wrangler.jsonc` and deploy the consumer.
+
+Neither step has been done; both are for Vaibhav to decide.
