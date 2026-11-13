@@ -52,7 +52,7 @@
     "copyright": "© {year} Kubar Protocol Private Limited"
   },
   "home": {
-    "display": "Building the institutional exchange<marker>¹</marker> for cross-border trade finance.",
+    "display": "Building the institutional exchange<marker></marker> for <nb>cross-border</nb> trade finance.",
     "subline": "Starting with the asset: export receivables an international financier can buy again and again, insured in its own name.",
     "routes": [
       {
@@ -64,7 +64,14 @@
         "href": "/products/navdhan-sdk"
       }
     ],
-    "followAnchor": "Follow one receivable"
+    "followAnchor": "Follow one receivable",
+    "oneReceivable": {
+      "heading": "Follow one receivable from shipment to settlement."
+    },
+    "standing": {
+      "heading": "Standing and memberships.",
+      "lead": "Kubar acts as the financier’s origination and servicing agent. It never holds the money or the credit risk."
+    }
   },
   "system": {
     "notFound": {

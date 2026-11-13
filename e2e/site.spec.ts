@@ -244,3 +244,24 @@ test.describe("registers below desktop", () => {
     await expectNoAxeViolations(page);
   });
 });
+
+test.describe("Home (build step 3, in progress)", () => {
+  test("footnote 1 has one target, reached from the headline and from the ledger", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.locator("#fn-1")).toHaveCount(1);
+    await expect(page.locator('a[href="#fn-1"]')).toHaveCount(2);
+    await page.locator("#fnref-1").click();
+    await expect(page).toHaveURL(/#fn-1$/);
+  });
+
+  test("at 390 the status footnote sits before the record, with no sideways scroll", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/");
+    const footnoteY = (await page.locator("#fn-1").boundingBox())!.y;
+    const recordY = (await page.getByText("Record RCV-0001").boundingBox())!.y;
+    expect(footnoteY).toBeLessThan(recordY);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await expectNoAxeViolations(page);
+  });
+});
