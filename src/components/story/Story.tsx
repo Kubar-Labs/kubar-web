@@ -171,13 +171,26 @@ export function Story({
                 <TextLink href={`#${skipTo}`} kind="anchor">{t("skip")}</TextLink>
                 {long ? null : <TextLink href="/how-it-works" kind="arrow">{t("seeHow")}</TextLink>}
               </div>
-              <ul aria-hidden="true" className={cn("flex flex-col gap-3", long ? "pt-16" : "pt-10")}>
+              {long ? null : (
+              <ul aria-hidden="true" className="flex flex-col gap-3 pt-10">
                 <li className="flex items-center gap-3"><PathLine kind="data" /><span className="t-tag text-ink-muted">{t("legend.data")}</span></li>
                 <li className="flex items-center gap-3"><PathLine kind="money" /><span className="t-tag text-ink-muted">{t("legend.money")}</span></li>
                 <li className="flex items-center gap-3"><span className="h-3 w-7 bg-action" /><span className="t-tag text-ink-muted">{t("legend.kubar")}</span></li>
               </ul>
+              )}
             </div>
-            <LanesDiagram state={state} parties={t.raw("parties") as string[]} labels={t.raw("lanes") as LaneLabels} />
+            {long ? (
+              <div className="flex flex-col">
+                <LanesDiagram state={state} parties={t.raw("parties") as string[]} labels={t.raw("lanes") as LaneLabels} />
+              <ul aria-hidden="true" className="flex flex-wrap gap-x-8 gap-y-3 pt-6 pl-[45px]">
+                <li className="flex items-center gap-3"><PathLine kind="data" /><span className="t-tag text-ink-muted">{t("legend.data")}</span></li>
+                <li className="flex items-center gap-3"><PathLine kind="money" /><span className="t-tag text-ink-muted">{t("legend.money")}</span></li>
+                <li className="flex items-center gap-3"><span className="h-3 w-7 bg-action" /><span className="t-tag text-ink-muted">{t("legend.kubar")}</span></li>
+              </ul>
+              </div>
+            ) : (
+              <LanesDiagram state={state} parties={t.raw("parties") as string[]} labels={t.raw("lanes") as LaneLabels} />
+            )}
           </div>
         </div>
       ) : null}

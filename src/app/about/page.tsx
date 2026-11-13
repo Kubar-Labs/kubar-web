@@ -82,14 +82,13 @@ export default function About() {
         <TechnologyProgrammes />
       </Section>
 
-      <Section labelledBy="gift-heading" className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-20">
+      <Section labelledBy="gift-heading" className="flex flex-col gap-10">
         <SectionHead
           id="gift-heading"
           heading={t("gift.heading")}
           lead={t.rich("gift.lead", { marker: () => <FootnoteMarker n={1} target="fn-1-gift" refId="fnref-1-gift" /> })}
-          layout="stacked"
         />
-        <Footnote n={1} id="fn-1-gift" backTo="fnref-1-gift" className="min-w-0 flex-1">
+        <Footnote n={1} id="fn-1-gift" backTo="fnref-1-gift" className="lg:ml-[480px] lg:max-w-[628px]">
           {footnotes("status")}
         </Footnote>
       </Section>
