@@ -10,9 +10,9 @@ Extracted from Figma, About · 1440 (frame 173:6), 13 Nov 2026, in reading order
 [Fine] Back to text
 
 ## In order
-[H2] What we’re building, in order.
+[H2] What we’re building.
 Foundations stack, ruled rows, built from the bottom up (component "Foundations stack", 121:1424, About variant):
-[Tag] Five foundations, built from the bottom up
+(After step 3, REDRAW-2026-11-14.md section 10: the H3 "Five foundations, built from the bottom up" is cut.)
 [UIL] The venue                               [BodyS] An ITFS for institutional financiers only, with Kubar as its neutral operator¹      [State] Planned (muted; the venue keeps its status word)
 [UIL] A record of performance                 [BodyS] The loss history, receivable by receivable
 [UIL] A clean payment path                    [BodyS] Payment matching, with the money moving only between banks
@@ -40,27 +40,26 @@ Each card ends with [UIS] LinkedIn (external link, "(opens in a new tab)" in its
 
 ## Standing and memberships
 [H2] Standing and memberships.
-[BodyL] Kubar acts as the financier’s origination and servicing agent. It never holds the money or the credit risk.
 (14 Nov: the register becomes four statements as on Home, so its column heads "Kind" and "Entry" are not shown.)
-Sandbox | Priority entry to the IFSCA FinTech Innovation Sandbox through GIFT IFIH
-Membership | Member of FACE, an RBI-recognised self-regulatory organisation for fintech
-Award | FinVision Award for Most Innovative Startup in Fintech, FinTech Edge 2026, NIBM Pune
-Award | Winner, Popular Choice Award, Startup Mahakumbh 2025
+(After step 3, REDRAW-2026-11-14.md section 10: the lead is cut, since the footer says it on every page; so are the kind labels Sandbox, Membership, Award and Award, since each statement starts with the same thing.)
+Priority entry to the IFSCA FinTech Innovation Sandbox through GIFT IFIH
+Member of FACE, an RBI-recognised self-regulatory organisation for fintech
+FinVision Award for Most Innovative Startup in Fintech, FinTech Edge 2026, NIBM Pune
+Winner, Popular Choice Award, Startup Mahakumbh 2025
 Programme marks (logo and name, no kind labels from 14 Nov): GIFT IFIH Young Builders Program · BharatNetra Startup Accelerator (GFTN) · STPI FinGlobe · MeitY GENESIS Entrepreneur in Residence · T-Hub, RubriX Cohort 5 · Pusa Krishi Incubation Programme 2026–27
 [Label] Technology programmes, grants and credits, then the fourteen technology entries exactly as on Home (copy/01-home.md).
 
 ## GIFT City
 [H2] Why GIFT City.
 [BodyL] GIFT City is India’s international financial services centre. Banks’ units there work in foreign currency and can buy export receivables under their own licences and credit policies, which is how Programme 1 runs. It is also home to the framework for trade-finance platforms (ITFS) under which Kubar’s own venue is planned¹. Kubar works from an office in GIFT City.
-[Fine] ¹ Kubar’s own ITFS registration is targeted for 2027; until then Kubar acts as the financier’s origination and servicing agent.
-[Fine] Back to text
+(After step 3, REDRAW-2026-11-14.md section 10: the second status footnote is cut: footnote ¹ shows once per page, and this marker links to the one under the hero.)
 
 ## Band · India-rooted line  (petrol ground)
 [Line] Kubar connects Indian trade flows to global institutional capital through GIFT City.
 
 ## Company
 [H2] The company.
-[Tag] Field | [Tag] Entry
+(After step 3, REDRAW-2026-11-14.md section 10: the column heads "Field" and "Entry" are cut; they name nothing.)
 Brand | Kubar Labs
 Legal entity | Kubar Protocol Private Limited, incorporated in India
 CIN | U70200WB2024PTC274850

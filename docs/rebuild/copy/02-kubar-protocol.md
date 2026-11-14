@@ -7,10 +7,10 @@ Extracted from Figma, Kubar Protocol · 1440 (frame 167:6), 13 Nov 2026, in read
 [Display] Underwrite once. Buy every receivable that fits.
 [BodyL] Kubar runs the programme around your limit: origination, the evidence package, the data your insurer needs and the matching of every payment. You buy each receivable without recourse for the buyer’s credit, insured in your own name.
 [UI] Start a programme conversation                  (filled button → /contact?intent=institution)
-[UI] Follow one receivable, shipment to settlement   (→ /how-it-works)
+[UI] See how it works                                (→ /how-it-works)
 
 ## What you buy
-[H2] An export receivable, with everything behind it.
+[H2] What you buy.
 [Tag] Receivable RCV-0001
 [Fine] Illustrative
 [Tag] Face value                 [BodyS] $225,000
@@ -23,7 +23,6 @@ Extracted from Figma, Kubar Protocol · 1440 (frame 167:6), 13 Nov 2026, in read
 [Tag] Cover                      [BodyS] Credit insurance on the buyer, in your name
 [Tag] Payment                    [BodyS] The buyer pays your collection account
 [Tag] Evidence                   [BodyS] One package, with your own read access
-[Fine] Illustrative: an example receivable, not a real transaction.
 
 Beside it, the money timeline (drawn to scale on a day axis; Figma component "Money timeline", 123:1184):
 [Tag] When the money moves · your side
@@ -43,25 +42,25 @@ At 768 and 390 the timeline is a stacked register; its labels there: "Day 0", "P
 
 ## How a programme runs
 [H2] How a programme runs.
+(After step 3, REDRAW-2026-11-14.md section 10: the party tags on both lists are cut, since each sentence names who acts; "Illustrative" is cut from the loop. In the hero drawing and the evidence drawing it is cut too: it shows once, on the receivable sheet.)
 Two ruled registers side by side at desktop (Set up once, 440 wide; Then, for every receivable, the rest); stacked at 768 and 390. No boxes or arrows.
 [Tag] Set up once
-[Code] 01  [BodyS] Kubar proposes the pool and its rules                                  [Tag] Kubar, to you
-[Code] 02  [BodyS] You agree the terms and set a programme limit                          [Tag] You
-[Code] 03  [BodyS] The insurer approves limits on the buyers, in your name                [Tag] The insurer
-[Code] 04  [BodyS] You appoint Kubar as your origination and servicing agent              [Tag] You, to Kubar
-[Code] 05  [BodyS] Exporters join: identity checks, their bank’s no-objection, a notice on their invoices   [Tag] Kubar and exporters
-[Code] 06  [BodyS] Buyers are told to pay your account, and acknowledge it                [Tag] Buyers
+[Code] 01  [BodyS] Kubar proposes the pool and its rules
+[Code] 02  [BodyS] You agree the terms and set a programme limit
+[Code] 03  [BodyS] The insurer approves limits on the buyers, in your name
+[Code] 04  [BodyS] You appoint Kubar as your origination and servicing agent
+[Code] 05  [BodyS] Exporters join: identity checks, their bank’s no-objection, a notice on their invoices
+[Code] 06  [BodyS] Buyers are told to pay your account, and acknowledge it
 [UI] See every step in detail                                                           (→ /how-it-works)
-[Tag] Then, for every receivable · limit set
-[Code] 01  [BodyS] The exporter, or its platform, submits the shipment                    [Tag] Exporter
-[Code] 02  [BodyS] Kubar checks it against the programme’s rules and assembles the evidence package   [Tag] Kubar
-[Code] 03  [BodyS] You accept it under your limit                                         [Tag] You
+[Tag] Then, for every receivable
+[Code] 01  [BodyS] The exporter, or its platform, submits the shipment
+[Code] 02  [BodyS] Kubar checks it against the programme’s rules and assembles the evidence package
+[Code] 03  [BodyS] You accept it under your limit
            [BodyS] The credit decision is yours; Kubar can’t override it.               (note with a 2 px rani rule on its left)
-[Code] 04  [BodyS] You pay the purchase price; the buyer pays you on the due date; you pay the exporter the balance   [Tag] You and the buyer
-[Code] 05  [BodyS] The outcome enters the loss history                                    [Tag] Kubar
+[Code] 04  [BodyS] You pay the purchase price; the buyer pays you on the due date; you pay the exporter the balance
+[Code] 05  [BodyS] The outcome enters the loss history
 [Code] RCV-0001 · RCV-0002 · RCV-0003 · …
 [BodyS] Every receivable that fits, inside your limit
-[Fine] Illustrative
 
 ## The evidence package
 [H2] Every element traces to a system the exporter doesn’t control.
@@ -78,7 +77,6 @@ Drawing (desktop only; component "Evidence sources", 130:2584): ten elements, ea
 [BodyS] Programme checks                                             [Tag] From Kubar
 [BodyS] Purchase and settlement                                      [Tag] From You and the exporter’s bank
 [Tag] Record RCV-0001
-[Fine] Illustrative
 [Body] You buy on it
 [Body] The insurer prices on it
 [Body] The exporter’s bank closes the shipping bill against it
@@ -99,7 +97,7 @@ Purchase and settlement | You and the exporter’s bank | Payment references; th
 [BodyS] The record is built on Corda, a permissioned ledger: one shared record of each receivable, who holds which rights after the purchase, and its payment and loss history.
 
 ## Insurance
-[H2] Cover in your name, on approved buyers.
+[H2] Cover in your name.
 [BodyL] The credit-insurance policy is yours: you are the insured, on buyer limits the insurer approves. Kubar insures nothing. It gives the insurer what it needs to set and keep those limits: the pool, each receivable as it’s bought and how each one paid. No receivable is bought without headroom on an approved limit.
 
 ## The payment path
@@ -112,7 +110,7 @@ Drawing (component "Money path", 120:1167; shared with How it works): four parti
 [BodyS] Purchase price, at purchase (90% of face)
 [BodyS] Face value, on the due date
 [BodyS] Deferred purchase price: the balance, less discount and charges
-[Tag] No account, no payment, no release           (under Kubar; plain words, no chip)
+[Tag] Kubar holds none                             (under Kubar; plain words, no chip; was "No account, no payment, no release")
 [BodyS] Every payment carries the receivable’s reference, and Kubar matches each one to its receivable.
 
 ## The loss history
@@ -163,7 +161,7 @@ Funds | Later, buying receivables from financiers
 (first column [UI], the other [BodyS])
 
 ## Programme 1
-[H2] Programme 1: rice, to buyers in the UAE and the Gulf.
+[H2] Programme 1: rice to buyers in the UAE and the Gulf.
 [Tag] Field | [Tag] Entry                         (the Status row is removed)
 Exporters | Indian rice exporters
 Buyers | Importers in the UAE and the wider Gulf, on approved insurance limits
@@ -186,8 +184,9 @@ Next | Chemicals and pharmaceutical formulations, then engineering goods and aut
 [Fine] Back to text
 
 ## Next step
-[H2] Start a programme conversation.
-[BodyL] Tell us what you finance today, and we’ll take you through how a programme would run for you.
+(After step 3, REDRAW-2026-11-14.md section 10: the heading repeated the button, so the lead is split.)
+[H2] Tell us what you finance today.
+[BodyL] We’ll take you through how a programme would run for you.
 [UI] Start a programme conversation              (filled button → /contact?intent=institution)
 [BodyS] Or email
 [UI] partnerships@kubar.tech                     (mailto)

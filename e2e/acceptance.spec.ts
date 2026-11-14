@@ -242,7 +242,7 @@ test.describe("rendered words match docs/rebuild/copy", () => {
   }
 
   const pages: [string, string, RegExp][] = [
-    ["/", "01-home.md", /^(Kubar is in the data path|Party · Financier|State 08 · Planned|05 of 08|01 … 08|Illustrative|Purchased|Back to text)/],
+    ["/", "01-home.md", /^(Kubar is in the data path|State 08 · Planned|05 of 08|01 … 08|Illustrative|Purchased|Back to text)/],
     ["/products/kubar-protocol", "02-kubar-protocol.md", /^(Back to text|Illustrative)/],
     ["/products/navdhan-sdk", "03-navdhan-sdk.md", /^(Illustrative)/],
     ["/how-it-works", "04-how-it-works.md", /^(06 of 08|Settled|Skip the story|Payment reference; closure|The buyer pays \$225,000|Doc \d\d|Purchased|Kubar · Buyer, UAE|Commercial invoice · Shipping bill|Record RCV-0001$|Data path · Kubar|Kubar holds none$|State$|Documents$)/],

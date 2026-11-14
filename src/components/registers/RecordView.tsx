@@ -12,8 +12,8 @@ import { cx as cn } from "@/lib/cx";
  * The head (identifier and Illustrative), the summary in Serif/Record, then
  * the six documents as sheets stacked 46 px apart, 06 on top and current
  * (rani edge, lifted shadow). Each sheet is tied by a hairline to its row:
- * number, document, source, FILED. Under them the Proves line and
- * "05 Purchased". Tablet and desktop keep the rows beside the stack; phones
+ * number, document, source, FILED. Under them the Proves line ("05
+ * Purchased" was cut after step 3, REDRAW section 10). Tablet and desktop keep the rows beside the stack; phones
  * list them under it.
  *
  * The rows are the real content, an ordered list read top to bottom; the
@@ -154,7 +154,6 @@ export function RecordView({
         <span className="t-fine shrink-0 text-ink-muted">{t("provesLabel")}</span>
         <span className="t-body min-h-[50px] text-ink md:t-body-sm md:min-h-[22px]">{documents[shown].proves}</span>
       </div>
-      <div className="t-tag mt-3.5 border-t border-rule pt-3.5 text-accent">{t("currentState")}</div>
     </div>
   );
 }

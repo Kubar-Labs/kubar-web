@@ -43,7 +43,6 @@
     "legal": "Legal",
     "privacy": "Privacy notice",
     "terms": "Terms of use",
-    "elsewhere": "Elsewhere",
     "linkedin": "LinkedIn",
     "linkedinLabel": "Kubar Labs on LinkedIn (opens in a new tab)",
     "role": "Kubar acts as a financier’s origination and servicing agent. It doesn’t lend, hold client money or take credit risk. Its services are for institutions only, and nothing on this site is an offer to the public.",
@@ -76,13 +75,11 @@
       "lead": "Exporters’ paper doesn’t arrive originated, insured and documented in a form a financier can buy again and again. Kubar builds that layer.",
       "figures": [
         {
-          "period": "A year",
           "figure": "About $80bn",
           "caption": "a year of Indian SME and mid-market export receivables is financeable: Kubar’s estimate for FY 2025–26.",
           "footnote": 2
         },
         {
-          "period": "In total",
           "figure": "$126.92M",
           "caption": "financed in total on GIFT City’s trade-finance platforms (ITFS): 2,857 transactions to June 2026.",
           "footnote": 3
@@ -109,7 +106,6 @@
       ],
       "rows": [
         {
-          "label": "On the exchange",
           "cells": [
             "Only banks and other financial institutions permitted by the RBI finance MSME invoices",
             "Distribution companies, generators, traders and large consumers buy and sell electricity",
@@ -127,7 +123,6 @@
           "accentLast": true
         }
       ],
-      "stackLabel": "Five foundations, built from the bottom up",
       "slabs": [
         {
           "name": "The venue, last",
@@ -154,7 +149,7 @@
       ]
     },
     "whoTakesPart": {
-      "heading": "Who takes part, and what each one does.",
+      "heading": "Who takes part.",
       "lead": "Only institutional financiers buy the receivables. There is no retail access.",
       "legend": {
         "money": "Money path: only between banks",
@@ -359,8 +354,7 @@
         "proves": "The financier bought the receivable, without recourse for the buyer’s credit"
       }
     ],
-    "provesLabel": "Proves",
-    "currentState": "05 Purchased"
+    "provesLabel": "Proves"
   },
   "ledger": {
     "columns": {
@@ -444,19 +438,15 @@
   "standing": {
     "rows": [
       {
-        "kind": "Sandbox",
         "entry": "Priority entry to the IFSCA FinTech Innovation Sandbox through GIFT IFIH"
       },
       {
-        "kind": "Membership",
         "entry": "Member of FACE, an RBI-recognised self-regulatory organisation for fintech"
       },
       {
-        "kind": "Award",
         "entry": "FinVision Award for Most Innovative Startup in Fintech, FinTech Edge 2026, NIBM Pune"
       },
       {
-        "kind": "Award",
         "entry": "Winner, Popular Choice Award, Startup Mahakumbh 2025"
       }
     ]
@@ -558,11 +548,9 @@
     "moneyPath": "Money path",
     "holdsNone": "Kubar holds none",
     "skip": "Skip the story",
-    "seeHow": "See how it works",
     "legend": {
       "data": "Data path: documents and records",
-      "money": "Money path: only between banks",
-      "kubar": "Kubar: the one filled column"
+      "money": "Money path: only between banks"
     },
     "parties": [
       "Exporter",
@@ -596,10 +584,10 @@
       "headline": "Underwrite once. Buy every receivable that fits.",
       "sub": "Kubar runs the programme around your limit: origination, the evidence package, the data your insurer needs and the matching of every payment. You buy each receivable without recourse for the buyer’s credit, insured in your own name.",
       "button": "Start a programme conversation",
-      "link": "Follow one receivable, shipment to settlement"
+      "link": "See how it works"
     },
     "whatYouBuy": {
-      "heading": "An export receivable, with everything behind it.",
+      "heading": "What you buy.",
       "title": "Receivable RCV-0001",
       "columns": {
         "field": "Field",
@@ -706,7 +694,7 @@
         }
       ],
       "link": "See every step in detail",
-      "each": "Then, for every receivable · limit set",
+      "each": "Then, for every receivable",
       "eachSteps": [
         {
           "no": "01",
@@ -860,7 +848,7 @@
       "alt": "Ten elements of the evidence package, each from its own source, flow into one record."
     },
     "insurance": {
-      "heading": "Cover in your name, on approved buyers.",
+      "heading": "Cover in your name.",
       "lead": "The credit-insurance policy is yours: you are the insured, on buyer limits the insurer approves. Kubar insures nothing. It gives the insurer what it needs to set and keep those limits: the pool, each receivable as it’s bought and how each one paid. No receivable is bought without headroom on an approved limit."
     },
     "payment": {
@@ -876,7 +864,7 @@
         "Face value, on the due date",
         "Deferred purchase price: the balance, less discount and charges"
       ],
-      "kubarNote": "No account, no payment, no release",
+      "kubarNote": "Kubar holds none",
       "under": "Every payment carries the receivable’s reference, and Kubar matches each one to its receivable.",
       "columns": {
         "payment": "Payment",
@@ -999,7 +987,7 @@
       ]
     },
     "programme1": {
-      "heading": "Programme 1: rice, to buyers in the UAE and the Gulf.",
+      "heading": "Programme 1: rice to buyers in the UAE and the Gulf.",
       "columns": [
         "Field",
         "Entry"
@@ -1047,8 +1035,8 @@
       }
     },
     "next": {
-      "heading": "Start a programme conversation.",
-      "body": "Tell us what you finance today, and we’ll take you through how a programme would run for you.",
+      "heading": "Tell us what you finance today.",
+      "body": "We’ll take you through how a programme would run for you.",
       "button": "Start a programme conversation",
       "orEmail": "Or email",
       "email": "partnerships@kubar.tech"
@@ -1100,7 +1088,7 @@
       "lead": "Your exporters can sell their export receivables to institutional financiers, beyond the limits their own banks set, without recourse for the buyer’s credit. They keep their own bank, and their buyers keep their terms."
     },
     "platform": {
-      "heading": "Finance in your product, with no credit risk and no money on your books.",
+      "heading": "Finance in your product.",
       "lead": "Your users are financed where they already book and document their shipments. You make no credit decisions and hold no money: financiers buy, insurers cover and Kubar runs the programme. Kubar is paid through the programme, not by the platform, and terms with each platform are agreed in writing."
     },
     "does": {
@@ -1160,7 +1148,7 @@
         "evidence": "The evidence package",
         "status": "Each step as it happens"
       },
-      "link": "Follow one receivable, shipment to settlement"
+      "link": "See how it works"
     },
     "rules": {
       "heading": "Rules the SDK follows.",
@@ -1195,8 +1183,8 @@
       "link": "See Kubar Protocol"
     },
     "next": {
-      "heading": "Talk about an integration.",
-      "body": "Tell us about your platform and your exporters, and we’ll take you through what an integration involves.",
+      "heading": "Tell us about your platform and your exporters.",
+      "body": "We’ll take you through what an integration involves.",
       "button": "Talk about an integration"
     }
   },
@@ -1212,7 +1200,7 @@
       "platforms": "For trade platforms"
     },
     "rail": {
-      "heading": "What happens to a receivable, in order.",
+      "heading": "What happens to a receivable.",
       "closing": "Kubar is in the data path of every step and in the money path of none.",
       "states": [
         {
@@ -1328,7 +1316,7 @@
       ],
       "from": "From · The financier",
       "proves": "The financier owns the receivable",
-      "record": "Record RCV-0001 · Evidence package, 8 of 8",
+      "record": "Record RCV-0001 · Evidence package",
       "elements": [
         "Commercial invoice",
         "Shipping bill",
@@ -1367,7 +1355,7 @@
         "Face value, on the due date",
         "Deferred purchase price: the balance, less discount and charges"
       ],
-      "kubarNote": "No account, no payment, no release",
+      "kubarNote": "Kubar holds none",
       "under": "Every payment carries the receivable’s reference, and Kubar matches each one to its receivable.",
       "columns": {
         "payment": "Payment",
@@ -1377,7 +1365,7 @@
       "alt": "Three payments move between the buyer, the financier and the exporter’s bank. None touches Kubar."
     },
     "unpaid": {
-      "heading": "If a buyer doesn’t pay, the financier claims under its own policy.",
+      "heading": "If a buyer doesn’t pay.",
       "title": "If a buyer doesn’t pay",
       "columns": {
         "no": "No.",
@@ -1583,7 +1571,7 @@
       "sub": "Kubar Labs is building the institutional exchange<marker></marker> for cross-border trade finance, from GIFT City. We started with the asset: export receivables an international financier can buy again and again, insured in its own name. A venue needs something financiers will bid on, so we build that first: receivables with cover, documents, a clean payment path and a history."
     },
     "order": {
-      "heading": "What we’re building, in order.",
+      "heading": "What we’re building.",
       "label": "Five foundations, built from the bottom up",
       "slabs": [
         {

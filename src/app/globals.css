@@ -564,18 +564,28 @@
   .iso-block {
     filter: drop-shadow(0 2px 4px rgb(2 39 50 / 0.08)) drop-shadow(0 14px 36px rgb(2 39 50 / 0.12)); /* --elevation-2 */
   }
-  /* The top face's resting fill is set here, not with a fill utility: the
-     utilities layer would beat the highlight below whatever its specificity. */
+  /* The top face stays white; the picked block's top edges turn rani at
+     2 px, as the hero marks its current sheet. Desktop only: below it the
+     labels sit under the drawing (REDRAW section 10). */
   .iso-top {
     fill: var(--color-raised);
-    transition: fill var(--duration-hover) var(--ease-standard);
   }
-  /* A picked label (hover, focus, tap) highlights its block's top face. */
-  .iso-foundations:has(li[data-level="0"]:is(:hover, :focus)) .iso-top[data-level="0"],
-  .iso-foundations:has(li[data-level="1"]:is(:hover, :focus)) .iso-top[data-level="1"],
-  .iso-foundations:has(li[data-level="2"]:is(:hover, :focus)) .iso-top[data-level="2"],
-  .iso-foundations:has(li[data-level="3"]:is(:hover, :focus)) .iso-top[data-level="3"] {
-    fill: var(--color-accent-soft);
+  .iso-top-edge {
+    fill: none;
+    stroke: var(--color-accent);
+    stroke-width: 2;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+    opacity: 0;
+    transition: opacity var(--duration-hover) var(--ease-standard);
+  }
+  @media (min-width: 1200px) {
+    .iso-foundations:has(li[data-level="0"]:is(:hover, :focus)) .iso-top-edge[data-level="0"],
+    .iso-foundations:has(li[data-level="1"]:is(:hover, :focus)) .iso-top-edge[data-level="1"],
+    .iso-foundations:has(li[data-level="2"]:is(:hover, :focus)) .iso-top-edge[data-level="2"],
+    .iso-foundations:has(li[data-level="3"]:is(:hover, :focus)) .iso-top-edge[data-level="3"] {
+      opacity: 1;
+    }
   }
   /* The scale card's bar grows from the left; the sliver and caption follow. */
   [data-phase="armed"] .scale-bar {
@@ -744,6 +754,19 @@
   }
   .lane-current {
     transition: transform var(--duration-write) var(--ease-standard);
+  }
+  /* Below desktop the pin's ground fades out over 24 px under the drawing,
+     so the cards aren't sliced as they pass under it. */
+  @media (width < 1200px) {
+    .story-pin::after {
+      content: "";
+      position: absolute;
+      inset-inline: 0;
+      top: 100%;
+      height: 24px;
+      background: linear-gradient(var(--color-page), transparent);
+      pointer-events: none;
+    }
   }
   /* A card is raised while its state is current: --elevation-2 on a
      pseudo-element that fades, so only opacity moves (200 ms). */

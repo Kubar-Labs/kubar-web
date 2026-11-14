@@ -21,7 +21,7 @@ async function scrollToState(page: Page, n: number) {
     const story = document.querySelector(".story-on")!;
     const slot = story.querySelectorAll("ol > li")[n - 1];
     const header = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--header-height"));
-    const pin = matchMedia("(min-width: 1200px)").matches ? 0 : (story.firstElementChild as HTMLElement).offsetHeight;
+    const pin = matchMedia("(min-width: 1200px)").matches ? 0 : story.querySelector<HTMLElement>(".story-pin")!.offsetHeight;
     const line = header + pin + 0.45 * (innerHeight - header - pin);
     window.scrollTo({ top: slot.getBoundingClientRect().top + scrollY - line + 20, behavior: "instant" });
   }, n);
@@ -308,7 +308,7 @@ test.describe("Home, complete (build step 3)", () => {
       "The missing piece isn’t capital.",
       "Follow one receivable from shipment to settlement.",
       "An exchange needs more than a venue.",
-      "Who takes part, and what each one does.",
+      "Who takes part.",
       "Standing and memberships.",
       "The people building it.",
       "Start the right conversation.",
@@ -433,49 +433,78 @@ test.describe("Home drawings (redraw step 2)", () => {
     await expect(page.locator(".iso-foundations")).toHaveAttribute("data-phase", "done");
   });
 
-  test("a foundation label highlights its block's top face on hover and tap, and Tab skips it", async ({ page }) => {
+  test("on desktop a foundation label marks its block with rani top edges, below desktop nothing, and Tab skips it", async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
-    // The computed fill, not whether :has() matches (a fill utility once beat the rule).
-    const soft = await page.evaluate(() => {
-      const probe = document.createElement("div");
-      probe.style.color = "var(--color-accent-soft)";
-      document.body.appendChild(probe);
-      const colour = getComputedStyle(probe).color;
-      probe.remove();
-      return colour;
-    });
+    // Computed values, not whether :has() matches (a fill utility once beat the rule).
     const label = page.locator('.iso-foundations li[data-level="2"]');
-    const face = page.locator('.iso-top[data-level="2"]');
-    const fill = () => face.evaluate((el) => getComputedStyle(el).fill);
+    const edge = page.locator('.iso-top-edge[data-level="2"]');
+    const face = page.locator(".iso-top").nth(2);
+    const opacity = () => edge.evaluate((el) => getComputedStyle(el).opacity);
+    const white = await face.evaluate((el) => getComputedStyle(el).fill);
     await expect(label).toHaveAttribute("tabindex", "-1");
-    expect(await fill()).not.toBe(soft);
+    expect(await opacity()).toBe("0");
     await label.hover();
-    await expect.poll(fill).toBe(soft);
+    await expect.poll(opacity).toBe("1");
+    expect(await edge.evaluate((el) => getComputedStyle(el).strokeWidth)).toBe("2px");
+    // The face stays white.
+    expect(await face.evaluate((el) => getComputedStyle(el).fill)).toBe(white);
     await page.mouse.move(0, 0);
-    await expect.poll(fill).not.toBe(soft);
-    // A click or tap focuses the label, so phones keep the highlight.
+    await expect.poll(opacity).toBe("0");
+    // A click focuses the label, and the mark holds.
     await label.click();
     await expect(label).toBeFocused();
-    await expect.poll(fill).toBe(soft);
+    await expect.poll(opacity).toBe("1");
     // Tab skips the labels and the map's Buyers card; the record's rows stay in the route.
     await expect(page.locator('[data-party="buyers"]')).toHaveAttribute("tabindex", "-1");
     await expect(page.locator(".iso-record ol li").first()).toHaveAttribute("tabindex", "0");
+    // Below desktop the labels sit under the drawing: no mark.
+    await page.setViewportSize({ width: 390, height: 844 });
+    await label.click();
+    await expect(label).toBeFocused();
+    expect(await opacity()).toBe("0");
   });
 
-  test("standing is four statements with their kinds, and the programmes sit in one row at desktop", async ({ page }) => {
+  test("standing is four plain statements, and the programmes sit in one row at desktop", async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto("/");
     const section = page.locator("section", { has: page.getByRole("heading", { name: "Standing and memberships." }) });
     await expect(section.locator("table")).toHaveCount(0);
     const statements = section.locator("ul").first().locator("li");
     await expect(statements).toHaveCount(4);
-    await expect(statements.first()).toContainText("Sandbox");
+    // No kind labels (REDRAW section 10): each statement starts with its kind.
+    await expect(statements.first()).toHaveText("Priority entry to the IFSCA FinTech Innovation Sandbox through GIFT IFIH");
     const marks = section.locator("ul").nth(1).locator("li");
     await expect(marks).toHaveCount(6);
     const tops = await marks.evaluateAll((els) => els.map((el) => Math.round(el.getBoundingClientRect().top)));
     expect(new Set(tops).size).toBe(1);
+  });
+});
+
+test.describe("Home hero order", () => {
+  test("on phones the record sits under the headline, while the DOM keeps headline, subline, routes, anchor, record", async ({ page }) => {
+    const top = (selector: string) => page.locator(selector).first().evaluate((el) => el.getBoundingClientRect().top);
+    for (const [width, height] of [[390, 844], [375, 667]] as const) {
+      await page.setViewportSize({ width, height });
+      await page.goto("/");
+      const h1 = page.locator("main h1");
+      const h1Bottom = await h1.evaluate((el) => el.getBoundingClientRect().bottom);
+      const record = await top(".iso-record");
+      expect(Math.round(record - h1Bottom), `${width}: 24 px under the headline`).toBe(24);
+      expect(await top("main h1 ~ p"), `${width}: subline after the record`).toBeGreaterThan(record);
+      expect(await top('a[href="#one-receivable"]')).toBeGreaterThan(await top("main h1 ~ p"));
+    }
+    // Screen readers hear the headline, subline and routes first.
+    const order = await page.evaluate(() => {
+      const nodes = [document.querySelector("main h1"), document.querySelector("main h1 ~ p"), document.querySelector('a[href="#one-receivable"]'), document.querySelector(".iso-record")];
+      return nodes.every((node, i) => i === 0 || nodes[i - 1]!.compareDocumentPosition(node!) & Node.DOCUMENT_POSITION_FOLLOWING);
+    });
+    expect(order).toBe(true);
+    // Tablet keeps the record last.
+    await page.setViewportSize({ width: 768, height: 1024 });
+    await page.goto("/");
+    expect(await top(".iso-record")).toBeGreaterThan(await top('a[href="#one-receivable"]'));
   });
 });
 
@@ -508,6 +537,15 @@ test.describe("pinned story (redraw step 3)", () => {
         await scrollToState(page, 7);
         await expect(state(page), `${width}x${height}`).toHaveAttribute("data-story-state", "7");
         expect(Math.round((await lanes.boundingBox())!.y), `${width}x${height} pinned again`).toBe(pinned);
+        // 08 shows with the drawing still in place; once the last card has gone, the drawing goes too.
+        await scrollToState(page, 8);
+        await expect(state(page), `${width}x${height}`).toHaveAttribute("data-story-state", "8");
+        expect(Math.round((await lanes.boundingBox())!.y), `${width}x${height} pinned at 08`).toBe(pinned);
+        await page.evaluate(() => {
+          const last = document.querySelectorAll(".story-on ol > li")[7].getBoundingClientRect();
+          window.scrollTo({ top: last.bottom + scrollY - 40, behavior: "instant" });
+        });
+        expect((await lanes.boundingBox())!.y, `${width}x${height} released`).toBeLessThan(pinned - 100);
         expect(await overflow(page), `${width}x${height}`).toBe(0);
       }
     });
@@ -629,7 +667,7 @@ test.describe("How it works (build step 4)", () => {
     await expect(cards).toHaveCount(8);
     await expect(cards.last()).toContainText("The financier owns the receivable");
     await expect(cards.last()).toHaveCSS("opacity", "1");
-    await expect(page.getByText("Record RCV-0001 · Evidence package, 8 of 8").locator("xpath=../..")).toHaveCSS("opacity", "1");
+    await expect(page.getByText("Record RCV-0001 · Evidence package", { exact: true }).locator("xpath=../..")).toHaveCSS("opacity", "1");
   });
 
   test("with reduced motion at 390 and 768 the ledger shows, nothing scrolls sideways and axe is clean", async ({ page }) => {

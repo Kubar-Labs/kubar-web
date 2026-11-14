@@ -4,7 +4,8 @@ import { cn } from "@/lib/utils";
 
 /*
  * Scale card (Figma 241:3412 at 1440, 248:3372 at 768, 248:3853 at 390;
- * REDRAW-2026-11-14.md, Home "The gap"). One raised card: "About $80bn" in
+ * REDRAW-2026-11-14.md, Home "The gap"). One raised card (its labels "A year" and "In total" were cut
+ * after step 3; the sentences say it): "About $80bn" in
  * Mono/Figure large at desktop, "$126.92M" in rani Mono/Figure, a full-width
  * petrol bar, and under it a rani sliver at 0.16% of the bar's width with the
  * "Drawn to scale" caption. Desktop sets the two figures side by side above
@@ -14,7 +15,7 @@ import { cn } from "@/lib/utils";
  * left over 600 ms; the sliver and its caption appear 200 ms after it
  * finishes. No count-up. Reduced motion and no script: drawn as it ends.
  */
-export type Figure = { period: string; figure: string; caption: string; footnote: number };
+export type Figure = { figure: string; caption: string; footnote: number };
 
 export function ScaleCard({
   figures,
@@ -33,16 +34,13 @@ export function ScaleCard({
   const [year, total] = figures;
 
   const figure = (item: Figure, large: boolean, extra?: string) => (
-    <div className={cn("flex flex-col gap-3", extra)}>
-      <dt className="t-fine text-ink-muted">{item.period}</dt>
-      <dd className="flex flex-col gap-3">
-        <span className={cn("whitespace-nowrap", large ? "t-figure text-ink lg:t-figure-lg" : "t-figure text-accent")}>{item.figure}</span>
-        <span className="t-body-sm text-ink">
-          {item.caption}
-          <FootnoteMarker n={item.footnote} {...footnoteId(item.footnote)} />
-        </span>
-      </dd>
-    </div>
+    <p className={cn("flex flex-col gap-3", extra)}>
+      <span className={cn("whitespace-nowrap", large ? "t-figure text-ink lg:t-figure-lg" : "t-figure text-accent")}>{item.figure}</span>
+      <span className="t-body-sm text-ink">
+        {item.caption}
+        <FootnoteMarker n={item.footnote} {...footnoteId(item.footnote)} />
+      </span>
+    </p>
   );
 
   return (
@@ -52,10 +50,8 @@ export function ScaleCard({
         className,
       )}
     >
-      <dl className="contents">
-        {figure(year, true, "lg:[&_dd>span:last-child]:max-w-[520px]")}
-        {figure(total, false, "order-3 lg:order-none lg:self-end")}
-      </dl>
+      {figure(year, true, "lg:[&>span:last-child]:max-w-[520px]")}
+      {figure(total, false, "order-3 lg:order-none lg:self-end")}
       <div className="order-2 flex flex-col gap-2.5 lg:order-none lg:col-span-2 lg:gap-3">
         <div role="img" aria-label={scaleAlt} className="scale-bar h-12 origin-left bg-action lg:h-16" />
         <div className="scale-sliver flex items-center gap-3 lg:gap-4">

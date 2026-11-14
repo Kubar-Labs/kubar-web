@@ -18,9 +18,12 @@ import { cn } from "@/lib/utils";
  * into place from the bottom one at a time, 80 ms apart; then the venue's
  * dashed outline draws (stroke-dashoffset, 480 ms), revealed through a mask
  * whose solid copy draws, since a dashed line can't draw with its own
- * dashoffset (section 9.4). Hover, focus or tap on a label highlights its
- * block's top face in accent-soft (CSS :has, globals.css). The markup is
- * rendered on the server; PlayOnce only sets the motion phase.
+ * dashoffset (section 9.4). On desktop, hover, focus or a click on a label
+ * marks its block as the hero marks its current sheet: the face stays white
+ * and its top edges turn rani at 2 px (CSS :has, globals.css). Below desktop
+ * there is no highlight: the labels sit under the drawing, in the blocks'
+ * order (REDRAW section 10). The markup is rendered on the server;
+ * PlayOnce only sets the motion phase.
  */
 export type Foundation = { name: string; line: string; where?: string; planned?: boolean };
 type FootnoteRef = (suffix: string) => { target: string; refId: string };
@@ -60,14 +63,12 @@ function faces(level: number) {
 }
 
 export function IsoFoundations({
-  title,
   foundations,
   footnote,
   plannedStyle = "tag",
   id,
   className,
 }: {
-  title: string;
   /** Top of the stack first: the venue, then down to the common standard. */
   foundations: Foundation[];
   footnote: FootnoteRef;
@@ -83,8 +84,7 @@ export function IsoFoundations({
   const levelOf = (i: number) => levels - 1 - i;
 
   return (
-    <div className={cn("flex flex-col gap-8 bg-inset px-5 pt-5 pb-8 md:px-8 md:pt-8 md:pb-10 lg:px-12 lg:pt-10 lg:pb-12", className)}>
-      <h3 className="t-h3 text-ink">{title}</h3>
+    <div className={cn("bg-inset px-5 pt-5 pb-8 md:px-8 md:pt-8 md:pb-10 lg:px-12 lg:pt-10 lg:pb-12", className)}>
       <PlayOnce className="iso-foundations relative">
         <svg
           aria-hidden="true"
@@ -117,7 +117,8 @@ export function IsoFoundations({
                   <g className="iso-block">
                     <polygon points={shape.left} className="fill-[var(--petrol-100)]" />
                     <polygon points={shape.right} className="fill-[var(--petrol-50)]" />
-                    <polygon points={shape.top} data-level={level} className="iso-top" />
+                    <polygon points={shape.top} className="iso-top" />
+                    <polygon points={shape.top} data-level={level} className="iso-top-edge" />
                   </g>
                   <line x1={shape.leaderX} x2={584} y1={shape.leaderY} y2={shape.leaderY} className="iso-leader-line hidden lg:inline" />
                 </g>

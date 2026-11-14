@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
  * Stack: the five foundations as ruled rows, the venue (planned, muted, with
  * footnote ¹) on top; at desktop a bottom-up arrow runs in the gutter.
  */
-export type ComparisonRow = { label: string; cells: string[]; footnoteOnLast?: boolean; accentLast?: boolean };
+export type ComparisonRow = { label?: string; cells: string[]; footnoteOnLast?: boolean; accentLast?: boolean };
 /** `where` is the state reference on Home; on About only the venue has one ("Planned"). */
 export type Slab = { name: string; line: string; where?: string; planned?: boolean };
 type FootnoteRef = (suffix: string) => { target: string; refId: string };
@@ -48,13 +48,13 @@ export function ExchangeColumns({
             )}
           >
             <h3 className="t-h3 text-ink">{name}</h3>
-            <dl className="flex flex-col gap-5 lg:gap-7">
-              {rows.map((row) => {
+            <div className="flex flex-col gap-5 lg:gap-7">
+              {rows.map((row, r) => {
                 const isState = Boolean(row.accentLast);
                 return (
-                  <div key={row.label} className="flex flex-col gap-1.5 lg:gap-2">
-                    <dt className="t-fine text-ink-muted">{row.label}</dt>
-                    <dd className={cn(isState ? "t-ui-lg flex items-start gap-2.5 text-ink" : "t-body text-ink")}>
+                  <div key={r} className="flex flex-col gap-1.5 lg:gap-2">
+                    {row.label ? <p className="t-fine text-ink-muted">{row.label}</p> : null}
+                    <p className={cn(isState ? "t-ui-lg flex items-start gap-2.5 text-ink" : "t-body text-ink")}>
                       {isState ? (
                         <svg aria-hidden="true" width="10" height="10" viewBox="0 0 10 10" className="mt-2 shrink-0">
                           {raised ? (
@@ -68,11 +68,11 @@ export function ExchangeColumns({
                         {row.cells[i]}
                         {row.footnoteOnLast && raised ? <FootnoteMarker n={1} {...footnote("exchange")} /> : null}
                       </span>
-                    </dd>
+                    </p>
                   </div>
                 );
               })}
-            </dl>
+            </div>
           </li>
         );
       })}

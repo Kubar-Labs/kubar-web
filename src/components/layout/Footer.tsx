@@ -34,6 +34,7 @@ export function Footer() {
         { href: "/how-it-works", label: t("howItWorks") },
         { href: "/about", label: t("about") },
         { href: "/contact", label: t("contact") },
+        { href: LINKEDIN, label: t("linkedin"), external: true, name: t("linkedinLabel") },
       ],
     },
     {
@@ -42,10 +43,6 @@ export function Footer() {
         { href: "/legal/privacy", label: t("privacy") },
         { href: "/legal/terms", label: t("terms") },
       ],
-    },
-    {
-      label: t("elsewhere"),
-      links: [{ href: LINKEDIN, label: t("linkedin"), external: true, name: t("linkedinLabel") }],
     },
   ];
 

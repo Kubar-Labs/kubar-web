@@ -6,20 +6,18 @@ Extracted from Figma, How it works · 1440 (frame 172:6), 13 Nov 2026, in readin
 (14 Nov: the kicker line above the headline is removed. REDRAW-2026-11-14.md, section 3.)
 [Display] From the port to the record.
 [BodyL] One illustrative receivable, followed step by step: who does what, the documents behind it and where the money moves. A $225k rice invoice to a buyer in the UAE, due 75 days after shipment.
-[Fine] Illustrative
+(After step 3, REDRAW-2026-11-14.md section 10: "Illustrative" is cut in all three places on this page, since the lead already says "illustrative".)
 [UIL] For financial institutions     → /products/kubar-protocol
 [UIL] For trade platforms            → /products/navdhan-sdk
 
 ## The rail  (pinned story, eight steps; see ../HANDOFF.md, Motion)
-[H2] What happens to a receivable, in order.
+[H2] What happens to a receivable.
 (14 Nov, option B: only the lanes drawing is pinned; each state is a card that scrolls past it, so the panel's "State" label goes and each card carries its own counter. The legend follows the cards. On tablets and phones the closing line below ends the cards too. REDRAW-2026-11-14.md, section 3a.)
 Desktop: the story panel (left) beside the lanes (right), as on Home but with the How it works panel (documents line, Sans/Body). The 1440 frame shows state 06:
+(After step 3, REDRAW-2026-11-14.md section 10: each card's state word loses its number.)
 [Tag] Record RCV-0001
-[Fine] Illustrative
-[Tag] State
-[Label] 06 of 08
-[Code] 06
 [State] Settled
+[Label] 06 of 08
 [Body] On the due date the buyer pays the financier’s collection account, quoting the receivable’s reference. Kubar matches the payment. The financier pays the exporter the balance, less its discount and charges, and the exporter’s bank closes the shipping bill. Where the exporter qualifies, the government’s interest subvention on export factoring is filed on the financier’s data and paid to the exporter.
 [Tag] Documents
 [Body] Payment reference; closure of the shipping bill
@@ -29,7 +27,8 @@ Desktop: the story panel (left) beside the lanes (right), as on Home but with th
 [Label] Kubar holds none            (rani)
 [Body] The buyer pays $225,000 to the financier; the financier pays the exporter the balance, less its discount and charges
 [UI] Skip the story                 (anchor past the rail)
-Legend: [Tag] Data path: documents and records · Money path: only between banks · Kubar: the one filled column
+Legend: [Tag] Data path: documents and records · Money path: only between banks
+(After step 3, REDRAW-2026-11-14.md section 10: the legend line "Kubar: the one filled column" is cut.)
 Lane heads: [UI] Exporter, Kubar (filled), Insurer, Buyer, UAE, Financier, Exporter’s bank
 Row numbers: [Code] 01 … 08
 Path labels in the lanes: Shipment, invoice (01) · Evidence package checked (02) · Limit and headroom (03) · Acknowledgement (04) · Evidence package and 90% of face (05) · Payment matched, Face value and The balance (06)
@@ -66,13 +65,11 @@ Eight document cards that lock into the record one after another (component "Evi
 [Tag] From · The financier
 [Body] The financier owns the receivable
 The record they lock into:
-[Tag] Record RCV-0001 · Evidence package, 8 of 8
-[Fine] Illustrative
+(After step 3, REDRAW-2026-11-14.md section 10: ", 8 of 8" in the record's title and "05 Purchased" under the stack are cut.)
+[Tag] Record RCV-0001 · Evidence package
 [BodyS] Commercial invoice · Shipping bill · Bill of lading · Inspection report · Credit-insurance cover · Buyer’s acknowledgement · No-objection · Purchase confirmation   (each with a filled square)
 [Tag] State
 [Label] 05 of 08
-[Code] 05
-[State] Purchased                   (rani)
 [BodyS] Each element carries its source, its time and who signed it. Any change after signing shows.
 [BodyS] The record is built on Corda, a permissioned ledger: one shared record of each receivable, who holds which rights after the purchase, and its payment and loss history.
 (No "In build" label under the Corda line: removed.)
@@ -84,11 +81,11 @@ Same drawing as Kubar Protocol (component "Money path", 120:1167):
 [BodyS] Purchase price, at purchase (90% of face)
 [BodyS] Face value, on the due date
 [BodyS] Deferred purchase price: the balance, less discount and charges
-[Tag] No account, no payment, no release
+[Tag] Kubar holds none                 (was "No account, no payment, no release")
 [BodyS] Every payment carries the receivable’s reference, and Kubar matches each one to its receivable.
 
 ## If a buyer doesn’t pay
-[H2] If a buyer doesn’t pay, the financier claims under its own policy.
+[H2] If a buyer doesn’t pay.
 (14 Nov: the paragraph beside the heading is cut; it repeated the flow. With no lead, the heading runs 800 wide at desktop.)
 A ruled register (component "If a buyer doesn’t pay", 133:2422), no boxes or arrows:
 [Tag] If a buyer doesn’t pay
@@ -117,7 +114,7 @@ Kubar | Designs the pool, checks and documents each receivable, matches payments
 
 ## Terms  (glossary; each term is also the target of first-use abbreviation tooltips across the site)
 [H2] The terms on this site.
-[Tag] Term | [Tag] Meaning
+(After step 3, REDRAW-2026-11-14.md section 10: the column heads "Term" and "Meaning" are cut; they name nothing.)
 Receivable | The amount an overseas buyer owes an exporter under a shipped invoice.
 Financier | The institution that buys the receivable: for Programme 1, a bank’s unit at GIFT City; on Kubar’s own venue¹, other institutional financiers, in GIFT City or abroad.
 Institutional financier | A bank, finance company or other institution that finances trade. Only institutional financiers buy the receivables.

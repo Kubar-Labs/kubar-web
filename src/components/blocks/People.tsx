@@ -54,7 +54,7 @@ export function PeopleRow({
   return (
     <ul
       className={cn(
-        "flex gap-4 max-lg:-mx-(--page-margin) max-lg:snap-x max-lg:overflow-x-auto max-lg:px-(--page-margin) max-lg:pb-2 lg:grid lg:grid-cols-6 lg:gap-6",
+        "flex gap-4 max-lg:-mx-(--page-margin) max-lg:snap-x max-lg:overflow-x-auto max-lg:scroll-px-(--page-margin) max-lg:px-(--page-margin) max-lg:pb-2 lg:grid lg:grid-cols-6 lg:gap-6",
         className,
       )}
     >

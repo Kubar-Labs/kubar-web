@@ -36,7 +36,7 @@ Beside it, the embed sketch (component "Embed sketch", 140:2523): a schematic, n
 [BodyL] Your exporters can sell their export receivables to institutional financiers, beyond the limits their own banks set, without recourse for the buyer’s credit. They keep their own bank, and their buyers keep their terms.
 
 ## For your platform
-[H2] Finance in your product, with no credit risk and no money on your books.
+[H2] Finance in your product.
 [BodyL] Your users are financed where they already book and document their shipments. You make no credit decisions and hold no money: financiers buy, insurers cover and Kubar runs the programme. Kubar is paid through the programme, not by the platform, and terms with each platform are agreed in writing.
 
 ## What the SDK does
@@ -53,14 +53,14 @@ Events for your product | Status updates you can show your users
 ## From your side
 [H2] How it runs on your platform.
 Desktop: a five-step register beside three lanes (Your platform, Kubar Protocol filled, The financier; component "Platform lanes", 138:2455). At 768 and 390: the register only.
-[Tag] Step | [Tag] What happens
+(After step 3, REDRAW-2026-11-14.md section 10: the column heads "Step" and "What happens" are cut; they name nothing.)
 [Code] 01  [Body] Your exporter books and documents a shipment in your platform, as it does today.
 [Code] 02  [Body] NavDhan SDK checks the shipment against the programme’s rules and shows an indicative offer.
 [Code] 03  [Body] With the exporter’s consent, the shipment data and documents go to Kubar Protocol, which assembles the evidence package.
 [Code] 04  [Body] A financier buys the receivable and pays the exporter’s own bank.
 [Code] 05  [Body] The buyer pays the financier on the due date. Your platform shows each step as it happens.
 Lane labels (desktop): [UI] Your platform, [UI] Kubar Protocol, [UI] The financier; path labels [Tag] NavDhan SDK, With the exporter’s consent, The evidence package, Each step as it happens.
-[UI] Follow one receivable, shipment to settlement       (→ /how-it-works)
+[UI] See how it works                                    (→ /how-it-works)
 
 ## Rules
 [H2] Rules the SDK follows.
@@ -73,13 +73,15 @@ Lane labels (desktop): [UI] Your platform, [UI] Kubar Protocol, [UI] The financi
 [H2] Your exporters see NavDhan. Kubar Protocol runs behind it.
 [BodyL] The programme, the evidence package, insurance and payment matching run on Kubar Protocol, the infrastructure Kubar presents to banks, insurers and funds.
 Layer stack (component "Layer stack", 139:2456), top to bottom; Kubar Protocol is the filled layer:
-[UI] Your platform              [BodyS] You keep the relationship
-  [UI] NavDhan SDK              [BodyS] What you embed            (nested inside Your platform)
-[UI] Kubar Protocol             [BodyS] The programme, the evidence package, insurance and payment matching
-[UI] Banks, insurers and funds  [BodyS] Financiers buy, insurers cover
+(After step 3, REDRAW-2026-11-14.md section 10: the four layer descriptions are cut, since each repeats the lead or the hero; the layer names stay.)
+[UI] Your platform
+  [UI] NavDhan SDK              (nested inside Your platform)
+[UI] Kubar Protocol
+[UI] Banks, insurers and funds
 [UI] See Kubar Protocol         (→ /products/kubar-protocol)
 
 ## Next step
-[H2] Talk about an integration.
-[BodyL] Tell us about your platform and your exporters, and we’ll take you through what an integration involves.
+(After step 3, REDRAW-2026-11-14.md section 10: the heading repeated the button, so the lead is split.)
+[H2] Tell us about your platform and your exporters.
+[BodyL] We’ll take you through what an integration involves.
 [UI] Talk about an integration  (filled button → /contact?intent=platform)

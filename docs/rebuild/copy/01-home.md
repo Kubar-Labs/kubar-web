@@ -36,16 +36,15 @@ Extracted from Figma, Home · 1440 (frame 160:6), 13 Nov 2026, in reading order.
 [State] Filed                              (row 06 is current: inset ground, rani marker, rani status)
 [Fine] Proves
 [BodyS] The financier bought the receivable, without recourse for the buyer’s credit
-[Tag] 05 Purchased                          (rani)
+(After step 3, REDRAW-2026-11-14.md section 10: "05 Purchased" under the record is cut.)
 (14 Nov: the record's summary is one sentence and "State 05 of 08" is gone. The status footnote ¹ is no longer in the hero; marker ¹ on "exchange" links to the one under the foundations. REDRAW-2026-11-14.md, sections 6 and 9.6.)
 
 ## The gap
 [H2] The missing piece isn’t capital.
 [BodyL] Exporters’ paper doesn’t arrive originated, insured and documented in a form a financier can buy again and again. Kubar builds that layer.
-[Tag] A year
+(After step 3, REDRAW-2026-11-14.md section 10: "A year" and "In total" are cut; the sentences under the figures say it.)
 [Figure] About $80bn
 [BodyS] a year of Indian SME and mid-market export receivables is financeable: Kubar’s estimate for FY 2025–26.²
-[Tag] In total
 [Figure] $126.92M
 [BodyS] financed in total on GIFT City’s trade-finance platforms (ITFS): 2,857 transactions to June 2026.³
         (drawing: a full-width 8 px bar for $80bn over a hairline track holding a 1 px tick for $126.92M, both to scale)
@@ -61,21 +60,17 @@ Extracted from Figma, Home · 1440 (frame 160:6), 13 Nov 2026, in reading order.
 ## One receivable  (the pinned story; see ../HANDOFF.md, Motion)
 [H2] Follow one receivable from shipment to settlement.
 (14 Nov, option B: only the lanes drawing is pinned; each state is a card that scrolls past it, so the panel's "State" label goes and each card carries its own counter, "05 of 08". REDRAW-2026-11-14.md, section 3a.)
+(After step 3, REDRAW-2026-11-14.md section 10: "Illustrative" is cut from the story; each card's state word loses its number; the "Party ·" line and the story's own "See how it works" link are cut, since the band right after it has the same link.)
 [Tag] Record RCV-0001
-[Fine] Illustrative
-[Tag] State
-[Label] 05 of 08
-[Code] 05
 [State] Purchased
+[Label] 05 of 08
 [BodyL] The financier buys the receivable, without recourse for the buyer’s credit.
-[Tag] Party · Financier
 [Tag] Data path · Kubar
 [Body] Package delivered; purchase recorded
 [Tag] Money path
 [Label] Kubar holds none                    (rani)
 [Body] The financier pays 90% of face to the exporter’s own bank
 [UI] Skip the story                         (anchor to the next section)
-[UI] See how it works                       → /how-it-works
 (14 Nov: the story panel's three-line legend is removed; "Data path: documents and records" and "Money path: only between banks" move to the Who takes part map.)
 [UI] Exporter
 [UI] Kubar                                  (the one filled column: petrol ground, white mark and name)
@@ -103,7 +98,7 @@ The 1440 frame shows the story at state 05. The text for all eight states is the
 [Tag] TReDS
 [Tag] Indian Energy Exchange
 [Tag] GIFT City · ITFS
-[Tag] On the exchange
+(After step 3, REDRAW-2026-11-14.md section 10: "On the exchange" is cut; "Today" stays.)
 [BodyS] Only banks and other financial institutions permitted by the RBI finance MSME invoices
 [BodyS] Distribution companies, generators, traders and large consumers buy and sell electricity
 [BodyS] Only institutional financiers would buy export receivables, on Kubar’s planned venue¹
@@ -111,7 +106,7 @@ The 1440 frame shows the story at state 05. The text for all eight states is the
 [BodyS] Running
 [BodyS] Running
 [BodyS] The rules exist; the asset doesn’t yet          (rani)
-[Tag] Five foundations, built from the bottom up
+(After step 3, REDRAW-2026-11-14.md section 10: the panel title "Five foundations, built from the bottom up" is cut.)
 [UIL] The venue, last
 [BodyS] An ITFS for institutional financiers only, with Kubar as its neutral operator¹
 [Tag] Planned¹                              (rani)
@@ -128,7 +123,7 @@ The 1440 frame shows the story at state 05. The text for all eight states is the
 [Fine] Back to text
 
 ## Who takes part
-[H2] Who takes part, and what each one does.
+[H2] Who takes part.
 [BodyL] Only institutional financiers buy the receivables. There is no retail access.
 (14 Nov: the register becomes a map of six cards, so its column heads "Party" and "Role" are not shown, and Buyers' "—" goes. The legend is under the cards.)
 [UI] Financiers
@@ -154,13 +149,10 @@ The 1440 frame shows the story at state 05. The text for all eight states is the
 ## Standing
 [H2] Standing and memberships.
 (14 Nov: the lead under the heading is removed on Home; it stays on About. The register becomes four statements, so its column heads "Kind" and "Entry" are not shown; each kind stays as a small label.)
-[Fine] Sandbox
+(After step 3, REDRAW-2026-11-14.md section 10: the kind labels Sandbox, Membership, Award and Award are cut; each statement starts with the same thing.)
 [BodyS] Priority entry to the IFSCA FinTech Innovation Sandbox through GIFT IFIH
-[Fine] Membership
 [BodyS] Member of FACE, an RBI-recognised self-regulatory organisation for fintech
-[Fine] Award
 [BodyS] FinVision Award for Most Innovative Startup in Fintech, FinTech Edge 2026, NIBM Pune
-[Fine] Award
 [BodyS] Winner, Popular Choice Award, Startup Mahakumbh 2025
         (programme marks: logo and name, six in one row at desktop; no kind labels from 14 Nov)
 [UI] GIFT IFIH Young Builders Program
