@@ -61,8 +61,11 @@ test.describe("what the site never shows", () => {
           return getComputedStyle(probe).boxShadow;
         });
         probe.remove();
+        // Tailwind's shadow utilities compose the elevation after four empty
+        // ring and inset layers ("rgba(0, 0, 0, 0) 0px 0px 0px 0px"); those draw nothing.
+        const visible = (shadow: string) => shadow.replace(/rgba\(0, 0, 0, 0\) 0px 0px 0px 0px(, )?/g, "") || "none";
         return [...document.querySelectorAll("main *, header *, footer *")]
-          .map((el) => getComputedStyle(el).boxShadow)
+          .map((el) => visible(getComputedStyle(el).boxShadow))
           .filter((shadow) => shadow !== "none" && !allowed.includes(shadow));
       });
       expect(strayShadows).toEqual([]);

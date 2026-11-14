@@ -154,19 +154,29 @@ test.describe("menu sheet below desktop", () => {
 test.describe("primitives and registers (build step 2), on Home", () => {
   test.use({ viewport: { width: 1440, height: 900 } });
 
-  test("the record shows what each document proves on hover and focus, then returns to the current one", async ({ page }) => {
+  // The record is now the isometric stack (REDRAW-2026-11-14.md, Home hero):
+  // an ordered list of six rows, 06 first, beside an aria-hidden drawing.
+  test("the record lifts a sheet and shows what its document proves on hover and focus, then returns to the current one", async ({ page }) => {
     await page.goto("/");
-    const record = page.locator("table").filter({ has: page.getByRole("columnheader", { name: "Document" }) });
-    await expect(record.getByRole("row")).toHaveCount(7);
-    const proves = page.getByText("The financier bought the receivable, without recourse for the buyer’s credit").last();
-    await expect(proves).toBeVisible();
-    await record.getByRole("row", { name: /Shipping bill/ }).hover();
+    const record = page.locator("ol[aria-describedby]").filter({ hasText: "Commercial invoice" });
+    const rows = record.locator("li");
+    await expect(rows).toHaveCount(6);
+    await expect(rows.first()).toContainText("Purchase confirmation");
+    await expect(rows.first()).toHaveAttribute("aria-current", "true");
+    // Every row tells assistive technology what its document proves.
+    await expect(rows.nth(4)).toContainText("Proves: The goods were cleared for export, as invoiced");
+    const shown = page.locator('[aria-hidden="true"]').getByText("The financier bought the receivable, without recourse for the buyer’s credit");
+    await expect(shown).toBeVisible();
+    await expect(page.locator(".iso-lift.is-lifted")).toHaveCount(0);
+    await rows.filter({ hasText: "Shipping bill" }).hover();
     await expect(page.locator('[aria-hidden="true"]').getByText("The goods were cleared for export, as invoiced")).toBeVisible();
+    await expect(page.locator(".iso-lift.is-lifted")).toHaveCount(1);
     await page.mouse.move(0, 0);
-    await expect(proves).toBeVisible();
-    await record.getByRole("row", { name: /Electronic bill of lading/ }).focus();
+    await expect(shown).toBeVisible();
+    await expect(page.locator(".iso-lift.is-lifted")).toHaveCount(0);
+    await rows.filter({ hasText: "Electronic bill of lading" }).focus();
     await expect(page.locator('[aria-hidden="true"]').getByText("The goods were shipped on board")).toBeVisible();
-    await expect(record).toHaveAttribute("aria-describedby", /.+/);
+    await expect(page.locator(".iso-record svg")).toHaveAttribute("aria-hidden", "true");
   });
 
   test("Illustrative opens its note in place and closes again", async ({ page }) => {
@@ -321,8 +331,11 @@ test.describe("Home, complete (build step 3)", () => {
 
   test("contact routes carry their intents and people link out", async ({ page }) => {
     await page.goto("/");
-    await expect(page.getByRole("link", { name: "Start a programme conversation" })).toHaveAttribute("href", "/contact?intent=institution");
-    await expect(page.getByRole("link", { name: "Talk about an integration" })).toHaveAttribute("href", "/contact?intent=platform");
+    // The first two routes are cards, each one link; the financial-institution card is petrol.
+    const institution = page.getByRole("link", { name: "A bank, finance company, insurer or fund Start a programme conversation" });
+    await expect(institution).toHaveAttribute("href", "/contact?intent=institution");
+    await expect(institution).toHaveAttribute("data-ground", "petrol");
+    await expect(page.getByRole("link", { name: "A trade platform or marketplace Talk about an integration" })).toHaveAttribute("href", "/contact?intent=platform");
     await expect(page.getByRole("link", { name: "Email us" })).toHaveAttribute("href", "mailto:partnerships@kubar.tech");
     await expect(page.getByRole("link", { name: "Write to us" })).toHaveAttribute("href", "/contact?intent=other");
     const card = page.getByRole("link", { name: "Vaibhav Sharma on LinkedIn (opens in a new tab)" });
@@ -338,6 +351,77 @@ test.describe("Home, complete (build step 3)", () => {
       expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
       await expectNoAxeViolations(page);
     }
+  });
+});
+
+test.describe("Home drawings (redraw step 2)", () => {
+  test("the map reads in one order, keeps money away from Kubar and dims the arrows a card doesn't touch", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/");
+    const map = page.locator(".party-map");
+    await expect(map.getByRole("heading", { level: 3 })).toHaveText(["Buyers", "Financiers", "Exporters", "Trade platforms", "Kubar", "Credit insurers"]);
+    await expect(map.getByText("Money path: only between banks")).toBeVisible();
+    await expect(map.getByText("Data path: documents and records")).toBeVisible();
+    // Six arrows between the cards at desktop: two solid (money), four dashed (data); none of money touches Kubar.
+    const arrows = map.locator("svg:visible .draw-arrow");
+    await expect(arrows).toHaveCount(6);
+    await expect(map.locator("svg:visible .draw-arrow:has(.draw-solid)")).toHaveCount(2);
+    for (const touches of await map.locator("svg:visible .draw-arrow:has(.draw-solid)").evaluateAll((els) => els.map((el) => el.getAttribute("data-touches")))) {
+      expect(touches).not.toContain("kubar");
+    }
+    // The whole card is its link's target.
+    await expect(map.locator('[data-party="kubar"]').getByRole("link", { name: "About" })).toHaveAttribute("href", "/about");
+    // Hovering Kubar dims the two money arrows and the data arrow between exporters and platforms.
+    await map.locator('[data-party="kubar"]').hover();
+    await page.waitForTimeout(300);
+    const dimmed = await arrows.evaluateAll((els) => els.filter((el) => getComputedStyle(el).opacity === "0.3").map((el) => el.getAttribute("data-touches")));
+    expect(dimmed.sort()).toEqual(["buyers financiers", "exporters platforms", "financiers exporters"]);
+  });
+
+  test("below desktop the map is one column with the return arrow up the right side", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/");
+    const map = page.locator(".party-map");
+    const names = ["buyers", "financiers", "exporters", "platforms", "kubar", "insurers"];
+    let previous = -Infinity;
+    for (const name of names) {
+      const box = (await map.locator(`[data-party="${name}"]`).boundingBox())!;
+      expect(box.y).toBeGreaterThan(previous);
+      previous = box.y;
+    }
+    // Five arrows down the column and the dashed return arrow, drawn between the measured cards.
+    await expect(map.locator("svg:visible .draw-arrow")).toHaveCount(6);
+    await expect(map.locator('svg:visible .draw-arrow[data-touches="kubar financiers"]')).toHaveCount(1);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
+  });
+
+  test("drawings start undrawn below the fold and play once as they come into view", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/");
+    const map = page.locator(".party-map");
+    await expect(map).toHaveAttribute("data-phase", "armed");
+    await map.scrollIntoViewIfNeeded();
+    await expect(map).toHaveAttribute("data-phase", "playing");
+    // Reduced motion: everything is drawn from the start.
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/");
+    await expect(page.locator(".party-map")).toHaveAttribute("data-phase", "done");
+    await expect(page.locator(".iso-foundations")).toHaveAttribute("data-phase", "done");
+  });
+
+  test("standing is four statements with their kinds, and the programmes sit in one row at desktop", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/");
+    const section = page.locator("section", { has: page.getByRole("heading", { name: "Standing and memberships." }) });
+    await expect(section.locator("table")).toHaveCount(0);
+    const statements = section.locator("ul").first().locator("li");
+    await expect(statements).toHaveCount(4);
+    await expect(statements.first()).toContainText("Sandbox");
+    const marks = section.locator("ul").nth(1).locator("li");
+    await expect(marks).toHaveCount(6);
+    const tops = await marks.evaluateAll((els) => els.map((el) => Math.round(el.getBoundingClientRect().top)));
+    expect(new Set(tops).size).toBe(1);
   });
 });
 

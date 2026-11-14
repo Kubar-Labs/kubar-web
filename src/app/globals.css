@@ -201,6 +201,37 @@
   grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
   column-gap: var(--grid-gutter);
 }
+/* A card that is a link (contact routes, map parties; REDRAW-2026-11-14.md,
+   section 7): at rest --elevation-2 (or --lift-rest); on hover, focus or tap
+   it rises to --elevation-3 and 2 px up over --duration-hover. The deeper
+   shadow sits on a pseudo-element and fades in, so only opacity and
+   transform move. Reduced motion: it doesn't move; its border darkens. */
+@utility lift-card {
+  position: relative;
+  box-shadow: var(--lift-rest, var(--elevation-2));
+  transition: translate var(--duration-hover) var(--ease-standard);
+  &::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    box-shadow: var(--elevation-3);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--duration-hover) var(--ease-standard);
+  }
+  &:is(:hover, :focus-within) {
+    translate: 0 -2px;
+  }
+  &:is(:hover, :focus-within)::before {
+    opacity: 1;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    &:is(:hover, :focus-within) {
+      translate: none;
+      border-color: var(--color-rule-strong);
+    }
+  }
+}
 @utility measure {
   max-width: var(--measure);
 }
@@ -270,6 +301,16 @@
   :focus-visible {
     outline: var(--focus-width) solid var(--color-focus);
     outline-offset: var(--focus-offset);
+  }
+
+  /* Tablet: running text keeps to the measure (REDRAW-2026-11-14.md, 9.10).
+     At desktop each block sets its own width; on phones the column is narrower. */
+  @media (min-width: 768px) and (max-width: 1199.98px) {
+    main p,
+    main dd,
+    main li.t-body {
+      max-width: var(--measure);
+    }
   }
 
   [data-ground="petrol"] {
@@ -446,6 +487,214 @@
   }
   .abbr[data-open] > .abbr-tip {
     display: block;
+  }
+
+  /* Isometric drawings (REDRAW-2026-11-14.md, sections 4 and 7). The
+     elevations as filters, so they follow the projected shape. */
+  .iso-sheet {
+    filter: drop-shadow(0 2px 4px rgb(2 39 50 / 0.08)) drop-shadow(0 14px 36px rgb(2 39 50 / 0.12)); /* --elevation-2 */
+  }
+  .iso-sheet-current,
+  .iso-lift-shadow {
+    filter: drop-shadow(0 4px 8px rgb(2 39 50 / 0.08)) drop-shadow(0 24px 56px rgb(2 39 50 / 0.16)); /* --elevation-3 */
+  }
+  .iso-lift-shadow {
+    opacity: 0;
+    transition: opacity var(--duration-disclose) var(--ease-standard);
+  }
+  .is-lifted .iso-lift-shadow {
+    opacity: 1;
+  }
+  .iso-ground {
+    fill: rgb(2 39 50 / 0.2);
+    filter: blur(14px);
+  }
+  .iso-text-code {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    letter-spacing: 0.02em;
+  }
+  .iso-text-state {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    font-size: 13px;
+    letter-spacing: 0.06em;
+  }
+  .iso-lift {
+    transition: transform var(--duration-disclose) var(--ease-standard);
+  }
+  .iso-lift.is-lifted {
+    transform: translateY(-14px);
+  }
+  .iso-leader {
+    position: absolute;
+    top: 11px;
+    left: -24px;
+    width: 16px;
+    border-top: 1px solid var(--color-rule);
+  }
+  .iso-leader.is-current {
+    border-color: var(--color-accent);
+  }
+  .iso-record {
+    --iso-record-gap: 74px;
+  }
+  @media (min-width: 768px) {
+    .iso-record {
+      --iso-record-gap: 50px;
+    }
+  }
+  @media (min-width: 1200px) {
+    .iso-record {
+      --iso-record-gap: 78px;
+    }
+  }
+  /* Blocks (foundations, layers, steps): a resting shadow under each, in
+     screen space; the top face takes accent-soft when its label is picked. */
+  .iso-block {
+    filter: drop-shadow(0 2px 4px rgb(2 39 50 / 0.08)) drop-shadow(0 14px 36px rgb(2 39 50 / 0.12)); /* --elevation-2 */
+  }
+  .iso-top {
+    transition: fill var(--duration-hover) var(--ease-standard);
+  }
+  /* A picked label (hover, focus, tap) highlights its block's top face. */
+  .iso-foundations:has(li[data-level="0"]:is(:hover, :focus)) .iso-top[data-level="0"],
+  .iso-foundations:has(li[data-level="1"]:is(:hover, :focus)) .iso-top[data-level="1"],
+  .iso-foundations:has(li[data-level="2"]:is(:hover, :focus)) .iso-top[data-level="2"],
+  .iso-foundations:has(li[data-level="3"]:is(:hover, :focus)) .iso-top[data-level="3"] {
+    fill: var(--color-accent-soft);
+  }
+  /* The scale card's bar grows from the left; the sliver and caption follow. */
+  [data-phase="armed"] .scale-bar {
+    transform: scaleX(0);
+  }
+  [data-phase="playing"] .scale-bar {
+    transition: transform var(--duration-scene) var(--ease-standard);
+  }
+  [data-phase="armed"] .scale-sliver {
+    opacity: 0;
+  }
+  [data-phase="playing"] .scale-sliver {
+    transition: opacity var(--duration-disclose) var(--ease-standard) calc(var(--duration-scene) + 200ms);
+  }
+  .iso-leader-line {
+    stroke: var(--color-rule);
+    stroke-width: 1;
+  }
+  .iso-leader-line.is-dashed,
+  .iso-venue {
+    stroke: var(--color-ink);
+    stroke-dasharray: 6 5;
+  }
+  .iso-venue {
+    fill: none;
+    stroke-width: 1;
+  }
+  /* The solid copy that reveals a dashed outline as it draws. */
+  .iso-outline-mask {
+    fill: none;
+    stroke: white;
+    stroke-width: 6;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+  }
+  [data-phase="armed"] .iso-rise {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  [data-phase="playing"] .iso-rise {
+    transition:
+      opacity var(--duration-write) var(--ease-standard),
+      transform var(--duration-write) var(--ease-standard);
+    transition-delay: calc(var(--level) * 80ms);
+  }
+  [data-phase="armed"] .iso-outline-mask {
+    stroke-dashoffset: 1;
+  }
+  [data-phase="playing"] .iso-outline-mask {
+    transition: stroke-dashoffset 480ms var(--ease-standard) calc(3 * 80ms + var(--duration-write));
+  }
+
+  /* Arrivals on page load: a sheet drops in from 24 px above; a row fades in. */
+  .iso-drop {
+    animation: iso-drop var(--duration-write) var(--ease-standard) both;
+  }
+  .iso-fade {
+    animation: iso-fade var(--duration-disclose) var(--ease-standard) both;
+  }
+  @keyframes iso-drop {
+    from {
+      opacity: 0;
+      transform: translateY(-24px);
+    }
+  }
+  @keyframes iso-fade {
+    from {
+      opacity: 0;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .iso-drop,
+    .iso-fade {
+      animation: none;
+    }
+    .iso-lift,
+    .iso-lift-shadow {
+      transition: none;
+    }
+    .iso-lift.is-lifted {
+      transform: none;
+    }
+    .is-lifted .iso-lift-shadow {
+      opacity: 0;
+    }
+    /* The lift becomes a colour change. */
+    .is-lifted :is(.iso-sheet, .iso-sheet-current) > rect:first-child {
+      fill: var(--color-accent-soft);
+    }
+  }
+
+  /* Lines that draw (Arrow.tsx; sections 7 and 9.4). With no script, reduced
+     motion or the drawing already in view: drawn. Armed: the lines are
+     undrawn and the heads hidden. Playing: each line draws over
+     --duration-write after its --draw-delay, and its head appears as the
+     line arrives. A solid line draws with its own dashoffset (pathLength 1);
+     a dashed one is revealed through a mask whose solid copy draws. */
+  .draw-solid,
+  .draw-mask {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+  }
+  .draw-mask {
+    fill: none;
+    stroke: white;
+    stroke-width: 6;
+  }
+  [data-phase="armed"] :is(.draw-solid, .draw-mask) {
+    stroke-dashoffset: 1;
+  }
+  [data-phase="armed"] .draw-head {
+    opacity: 0;
+  }
+  [data-phase="playing"] :is(.draw-solid, .draw-mask) {
+    transition: stroke-dashoffset var(--duration-write) var(--ease-standard) var(--draw-delay, 0ms);
+  }
+  [data-phase="playing"] .draw-head {
+    transition: opacity var(--duration-hover) var(--ease-standard) calc(var(--draw-delay, 0ms) + var(--duration-write));
+  }
+
+  /* The who-takes-part map: a card under the pointer or focus dims the
+     arrows that don't touch it to 30%. */
+  .party-map .draw-arrow {
+    transition: opacity var(--duration-hover) var(--ease-standard);
+  }
+  .party-map:has([data-party="financiers"]:is(:hover, :focus-within)) .draw-arrow:not([data-touches~="financiers"]),
+  .party-map:has([data-party="insurers"]:is(:hover, :focus-within)) .draw-arrow:not([data-touches~="insurers"]),
+  .party-map:has([data-party="platforms"]:is(:hover, :focus-within)) .draw-arrow:not([data-touches~="platforms"]),
+  .party-map:has([data-party="exporters"]:is(:hover, :focus-within)) .draw-arrow:not([data-touches~="exporters"]),
+  .party-map:has([data-party="buyers"]:is(:hover, :focus-within)) .draw-arrow:not([data-touches~="buyers"]),
+  .party-map:has([data-party="kubar"]:is(:hover, :focus-within)) .draw-arrow:not([data-touches~="kubar"]) {
+    opacity: 0.3;
   }
 
   /* The pinned story. A lanes row writes in over --duration-write: its

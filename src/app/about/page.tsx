@@ -76,7 +76,7 @@ export default function About() {
 
       <Section labelledBy="standing-heading" className="flex flex-col gap-10 lg:gap-16">
         <SectionHead id="standing-heading" heading={t("standing.heading")} lead={t("standing.lead")} />
-        <Standing narrowKind className="lg:max-w-[845px]" />
+        <Standing className="lg:max-w-[845px]" />
         <FinanceProgrammes />
         <TechnologyProgrammes />
       </Section>

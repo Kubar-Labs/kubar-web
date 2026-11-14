@@ -60,11 +60,10 @@ export function ProgrammeMark({ id, name, scale = 1, boxWidth, className }: Prog
         <span
           role="img"
           aria-label={name}
-          className="absolute bg-partner-mark"
+          // Centred in its box like every other mark (REDRAW-2026-11-14.md, section 3),
+          // also when the box is narrower than 176.
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-partner-mark"
           style={{
-            // Centred in its box like every other mark (REDRAW-2026-11-14.md, section 3).
-            left: (width - w) / 2,
-            top: (height - h) / 2,
             width: w,
             height: h,
             maskImage: `url(/programmes/${id}.png)`,

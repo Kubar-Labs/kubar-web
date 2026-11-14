@@ -2,13 +2,15 @@ import { FootnoteMarker } from "@/components/ui/Footnote";
 import { cn } from "@/lib/utils";
 
 /*
- * Exchange comparison (Figma C4 121:1171) and Foundations stack (121:1424),
- * Home "An exchange needs more than a venue."
+ * Three exchanges (Figma 242:3390; REDRAW-2026-11-14.md, Home): TReDS and
+ * the Indian Energy Exchange as two quiet columns, GIFT City · ITFS as the
+ * one raised card in the Petrol mode (480 wide at desktop), each with who is
+ * on the exchange and where it stands today. A filled dot for "Running", a
+ * hollow rani dot for "The rules exist; the asset doesn't yet". Below desktop
+ * they stack.
  *
- * Comparison: a register 628 wide; TReDS, the Indian Energy Exchange and
- * GIFT City · ITFS against who is on the exchange, whether the public is
- * admitted and where each stands today ("The rules exist; the asset doesn't
- * yet" in rani). A real table; below desktop, one block per exchange.
+ * The foundations stack below (FoundationsStack) is About's until build
+ * step 6; Home draws the foundations with IsoFoundations.
  *
  * Stack: the five foundations as ruled rows, the venue (planned, muted, with
  * footnote ¹) on top; at desktop a bottom-up arrow runs in the gutter.
@@ -18,88 +20,63 @@ export type ComparisonRow = { label: string; cells: string[]; footnoteOnLast?: b
 export type Slab = { name: string; line: string; where?: string; planned?: boolean };
 type FootnoteRef = (suffix: string) => { target: string; refId: string };
 
-export function ExchangeComparison({
-  exchangeHead,
+export function ExchangeColumns({
   exchanges,
   rows,
   footnote,
   className,
 }: {
-  exchangeHead: string;
   exchanges: string[];
   rows: ComparisonRow[];
   footnote: FootnoteRef;
   className?: string;
 }) {
-  const cellText = (row: ComparisonRow, i: number) => (
-    <>
-      {row.cells[i]}
-      {row.footnoteOnLast && i === row.cells.length - 1 ? <FootnoteMarker n={1} {...footnote("comparison")} /> : null}
-    </>
-  );
-  const cellClass = (row: ComparisonRow, i: number) =>
-    cn("t-body-sm", row.accentLast && i === row.cells.length - 1 ? "text-accent" : "text-ink");
-
+  const picked = exchanges.length - 1;
   return (
-    <div className={className}>
-      {/* Desktop: the register. */}
-      <table className="hidden w-full table-fixed border-collapse text-left lg:table">
-        <colgroup>
-          <col className="w-[21.66%]" />
-          <col className="w-[26.11%]" />
-          <col className="w-[26.11%]" />
-          <col className="w-[26.11%]" />
-        </colgroup>
-        <thead>
-          <tr className="border-b-2 border-rule-strong">
-            <th scope="col" className="pb-3">
-              <span className="sr-only">{exchangeHead}</span>
-            </th>
-            {exchanges.map((name) => (
-              <th key={name} scope="col" className="t-h4 pb-3 pl-3 font-medium text-ink">
-                {name}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row, r) => (
-            <tr key={row.label} className={r === rows.length - 1 ? "border-b-2 border-rule-strong" : "border-b border-rule"}>
-              <th scope="row" className="t-fine py-4 align-top font-normal text-ink-muted">
-                {row.label}
-              </th>
-              {row.cells.map((_, i) => (
-                <td key={i} className={cn("py-4 pl-3 align-top", cellClass(row, i))}>
-                  {cellText(row, i)}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
-      {/* Below desktop: one block per exchange. */}
-      <div className="flex flex-col border-t-2 border-rule-strong lg:hidden">
-        {exchanges.map((name, i) => (
-          <section key={name} className={cn("flex flex-col gap-3 py-4", i === exchanges.length - 1 ? "border-b-2 border-rule-strong" : "border-b border-rule")}>
-            <h3 className="t-ui-lg text-ink">{name}</h3>
-            <dl className="flex flex-col gap-3">
-              {rows.map((row) => (
-                <div key={row.label} className="flex flex-col gap-1">
-                  <dt className="t-fine text-ink-muted">{row.label}</dt>
-                  <dd className={cellClass(row, i)}>
-                    {row.cells[i]}
-                    {row.footnoteOnLast && i === row.cells.length - 1 ? (
-                      <FootnoteMarker n={1} {...footnote("comparison-stacked")} />
-                    ) : null}
-                  </dd>
-                </div>
-              ))}
+    <ul className={cn("flex flex-col gap-4 lg:flex-row lg:items-start lg:gap-10", className)}>
+      {exchanges.map((name, i) => {
+        const raised = i === picked;
+        return (
+          <li
+            key={name}
+            data-ground={raised ? "petrol" : undefined}
+            className={cn(
+              "flex flex-col gap-5 lg:gap-7",
+              raised
+                ? "border border-rule bg-page px-6 pt-5 pb-6 shadow-elevation-3 lg:w-[480px] lg:shrink-0 lg:px-9 lg:pt-8 lg:pb-10"
+                : "pt-0 pb-3 lg:min-w-0 lg:flex-1 lg:pt-7 lg:pb-8",
+            )}
+          >
+            <h3 className="t-h3 text-ink">{name}</h3>
+            <dl className="flex flex-col gap-5 lg:gap-7">
+              {rows.map((row) => {
+                const isState = Boolean(row.accentLast);
+                return (
+                  <div key={row.label} className="flex flex-col gap-1.5 lg:gap-2">
+                    <dt className="t-fine text-ink-muted">{row.label}</dt>
+                    <dd className={cn(isState ? "t-ui-lg flex items-start gap-2.5 text-ink" : "t-body text-ink")}>
+                      {isState ? (
+                        <svg aria-hidden="true" width="10" height="10" viewBox="0 0 10 10" className="mt-2 shrink-0">
+                          {raised ? (
+                            <circle cx="5" cy="5" r="4.25" fill="none" strokeWidth="1.5" className="stroke-accent" />
+                          ) : (
+                            <circle cx="5" cy="5" r="5" className="fill-ink" />
+                          )}
+                        </svg>
+                      ) : null}
+                      <span>
+                        {row.cells[i]}
+                        {row.footnoteOnLast && raised ? <FootnoteMarker n={1} {...footnote("exchange")} /> : null}
+                      </span>
+                    </dd>
+                  </div>
+                );
+              })}
             </dl>
-          </section>
-        ))}
-      </div>
-    </div>
+          </li>
+        );
+      })}
+    </ul>
   );
 }
 

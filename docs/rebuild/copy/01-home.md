@@ -9,10 +9,7 @@ Extracted from Figma, Home · 1440 (frame 160:6), 13 Nov 2026, in reading order.
 [Tag] Record RCV-0001
 [Fine] Illustrative                         (rani, dotted underline; opens "An example receivable, not a real transaction." in place)
 [Record] $225,000 rice invoice to a buyer in the UAE, due 75 days after shipment.
-[Tag] No.
-[Tag] Document
-[Tag] Source
-[Tag] Status
+(14 Nov: the record becomes the isometric stack of six sheets with a row tied to each, 06 on top, so its column heads "No.", "Document", "Source" and "Status" are not shown.)
 [Code] 01
 [UI] Commercial invoice
 [BodyS] The exporter
@@ -132,8 +129,7 @@ The 1440 frame shows the story at state 05. The text for all eight states is the
 ## Who takes part
 [H2] Who takes part, and what each one does.
 [BodyL] Only institutional financiers buy the receivables. There is no retail access.
-[Tag] Party
-[Tag] Role
+(14 Nov: the register becomes a map of six cards, so its column heads "Party" and "Role" are not shown, and Buyers' "—" goes. The legend is under the cards.)
 [UI] Financiers
 [BodyS] Set a programme limit once, then buy every receivable that fits, insured in their own name
 [UI] For financial institutions             → /products/kubar-protocol
@@ -148,23 +144,22 @@ The 1440 frame shows the story at state 05. The text for all eight states is the
 [UI] How it works                           → /how-it-works
 [UI] Buyers
 [BodyS] Pay the financier’s account, on the terms they already have
-[BodyS] —
 [UI] Kubar                                  (name only: no mark in this row)
 [BodyS] Runs the programme: origination, the evidence package, servicing and reporting. No money and no credit risk
 [UI] About                                  → /about
+[Fine] Money path: only between banks       (legend: solid line)
+[Fine] Data path: documents and records     (legend: dashed line)
 
 ## Standing
 [H2] Standing and memberships.
-(14 Nov: the lead under the heading is removed on Home; it stays on About.)
-[Tag] Kind
-[Tag] Entry
-[Tag] Sandbox
+(14 Nov: the lead under the heading is removed on Home; it stays on About. The register becomes four statements, so its column heads "Kind" and "Entry" are not shown; each kind stays as a small label.)
+[Fine] Sandbox
 [BodyS] Priority entry to the IFSCA FinTech Innovation Sandbox through GIFT IFIH
-[Tag] Membership
+[Fine] Membership
 [BodyS] Member of FACE, an RBI-recognised self-regulatory organisation for fintech
-[Tag] Award
+[Fine] Award
 [BodyS] FinVision Award for Most Innovative Startup in Fintech, FinTech Edge 2026, NIBM Pune
-[Tag] Award
+[Fine] Award
 [BodyS] Winner, Popular Choice Award, Startup Mahakumbh 2025
         (programme marks: logo and name, six in one row at desktop; no kind labels from 14 Nov)
 [UI] GIFT IFIH Young Builders Program
@@ -182,13 +177,12 @@ The 1440 frame shows the story at state 05. The text for all eight states is the
 [UI] Manchit Sanan         [Tag] Compliance Lead
 [UI] Divyesh Reddy         [Tag] Partnerships Lead
 [UI] Kavish Mahajan        [Tag] Creative Director
-        (each name links to the person's LinkedIn, external; portraits in colour)
+        (each name links to the person's LinkedIn, external; portraits greyscale at rest, in colour on hover or focus)
 [UIL] Meet the team and advisers           → /about#team
 
 ## Contact
 [H2] Start the right conversation.
-[Tag] If you are
-[Tag] Next step
+(14 Nov: the first two routes become cards and the last two small link rows, so the column heads "If you are" and "Next step" are not shown.)
 [UI] A bank, finance company, insurer or fund      [UI] Start a programme conversation   → /contact?intent=institution
 [UI] A trade platform or marketplace               [UI] Talk about an integration        → /contact?intent=platform
 [UI] An investor                                   [UI] Email us                          → mailto:partnerships@kubar.tech

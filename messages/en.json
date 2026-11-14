@@ -156,10 +156,9 @@
     "whoTakesPart": {
       "heading": "Who takes part, and what each one does.",
       "lead": "Only institutional financiers buy the receivables. There is no retail access.",
-      "columns": {
-        "party": "Party",
-        "role": "Role",
-        "more": "Read more"
+      "legend": {
+        "money": "Money path: only between banks",
+        "data": "Data path: documents and records"
       },
       "rows": [
         {
@@ -254,10 +253,6 @@
     },
     "contact": {
       "heading": "Start the right conversation.",
-      "columns": {
-        "who": "If you are",
-        "step": "Next step"
-      },
       "rows": [
         {
           "who": "A bank, finance company, insurer or fund",
@@ -447,10 +442,6 @@
     ]
   },
   "standing": {
-    "columns": {
-      "kind": "Kind",
-      "entry": "Entry"
-    },
     "rows": [
       {
         "kind": "Sandbox",

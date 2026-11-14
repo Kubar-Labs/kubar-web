@@ -1,11 +1,12 @@
 import { useTranslations } from "next-intl";
 import { Band } from "@/components/blocks/Band";
-import { FigurePair, type Figure } from "@/components/blocks/FigurePair";
-import { ExchangeComparison, FoundationsStack, type ComparisonRow, type Slab } from "@/components/blocks/Foundations";
+import { ScaleCard, type Figure } from "@/components/blocks/ScaleCard";
+import { ExchangeColumns, type ComparisonRow } from "@/components/blocks/Foundations";
+import { IsoFoundations, type Foundation } from "@/components/blocks/IsoFoundations";
 import { PeopleRow, type Person } from "@/components/blocks/People";
 import { Section, SectionHead } from "@/components/blocks/Section";
-import { ContactRoutes, type ContactRoute } from "@/components/registers/ContactRoutes";
-import { WhoTakesPart, type PartyRow } from "@/components/registers/WhoTakesPart";
+import { RouteCards, type HomeRoute } from "@/components/blocks/RouteCards";
+import { PartyMap, type Party } from "@/components/map/PartyMap";
 import { Story } from "@/components/story/Story";
 import { Ledger } from "@/components/registers/Ledger";
 import { FinanceProgrammes, TechnologyProgrammes } from "@/components/registers/Programmes";
@@ -35,7 +36,7 @@ export default function Home() {
       {/* Hero. Desktop: display and routes (600) beside the record. Below
           desktop: display, subline, routes, the anchor, then the record. */}
       <section>
-        <div className="page-container flex flex-col gap-6 pt-8 pb-12 lg:grid lg:grid-cols-[600px_minmax(0,1fr)] lg:items-start lg:gap-x-20 lg:gap-y-[72px] lg:pt-16 lg:pb-[72px]">
+        <div className="page-container flex flex-col gap-6 pt-8 pb-12 lg:grid lg:grid-cols-[578px_minmax(0,1fr)] lg:items-start lg:gap-x-9 lg:pt-16 lg:pb-[72px]">
           <div className="flex flex-col gap-6 lg:gap-12">
             <h1 className="t-display text-ink">
               {t.rich("display", {
@@ -53,11 +54,13 @@ export default function Home() {
         </div>
       </section>
 
-      <Section labelledBy="gap-heading" className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-20">
-        <SectionHead id="gap-heading" heading={t("gap.heading")} lead={t("gap.lead")} layout="stacked" />
-        <div className="flex min-w-0 flex-1 flex-col gap-10">
-          <FigurePair
-            figures={t.raw("gap.figures") as Figure[]}
+      {/* The gap (Figma 160:63): heading and lead across the top, then the
+          raised scale card, then the two footnotes (² behind a disclosure). */}
+      <Section labelledBy="gap-heading" className="flex flex-col gap-10 lg:gap-16">
+        <SectionHead id="gap-heading" heading={t("gap.heading")} lead={t("gap.lead")} />
+        <div className="flex min-w-0 flex-col gap-10 lg:gap-16">
+          <ScaleCard
+            figures={t.raw("gap.figures") as [Figure, Figure]}
             scaleNote={t("gap.scaleNote")}
             scaleAlt={t("gap.scaleAlt")}
             footnoteId={(n) => ({ target: `fn-${n}`, refId: `fnref-${n}` })}
@@ -84,21 +87,17 @@ export default function Home() {
 
       <Section labelledBy="foundations-heading" className="flex flex-col gap-10 lg:gap-16">
         <SectionHead id="foundations-heading" heading={t("foundations.heading")} lead={t("foundations.lead")} />
-        <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:justify-between">
-          <ExchangeComparison
-            className="lg:w-[628px] lg:shrink-0"
-            exchangeHead={t("foundations.exchangeHead")}
-            exchanges={t.raw("foundations.exchanges") as string[]}
-            rows={t.raw("foundations.rows") as ComparisonRow[]}
-            footnote={(suffix) => ({ target: FN_STATUS, refId: `fnref-1-${suffix}` })}
-          />
-          <FoundationsStack
-            className="lg:w-[543px] lg:shrink-0"
-            label={t("foundations.stackLabel")}
-            slabs={t.raw("foundations.slabs") as Slab[]}
-            footnote={(suffix) => ({ target: FN_STATUS, refId: `fnref-1-${suffix}` })}
-          />
-        </div>
+        <ExchangeColumns
+          exchanges={t.raw("foundations.exchanges") as string[]}
+          rows={t.raw("foundations.rows") as ComparisonRow[]}
+          footnote={(suffix) => ({ target: FN_STATUS, refId: `fnref-1-${suffix}` })}
+        />
+        <IsoFoundations
+          id="home-foundations"
+          title={t("foundations.stackLabel")}
+          foundations={t.raw("foundations.slabs") as Foundation[]}
+          footnote={(suffix) => ({ target: FN_STATUS, refId: `fnref-1-${suffix}` })}
+        />
         <Footnote n={1} id={FN_STATUS} backTo="fnref-1" className="lg:max-w-[628px]">
           {footnotes("status")}
         </Footnote>
@@ -106,9 +105,9 @@ export default function Home() {
 
       <Section labelledBy="who-heading" className="flex flex-col gap-10 lg:gap-16">
         <SectionHead id="who-heading" heading={t("whoTakesPart.heading")} lead={t("whoTakesPart.lead")} />
-        <WhoTakesPart
-          columns={t.raw("whoTakesPart.columns") as { party: string; role: string; more: string }}
-          rows={t.raw("whoTakesPart.rows") as PartyRow[]}
+        <PartyMap
+          parties={t.raw("whoTakesPart.rows") as Party[]}
+          legend={t.raw("whoTakesPart.legend") as { money: string; data: string }}
         />
       </Section>
 
@@ -133,11 +132,7 @@ export default function Home() {
 
       <Section labelledBy="contact-heading" className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-20">
         <SectionHead id="contact-heading" heading={t("contact.heading")} layout="stacked" />
-        <ContactRoutes
-          className="min-w-0 flex-1"
-          columns={t.raw("contact.columns") as { who: string; step: string }}
-          rows={t.raw("contact.rows") as ContactRoute[]}
-        />
+        <RouteCards className="min-w-0 flex-1" routes={t.raw("contact.rows") as HomeRoute[]} />
       </Section>
 
       <Section>

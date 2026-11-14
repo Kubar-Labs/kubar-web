@@ -41,7 +41,7 @@ Each card ends with [UIS] LinkedIn (external link, "(opens in a new tab)" in its
 ## Standing and memberships
 [H2] Standing and memberships.
 [BodyL] Kubar acts as the financier’s origination and servicing agent. It never holds the money or the credit risk.
-[Tag] Kind | [Tag] Entry
+(14 Nov: the register becomes four statements as on Home, so its column heads "Kind" and "Entry" are not shown.)
 Sandbox | Priority entry to the IFSCA FinTech Innovation Sandbox through GIFT IFIH
 Membership | Member of FACE, an RBI-recognised self-regulatory organisation for fintech
 Award | FinVision Award for Most Innovative Startup in Fintech, FinTech Edge 2026, NIBM Pune

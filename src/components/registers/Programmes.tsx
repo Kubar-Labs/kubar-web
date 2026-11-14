@@ -3,12 +3,13 @@ import { ProgrammeMark } from "@/components/registers/ProgrammeMark";
 import { cn } from "@/lib/utils";
 
 /*
- * Programme rows (Figma C4: Programme entry 165:3536, Technology entry 41:20).
+ * Programme rows (Figma: Programmes · strip 244:3298 in Home · 1440, 248:3551
+ * at 768, 248:4034 at 390; Technology entry 41:20).
  *
- * Finance and government: desktop two lists of three, each under a 2 px
- * strong rule, every entry a 176 × 64 mark, the name (Sans/UI) and the kind
- * (Mono/Tag) with a hairline below. Below desktop one list of six: the mark
- * at 120 × 44, the name over the kind.
+ * Finance and government: the six marks in one row at desktop, each a
+ * 176 × 64 mark with its name (Sans/UI) under it and no kind label
+ * (REDRAW-2026-11-14.md, Home). Three to a row on tablet, two on phones with
+ * the mark at 90%. No rules.
  *
  * Technology: the mark with its name centred under it (Sans/Fine, at most
  * 160 wide); seven across at desktop, two per row below.
@@ -19,24 +20,16 @@ type TechEntry = { id: string; name: string };
 export function FinanceProgrammes({ className }: { className?: string }) {
   const t = useTranslations("programmes");
   const entries = t.raw("finance") as FinanceEntry[];
-  const lists = [entries.slice(0, 3), entries.slice(3)];
   return (
-    <div className={cn("flex flex-col lg:flex-row lg:gap-6", className)}>
-      {lists.map((list, listIndex) => (
-        <ul
-          key={listIndex}
-          className={cn("flex-1 lg:border-t-2 lg:border-rule-strong", listIndex === 0 && "max-lg:border-t-2 max-lg:border-rule-strong")}
-        >
-          {list.map((entry) => (
-            <li key={entry.id} className="flex items-center gap-4 border-b border-rule py-3 lg:gap-6">
-              <ProgrammeMark id={entry.id} name={entry.name} className="lg:hidden" scale={120 / 176} />
-              <ProgrammeMark id={entry.id} name={entry.name} className="hidden lg:block" />
-              <span className="t-ui min-w-0 flex-1 text-ink">{entry.name}</span>
-            </li>
-          ))}
-        </ul>
+    <ul className={cn("grid grid-cols-2 gap-x-4 gap-y-7 md:grid-cols-3 lg:grid-cols-6 lg:gap-x-6", className)}>
+      {entries.map((entry) => (
+        <li key={entry.id} className="flex min-w-0 flex-col gap-2.5 lg:gap-3">
+          <ProgrammeMark id={entry.id} name={entry.name} className="max-w-full md:hidden" scale={0.9} />
+          <ProgrammeMark id={entry.id} name={entry.name} className="hidden max-w-full md:block" />
+          <span className="t-ui text-ink">{entry.name}</span>
+        </li>
       ))}
-    </div>
+    </ul>
   );
 }
 
@@ -46,10 +39,10 @@ export function TechnologyProgrammes({ className }: { className?: string }) {
   return (
     <div className={cn("flex flex-col gap-8 lg:gap-10", className)}>
       <p className="t-fine text-ink-muted">{t("technologyLabel")}</p>
-      <ul className="grid grid-cols-[repeat(2,minmax(0,167px))] gap-4 md:grid-cols-[repeat(auto-fill,167px)] lg:grid-cols-[repeat(7,176px)] lg:gap-x-2 lg:gap-y-8">
+      <ul className="grid grid-cols-[repeat(2,minmax(0,167px))] gap-4 md:grid-cols-[repeat(auto-fill,167px)] lg:grid-cols-[repeat(7,minmax(0,176px))] lg:gap-x-2 lg:gap-y-8">
         {entries.map((entry) => (
-          <li key={entry.id} className="flex flex-col items-center gap-2">
-            <ProgrammeMark id={entry.id} name={entry.name} className="max-lg:w-full!" />
+          <li key={entry.id} className="flex min-w-0 flex-col items-center gap-2">
+            <ProgrammeMark id={entry.id} name={entry.name} className="max-w-full max-lg:w-full!" />
             <span className="t-fine max-w-40 text-center text-ink">{entry.name}</span>
           </li>
         ))}

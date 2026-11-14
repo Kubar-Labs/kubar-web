@@ -126,7 +126,8 @@ export function Ledger({ current = "05", footnote, states: ownStates, className 
                 className={cn(
                   cell,
                   "max-lg:col-start-2",
-                  isPlanned ? "t-state text-ink-muted" : "t-fine text-ink-muted",
+                  // The state style only where the cell shows "Planned"; a named party is Sans/Fine.
+                  isPlanned && !row.party ? "t-state text-ink-muted" : "t-fine text-ink-muted",
                 )}
               >
                 {isPlanned ? (row.party ?? t("planned")) : row.party}
