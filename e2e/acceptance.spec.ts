@@ -182,24 +182,52 @@ test.describe("performance budget (HANDOFF section 11)", () => {
       await page.setViewportSize({ width: 390, height: 844 });
       const client = await context.newCDPSession(page);
       await client.send("Network.enable");
-      const types = new Map<string, { url: string; type: string }>();
-      const sizes = new Map<string, number>();
-      client.on("Network.responseReceived", (event) => types.set(event.requestId, { url: event.response.url, type: event.type }));
-      client.on("Network.loadingFinished", (event) => sizes.set(event.requestId, event.encodedDataLength));
+      // Each width loads from the network, not from the first load's cache.
+      await client.send("Network.setCacheDisabled", { cacheDisabled: true });
+      const seen = new Map<string, { url: string; type: string; prefetch: boolean; bytes: number }>();
+      client.on("Network.requestWillBeSent", (event) =>
+        seen.set(event.requestId, {
+          url: event.request.url,
+          type: event.type ?? "",
+          // Next's router prefetch of linked routes sends this header (RSC payloads).
+          prefetch: Object.keys(event.request.headers).some((k) => /^(next-router-prefetch|purpose|sec-purpose)$/i.test(k)),
+          bytes: 0,
+        }),
+      );
+      client.on("Network.responseReceived", (event) => {
+        const r = seen.get(event.requestId);
+        if (r) r.type = event.type;
+      });
+      client.on("Network.loadingFinished", (event) => {
+        const r = seen.get(event.requestId);
+        if (r) r.bytes = event.encodedDataLength;
+      });
+      // The page's own script, without prefetches: Next also fetches the routes linked from
+      // what's on screen (and their page chunks), which this page doesn't run. Bytes on the wire,
+      // headers included. Measured at 390 and at 1440, where different links are on screen.
+      const own = path === "/" ? "/app/page-" : `/app${path}/page-`;
+      const ownScripts = () =>
+        [...seen.values()]
+          .filter((r) => r.type === "Script" && !r.prefetch && (!/\/app\/.*page-/.test(r.url) || r.url.includes(own)))
+          .reduce((sum, r) => sum + r.bytes, 0);
+      const prefetched = () => [...seen.values()].filter((r) => r.prefetch || (r.type === "Script" && /\/app\/.*page-/.test(r.url) && !r.url.includes(own))).reduce((sum, r) => sum + r.bytes, 0);
+      await page.setViewportSize({ width: 1440, height: 900 });
+      await page.goto(path, { waitUntil: "networkidle" });
+      const wide = ownScripts();
+      console.log(`${path} at 1440: own scripts ${(wide / 1024).toFixed(1)} KB; prefetched ${(prefetched() / 1024).toFixed(1)} KB`);
+      expect(wide).toBeLessThanOrEqual(170 * 1024);
+      seen.clear();
+      await page.setViewportSize({ width: 390, height: 844 });
       await page.goto(path, { waitUntil: "networkidle" });
 
-      const requests = [...types.entries()].map(([id, r]) => ({ ...r, bytes: sizes.get(id) ?? 0 }));
+      const requests = [...seen.values()];
       const origin = new URL(page.url()).origin;
       expect(requests.filter((r) => !r.url.startsWith(origin) && !r.url.startsWith("data:")).map((r) => r.url)).toEqual([]);
 
-      // The page's own script: Next also prefetches the chunks of pages linked from here, which this page doesn't run.
-      const own = path === "/" ? "/app/page-" : `/app${path}/page-`;
-      const scripts = requests
-        .filter((r) => r.type === "Script" && (!/\/app\/.*page-/.test(r.url) || r.url.includes(own)))
-        .reduce((sum, r) => sum + r.bytes, 0);
+      const scripts = ownScripts();
       const fonts = requests.filter((r) => r.type === "Font");
       test.info().annotations.push({ type: "weights", description: `${path}: scripts ${(scripts / 1024).toFixed(1)} KB compressed, fonts ${(fonts.reduce((s, r) => s + r.bytes, 0) / 1024).toFixed(1)} KB` });
-      console.log(`${path}: scripts ${(scripts / 1024).toFixed(1)} KB compressed; fonts ${fonts.length} files, ${(fonts.reduce((s, r) => s + r.bytes, 0) / 1024).toFixed(1)} KB`);
+      console.log(`${path} at 390: own scripts ${(scripts / 1024).toFixed(1)} KB; prefetched ${(prefetched() / 1024).toFixed(1)} KB; fonts ${fonts.length} files, ${(fonts.reduce((s, r) => s + r.bytes, 0) / 1024).toFixed(1)} KB`);
       expect(scripts).toBeLessThanOrEqual(170 * 1024);
       expect(fonts.reduce((sum, r) => sum + r.bytes, 0)).toBeLessThanOrEqual(300 * 1024);
       await expect(page.locator('link[rel="preload"][as="font"]')).toHaveCount(2);

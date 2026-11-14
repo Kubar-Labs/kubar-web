@@ -5,15 +5,16 @@ import { cn } from "@/lib/utils";
  * REDRAW-2026-11-14.md, Kubar Protocol). Exporters and Buyers as two raised
  * cards (--elevation-2) joined by a 2 px arrow labelled "Terms / Open
  * account"; Financier and Cover as plain text; "Next" in a dashed box. On
- * phones the cards stack and the arrow points down. The labels are Sans/Fine,
- * in rani where the frame shows rani.
+ * phones the cards stack and the arrow points down. The labels are Sans/Fine
+ * in the secondary colour at every width (rani is kept for footnote markers,
+ * the current state, Illustrative and errors).
  */
 type Row = [label: string, value: string];
 
-function Pair({ label, value, tone = "accent" }: { label: string; value: string; tone?: "accent" | "muted" }) {
+function Pair({ label, value }: { label: string; value: string }) {
   return (
     <>
-      <dt className={cn("t-fine", tone === "accent" ? "text-accent" : "text-ink-muted")}>{label}</dt>
+      <dt className="t-fine text-ink-muted">{label}</dt>
       <dd className="t-h4 text-ink">{value}</dd>
     </>
   );
@@ -56,7 +57,7 @@ export function Corridor({ rows, className }: { rows: Row[]; className?: string 
         </dl>
       </div>
       <dl className="flex flex-col gap-3 border border-dashed border-rule-strong px-6 pt-5 pb-6 lg:px-7 lg:pt-6 lg:pb-7">
-        <Pair label={next[0]} value={next[1]} tone="muted" />
+        <Pair label={next[0]} value={next[1]} />
       </dl>
     </div>
   );

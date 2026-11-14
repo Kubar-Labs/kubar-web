@@ -39,7 +39,7 @@ Beside it, the money timeline (drawn to scale on a day axis; Figma component "Mo
 [Code] Due date · day 75
 [Fine] Days after shipment. The purchase date is illustrative: it follows the documents, the insurer’s limit check and the buyer’s acknowledgement.
 
-At 768 and 390 the timeline is a stacked register; its labels there: "Day 0", "Paid out · at purchase", "Received · day 75", "Paid out · later", "Meanwhile", "Day 75", and the receiving account is named "Financier’s collection account".
+At 768 and 390 the small drawing (the day 0 and day 75 bars, 350 wide) sits above the words as a list; its labels there: "Day 0", "Paid out · at purchase", "Received · day 75", "Paid out · later", "Meanwhile", "Day 75", and the receiving account is named "Financier’s collection account".
 
 ## How a programme runs
 [H2] How a programme runs.
@@ -111,7 +111,12 @@ Drawing (component "Money path", 120:1167; shared with How it works): four parti
 [BodyS] Purchase price, at purchase (90% of face)
 [BodyS] Face value, on the due date
 [BodyS] Deferred purchase price: the balance, less discount and charges
-[Tag] Kubar holds none                             (under Kubar; plain words, no chip; was "No account, no payment, no release")
+[Tag] Kubar holds none                             (under Kubar, on its grey chip; was "No account, no payment, no release")
+Below 1200, the three payments as rows, each with its from and to (Figma 120:1141), then Kubar with the chip:
+[Fine] Financier → Exporter’s bank
+[Fine] Buyer → Financier’s collection account
+[Fine] Financier → Exporter’s bank
+[Fine] Kubar   [Fine] Kubar holds none     (on the grey chip)
 [BodyS] Every payment carries the receivable’s reference, and Kubar matches each one to its receivable.
 
 ## The loss history

@@ -55,15 +55,16 @@ export default function KubarProtocol() {
 
       <Section labelledBy="buy-heading" className="flex flex-col gap-10 lg:gap-16">
         <SectionHead id="buy-heading" heading={t("whatYouBuy.heading")} layout="wide" />
-        <div className="flex flex-col gap-12 min-[1440px]:flex-row min-[1440px]:items-start min-[1440px]:gap-6">
+        <div className="flex flex-col gap-12 min-[1280px]:flex-row min-[1280px]:items-start min-[1280px]:gap-6">
           <ReceivableSheet
             className="lg:w-[519px] lg:shrink-0"
             title={t("whatYouBuy.title")}
             illustrative={<Illustrative />}
             rows={t.raw("whatYouBuy.rows") as string[][]}
           />
-          {/* Side by side from 1440 up (519 + 24 + 737 = 1280); below that the timeline sits under the sheet. */}
-          <MoneyTimeline copy={t.raw("timeline") as TimelineCopy} className="min-w-0 lg:shrink-0" />
+          {/* Side by side from 1280 up, the timeline taking the rest of the row (737 at 1440, about 580 at 1280);
+              between 1200 and 1279 it sits under the sheet at the full content width. */}
+          <MoneyTimeline copy={t.raw("timeline") as TimelineCopy} className="min-w-0 min-[1280px]:max-w-[737px] min-[1280px]:flex-1" />
         </div>
       </Section>
 
@@ -108,12 +109,13 @@ export default function KubarProtocol() {
         <SectionHead id="insurance-heading" heading={t("insurance.heading")} lead={t("insurance.lead")} />
       </Section>
 
-      <Section labelledBy="payment-heading" className="flex flex-col gap-10 lg:gap-16 min-[1440px]:flex-row min-[1440px]:items-start min-[1440px]:gap-20">
+      <Section labelledBy="payment-heading" className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-20">
         <SectionHead id="payment-heading" heading={t("payment.heading")} layout="stacked" />
         <MoneyPath
           className="min-w-0 flex-1"
           parties={t.raw("payment.parties") as string[]}
           payments={t.raw("payment.payments") as string[]}
+          routes={t.raw("payment.routes") as [string, string][]}
           kubarNote={t("payment.kubarNote")}
           under={t("payment.under")}
           columns={t.raw("payment.columns") as { payment: string; from: string; to: string }}

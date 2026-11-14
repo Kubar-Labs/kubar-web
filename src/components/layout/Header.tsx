@@ -12,13 +12,13 @@ import { cx as cn } from "@/lib/cx";
 /*
  * Header (Figma C3 87:142). Fixed on scroll on every page (option B).
  * Desktop (≥ 1200): lock-up, Products (menu on click), How it works, About,
- * Contact; LinkedIn and "Talk to us" on the right; a double rule under it.
+ * Contact; "Talk to us" on the right; a double rule under it. LinkedIn is
+ * not in the header or the menu sheet (15 Nov); it stays in the footer.
  * Below 1200 the links collapse into "Menu", which opens a full-screen sheet
  * (a modal <dialog>: focus stays inside, Escape closes, the page behind
  * doesn't scroll, focus returns to Menu).
  */
 
-const LINKEDIN = "https://www.linkedin.com/company/kubarlabs/";
 const DESKTOP = "(min-width: 1200px)";
 
 const navItem =
@@ -190,16 +190,6 @@ export function Header({ copy }: { /** The "header" messages. */ copy: unknown }
         </nav>
 
         <div className="hidden items-center gap-6 lg:flex">
-          <a
-            href={LINKEDIN}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={t("linkedinLabel")}
-            className={navItem}
-          >
-            {t("linkedin")}
-            <Icon name="arrow-up-right" className="shrink-0" />
-          </a>
           <ButtonLink href="/contact" size={44}>
             {t("talkToUs")}
           </ButtonLink>
@@ -257,8 +247,8 @@ export function Header({ copy }: { /** The "header" messages. */ copy: unknown }
             </ul>
           </div>
           <ul>
-            {pages.map((page) => (
-              <li key={page.href} className="border-t border-rule">
+            {pages.map((page, index) => (
+              <li key={page.href} className={cn("border-t border-rule", index === pages.length - 1 && "border-b")}>
                 <Link
                   href={page.href}
                   aria-current={pathname === page.href ? "page" : undefined}
@@ -270,18 +260,6 @@ export function Header({ copy }: { /** The "header" messages. */ copy: unknown }
                 </Link>
               </li>
             ))}
-            <li className="border-y border-rule">
-              <a
-                href={LINKEDIN}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={t("linkedinLabel")}
-                className="t-ui-lg flex items-center justify-between py-4 text-ink"
-              >
-                {t("linkedin")}
-                <Icon name="arrow-up-right" className="shrink-0" />
-              </a>
-            </li>
           </ul>
           <ButtonLink href="/contact" size={48} className="w-full" onClick={closeSheet}>
             {t("talkToUs")}

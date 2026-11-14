@@ -70,6 +70,7 @@ export default function HowItWorks() {
           wide
           parties={t.raw("money.parties") as string[]}
           payments={t.raw("money.payments") as string[]}
+          routes={t.raw("money.routes") as [string, string][]}
           kubarNote={t("money.kubarNote")}
           under={t("money.under")}
           columns={t.raw("money.columns") as { payment: string; from: string; to: string }}

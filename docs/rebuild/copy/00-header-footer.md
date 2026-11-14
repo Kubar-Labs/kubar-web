@@ -13,7 +13,7 @@ Extracted from Figma, Home · 1440 (frame 160:6), 13 Nov 2026. The bracketed tag
 [UI] How it works
 [UI] About
 [UI] Contact
-[UI] LinkedIn            (external, opens in a new tab)
+(15 Nov, Vaibhav: LinkedIn is removed from the header at every width and from the menu sheet; it stays in the footer under Company, on the people cards and in the JSON-LD.)
 [UI] Talk to us          (filled button → /contact)
 
 At 768 and 390 the links collapse into a "Menu" button (64 × 44) that opens a full-screen sheet of ruled rows, with "Talk to us" at 48 px tall at the foot.

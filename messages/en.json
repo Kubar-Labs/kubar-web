@@ -24,8 +24,6 @@
     "howItWorks": "How it works",
     "about": "About",
     "contact": "Contact",
-    "linkedin": "LinkedIn",
-    "linkedinLabel": "Kubar Labs on LinkedIn (opens in a new tab)",
     "talkToUs": "Talk to us",
     "menu": "Menu",
     "close": "Close",
@@ -645,6 +643,8 @@
       "purchase": "Purchase",
       "due": "Due date · day 75",
       "note": "Days after shipment. The purchase date is illustrative: it follows the documents, the insurer’s limit check and the buyer’s acknowledgement.",
+      "dayZero": "Day 0",
+      "dayDue": "Day 75",
       "stacked": {
         "paid": "Paid out · at purchase",
         "meanwhile": "Meanwhile",
@@ -842,6 +842,20 @@
         "Purchase price, at purchase (90% of face)",
         "Face value, on the due date",
         "Deferred purchase price: the balance, less discount and charges"
+      ],
+      "routes": [
+        [
+          "Financier",
+          "Exporter’s bank"
+        ],
+        [
+          "Buyer",
+          "Financier’s collection account"
+        ],
+        [
+          "Financier",
+          "Exporter’s bank"
+        ]
       ],
       "kubarNote": "Kubar holds none",
       "under": "Every payment carries the receivable’s reference, and Kubar matches each one to its receivable.",
@@ -1329,6 +1343,20 @@
         "Purchase price, at purchase (90% of face)",
         "Face value, on the due date",
         "Deferred purchase price: the balance, less discount and charges"
+      ],
+      "routes": [
+        [
+          "Financier",
+          "Exporter’s bank"
+        ],
+        [
+          "Buyer",
+          "Financier’s collection account"
+        ],
+        [
+          "Financier",
+          "Exporter’s bank"
+        ]
       ],
       "kubarNote": "Kubar holds none",
       "under": "Every payment carries the receivable’s reference, and Kubar matches each one to its receivable.",

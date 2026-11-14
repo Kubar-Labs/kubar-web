@@ -82,6 +82,10 @@ Same drawing as Kubar Protocol (component "Money path", 120:1167):
 [BodyS] Face value, on the due date
 [BodyS] Deferred purchase price: the balance, less discount and charges
 [Tag] Kubar holds none                 (was "No account, no payment, no release")
+Below 1200, the three payments as rows, each with its from and to (Figma 120:1141), then Kubar with the chip:
+[Fine] Financier → Exporter’s bank
+[Fine] Buyer → Financier’s collection account
+[Fine] Financier → Exporter’s bank
 [BodyS] Every payment carries the receivable’s reference, and Kubar matches each one to its receivable.
 
 ## If a buyer doesn’t pay

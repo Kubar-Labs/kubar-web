@@ -1,4 +1,6 @@
+import { Fragment } from "react";
 import { Arrow, straight } from "@/components/drawings/Arrow";
+import { FitStage } from "@/components/drawings/FitStage";
 import { PlayOnce } from "@/components/drawings/PlayOnce";
 import { ReturnArrow } from "@/components/map/ReturnArrow";
 import { TextLink } from "@/components/ui/TextLink";
@@ -10,9 +12,9 @@ import { cn } from "@/lib/utils";
  * on a vertical line; "Then, for every receivable" as five raised cards round
  * an ellipse with five direction arrows and the RCV line in the middle.
  * Below desktop the five cards run in a column with an arrow between each and
- * a return arrow up the left side. The two sit side by side from 1440 up,
- * where the content is 1280 wide; between 1200 and 1440 the loop sits under
- * the set-up list. The party tags were cut after step 3 (section 10): each
+ * a return arrow up the left side. From 1200 up the two sit side by side as
+ * at 1440: the set-up list narrows first (440 down to 300), and only below
+ * 1280 does the loop scale down to its column (FitStage). The party tags were cut after step 3 (section 10): each
  * sentence names who acts.
  *
  * Motion (section 7), once at 40% in view: the ellipse draws clockwise from
@@ -55,7 +57,7 @@ function headOnEllipse(deg: number) {
 
 function SetUpOnce({ heading, steps, link }: { heading: string; steps: ProgrammeStep[]; link: { label: string; href: string } }) {
   return (
-    <div className="flex flex-col gap-6 min-[1440px]:w-[440px] min-[1440px]:shrink-0">
+    <div className="flex flex-col gap-6 lg:w-[clamp(300px,calc(100%-808px),440px)] lg:shrink-0">
       <h3 className="t-h4 text-ink">{heading}</h3>
       <ol>
         {steps.map((step, i) => (
@@ -102,9 +104,10 @@ export function ProgrammeRuns({
 }) {
   const last = each.steps.length - 1;
   return (
-    <div className={cn("flex flex-col gap-12 min-[1440px]:flex-row min-[1440px]:items-start min-[1440px]:gap-20", className)}>
+    <div className={cn("flex flex-col gap-12 lg:flex-row lg:items-start lg:justify-between lg:gap-12", className)}>
       <SetUpOnce heading={setUp.heading} steps={setUp.steps} link={link} />
 
+      <FitStage width={760} height={660} className="lg:max-w-[760px] lg:min-w-0 lg:flex-1">
       <PlayOnce className="programme-loop relative flex flex-col gap-5 lg:block lg:h-[660px] lg:w-[760px] lg:shrink-0">
         <h3 className="t-h4 text-ink lg:absolute lg:top-0 lg:left-0">{each.heading}</h3>
 
@@ -163,10 +166,19 @@ export function ProgrammeRuns({
         </div>
 
         <div className="flex flex-col gap-1.5 lg:absolute lg:top-[316px] lg:left-[274px] lg:w-[212px] lg:items-center lg:gap-2 lg:text-center">
-          <p className="t-code text-ink">{refs}</p>
+          {/* Each reference stays on one line; the line breaks only between them. */}
+          <p className="t-code text-ink">
+            {refs.split(" · ").map((ref, i, all) => (
+              <Fragment key={ref}>
+                <span className="whitespace-nowrap">{ref}</span>
+                {i < all.length - 1 ? " · " : null}
+              </Fragment>
+            ))}
+          </p>
           <p className="t-body-sm text-ink">{refsLine}</p>
         </div>
       </PlayOnce>
+      </FitStage>
     </div>
   );
 }

@@ -139,9 +139,11 @@ test.describe("header at desktop", () => {
     await expect(page.getByRole("button", { name: "Products" })).toHaveAttribute("aria-expanded", "false");
   });
 
-  test("LinkedIn says it opens in a new tab", async ({ page }) => {
+  test("LinkedIn is in the footer, not the header, and says it opens in a new tab", async ({ page }) => {
     await page.goto("/");
-    const linkedin = page.getByRole("banner").getByRole("link", { name: "Kubar Labs on LinkedIn (opens in a new tab)" });
+    // Removed from the header on 15 Nov; the footer keeps it under Company.
+    await expect(page.getByRole("banner").getByRole("link", { name: /LinkedIn/ })).toHaveCount(0);
+    const linkedin = page.getByRole("contentinfo").getByRole("link", { name: "Kubar Labs on LinkedIn (opens in a new tab)" });
     await expect(linkedin).toHaveAttribute("target", "_blank");
     await expect(page.getByRole("banner").getByRole("link", { name: "Talk to us" })).toHaveAttribute("href", "/contact");
   });
@@ -617,6 +619,70 @@ test.describe("Kubar Protocol (redraw step 4)", () => {
     // Programme 1: Next in a dashed box; the venue has no numbers.
     await expect(page.locator("dl.border-dashed")).toContainText("Chemicals and pharmaceutical formulations");
     await expect(page.locator("section", { has: page.getByRole("heading", { name: "The venue comes last." }) }).locator(".t-code")).toHaveCount(0);
+  });
+
+  test("laptops keep the 1440 composition from 1200 up", async ({ page }) => {
+    const box = async (selector: string) => (await page.locator(selector).first().boundingBox())!;
+    for (const width of [1200, 1280, 1366, 1440]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto("/products/kubar-protocol");
+      // What you buy: the timeline beside the sheet from 1280, under it at full width below that.
+      const sheet = await box("dl:has(> dt:text-is('Face value'))");
+      const timeline = await box("[role='img'][aria-label^='A timeline']");
+      if (width >= 1280) expect(timeline.x, `${width}: timeline beside the sheet`).toBeGreaterThan(sheet.x + sheet.width);
+      else expect(timeline.y, `${width}: timeline under the sheet`).toBeGreaterThan(sheet.y + sheet.height);
+      // How a programme runs: the loop beside the set-up list, its cards inside the page.
+      const setUp = await box(".programme-loop >> xpath=ancestor::div[contains(@class,'fit-stage')]/preceding-sibling::div[1]");
+      const loop = await box(".programme-loop");
+      expect(loop.x, `${width}: loop beside the list`).toBeGreaterThan(setUp.x + setUp.width - 1);
+      expect(loop.x + loop.width, `${width}: loop inside the page`).toBeLessThanOrEqual(width);
+      // The payment lanes beside the heading.
+      const heading = await box("#payment-heading");
+      const lanes = await box("[role='img'][aria-label^='Three payments']");
+      expect(lanes.x, `${width}: lanes beside the heading`).toBeGreaterThan(heading.x + heading.width);
+      expect(lanes.y, `${width}: lanes level with the heading`).toBeLessThan(heading.y + heading.height);
+    }
+  });
+
+  test("references stay whole, Programme 1's labels are muted, and the payment path reads as drawn", async ({ page }) => {
+    await page.setViewportSize({ width: 1366, height: 900 });
+    await page.goto("/products/kubar-protocol");
+    for (const ref of await page.locator(".programme-loop .t-code > span").all()) {
+      await expect(ref).toHaveCSS("white-space", "nowrap");
+    }
+    const muted = await page.evaluate(() => {
+      const probe = document.createElement("span");
+      probe.style.color = "var(--color-ink-muted)";
+      document.body.appendChild(probe);
+      const colour = getComputedStyle(probe).color;
+      probe.remove();
+      return colour;
+    });
+    for (const label of ["Exporters", "Buyers", "Financier", "Cover", "Next"]) {
+      await expect(page.locator("dt", { hasText: new RegExp(`^${label}$`) }).last()).toHaveCSS("color", muted);
+    }
+    // At 1440 the note sits on its grey chip.
+    await expect(page.locator("[role='img'][aria-label^='Three payments'] p", { hasText: "Kubar holds none" })).toHaveClass(/bg-accent-soft/);
+    // Below 1200: "Kubar" with the chip, and "Buyer → Financier’s collection account".
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/products/kubar-protocol");
+    const kubarRow = page.locator("p", { has: page.locator("span", { hasText: "Kubar holds none" }) }).filter({ hasText: /^Kubar/ });
+    await expect(kubarRow.first()).toBeVisible();
+    await expect(kubarRow.first()).not.toContainText("Kubar:");
+    await expect(page.getByRole("row", { name: /Face value, on the due date/ })).toContainText("Financier’s collection account");
+    await expect(page.getByRole("row", { name: /Face value, on the due date/ })).toContainText("Buyer");
+  });
+
+  test("tablets and phones keep the small money timeline and the evidence drawing", async ({ page }) => {
+    for (const [width, height] of [[390, 844], [768, 1024], [820, 1180]] as const) {
+      await page.setViewportSize({ width, height });
+      await page.goto("/products/kubar-protocol");
+      await expect(page.getByText("Day 0", { exact: true }), `${width}`).toBeVisible();
+      await expect(page.getByText("Day 75", { exact: true }), `${width}`).toBeVisible();
+      // The stacked evidence drawing: the elements, then the record box with its three readers.
+      await expect(page.locator("li:visible", { hasText: "You buy on it" }), `${width}`).toHaveCount(1);
+      await expect(page.locator("p:visible", { hasText: /^Record RCV-0001$/ }), `${width}`).toHaveCount(1);
+    }
   });
 
   test("nothing scrolls sideways from 1200 to 1440", async ({ page }) => {

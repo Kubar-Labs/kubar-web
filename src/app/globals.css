@@ -748,6 +748,27 @@
     }
   }
 
+  /* A fixed-size desktop drawing fitted to its column (FitStage): from 1200
+     up it keeps its composition and scales down only when the column is
+     narrower. The script measures --fit; 1200 to 1279 start from an estimate. */
+  @media (min-width: 1200px) {
+    .fit-stage {
+      --fit: 1;
+      height: calc(var(--stage-h) * var(--fit));
+    }
+    .fit-stage-inner {
+      width: var(--stage-w);
+      height: var(--stage-h);
+      transform: scale(var(--fit));
+      transform-origin: top left;
+    }
+  }
+  @media (min-width: 1200px) and (max-width: 1279.98px) {
+    .fit-stage {
+      --fit: 0.91;
+    }
+  }
+
   /* How a programme runs (ProgrammeRuns). The set-up dots rest at
      --elevation-1. A loop card raises to --elevation-3 on hover, focus or
      tap: the deeper shadow fades in on a pseudo-element. */
