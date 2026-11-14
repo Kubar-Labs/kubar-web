@@ -1,0 +1,643 @@
+<!doctype html>
+<!-- Prototype for the pinned-story decision of 14 Nov 2026. Vaibhav chose option B: only the lanes drawing is pinned,
+     and each step is a card that scrolls past it. Option A is kept for comparison. Open this file in a browser;
+     it is not part of the site build. Published copy: Pinned Story Options artifact. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pinned Story Options</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&family=Schibsted+Grotesk:wght@400;500&display=swap">
+<style>
+/* Layout: the choice and an at-a-glance matrix on top, then the two options side by side as scrollable screens of the real site. */
+:root {
+  --bg: #EEF1F2; --panel: #FFFFFF; --ink: #022732; --muted: #4E686F; --rule: #CCD4D6; --accent: #AD2468; --chip: #E1E5E6; --sel: #E1E5E6;
+  /* the site inside the screens keeps its own light colours in both themes */
+  --site-bg: #FFFFFF; --site-ink: #022732; --site-muted: #4E686F; --site-rule: #CCD4D6; --site-strong: #022732;
+  --site-inset: #ECECE8; --site-rani: #AD2468; --site-petrol: #022732; --site-on-petrol: #FFFFFF; --site-faint: #A6B3B7;
+  --sans: "Schibsted Grotesk", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --shadow-1: 0 1px 2px rgb(2 39 50 / .08), 0 6px 16px rgb(2 39 50 / .08);
+  --shadow-2: 0 2px 4px rgb(2 39 50 / .08), 0 14px 36px rgb(2 39 50 / .12);
+  --frame-shadow: 0 1px 2px rgb(2 39 50 / .10), 0 12px 32px rgb(2 39 50 / .14);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0C1C21; --panel: #13282F; --ink: #E1E5E6; --muted: #A6B3B7; --rule: #2B444C; --accent: #E58AB3; --chip: #1D343B; --sel: #1F3A42;
+    --frame-shadow: 0 1px 2px rgb(0 0 0 / .4), 0 12px 32px rgb(0 0 0 / .45);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0C1C21; --panel: #13282F; --ink: #E1E5E6; --muted: #A6B3B7; --rule: #2B444C; --accent: #E58AB3; --chip: #1D343B; --sel: #1F3A42;
+  --frame-shadow: 0 1px 2px rgb(0 0 0 / .4), 0 12px 32px rgb(0 0 0 / .45);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+.wrap { max-width: 1560px; margin: 0 auto; padding-block: 32px 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 28px; }
+h1 { font-weight: 500; font-size: clamp(26px, 3vw, 36px); line-height: 1.15; margin: 0; text-wrap: balance; letter-spacing: -0.01em; }
+h2 { font-weight: 500; font-size: 19px; line-height: 1.3; margin: 0; }
+.lede { max-width: 70ch; margin: 10px 0 0; color: var(--muted); font-size: 16px; }
+.controls { display: grid; gap: 12px; }
+.ctl { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; }
+.ctl-label { font-size: 13px; color: var(--muted); min-width: 52px; }
+.seg { display: flex; flex-wrap: wrap; gap: 6px; }
+.seg button { font: inherit; font-size: 14px; color: var(--ink); background: var(--panel); border: 1px solid var(--rule); padding: 6px 12px; border-radius: 999px; cursor: pointer; line-height: 1.3; }
+.seg button small { color: var(--muted); font-size: 12px; margin-left: 4px; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.seg button[aria-pressed="true"] small { color: inherit; opacity: .75; }
+.seg button:focus-visible, .mx-row:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.check { display: inline-flex; gap: 8px; align-items: center; font-size: 14px; cursor: pointer; }
+.check input { width: 16px; height: 16px; accent-color: var(--ink); }
+
+.matrix-box { background: var(--panel); border: 1px solid var(--rule); border-radius: 12px; padding: 18px 20px; display: grid; gap: 12px; min-width: 0; }
+.matrix-scroll { overflow-x: auto; }
+table.mx { border-collapse: collapse; width: 100%; min-width: 640px; font-size: 14px; font-variant-numeric: tabular-nums; }
+.mx th { text-align: left; font-weight: 500; font-size: 12px; color: var(--muted); padding: 6px 10px; border-bottom: 1px solid var(--rule); }
+.mx td { padding: 8px 10px; border-bottom: 1px solid var(--rule); vertical-align: middle; }
+.mx tr:last-child td { border-bottom: 0; }
+.mx-row { cursor: pointer; }
+.mx-row[aria-selected="true"] td { background: var(--sel); }
+.mx td.scr { white-space: nowrap; }
+.mx td.scr span { color: var(--muted); font-size: 12px; margin-left: 6px; }
+.verdict { display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; }
+.dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; flex: none; }
+.dot.pin { background: var(--ink); }
+.dot.no { border: 1.6px solid var(--accent); }
+.verdict.no { color: var(--accent); }
+.mx-key { font-size: 12px; color: var(--muted); }
+
+.compare { display: grid; grid-template-columns: repeat(var(--cols, 2), minmax(0, 1fr)); gap: 24px; align-items: start; }
+.opt { display: grid; gap: 12px; min-width: 0; }
+.opt[hidden] { display: none; }
+.opt-head { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
+.opt-head .tag { font-family: var(--mono); font-size: 13px; color: var(--muted); }
+.status { font-size: 14px; display: flex; gap: 8px; align-items: baseline; min-height: 42px; }
+.status .dot { transform: translateY(1px); }
+.status.no { color: var(--accent); }
+.frame { position: relative; overflow: hidden; background: var(--site-bg); border: 1px solid var(--rule); box-shadow: var(--frame-shadow); justify-self: start; }
+.frame.laptop { border-radius: 8px; }
+.frame.phone { border-radius: 26px; border-width: 6px; border-color: #10262D; }
+.dev { position: absolute; left: 0; top: 0; overflow-y: auto; overflow-x: hidden; transform-origin: 0 0; background: var(--site-bg); overscroll-behavior: contain; }
+.trade { margin: 2px 0 0; padding-left: 18px; display: grid; gap: 6px; font-size: 14px; color: var(--ink); max-width: 62ch; }
+.trade li::marker { color: var(--muted); }
+.note { font-size: 13px; color: var(--muted); max-width: 90ch; margin: 0; }
+.hint { font-size: 13px; color: var(--muted); }
+
+/* ---------- the simulated kubar.tech ---------- */
+.site { font-family: var(--sans); color: var(--site-ink); background: var(--site-bg); -webkit-font-smoothing: antialiased; }
+.site * { box-sizing: border-box; }
+.s-hdr { position: sticky; top: 0; z-index: 5; background: var(--site-bg); border-bottom: 1px solid var(--site-rule); display: flex; align-items: center; justify-content: space-between; }
+.s-logo { display: flex; align-items: center; gap: 9px; font-weight: 500; font-size: 18px; }
+.s-logo i { width: 22px; height: 16px; background: var(--site-petrol); display: inline-block; clip-path: polygon(0 20%, 100% 0, 100% 100%, 22% 100%); }
+.s-nav { display: flex; align-items: center; gap: 26px; font-size: 15px; }
+.s-btn { background: var(--site-petrol); color: var(--site-on-petrol); padding: 9px 16px; font-size: 15px; }
+.s-sec { padding-top: 72px; padding-bottom: 72px; }
+.s-h2 { font-weight: 500; font-size: 44px; line-height: 50px; margin: 0; letter-spacing: -0.005em; max-width: 820px; }
+.s-lead { font-size: 19px; line-height: 29px; color: var(--site-muted); margin: 0; max-width: 680px; }
+.s-head { display: grid; grid-template-columns: 400px 1fr; gap: 80px; margin-bottom: 56px; }
+.s-bar { height: 56px; background: var(--site-petrol); margin-top: 28px; }
+.s-sliver { width: 2px; height: 56px; background: var(--site-rani); margin-top: 10px; }
+.s-band { background: var(--site-petrol); color: var(--site-on-petrol); }
+.s-band p { font-weight: 500; font-size: 28px; line-height: 36px; margin: 0; max-width: 900px; }
+.s-stub { height: 14px; background: var(--site-inset); margin-top: 14px; }
+.s-card { background: var(--site-bg); border: 1px solid var(--site-rule); padding: 20px 24px 22px; }
+.s-card.raised { box-shadow: var(--shadow-2); }
+.s-card.flat { box-shadow: none; color: var(--site-muted); }
+.s-card.flat .s-stateword, .s-card.flat .s-sent, .s-card.flat .s-ptext { color: var(--site-muted); }
+.s-card.b { transition: box-shadow .2s ease, color .2s ease; }
+.s-idrow { display: flex; justify-content: space-between; align-items: center; font: 11px/16px var(--mono); }
+.s-illus { font: 13px/20px var(--sans); color: var(--site-rani); text-decoration: underline dotted; text-underline-offset: 3px; }
+.s-rule { height: 1px; background: var(--site-rule); margin: 12px 0; }
+.s-rule.strong { background: var(--site-strong); }
+.s-state { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.s-stateword { font: 500 13px/20px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--site-rani); }
+.s-stateword.planned { color: var(--site-muted); }
+.s-count { font: 13px/20px var(--mono); color: var(--site-muted); }
+.s-sent { margin: 10px 0 0; font-size: 19px; line-height: 28px; }
+.s-fine { font: 13px/20px var(--sans); color: var(--site-muted); }
+.s-path { display: grid; gap: 3px; }
+.s-plab { display: flex; align-items: center; gap: 8px; font: 13px/20px var(--sans); color: var(--site-muted); }
+.s-plab b { font-weight: 400; color: var(--site-rani); }
+.s-ptext { font-size: 16px; line-height: 25px; }
+.s-links { display: flex; flex-wrap: wrap; gap: 8px 28px; font-size: 15px; line-height: 20px; }
+.s-links span { text-decoration: underline; text-underline-offset: 3px; }
+.s-legend { display: grid; gap: 4px; margin-top: 14px; }
+.site.phone .s-sec { padding-top: 48px; padding-bottom: 48px; }
+.site.phone .s-h2 { font-size: 30px; line-height: 36px; }
+.site.phone .s-lead { font-size: 18px; line-height: 28px; }
+.site.phone .s-head { display: grid; grid-template-columns: 1fr; gap: 14px; margin-bottom: 28px; }
+.site.phone .s-band p { font-size: 24px; line-height: 31px; }
+.site.phone .s-card { padding: 14px 16px 16px; }
+.site.phone .s-sent { font-size: 17px; line-height: 25px; margin-top: 8px; }
+.site.phone .s-ptext { font-size: 15px; line-height: 22px; }
+.site.phone .s-rule { margin: 10px 0; }
+.site.hiw .s-sent { font-size: 17px; line-height: 26px; }
+.site.hiw.phone .s-sent { font-size: 16px; line-height: 24px; }
+.a-pin { position: sticky; display: flex; }
+.b-grid { display: grid; grid-template-columns: 411px minmax(0, 1fr); gap: 24px; }
+.b-col { display: grid; align-content: start; }
+.b-step { padding-bottom: 24px; }
+.b-sticky { position: sticky; }
+.b-phone-pin { position: sticky; z-index: 3; background: var(--site-bg); padding: 10px 0 12px; box-shadow: 0 10px 12px -10px rgb(2 39 50 / .18); }
+.ledger { border-top: 1px solid var(--site-strong); }
+.lg-row { display: grid; grid-template-columns: 44px 150px minmax(0, 1fr) 260px; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--site-rule); }
+.lg-row .n { font: 13px/20px var(--mono); color: var(--site-muted); }
+.lg-row .w { font: 500 13px/20px var(--mono); letter-spacing: .06em; text-transform: uppercase; }
+.lg-row .t { font-size: 16px; line-height: 25px; }
+.site.phone .lg-row { grid-template-columns: 30px minmax(0, 1fr); gap: 4px 10px; }
+.site.phone .lg-row .t, .site.phone .lg-row .d { grid-column: 2; }
+.lg-row .d { font: 13px/20px var(--sans); color: var(--site-muted); }
+/* lanes drawing */
+.l-box { fill: var(--site-bg); stroke: var(--site-strong); stroke-width: 1; }
+.l-box.k { fill: var(--site-petrol); }
+.l-btxt { fill: var(--site-ink); font-family: var(--sans); }
+.l-btxt.k { fill: var(--site-on-petrol); }
+.l-life { stroke: var(--site-rule); stroke-width: 1; }
+.l-rowline { stroke: var(--site-rule); stroke-width: 1; opacity: .7; }
+.l-cur { fill: var(--site-inset); }
+.l-mark { fill: var(--site-rani); }
+.l-num { fill: var(--site-muted); font: 13px var(--mono); }
+.l-num.c { fill: var(--site-rani); }
+.l-data { stroke: var(--site-muted); stroke-width: 1.5; stroke-dasharray: 5 3; fill: none; }
+.l-money { stroke: var(--site-ink); stroke-width: 2; fill: none; }
+.l-plan { stroke: var(--site-faint); stroke-width: 1.5; stroke-dasharray: 2 3; fill: none; }
+.l-head-d { fill: var(--site-muted); } .l-head-m { fill: var(--site-ink); } .l-head-p { fill: var(--site-faint); }
+.l-sq { fill: var(--site-ink); }
+.l-lab { fill: var(--site-muted); font: 13px var(--sans); }
+.l-lab.m { fill: var(--site-ink); }
+.l-lab.p { fill: var(--site-faint); }
+@media (max-width: 820px) { .compare { grid-template-columns: minmax(0, 1fr) !important; } }
+@media (prefers-reduced-motion: reduce) { .s-card.b { transition: none; } }
+</style>
+</head>
+<body>
+
+
+<main class="wrap">
+  <header>
+    <h1>Two ways to pin the story</h1>
+    <p class="lede">Scroll inside each screen. Both run the same eight steps with the site’s own copy. Option A pins the drawing and one panel together, and shows the static ledger when they don’t fit. Option B pins only the drawing, and each step’s words scroll past it as a card.</p>
+  </header>
+
+  <section class="controls" aria-label="Choose what to compare">
+    <div class="ctl"><span class="ctl-label" id="lbl-story">Story</span><div class="seg" id="seg-story" role="group" aria-labelledby="lbl-story"></div></div>
+    <div class="ctl"><span class="ctl-label" id="lbl-screen">Screen</span><div class="seg" id="seg-screen" role="group" aria-labelledby="lbl-screen"></div></div>
+    <div class="ctl"><span class="ctl-label" id="lbl-view">Show</span><div class="seg" id="seg-view" role="group" aria-labelledby="lbl-view"></div>
+      <label class="check" for="sync"><input type="checkbox" id="sync" checked> Scroll both together</label></div>
+  </section>
+
+  <section class="matrix-box" aria-labelledby="mx-title">
+    <h2 id="mx-title">Where each one pins</h2>
+    <div class="matrix-scroll"><table class="mx" id="mx"></table></div>
+    <p class="mx-key">Pick a row to load that screen below. Heights are the visible browser area, after the browser’s own bars.</p>
+  </section>
+
+  <section class="compare" id="compare">
+    <article class="opt" id="opt-a">
+      <div class="opt-head"><span class="tag">A</span><h2>One pinned panel</h2></div>
+      <div class="status" id="st-a"></div>
+      <div class="frame" id="fr-a"><div class="dev" id="dev-a"></div></div>
+      <ul class="trade">
+        <li>The drawing and the words for the current step stay still together; nothing moves past the reader.</li>
+        <li>Pins only when the drawing and the longest step both fit under the header. Everywhere else readers get the static ledger.</li>
+        <li>How it works step 06 runs to about 70 words, so that rail pins only on tall desktop screens.</li>
+      </ul>
+    </article>
+    <article class="opt" id="opt-b">
+      <div class="opt-head"><span class="tag">B</span><h2>Pinned drawing, scrolling text</h2></div>
+      <div class="status" id="st-b"></div>
+      <div class="frame" id="fr-b"><div class="dev" id="dev-b"></div></div>
+      <ul class="trade">
+        <li>Only the drawing has to fit, so it pins on every laptop and phone listed here.</li>
+        <li>Each step arrives as a card and the current one is raised. Long steps take longer to scroll past; no copy needs cutting.</li>
+        <li>The words move rather than stay put, and the story takes a little more scrolling.</li>
+      </ul>
+    </article>
+  </section>
+
+  <p class="note">How the fit is worked out. A uses rows of 64 px on laptops and 24 px on phones, as Claude Code proposed, and pins only if the drawing and the tallest step fit below the header. B sizes its rows from the screen: 44 to 74 px on laptops, and 22 to 40 px on phones with the drawing taking at most 45% of the screen; it pins down to about 545 px of height. The step text is the copy deck’s; the How it works panel keeps its three-line legend, as it does today.</p>
+</main>
+
+<script>
+(() => {
+  const SCREENS = [
+    { w: 1920, h: 960, name: 'Large monitor' },
+    { w: 1440, h: 790, name: 'MacBook Air 13″' },
+    { w: 1366, h: 650, name: 'Windows laptop' },
+    { w: 1280, h: 590, name: 'Laptop at 150%' },
+    { w: 390, h: 664, name: 'iPhone 15' },
+    { w: 375, h: 548, name: 'iPhone SE' },
+  ];
+  const PARTY = ['Exporter', 'Kubar', 'Insurer', 'Buyer, UAE', 'Financier', 'Exporter’s bank'];
+  const PARTY_2 = [['Exporter'], ['Kubar'], ['Insurer'], ['Buyer,', 'UAE'], ['Financier'], ['Exporter’s', 'bank']];
+  const LANES = [
+    [{ f: 0, t: 1, k: 'data', l: 'Shipment, invoice' }],
+    [{ at: 1, k: 'mark', l: 'Evidence package checked' }],
+    [{ f: 2, t: 1, k: 'data', l: 'Limit and headroom' }],
+    [{ f: 3, t: 1, k: 'data', l: 'Acknowledgement' }],
+    [{ f: 1, t: 4, k: 'data', l: 'Evidence package', dy: -7 }, { f: 4, t: 5, k: 'money', l: '90% of face', dy: 7 }],
+    [{ f: 4, t: 1, k: 'data', l: 'Payment matched', dy: -7 }, { f: 3, t: 4, k: 'money', l: 'Face value', dy: 7 }, { f: 4, t: 5, k: 'money', l: 'The balance', dy: 7 }],
+    [{ at: 1, k: 'mark', l: 'Added to the loss history' }],
+    [{ f: 4, t: 6, k: 'plan', l: 'Transferred, later' }],
+  ];
+  const WORDS = ['Shipped', 'Documented', 'Insured', 'Acknowledged', 'Purchased', 'Settled', 'Recorded', 'Planned'];
+  const NONE = 'Kubar holds none';
+  const STORIES = {
+    home: {
+      title: 'Follow one receivable from shipment to settlement.',
+      links: ['Skip the story ↓', 'See how it works →'],
+      legend: false,
+      steps: [
+        { s: 'The exporter ships the rice and invoices the buyer, with the instruction to pay the financier’s account.', party: 'Exporter', data: 'Shipment and invoice data received' },
+        { s: 'Shipping bill, invoice and bill of lading are checked against each other and filed in one evidence package.', data: 'Evidence package assembled and checked' },
+        { s: 'The buyer’s limit with the insurer is checked; the cover is in the financier’s name.', data: 'Limit and headroom confirmed' },
+        { s: 'The buyer acknowledges that it will pay the financier.', party: 'Buyer', data: 'Acknowledgement filed' },
+        { s: 'The financier buys the receivable, without recourse for the buyer’s credit.', party: 'Financier', data: 'Package delivered; purchase recorded', money: 'The financier pays 90% of face to the exporter’s own bank' },
+        { s: 'On the due date the buyer pays, and the exporter’s bank closes the shipping bill.', party: 'Buyer, financier, exporter’s bank', data: 'Payment matched; closure tracked', money: 'The buyer pays the financier’s collection account; the financier pays the exporter the balance, less its discount and charges.' },
+        { s: 'The outcome joins the record of how the asset performs.', data: 'Added to the loss history' },
+        { s: 'On the venue, a receivable can move to another institutional financier, with a registry entry.', planned: true },
+      ],
+      next: 'Kubar is in the data path of every step and in the money path of none.',
+    },
+    hiw: {
+      title: 'What happens to a receivable, in order.',
+      links: ['Skip the story ↓'],
+      legend: true,
+      steps: [
+        { s: 'The exporter ships the rice and issues its invoice. The invoice carries the assignment notice: the instruction to pay the financier’s account.', data: 'Shipment and invoice data received' },
+        { s: 'Kubar checks the shipping bill against the invoice (goods, quantity, value and buyer), checks who the exporter and the buyer are, runs the programme’s rules and files everything in one evidence package. The exporter’s bank’s no-objection is on file.', data: 'Evidence package assembled and checked' },
+        { s: 'The buyer’s limit with the insurer is checked for headroom. The cover is in the financier’s name.', data: 'Limit and headroom confirmed' },
+        { s: 'The buyer acknowledges the notice: it will pay the financier’s account.', data: 'Acknowledgement filed' },
+        { s: 'The financier accepts the receivable under its programme limit, without recourse for the buyer’s credit, and pays the purchase price. The credit decision is the financier’s own.', data: 'Package delivered; purchase recorded', money: 'The financier pays 90% of face to the exporter’s own bank' },
+        { s: 'On the due date the buyer pays the financier’s collection account, quoting the receivable’s reference. Kubar matches the payment. The financier pays the exporter the balance, less its discount and charges, and the exporter’s bank closes the shipping bill. Where the exporter qualifies, the government’s interest subvention on export factoring is filed on the financier’s data and paid to the exporter.', docs: 'Payment reference; closure of the shipping bill', data: 'Payment matched; closure tracked', money: 'The buyer pays $225,000 to the financier; the financier pays the exporter the balance, less its discount and charges' },
+        { s: 'The outcome joins the loss history, by buyer, exporter and commodity.', data: 'Added to the loss history' },
+        { s: 'Once the venue is registered, a receivable can move from one institutional financier to another, with a registry entry in place of a fresh assignment.', party: 'Institutional financiers', planned: true },
+      ],
+      next: 'Who relies on the record.',
+    },
+  };
+
+  const state = { story: 'home', screen: 1, view: 'both', sync: true };
+  try { const saved = JSON.parse(localStorage.getItem('pinned-story-options') || 'null'); if (saved) Object.assign(state, saved); } catch (e) {}
+  const save = () => { try { localStorage.setItem('pinned-story-options', JSON.stringify(state)); } catch (e) {} };
+
+  const el = (tag, cls, txt) => { const n = document.createElement(tag); if (cls) n.className = cls; if (txt != null) n.textContent = txt; return n; };
+  const pad2 = (i) => String(i + 1).padStart(2, '0');
+  const isPhone = (W) => W < 768;
+  const headerH = (W) => (isPhone(W) ? 65 : 81);
+  const margin = (W) => (isPhone(W) ? 20 : Math.max(48, (W - 1280) / 2));
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+  // ---------- one step's words (panel in A, card in B) ----------
+  function glyph(kind) {
+    const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    s.setAttribute('width', '24'); s.setAttribute('height', '8'); s.setAttribute('aria-hidden', 'true');
+    s.innerHTML = kind === 'money'
+      ? '<line x1="0" y1="4" x2="18" y2="4" class="l-money"/><polygon points="24,4 17,0.5 17,7.5" class="l-head-m"/>'
+      : '<line x1="0" y1="4" x2="18" y2="4" class="l-data"/><polygon points="24,4 17,0.5 17,7.5" class="l-head-d"/>';
+    return s;
+  }
+  function stepWords(storyKey, i, opts) {
+    const st = STORIES[storyKey].steps[i];
+    const frag = document.createDocumentFragment();
+    const top = el('div', 's-state');
+    const word = el('span', 's-stateword' + (st.planned ? ' planned' : ''), (st.planned ? '' : pad2(i) + ' ') + WORDS[i]);
+    top.append(word);
+    if (opts.count) top.append(el('span', 's-count', pad2(i) + ' of 08'));
+    frag.append(top);
+    frag.append(el('p', 's-sent', st.s));
+    if (st.party && storyKey === 'home') frag.append(el('div', 's-fine', 'Party · ' + st.party));
+    if (st.docs) { frag.append(el('div', 's-rule')); const d = el('div', 's-path'); d.append(el('div', 's-plab', 'Documents')); d.append(el('div', 's-ptext', st.docs)); frag.append(d); }
+    if (st.data) {
+      frag.append(el('div', 's-rule'));
+      const d = el('div', 's-path'); const lab = el('div', 's-plab'); lab.append(glyph('data'), document.createTextNode('Data path · Kubar'));
+      d.append(lab, el('div', 's-ptext', st.data)); frag.append(d);
+    }
+    if (st.money) {
+      frag.append(el('div', 's-rule'));
+      const d = el('div', 's-path'); const lab = el('div', 's-plab'); lab.append(glyph('money'), document.createTextNode('Money path'));
+      const b = el('b', null, NONE); lab.append(b); d.append(lab, el('div', 's-ptext', st.money)); frag.append(d);
+    }
+    return frag;
+  }
+  function panelA(storyKey, i, W) {
+    const S = STORIES[storyKey];
+    const card = el('div', 's-card raised');
+    const id = el('div', 's-idrow'); id.append(el('span', null, 'Record RCV-0001'), el('span', 's-illus', 'Illustrative'));
+    card.append(id, el('div', 's-rule strong'));
+    card.append(stepWords(storyKey, i, { count: true }));
+    card.append(el('div', 's-rule strong'));
+    const links = el('div', 's-links'); for (const l of S.links) links.append(el('span', null, l)); card.append(links);
+    if (S.legend) {
+      const lg = el('div', 's-legend');
+      const a = el('div', 's-plab'); a.append(glyph('data'), document.createTextNode('Data path: documents and records'));
+      const b = el('div', 's-plab'); b.append(glyph('money'), document.createTextNode('Money path: only between banks'));
+      const c = el('div', 's-plab'); const sw = el('i'); sw.style.cssText = 'width:22px;height:8px;background:var(--site-petrol);display:inline-block'; c.append(sw, document.createTextNode('Kubar: the one filled column'));
+      lg.append(a, b, c); card.append(lg);
+    }
+    return card;
+  }
+  function cardB(storyKey, i) {
+    const card = el('div', 's-card b flat');
+    card.append(stepWords(storyKey, i, { count: true }));
+    return card;
+  }
+
+  // ---------- the lanes drawing ----------
+  function lanesSVG(cur, w, rowH, partyH, phone) {
+    const gut = phone ? 8 : 36, colW = (w - gut) / 6, top = partyH, h = top + 8 * rowH + 1;
+    const X = (c) => (c === 6 ? w - 4 : gut + (c + 0.5) * colW);
+    const boxFont = phone ? 10 : colW < 126 ? 13.5 : 15;
+    let s = `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-hidden="true">`;
+    s += `<rect class="l-cur" x="${gut}" y="${top + cur * rowH}" width="${w - gut}" height="${rowH}"/>`;
+    s += `<rect class="l-mark" x="${gut - (phone ? 8 : 6)}" y="${top + cur * rowH}" width="4" height="${rowH}"/>`;
+    for (let r = 1; r < 8; r++) s += `<line class="l-rowline" x1="${gut}" x2="${w}" y1="${top + r * rowH}" y2="${top + r * rowH}"/>`;
+    for (let c = 0; c < 6; c++) s += `<line class="l-life" x1="${X(c)}" x2="${X(c)}" y1="${partyH - 8}" y2="${top + 8 * rowH}"/>`;
+    for (let c = 0; c < 6; c++) {
+      const bx = gut + c * colW + 3, bw = colW - 6, bh = partyH - 8, k = c === 1 ? ' k' : '';
+      s += `<rect class="l-box${k}" x="${bx}" y="0.5" width="${bw}" height="${bh}"/>`;
+      const lines = phone ? PARTY_2[c] : [PARTY[c]];
+      const lh = boxFont + 2, y0 = bh / 2 - ((lines.length - 1) * lh) / 2 + boxFont * 0.36;
+      lines.forEach((t, j) => { s += `<text class="l-btxt${k}" x="${bx + bw / 2}" y="${y0 + j * lh}" text-anchor="middle" font-size="${boxFont}">${t}</text>`; });
+    }
+    if (!phone) for (let r = 0; r < 8; r++) s += `<text class="l-num${r === cur ? ' c' : ''}" x="${gut - 14}" y="${top + r * rowH + rowH / 2 + 4.5}" text-anchor="end">${pad2(r)}</text>`;
+    const showLab = !phone && rowH >= 40;
+    for (let r = 0; r <= cur; r++) {
+      const mid = top + r * rowH + rowH / 2;
+      for (const a of LANES[r]) {
+        if (a.k === 'mark') {
+          s += `<rect class="l-sq" x="${X(1) - 3.5}" y="${mid - 3.5}" width="7" height="7"/>`;
+          if (showLab) s += `<text class="l-lab" x="${X(1) + 12}" y="${mid + 4.5}">${a.l}</text>`;
+          continue;
+        }
+        const y = mid + (a.dy || 0) * (rowH < 40 ? 0.55 : 1), x1 = X(a.f), x2 = X(a.t), d = Math.sign(x2 - x1);
+        const cls = a.k === 'money' ? 'l-money' : a.k === 'plan' ? 'l-plan' : 'l-data';
+        const hc = a.k === 'money' ? 'l-head-m' : a.k === 'plan' ? 'l-head-p' : 'l-head-d';
+        s += `<line class="${cls}" x1="${x1 + 3 * d}" x2="${x2 - 6 * d}" y1="${y}" y2="${y}"/>`;
+        s += `<polygon class="${hc}" points="${x2},${y} ${x2 - 7 * d},${y - 3.6} ${x2 - 7 * d},${y + 3.6}"/>`;
+        if (showLab) {
+          const lx = Math.min(x1, x2) + 10, ly = a.k === 'money' ? y + 15 : y - 6;
+          s += `<text class="l-lab${a.k === 'money' ? ' m' : a.k === 'plan' ? ' p' : ''}" x="${lx}" y="${ly}">${a.l}</text>`;
+        }
+      }
+    }
+    return s + '</svg>';
+  }
+
+  // ---------- fit rules ----------
+  const measureCache = new Map();
+  let measureHost = null;
+  function tallestPanel(storyKey, W) {
+    const phone = isPhone(W), width = phone ? W - 2 * margin(W) : 411;
+    const key = storyKey + '|' + width + '|' + phone;
+    if (measureCache.has(key)) return measureCache.get(key);
+    if (!measureHost) { measureHost = el('div'); measureHost.style.cssText = 'position:absolute;left:-99999px;top:0;visibility:hidden;'; document.body.append(measureHost); }
+    const site = el('div', 'site' + (phone ? ' phone' : '') + (storyKey === 'hiw' ? ' hiw' : ''));
+    site.style.width = width + 'px'; measureHost.replaceChildren(site);
+    let max = 0, at = 0;
+    for (let i = 0; i < 8; i++) {
+      const p = panelA(storyKey, i, W);
+      if (phone) { p.querySelector('.s-idrow').remove(); p.querySelector('.s-rule.strong').remove(); }
+      site.replaceChildren(p); if (p.offsetHeight > max) { max = p.offsetHeight; at = i; }
+    }
+    const r = { h: max, step: at }; measureCache.set(key, r); return r;
+  }
+  function fitA(storyKey, W, H) {
+    const phone = isPhone(W), have = H - headerH(W), panel = tallestPanel(storyKey, W);
+    if (!phone) { const lanes = 64 + 8 * 64; const need = Math.max(lanes, panel.h) + 48; return { pins: need <= have, need, have, panel, rowH: 64, lanes }; }
+    const lanes = 40 + 8 * 24; const need = 20 + 8 + lanes + 12 + panel.h + 16; return { pins: need <= have, need, have, panel, rowH: 24, lanes };
+  }
+  function fitB(storyKey, W, H) {
+    const phone = isPhone(W), hh = headerH(W);
+    if (!phone) { const raw = (H - hh - 64 - 48) / 8; const rowH = clamp(raw, 44, 74); const need = hh + 64 + 8 * 44 + 48; return { pins: raw >= 44, need, have: H, rowH: Math.floor(rowH), lanes: 64 + 8 * Math.floor(rowH) }; }
+    const raw = (0.45 * H - 40 - 28) / 8; const rowH = clamp(raw, 22, 40); return { pins: raw >= 22, need: Math.ceil((40 + 28 + 8 * 22) / 0.45), have: H, rowH: Math.floor(rowH), lanes: 40 + 8 * Math.floor(rowH) };
+  }
+
+  // ---------- the simulated page ----------
+  const topIn = (node, root) => { let y = 0, n = node; while (n && n !== root) { y += n.offsetTop; n = n.offsetParent; } return y; };
+
+  function header(W) {
+    const h = el('header', 's-hdr'); const m = margin(W);
+    h.style.height = headerH(W) + 'px'; h.style.padding = `0 ${m}px`;
+    const logo = el('div', 's-logo'); logo.append(el('i'), document.createTextNode('Kubar Labs')); h.append(logo);
+    if (isPhone(W)) h.append(el('span', null, 'Menu'));
+    else { const nav = el('nav', 's-nav'); for (const t of ['Products', 'How it works', 'About', 'Contact', 'LinkedIn ↗']) nav.append(el('span', null, t)); nav.append(el('span', 's-btn', 'Talk to us')); h.append(nav); }
+    return h;
+  }
+  function preSection(W, storyKey) {
+    const sec = el('section', 's-sec'); const m = margin(W); sec.style.padding = `${isPhone(W) ? 48 : 72}px ${m}px`;
+    const head = el('div', 's-head');
+    if (storyKey === 'home') { head.append(el('h2', 's-h2', 'The missing piece isn’t capital.'), el('p', 's-lead', 'Exporters’ paper doesn’t arrive originated, insured and documented in a form a financier can buy again and again. Kubar builds that layer.')); sec.append(head, el('div', 's-bar'), el('div', 's-sliver')); }
+    else { head.append(el('h2', 's-h2', 'From the port to the record.'), el('p', 's-lead', 'One illustrative receivable, followed step by step: who does what, the documents behind it and where the money moves.')); sec.append(head); for (let i = 0; i < 3; i++) { const s = el('div', 's-stub'); s.style.width = (90 - i * 18) + '%'; sec.append(s); } }
+    return sec;
+  }
+  function afterSections(W, storyKey) {
+    const m = margin(W), out = [];
+    if (storyKey === 'home') { const band = el('section', 's-sec s-band'); band.style.padding = `${isPhone(W) ? 56 : 88}px ${m}px`; band.append(el('p', null, STORIES.home.next)); out.push(band); }
+    const sec = el('section', 's-sec'); sec.style.padding = `${isPhone(W) ? 48 : 72}px ${m}px`;
+    sec.append(el('h2', 's-h2', storyKey === 'home' ? 'An exchange needs more than a venue.' : STORIES.hiw.next));
+    for (let i = 0; i < 5; i++) { const s = el('div', 's-stub'); s.style.width = (96 - i * 11) + '%'; sec.append(s); }
+    out.push(sec); return out;
+  }
+  function ledger(storyKey, W) {
+    const box = el('div', 'ledger');
+    STORIES[storyKey].steps.forEach((st, i) => {
+      const row = el('div', 'lg-row');
+      row.append(el('span', 'n', pad2(i)), el('span', 'w', WORDS[i]), el('span', 't', st.s));
+      const d = el('span', 'd', st.data ? 'Data path: ' + st.data + (st.money ? '. Money path: ' + st.money : '') : ''); row.append(d);
+      box.append(row);
+    });
+    return box;
+  }
+
+  function build(dev, opt, storyKey, W, H) {
+    const phone = isPhone(W), hh = headerH(W), m = margin(W), cw = W - 2 * m;
+    const site = el('div', 'site' + (phone ? ' phone' : '') + (storyKey === 'hiw' ? ' hiw' : ''));
+    site.style.width = W + 'px';
+    site.append(header(W), preSection(W, storyKey));
+    const sec = el('section', 's-sec'); sec.style.padding = `${phone ? 48 : 72}px ${m}px`;
+    sec.append(el('h2', 's-h2', STORIES[storyKey].title)); sec.lastChild.style.marginBottom = (phone ? 24 : 48) + 'px';
+    site.append(sec);
+    let onScroll = () => {};
+    const fit = opt === 'a' ? fitA(storyKey, W, H) : fitB(storyKey, W, H);
+
+    if (!fit.pins) {
+      sec.append(ledger(storyKey, W));
+    } else if (opt === 'a') {
+      const step = Math.round(0.6 * H), pinH = H - hh;
+      const track = el('div'); track.style.height = (pinH + 7 * step) + 'px';
+      const pin = el('div', 'a-pin'); pin.style.top = hh + 'px'; pin.style.height = pinH + 'px';
+      const lanesW = phone ? cw : cw - 411 - 24;
+      const panelBox = el('div'), lanesBox = el('div');
+      if (phone) {
+        pin.style.flexDirection = 'column'; pin.style.padding = '10px 0 0'; pin.style.gap = '12px';
+        const id = el('div', 's-idrow'); id.append(el('span', null, 'Record RCV-0001'), el('span', 's-illus', 'Illustrative'));
+        pin.append(id, lanesBox, panelBox);
+      } else {
+        pin.style.gap = '24px'; pin.style.padding = '24px 0'; pin.style.alignItems = 'flex-start';
+        panelBox.style.width = '411px'; panelBox.style.flex = 'none'; lanesBox.style.flex = '1';
+        pin.append(panelBox, lanesBox);
+      }
+      track.append(pin); sec.append(track);
+      let shown = -1;
+      const show = (i) => {
+        if (i === shown) return; shown = i;
+        const p = panelA(storyKey, i, W);
+        if (phone) { p.querySelector('.s-idrow').remove(); p.querySelector('.s-rule.strong').remove(); }
+        panelBox.replaceChildren(p);
+        lanesBox.innerHTML = lanesSVG(i, lanesW, fit.rowH, phone ? 40 : 64, phone);
+      };
+      show(0);
+      onScroll = () => { const t = dev.scrollTop + hh - topIn(track, dev); show(clamp(Math.floor(t / step), 0, 7)); };
+    } else {
+      const S = STORIES[storyKey], step = Math.round((phone ? 0.5 : 0.6) * H);
+      const cards = [];
+      if (phone) {
+        const pin = el('div', 'b-phone-pin'); pin.style.top = hh + 'px';
+        const id = el('div', 's-idrow'); id.append(el('span', null, 'Record RCV-0001'), el('span', 's-illus', 'Illustrative'));
+        id.style.marginBottom = '8px';
+        const lanesBox = el('div'); pin.append(id, lanesBox); sec.append(pin);
+        const col = el('div', 'b-col'); col.style.paddingTop = '16px';
+        const skip = el('div', 's-links'); skip.style.marginBottom = '16px'; skip.append(el('span', null, 'Skip the story ↓')); col.append(skip);
+        S.steps.forEach((_, i) => { const w = el('div', 'b-step'); if (i < 7) w.style.minHeight = step + 'px'; const c = cardB(storyKey, i); w.append(c); cards.push(c); col.append(w); });
+        const tail = el('div'); tail.style.height = Math.round(0.25 * H) + 'px'; col.append(tail);
+        if (storyKey === 'home') { const l = el('div', 's-links'); l.append(el('span', null, S.links[1])); col.append(l); }
+        sec.append(col);
+        let shown = -1; const paint = (i) => { if (i === shown) return; shown = i; lanesBox.innerHTML = lanesSVG(i, cw, fit.rowH, 40, true); cards.forEach((c, j) => { c.classList.toggle('raised', j === i); c.classList.toggle('flat', j !== i); }); };
+        paint(0);
+        onScroll = () => { const blockH = pin.offsetHeight; const line = dev.scrollTop + hh + blockH + 0.45 * (H - hh - blockH); let i = 0; cards.forEach((c, j) => { if (topIn(c, dev) <= line) i = j; }); paint(i); };
+      } else {
+        const grid = el('div', 'b-grid');
+        const col = el('div', 'b-col');
+        const id = el('div', 's-idrow'); id.append(el('span', null, 'Record RCV-0001'), el('span', 's-illus', 'Illustrative'));
+        id.style.paddingBottom = '10px'; id.style.borderBottom = '1px solid var(--site-strong)'; id.style.marginBottom = '16px'; col.append(id);
+        const skip = el('div', 's-links'); skip.style.marginBottom = '20px'; skip.append(el('span', null, 'Skip the story ↓')); col.append(skip);
+        S.steps.forEach((_, i) => { const w = el('div', 'b-step'); if (i < 7) w.style.minHeight = step + 'px'; const c = cardB(storyKey, i); w.append(c); cards.push(c); col.append(w); });
+        const tail = el('div'); tail.style.height = Math.round(0.3 * H) + 'px'; col.append(tail);
+        if (storyKey === 'home') { const l = el('div', 's-links'); l.append(el('span', null, S.links[1])); col.append(l); }
+        if (S.legend) { const lg = el('div', 's-legend'); for (const t of ['Data path: documents and records', 'Money path: only between banks', 'Kubar: the one filled column']) lg.append(el('div', 's-fine', t)); col.append(lg); }
+        const right = el('div'); const lanesBox = el('div', 'b-sticky'); lanesBox.style.top = (hh + 24) + 'px'; right.append(lanesBox);
+        grid.append(col, right); sec.append(grid);
+        const lanesW = cw - 411 - 24;
+        let shown = -1; const paint = (i) => { if (i === shown) return; shown = i; lanesBox.innerHTML = lanesSVG(i, lanesW, fit.rowH, 64, false); cards.forEach((c, j) => { c.classList.toggle('raised', j === i); c.classList.toggle('flat', j !== i); }); };
+        paint(0);
+        onScroll = () => { const line = dev.scrollTop + hh + 0.45 * (H - hh); let i = 0; cards.forEach((c, j) => { if (topIn(c, dev) <= line) i = j; }); paint(i); };
+      }
+    }
+    for (const s of afterSections(W, storyKey)) site.append(s);
+    dev.replaceChildren(site);
+    return { fit, onScroll };
+  }
+
+  // ---------- page wiring ----------
+  const devA = document.getElementById('dev-a'), devB = document.getElementById('dev-b');
+  const frA = document.getElementById('fr-a'), frB = document.getElementById('fr-b');
+  const stA = document.getElementById('st-a'), stB = document.getElementById('st-b');
+  const compare = document.getElementById('compare');
+  let handlers = { a: () => {}, b: () => {} };
+
+  function statusText(opt, fit, storyKey, W, H) {
+    const where = isPhone(W) ? 'below the header' : 'below the header';
+    if (opt === 'a') {
+      if (fit.pins) return [true, `Pins. The drawing and the tallest step need ${fit.need} px; this screen leaves ${fit.have} px ${where}.`];
+      return [false, `Doesn’t pin. The tallest step (${pad2(fit.panel.step)}) and the drawing need ${fit.need} px; this screen leaves ${fit.have} px, so readers get the static ledger.`];
+    }
+    if (fit.pins) return [true, `Pins. Rows of ${fit.rowH} px put the drawing at ${fit.lanes} px; the words scroll past it, however long a step is.`];
+    return [false, `Doesn’t pin below about ${fit.need} px of height; readers get the static ledger.`];
+  }
+  function setStatus(node, [ok, text]) { node.className = 'status' + (ok ? '' : ' no'); node.replaceChildren(); const d = el('span', 'dot ' + (ok ? 'pin' : 'no')); node.append(d, el('span', null, text)); }
+
+  function layoutFrames() {
+    const sc = SCREENS[state.screen], W = sc.w, H = sc.h;
+    const both = state.view === 'both';
+    compare.style.setProperty('--cols', both ? 2 : 1);
+    document.getElementById('opt-a').hidden = state.view === 'b';
+    document.getElementById('opt-b').hidden = state.view === 'a';
+    const colW = (both && window.innerWidth > 820) ? (compare.clientWidth - 24) / 2 : compare.clientWidth;
+    const maxH = Math.max(320, window.innerHeight * 0.8);
+    const s = Math.min(1, (colW - (isPhone(W) ? 12 : 2)) / W, maxH / H);
+    for (const [fr, dev] of [[frA, devA], [frB, devB]]) {
+      fr.className = 'frame ' + (isPhone(W) ? 'phone' : 'laptop');
+      fr.style.width = Math.round(W * s + (isPhone(W) ? 12 : 2)) + 'px';
+      fr.style.height = Math.round(H * s + (isPhone(W) ? 12 : 2)) + 'px';
+      dev.style.width = W + 'px'; dev.style.height = H + 'px'; dev.style.transform = `scale(${s})`;
+    }
+  }
+
+  function render() {
+    const sc = SCREENS[state.screen];
+    const a = build(devA, 'a', state.story, sc.w, sc.h);
+    const b = build(devB, 'b', state.story, sc.w, sc.h);
+    handlers = { a: a.onScroll, b: b.onScroll };
+    setStatus(stA, statusText('a', a.fit, state.story, sc.w, sc.h));
+    setStatus(stB, statusText('b', b.fit, state.story, sc.w, sc.h));
+    layoutFrames(); devA.scrollTop = 0; devB.scrollTop = 0; a.onScroll(); b.onScroll();
+    renderMatrix(); renderControls(); save();
+  }
+
+  // scroll handling and syncing
+  let driver = null, driverT = 0;
+  function onDevScroll(which) {
+    const now = performance.now();
+    handlers[which]();
+    if (!state.sync || state.view !== 'both') return;
+    if (driver && driver !== which && now - driverT < 120) return;
+    driver = which; driverT = now;
+    const src = which === 'a' ? devA : devB, dst = which === 'a' ? devB : devA;
+    const f = src.scrollTop / Math.max(1, src.scrollHeight - src.clientHeight);
+    dst.scrollTop = f * (dst.scrollHeight - dst.clientHeight);
+  }
+  devA.addEventListener('scroll', () => onDevScroll('a'), { passive: true });
+  devB.addEventListener('scroll', () => onDevScroll('b'), { passive: true });
+
+  // controls
+  function segButtons(id, items, cur, onPick) {
+    const box = document.getElementById(id); box.replaceChildren();
+    items.forEach(([val, label, small]) => {
+      const b = el('button'); b.type = 'button'; b.textContent = label; if (small) b.append(el('small', null, small));
+      b.setAttribute('aria-pressed', String(val === cur)); b.addEventListener('click', () => onPick(val)); box.append(b);
+    });
+  }
+  function renderControls() {
+    segButtons('seg-story', [['home', 'Home'], ['hiw', 'How it works']], state.story, (v) => { state.story = v; render(); });
+    segButtons('seg-screen', SCREENS.map((s, i) => [i, `${s.w} × ${s.h}`, s.name]), state.screen, (v) => { state.screen = v; render(); });
+    segButtons('seg-view', [['both', 'Side by side'], ['a', 'A only'], ['b', 'B only']], state.view, (v) => { state.view = v; layoutFrames(); renderControls(); save(); });
+    document.getElementById('sync').checked = state.sync;
+  }
+  document.getElementById('sync').addEventListener('change', (e) => { state.sync = e.target.checked; save(); });
+
+  function verdictCell(fit) {
+    const td = el('td'); const v = el('span', 'verdict' + (fit.pins ? '' : ' no'));
+    v.append(el('span', 'dot ' + (fit.pins ? 'pin' : 'no')), document.createTextNode(fit.pins ? 'Pins' : 'Static ledger'));
+    td.append(v); return td;
+  }
+  function renderMatrix() {
+    const t = document.getElementById('mx'); t.replaceChildren();
+    const head = el('tr'); for (const h of ['Screen', 'A · Home', 'A · How it works', 'B · Home', 'B · How it works']) head.append(el('th', null, h));
+    const thead = el('thead'); thead.append(head); t.append(thead);
+    const tb = el('tbody');
+    SCREENS.forEach((sc, i) => {
+      const tr = el('tr', 'mx-row'); tr.tabIndex = 0; tr.setAttribute('aria-selected', String(i === state.screen));
+      const c0 = el('td', 'scr', `${sc.w} × ${sc.h}`); c0.append(el('span', null, sc.name)); tr.append(c0);
+      tr.append(verdictCell(fitA('home', sc.w, sc.h)), verdictCell(fitA('hiw', sc.w, sc.h)), verdictCell(fitB('home', sc.w, sc.h)), verdictCell(fitB('hiw', sc.w, sc.h)));
+      const pick = () => { state.screen = i; render(); };
+      tr.addEventListener('click', pick); tr.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); } });
+      tb.append(tr);
+    });
+    t.append(tb);
+  }
+
+  let rz = 0; window.addEventListener('resize', () => { cancelAnimationFrame(rz); rz = requestAnimationFrame(layoutFrames); });
+  render();
+  const fonts = [document.fonts.load('400 16px "Schibsted Grotesk"'), document.fonts.load('500 16px "Schibsted Grotesk"'), document.fonts.load('400 13px "Geist Mono"'), document.fonts.load('500 13px "Geist Mono"')];
+  Promise.allSettled(fonts).then(() => document.fonts.ready).then(() => { measureCache.clear(); render(); });
+})();
+</script>
+
+</body>
+</html>
