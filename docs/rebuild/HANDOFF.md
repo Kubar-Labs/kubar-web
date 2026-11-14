@@ -1,5 +1,7 @@
 # kubar.tech rebuild: Phase 8 handoff
 
+> **14 Nov 2026:** read `REDRAW-2026-11-14.md` after this file. It changes the look, the drawings, the motion and some copy; where the two disagree, the redraw file wins.
+
 For Claude Code, building the new kubar.tech in `Kubar-Labs/kubar-web`. Prepared 13 Nov 2026 from the signed-off design (Phases 5 to 7, with the option B changes of 4–12 Nov). Owner: Vaibhav Sharma, vaibhav@kubar.tech.
 
 Everything you need to build is in this folder:
