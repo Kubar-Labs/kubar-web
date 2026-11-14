@@ -589,10 +589,6 @@
     "whatYouBuy": {
       "heading": "What you buy.",
       "title": "Receivable RCV-0001",
-      "columns": {
-        "field": "Field",
-        "entry": "Entry"
-      },
       "rows": [
         [
           "Face value",
@@ -634,8 +630,7 @@
           "Evidence",
           "One package, with your own read access"
         ]
-      ],
-      "under": "Illustrative: an example receivable, not a real transaction."
+      ]
     },
     "timeline": {
       "title": "When the money moves · your side",
@@ -664,33 +659,27 @@
       "setUpSteps": [
         {
           "no": "01",
-          "text": "Kubar proposes the pool and its rules",
-          "who": "Kubar, to you"
+          "text": "Kubar proposes the pool and its rules"
         },
         {
           "no": "02",
-          "text": "You agree the terms and set a programme limit",
-          "who": "You"
+          "text": "You agree the terms and set a programme limit"
         },
         {
           "no": "03",
-          "text": "The insurer approves limits on the buyers, in your name",
-          "who": "The insurer"
+          "text": "The insurer approves limits on the buyers, in your name"
         },
         {
           "no": "04",
-          "text": "You appoint Kubar as your origination and servicing agent",
-          "who": "You, to Kubar"
+          "text": "You appoint Kubar as your origination and servicing agent"
         },
         {
           "no": "05",
-          "text": "Exporters join: identity checks, their bank’s no-objection, a notice on their invoices",
-          "who": "Kubar and exporters"
+          "text": "Exporters join: identity checks, their bank’s no-objection, a notice on their invoices"
         },
         {
           "no": "06",
-          "text": "Buyers are told to pay your account, and acknowledge it",
-          "who": "Buyers"
+          "text": "Buyers are told to pay your account, and acknowledge it"
         }
       ],
       "link": "See every step in detail",
@@ -698,39 +687,29 @@
       "eachSteps": [
         {
           "no": "01",
-          "text": "The exporter, or its platform, submits the shipment",
-          "who": "Exporter"
+          "text": "The exporter, or its platform, submits the shipment"
         },
         {
           "no": "02",
-          "text": "Kubar checks it against the programme’s rules and assembles the evidence package",
-          "who": "Kubar"
+          "text": "Kubar checks it against the programme’s rules and assembles the evidence package"
         },
         {
           "no": "03",
-          "text": "You accept it under your limit",
-          "who": "You"
+          "text": "You accept it under your limit"
         },
         {
           "no": "04",
-          "text": "You pay the purchase price; the buyer pays you on the due date; you pay the exporter the balance",
-          "who": "You and the buyer"
+          "text": "You pay the purchase price; the buyer pays you on the due date; you pay the exporter the balance"
         },
         {
           "no": "05",
-          "text": "The outcome enters the loss history",
-          "who": "Kubar"
+          "text": "The outcome enters the loss history"
         }
       ],
       "note": "The credit decision is yours; Kubar can’t override it.",
       "noteAfter": "03",
       "refs": "RCV-0001 · RCV-0002 · RCV-0003 · …",
-      "refsLine": "Every receivable that fits, inside your limit",
-      "columns": {
-        "no": "No.",
-        "step": "Step",
-        "who": "Who"
-      }
+      "refsLine": "Every receivable that fits, inside your limit"
     },
     "evidence": {
       "heading": "Every element traces to a system the exporter doesn’t control.",
@@ -988,10 +967,6 @@
     },
     "programme1": {
       "heading": "Programme 1: rice to buyers in the UAE and the Gulf.",
-      "columns": [
-        "Field",
-        "Entry"
-      ],
       "rows": [
         [
           "Exporters",

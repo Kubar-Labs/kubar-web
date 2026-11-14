@@ -16,31 +16,52 @@ type PageHeroProps = {
   children?: React.ReactNode;
   /** A drawing set beside the words at desktop (lower right) and under them below desktop. */
   aside?: React.ReactNode;
+  /**
+   * "beside": the words (720) and the drawing side by side, centred on each
+   * other, 60 apart (Kubar Protocol, Figma 167:52); below desktop the drawing
+   * sits 40 under the words, centred.
+   */
+  asidePlacement?: "lower-right" | "beside";
 };
 
-export function PageHero({ headline, sub, button, link, children, aside }: PageHeroProps) {
+export function PageHero({ headline, sub, button, link, children, aside, asidePlacement = "lower-right" }: PageHeroProps) {
+  const words = (
+    <>
+      <h1 className="t-display text-ink">{headline}</h1>
+      {sub ? <p className="t-body-lg pt-8 text-ink-muted max-lg:max-w-(--measure) lg:max-w-[628px]">{sub}</p> : null}
+      {button || link ? (
+        <div className="flex flex-col items-start gap-6 pt-8 lg:flex-row lg:items-center lg:gap-8">
+          {button ? (
+            <ButtonLink href={button.href} icon="arrow-right">
+              {button.label}
+            </ButtonLink>
+          ) : null}
+          {link ? (
+            <TextLink href={link.href} kind="arrow">
+              {link.label}
+            </TextLink>
+          ) : null}
+        </div>
+      ) : null}
+      {children}
+    </>
+  );
+
+  if (aside && asidePlacement === "beside") {
+    return (
+      <section>
+        <div className="page-container flex flex-col gap-10 pt-8 pb-12 lg:flex-row lg:items-center lg:gap-[60px] lg:pt-16 lg:pb-[72px]">
+          <div className="flex flex-col lg:w-[720px] lg:min-w-0 lg:shrink">{words}</div>
+          <div className="mx-auto w-full max-w-[474px] lg:mx-0 lg:min-w-0 lg:shrink lg:basis-[474px]">{aside}</div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section>
       <div className={cn("page-container relative pt-8 pb-12 lg:pt-16 lg:pb-[72px]", aside && "lg:min-h-[969px]")}>
-        <div className="flex flex-col lg:max-w-[1063px]">
-          <h1 className="t-display text-ink">{headline}</h1>
-          {sub ? <p className="t-body-lg pt-8 text-ink-muted max-lg:max-w-(--measure) lg:max-w-[628px]">{sub}</p> : null}
-          {button || link ? (
-            <div className="flex flex-col items-start gap-6 pt-8 lg:flex-row lg:items-center lg:gap-8">
-              {button ? (
-                <ButtonLink href={button.href} icon="arrow-right">
-                  {button.label}
-                </ButtonLink>
-              ) : null}
-              {link ? (
-                <TextLink href={link.href} kind="arrow">
-                  {link.label}
-                </TextLink>
-              ) : null}
-            </div>
-          ) : null}
-          {children}
-        </div>
+        <div className="flex flex-col lg:max-w-[1063px]">{words}</div>
         {aside ? <div className="pt-10 lg:absolute lg:top-[408px] lg:right-(--page-margin) lg:pt-0">{aside}</div> : null}
       </div>
     </section>

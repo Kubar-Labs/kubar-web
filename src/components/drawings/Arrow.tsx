@@ -6,7 +6,8 @@
  * The arrowhead appears only when its line arrives. The movement is keyed
  * off the drawing's data-phase (PlayOnce) and --draw-delay (globals.css).
  */
-export type ArrowKind = "money" | "data";
+/** Money: solid 2 px. Data: dashed 1.5 px. Flow: solid 1.5 px, a step to the next (the programme loop). */
+export type ArrowKind = "money" | "data" | "flow";
 
 export function Arrow({
   id,
@@ -31,10 +32,10 @@ export function Arrow({
   className?: string;
 }) {
   const style = { ["--draw-delay" as string]: `${delay}ms` };
-  if (kind === "money") {
+  if (kind === "money" || kind === "flow") {
     return (
       <g className={`draw-arrow ${className ?? ""}`} data-touches={touches} style={style}>
-        <path d={d} pathLength={1} className="draw-solid fill-none stroke-ink" strokeWidth={2} />
+        <path d={d} pathLength={1} className="draw-solid fill-none stroke-ink" strokeWidth={kind === "money" ? 2 : 1.5} />
         <polygon points={head} className="draw-head fill-ink" />
       </g>
     );

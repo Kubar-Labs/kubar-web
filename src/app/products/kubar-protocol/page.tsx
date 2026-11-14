@@ -7,15 +7,23 @@ import { PageHero } from "@/components/blocks/PageHero";
 import { Section, SectionHead } from "@/components/blocks/Section";
 import { EvidenceSources } from "@/components/protocol/EvidenceSources";
 import { MoneyPath } from "@/components/protocol/MoneyPath";
+import { Corridor } from "@/components/protocol/Corridor";
+import { HoldsCards } from "@/components/protocol/HoldsCards";
+import { LimitDrawing } from "@/components/protocol/LimitDrawing";
 import { MoneyTimeline, type TimelineCopy } from "@/components/protocol/MoneyTimeline";
-import { ProgrammeSteps, type Step } from "@/components/protocol/ProgrammeSteps";
+import { ProgrammeRuns, type ProgrammeStep } from "@/components/protocol/ProgrammeRuns";
+import { ReceivableSheet } from "@/components/protocol/ReceivableSheet";
 import { VenueRegister } from "@/components/protocol/VenueRegister";
 import { Register } from "@/components/registers/Register";
 import { Footnote, FootnoteMarker } from "@/components/ui/Footnote";
 import { Illustrative } from "@/components/ui/Illustrative";
-import { TextLink } from "@/components/ui/TextLink";
 
-/* Kubar Protocol (Figma 167:6 at 1440, 169:1931 at 768, 168:684 at 390). */
+/*
+ * Kubar Protocol (Figma 167:6 at 1440, 169:1931 at 768, 168:684 at 390;
+ * REDRAW-2026-11-14.md, Kubar Protocol, and the copy changes of section 10).
+ * "Illustrative" shows once, on the receivable sheet, where the example first
+ * shows a figure.
+ */
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("kubarProtocol.meta");
@@ -33,7 +41,6 @@ function withMarker(text: string, marker: React.ReactNode) {
 export default function KubarProtocol() {
   const t = useTranslations("kubarProtocol");
   const footnotes = useTranslations("footnotes");
-  const stepColumns = t.raw("programme.columns") as { no: string; step: string; who: string };
 
   return (
     <>
@@ -42,51 +49,35 @@ export default function KubarProtocol() {
         sub={t("hero.sub")}
         button={{ label: t("hero.button"), href: CONTACT }}
         link={{ label: t("hero.link"), href: "/how-it-works" }}
+        aside={<LimitDrawing className="block h-auto w-full overflow-visible" />}
+        asidePlacement="beside"
       />
 
       <Section labelledBy="buy-heading" className="flex flex-col gap-10 lg:gap-16">
         <SectionHead id="buy-heading" heading={t("whatYouBuy.heading")} layout="wide" />
-        <div className="flex flex-col gap-12 lg:flex-row lg:items-start lg:gap-6">
-          <div className="lg:w-[519px] lg:shrink-0">
-            <Register
-              first="label"
-              caption={
-                <span className="flex items-center gap-3">
-                  <span className="t-tag text-ink-muted">{t("whatYouBuy.title")}</span>
-                  <Illustrative align="start" />
-                </span>
-              }
-              columns={[t("whatYouBuy.columns.field"), t("whatYouBuy.columns.entry")]}
-              widths={[174, 345]}
-              rows={t.raw("whatYouBuy.rows") as string[][]}
-            />
-            <p className="t-fine pt-3 text-ink-muted">{t("whatYouBuy.under")}</p>
-          </div>
+        <div className="flex flex-col gap-12 min-[1440px]:flex-row min-[1440px]:items-start min-[1440px]:gap-6">
+          <ReceivableSheet
+            className="lg:w-[519px] lg:shrink-0"
+            title={t("whatYouBuy.title")}
+            illustrative={<Illustrative />}
+            rows={t.raw("whatYouBuy.rows") as string[][]}
+          />
+          {/* Side by side from 1440 up (519 + 24 + 737 = 1280); below that the timeline sits under the sheet. */}
           <MoneyTimeline copy={t.raw("timeline") as TimelineCopy} className="min-w-0 lg:shrink-0" />
         </div>
       </Section>
 
       <Section labelledBy="runs-heading" className="flex flex-col gap-10 lg:gap-16">
         <SectionHead id="runs-heading" heading={t("programme.heading")} layout="wide" />
-        <div className="flex flex-col gap-12 lg:flex-row lg:items-start lg:gap-20">
-          <div className="flex flex-col items-start gap-8 lg:w-[440px] lg:shrink-0">
-            <ProgrammeSteps heading={t("programme.setUp")} steps={t.raw("programme.setUpSteps") as Step[]} columns={stepColumns} close />
-            <TextLink href="/how-it-works" kind="arrow">{t("programme.link")}</TextLink>
-          </div>
-          <div className="flex min-w-0 flex-1 flex-col">
-            <ProgrammeSteps
-              heading={t("programme.each")}
-              steps={t.raw("programme.eachSteps") as Step[]}
-              columns={stepColumns}
-              note={{ after: t("programme.noteAfter"), text: t("programme.note") }}
-            />
-            <div className="flex flex-col items-start gap-2 pt-6">
-              <p className="t-code text-ink-muted">{t("programme.refs")}</p>
-              <p className="t-body-sm text-ink-muted">{t("programme.refsLine")}</p>
-              <Illustrative align="start" />
-            </div>
-          </div>
-        </div>
+        <ProgrammeRuns
+          setUp={{ heading: t("programme.setUp"), steps: t.raw("programme.setUpSteps") as ProgrammeStep[] }}
+          each={{ heading: t("programme.each"), steps: t.raw("programme.eachSteps") as ProgrammeStep[] }}
+          link={{ label: t("programme.link"), href: "/how-it-works" }}
+          note={t("programme.note")}
+          noteAfter={t("programme.noteAfter")}
+          refs={t("programme.refs")}
+          refsLine={t("programme.refsLine")}
+        />
       </Section>
 
       <Section labelledBy="evidence-heading" className="flex flex-col gap-10 lg:gap-16">
@@ -117,7 +108,7 @@ export default function KubarProtocol() {
         <SectionHead id="insurance-heading" heading={t("insurance.heading")} lead={t("insurance.lead")} />
       </Section>
 
-      <Section labelledBy="payment-heading" className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-20">
+      <Section labelledBy="payment-heading" className="flex flex-col gap-10 lg:gap-16 min-[1440px]:flex-row min-[1440px]:items-start min-[1440px]:gap-20">
         <SectionHead id="payment-heading" heading={t("payment.heading")} layout="stacked" />
         <MoneyPath
           className="min-w-0 flex-1"
@@ -136,12 +127,9 @@ export default function KubarProtocol() {
 
       <Section id="who-holds-what" labelledBy="holds-heading" className="flex flex-col gap-10 lg:gap-16">
         <SectionHead id="holds-heading" heading={t("holds.heading")} layout="wide" />
-        <Register
-          className="lg:max-w-[1062px]"
-          columns={t.raw("holds.columns") as string[]}
-          widths={[326, 326, 410]}
-          rows={t.raw("holds.rows") as string[][]}
-          stackLabels
+        <HoldsCards
+          rows={t.raw("holds.rows") as [string, string, string][]}
+          labels={(t.raw("holds.columns") as string[]).slice(1) as [string, string]}
         />
       </Section>
 
@@ -164,13 +152,7 @@ export default function KubarProtocol() {
 
       <Section labelledBy="programme1-heading" className="flex flex-col gap-10 lg:gap-16">
         <SectionHead id="programme1-heading" heading={t("programme1.heading")} layout="wide" />
-        <Register
-          className="lg:max-w-[845px]"
-          first="label"
-          columns={t.raw("programme1.columns") as string[]}
-          widths={[217, 628]}
-          rows={t.raw("programme1.rows") as string[][]}
-        />
+        <Corridor rows={t.raw("programme1.rows") as [string, string][]} />
       </Section>
 
       <Section labelledBy="venue-heading" className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-20">

@@ -501,6 +501,9 @@
 
   /* Isometric drawings (REDRAW-2026-11-14.md, sections 4 and 7). The
      elevations as filters, so they follow the projected shape. */
+  .iso-sheet-rest {
+    filter: drop-shadow(0 1px 2px rgb(2 39 50 / 0.08)) drop-shadow(0 6px 16px rgb(2 39 50 / 0.08)); /* --elevation-1 */
+  }
   .iso-sheet {
     filter: drop-shadow(0 2px 4px rgb(2 39 50 / 0.08)) drop-shadow(0 14px 36px rgb(2 39 50 / 0.12)); /* --elevation-2 */
   }
@@ -664,7 +667,8 @@
   }
   @media (prefers-reduced-motion: reduce) {
     .iso-drop,
-    .iso-fade {
+    .iso-fade,
+    .limit-settle {
       animation: none;
     }
     .iso-lift,
@@ -724,6 +728,93 @@
   .party-map:has([data-party="buyers"]:is(:hover, :focus-within)) .draw-arrow:not([data-touches~="buyers"]),
   .party-map:has([data-party="kubar"]:is(:hover, :focus-within)) .draw-arrow:not([data-touches~="kubar"]) {
     opacity: 0.3;
+  }
+
+  /* Kubar Protocol hero: the programme limit as a dashed box (LimitDrawing).
+     On page load RCV-0003 starts 40 px higher and settles above the box. */
+  .limit-edge {
+    fill: none;
+    stroke: var(--color-ink);
+    stroke-width: 1;
+    stroke-dasharray: 4 4;
+    vector-effect: non-scaling-stroke;
+  }
+  .limit-settle {
+    animation: limit-settle var(--duration-scene) var(--ease-standard) both;
+  }
+  @keyframes limit-settle {
+    from {
+      transform: translateY(-40px);
+    }
+  }
+
+  /* How a programme runs (ProgrammeRuns). The set-up dots rest at
+     --elevation-1. A loop card raises to --elevation-3 on hover, focus or
+     tap: the deeper shadow fades in on a pseudo-element. */
+  .setup-dot {
+    filter: drop-shadow(0 1px 2px rgb(2 39 50 / 0.08)) drop-shadow(0 6px 16px rgb(2 39 50 / 0.08)); /* --elevation-1 */
+  }
+  .raise-card {
+    position: relative;
+  }
+  .raise-card::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    box-shadow: var(--elevation-3);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--duration-hover) var(--ease-standard);
+  }
+  .raise-card:is(:hover, :focus)::before {
+    opacity: 1;
+  }
+  /* The loop at desktop: the ellipse draws clockwise from 01 over 900 ms; each
+     arrowhead and card appears as the line reaches it; then one small sheet
+     travels the loop and stops by 05. Drawn as it ends without script, with
+     reduced motion or when already in view. */
+  .loop-line {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+  }
+  .loop-sheet {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 16px;
+    height: 20px;
+    border: 1px solid var(--color-rule-strong);
+    border-bottom: 2px solid var(--color-accent);
+    background-color: var(--color-raised);
+    box-shadow: var(--elevation-1);
+    offset-rotate: 0deg;
+    offset-distance: 72%;
+  }
+  @media (min-width: 1200px) {
+    [data-phase="armed"] .loop-line {
+      stroke-dashoffset: 1;
+    }
+    [data-phase="armed"] :is(.loop-head, .loop-card) {
+      opacity: 0;
+    }
+    [data-phase="armed"] .loop-sheet {
+      offset-distance: 0%;
+      opacity: 0;
+    }
+    [data-phase="playing"] .loop-line {
+      transition: stroke-dashoffset 900ms linear;
+    }
+    [data-phase="playing"] .loop-head {
+      transition: opacity var(--duration-hover) var(--ease-standard) var(--draw-delay, 0ms);
+    }
+    [data-phase="playing"] .loop-card {
+      transition: opacity var(--duration-disclose) var(--ease-standard) var(--card-delay, 0ms);
+    }
+    [data-phase="playing"] .loop-sheet {
+      transition:
+        opacity var(--duration-hover) var(--ease-standard) 900ms,
+        offset-distance 1800ms var(--ease-standard) 900ms;
+    }
   }
 
   /* The pinned story, option B (StoryView.tsx, Lanes.tsx; REDRAW section

@@ -11,6 +11,7 @@ Extracted from Figma, Kubar Protocol · 1440 (frame 167:6), 13 Nov 2026, in read
 
 ## What you buy
 [H2] What you buy.
+(Step 4: the register becomes the receivable sheet, REDRAW-2026-11-14.md, Kubar Protocol: its column heads "Field" and "Entry" are not shown; the face value is the sheet's figure.)
 [Tag] Receivable RCV-0001
 [Fine] Illustrative
 [Tag] Face value                 [BodyS] $225,000
@@ -43,7 +44,7 @@ At 768 and 390 the timeline is a stacked register; its labels there: "Day 0", "P
 ## How a programme runs
 [H2] How a programme runs.
 (After step 3, REDRAW-2026-11-14.md section 10: the party tags on both lists are cut, since each sentence names who acts; "Illustrative" is cut from the loop. In the hero drawing and the evidence drawing it is cut too: it shows once, on the receivable sheet.)
-Two ruled registers side by side at desktop (Set up once, 440 wide; Then, for every receivable, the rest); stacked at 768 and 390. No boxes or arrows.
+Step 4 (REDRAW-2026-11-14.md, Kubar Protocol): "Set up once" as six numbered dots on a line; "Then, for every receivable" as five raised cards round an ellipse; below desktop the cards run in a column with a return arrow.
 [Tag] Set up once
 [Code] 01  [BodyS] Kubar proposes the pool and its rules
 [Code] 02  [BodyS] You agree the terms and set a programme limit
@@ -119,7 +120,8 @@ Drawing (component "Money path", 120:1167; shared with How it works): four parti
 
 ## Who holds what
 [H2] You hold the receivable, the policy and the account.
-[Tag] Party | [Tag] Holds | [Tag] Doesn’t hold
+(Step 4: the register becomes five blocks, "You, the financier" as the petrol card, so the column head "Party" is not shown; "Holds" and "Doesn’t hold" label each block's two lines.)
+[Fine] Holds | [Fine] Doesn’t hold
 You, the financier | The receivable, the collection account, the insurance policy and the buyer’s credit risk | Recourse to the exporter for the buyer’s credit
 The insurer | The buyer’s credit risk on the covered share | Dispute or fraud risk
 The exporter | Disputes, returns, set-off and fraud on its own trades | The receivable, once sold
@@ -162,7 +164,7 @@ Funds | Later, buying receivables from financiers
 
 ## Programme 1
 [H2] Programme 1: rice to buyers in the UAE and the Gulf.
-[Tag] Field | [Tag] Entry                         (the Status row is removed)
+(Step 4: the register becomes the corridor, REDRAW-2026-11-14.md, Kubar Protocol, so its column heads "Field" and "Entry" are not shown. The Status row was removed earlier.)
 Exporters | Indian rice exporters
 Buyers | Importers in the UAE and the wider Gulf, on approved insurance limits
 Terms | Open account
@@ -175,9 +177,10 @@ Next | Chemicals and pharmaceutical formulations, then engineering goods and aut
 [H2] The venue comes last.
 [Body] Kubar’s own ITFS, once registered¹, is meant to do three things the programmes can’t:
 [State] Planned                                  (muted; the one status word kept on the site, with its footnote)
-[Code] 01  [Body] Admit institutional financiers beyond banks’ units at GIFT City, including those with no presence there
-[Code] 02  [Body] Keep a registry so a receivable can change hands without a fresh assignment each time
-[Code] 03  [Body] Give insurers, rating agencies and funds a neutral operator’s record to rely on
+(Step 4: the numbers are removed, REDRAW-2026-11-14.md, Kubar Protocol.)
+[Body] Admit institutional financiers beyond banks’ units at GIFT City, including those with no presence there
+[Body] Keep a registry so a receivable can change hands without a fresh assignment each time
+[Body] Give insurers, rating agencies and funds a neutral operator’s record to rely on
 [BodyS] Like the programmes, it is for institutional financiers only.
 [Fine] ¹
 [Fine] Kubar’s own ITFS registration is targeted for 2027; until then Kubar acts as the financier’s origination and servicing agent.

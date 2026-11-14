@@ -1,4 +1,3 @@
-import { Illustrative } from "@/components/ui/Illustrative";
 
 /*
  * Evidence sources (Figma C4 130:2584), Kubar Protocol "The evidence
@@ -51,10 +50,7 @@ export function EvidenceSources({
         <path d="M208.7 246.7L214 252L208.7 257.3" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
       <div className="absolute top-[121px] left-[760px] flex w-[302px] flex-col gap-4 border border-t-2 border-rule-strong bg-raised p-5">
-        <div className="flex flex-col items-start gap-2">
-          <p className="t-tag text-ink-muted">{record}</p>
-          <Illustrative align="start" />
-        </div>
+        <p className="t-tag text-ink-muted">{record}</p>
         <ul>
           {readers.map((reader) => (
             <li key={reader} className="t-body border-t border-rule py-3 text-ink">

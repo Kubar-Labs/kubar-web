@@ -35,6 +35,7 @@ export function IsoSheetShape({
   w,
   h,
   current = false,
+  elevation,
   children,
 }: {
   x: number;
@@ -42,8 +43,11 @@ export function IsoSheetShape({
   w: number;
   h: number;
   current?: boolean;
+  /** The sheet's elevation: 3 when current, otherwise 2 unless set (1 for sheets at rest in a pile). */
+  elevation?: 1 | 2 | 3;
   children?: React.ReactNode;
 }) {
+  const lift = elevation ?? (current ? 3 : 2);
   return (
     <>
       <g transform={`translate(${x} ${y + 4}) ${ISO_MATRIX}`}>
@@ -53,7 +57,10 @@ export function IsoSheetShape({
       <g transform={`translate(${x} ${y}) ${ISO_MATRIX}`} className="iso-lift-shadow">
         <rect width={w} height={h} className="fill-raised" />
       </g>
-      <g transform={`translate(${x} ${y}) ${ISO_MATRIX}`} className={current ? "iso-sheet-current" : "iso-sheet"}>
+      <g
+        transform={`translate(${x} ${y}) ${ISO_MATRIX}`}
+        className={lift === 3 ? "iso-sheet-current" : lift === 1 ? "iso-sheet-rest" : "iso-sheet"}
+      >
         <rect
           width={w}
           height={h}

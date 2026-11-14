@@ -26,19 +26,16 @@ export function VenueRegister({
         <p className="t-body flex-1 text-ink">{sentence}</p>
         <p className="t-state text-ink-muted">{planned}</p>
       </div>
-      <ol>
+      <ul>
         {things.map((thing, i) => (
           <li
             key={thing}
-            className={cn("flex items-baseline gap-3 py-4 lg:gap-6", i === things.length - 1 ? "border-b-2 border-rule-strong" : "border-b border-rule")}
+            className={cn("t-body py-4 text-ink", i === things.length - 1 ? "border-b-2 border-rule-strong" : "border-b border-rule")}
           >
-            <span aria-hidden="true" className="t-code w-6 shrink-0 text-ink lg:w-auto lg:flex-1">
-              {String(i + 1).padStart(2, "0")}
-            </span>
-            <span className="t-body flex-1 text-ink">{thing}</span>
+            {thing}
           </li>
         ))}
-      </ol>
+      </ul>
       <p className="t-body-sm pt-4 text-ink-muted">{under}</p>
     </div>
   );

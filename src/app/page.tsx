@@ -33,29 +33,28 @@ export default function Home() {
 
   return (
     <>
-      {/* Hero. Desktop: display and routes (600) beside the record. Tablet:
-          display, subline, routes, the anchor, then the record. Phones (below
-          768, Figma 162:1311): the record moves up to sit directly under the
-          display, ahead of the subline, routes and anchor, 24 px apart. Only
-          the order on screen changes: the wrapper dissolves (max-md:contents)
-          and `order` places its parts, so the DOM, and what a screen reader
-          hears, stays display, subline, routes, anchor, record. */}
+      {/* Hero. Below 1200 (phones, tablets, an iPad in landscape; Figma
+          162:1311 at 390, 166:3365 at 768) the record sits directly after
+          the display, and the page order is the screen order: display,
+          record, subline, routes, anchor, 24 px apart. From 1200 up, one
+          grid: the display in column 1, row 1; the routes in column 1, row 2
+          at its top; the record in column 2 across both rows (rows auto 1fr,
+          48 px apart; 36 px between the columns); the subline and the anchor
+          hidden. */}
       <section>
-        <div className="page-container flex flex-col gap-6 pt-8 pb-12 lg:grid lg:grid-cols-[578px_minmax(0,1fr)] lg:items-start lg:gap-x-9 lg:pt-16 lg:pb-[72px]">
-          <div className="flex flex-col gap-6 max-md:contents lg:gap-12">
-            <h1 className="t-display text-ink max-md:order-1">
-              {t.rich("display", {
-                marker: () => <FootnoteMarker n={1} target={FN_STATUS} refId="fnref-1" />,
-                nb: (chunks) => <span className="whitespace-nowrap">{chunks}</span>,
-              })}
-            </h1>
-            <p className="t-body-lg text-ink-muted max-md:order-3 lg:hidden">{t("subline")}</p>
-            <RouteRows routes={routes} className="max-md:order-3" />
-            <TextLink href="#one-receivable" kind="anchor" className="self-start max-md:order-3 lg:hidden">
-              {t("followAnchor")}
-            </TextLink>
-          </div>
-          <Record className="min-w-0 max-md:order-2 lg:col-start-2 lg:row-start-1" />
+        <div className="page-container flex flex-col gap-6 pt-8 pb-12 lg:grid lg:grid-cols-[578px_minmax(0,1fr)] lg:grid-rows-[auto_1fr] lg:items-start lg:gap-x-9 lg:gap-y-12 lg:pt-16 lg:pb-[72px]">
+          <h1 className="t-display text-ink lg:col-start-1 lg:row-start-1">
+            {t.rich("display", {
+              marker: () => <FootnoteMarker n={1} target={FN_STATUS} refId="fnref-1" />,
+              nb: (chunks) => <span className="whitespace-nowrap">{chunks}</span>,
+            })}
+          </h1>
+          <Record className="min-w-0 lg:col-start-2 lg:row-span-2 lg:row-start-1" />
+          <p className="t-body-lg text-ink-muted lg:hidden">{t("subline")}</p>
+          <RouteRows routes={routes} className="lg:col-start-1 lg:row-start-2" />
+          <TextLink href="#one-receivable" kind="anchor" className="self-start lg:hidden">
+            {t("followAnchor")}
+          </TextLink>
         </div>
       </section>
 

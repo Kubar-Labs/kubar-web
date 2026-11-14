@@ -4,6 +4,11 @@ import type { NextConfig } from "next";
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
 const isDevelopment = process.env.NODE_ENV === "development";
+// LOCAL_PREVIEW=1 at build time: a production build to open over plain http on
+// this machine or the local network (WebKit checks, a phone on the same Wi-Fi).
+// Safari would otherwise upgrade every script and stylesheet to https and the
+// page would load unstyled. Never set it for a deploy.
+const upgradeInsecure = !isDevelopment && process.env.LOCAL_PREVIEW !== "1";
 const contentSecurityPolicy = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline'${isDevelopment ? " 'unsafe-eval'" : ""}`,
@@ -16,7 +21,7 @@ const contentSecurityPolicy = [
   "base-uri 'self'",
   "form-action 'self'",
   "frame-ancestors 'none'",
-  ...(!isDevelopment ? ["upgrade-insecure-requests"] : []),
+  ...(upgradeInsecure ? ["upgrade-insecure-requests"] : []),
 ].join("; ");
 
 const nextConfig: NextConfig = {

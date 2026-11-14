@@ -1,8 +1,10 @@
-import { Arrow, straight, type ArrowKind } from "@/components/drawings/Arrow";
+import { Arrow, straight } from "@/components/drawings/Arrow";
 import { PlayOnce } from "@/components/drawings/PlayOnce";
 import { ReturnArrow } from "@/components/map/ReturnArrow";
 import { TextLink } from "@/components/ui/TextLink";
 import { cn } from "@/lib/utils";
+
+type ArrowKind = "money" | "data";
 
 /*
  * Who takes part · map (Figma 243:3330 at 1440, 248:3474 at 768, 248:3955 at

@@ -483,28 +483,36 @@ test.describe("Home drawings (redraw step 2)", () => {
 });
 
 test.describe("Home hero order", () => {
-  test("on phones the record sits under the headline, while the DOM keeps headline, subline, routes, anchor, record", async ({ page }) => {
+  test("below 1200 the record follows the headline in the page and on screen; from 1200 the desktop grid", async ({ page }) => {
     const top = (selector: string) => page.locator(selector).first().evaluate((el) => el.getBoundingClientRect().top);
-    for (const [width, height] of [[390, 844], [375, 667]] as const) {
+    // Phones, tablets and iPads (portrait and landscape).
+    for (const [width, height] of [[390, 844], [375, 667], [744, 1133], [820, 1180], [1180, 820]] as const) {
       await page.setViewportSize({ width, height });
       await page.goto("/");
-      const h1 = page.locator("main h1");
-      const h1Bottom = await h1.evaluate((el) => el.getBoundingClientRect().bottom);
+      const h1Bottom = await page.locator("main h1").evaluate((el) => el.getBoundingClientRect().bottom);
       const record = await top(".iso-record");
       expect(Math.round(record - h1Bottom), `${width}: 24 px under the headline`).toBe(24);
+      // On the first screen.
+      expect(record, `${width}: the record starts on the first screen`).toBeLessThan(height);
       expect(await top("main h1 ~ p"), `${width}: subline after the record`).toBeGreaterThan(record);
       expect(await top('a[href="#one-receivable"]')).toBeGreaterThan(await top("main h1 ~ p"));
     }
-    // Screen readers hear the headline, subline and routes first.
-    const order = await page.evaluate(() => {
-      const nodes = [document.querySelector("main h1"), document.querySelector("main h1 ~ p"), document.querySelector('a[href="#one-receivable"]'), document.querySelector(".iso-record")];
-      return nodes.every((node, i) => i === 0 || nodes[i - 1]!.compareDocumentPosition(node!) & Node.DOCUMENT_POSITION_FOLLOWING);
+    // The page order is the screen order: headline, record, subline, routes, anchor.
+    const inOrder = await page.evaluate(() => {
+      const nodes = [
+        document.querySelector("main h1"),
+        document.querySelector(".iso-record"),
+        document.querySelector("main h1 ~ p:not(.iso-record *)"),
+        document.querySelector('a[href="#one-receivable"]'),
+      ];
+      return nodes.every((node, i) => i === 0 || Boolean(nodes[i - 1]!.compareDocumentPosition(node!) & Node.DOCUMENT_POSITION_FOLLOWING));
     });
-    expect(order).toBe(true);
-    // Tablet keeps the record last.
-    await page.setViewportSize({ width: 768, height: 1024 });
+    expect(inOrder).toBe(true);
+    // From 1200: the record beside the headline, the routes under the headline.
+    await page.setViewportSize({ width: 1376, height: 1032 });
     await page.goto("/");
-    expect(await top(".iso-record")).toBeGreaterThan(await top('a[href="#one-receivable"]'));
+    expect(Math.round(await top(".iso-record"))).toBe(Math.round(await top("main h1")));
+    await expect(page.locator("main h1 ~ p").first()).toBeHidden();
   });
 });
 
@@ -572,7 +580,7 @@ test.describe("pinned story (redraw step 3)", () => {
   });
 });
 
-test.describe("Kubar Protocol (build step 4)", () => {
+test.describe("Kubar Protocol (redraw step 4)", () => {
   test("carries its metadata, actions and the venue footnote", async ({ page }) => {
     await page.goto("/products/kubar-protocol");
     await expect(page).toHaveTitle("Kubar Protocol · Kubar Labs");
@@ -581,7 +589,42 @@ test.describe("Kubar Protocol (build step 4)", () => {
     await expect(page.getByRole("link", { name: "partnerships@kubar.tech" })).toHaveAttribute("href", "mailto:partnerships@kubar.tech");
     await expect(page.locator("#fn-1")).toHaveCount(1);
     await expect(page.getByText("Planned", { exact: true })).toHaveCount(1);
-    await expect(page.getByRole("heading", { level: 3 })).toHaveCount(10);
+    // Ten questions, the two halves of "How a programme runs" and the five parties of "Who holds what".
+    await expect(page.getByRole("heading", { level: 3 })).toHaveCount(17);
+  });
+
+  test("redraw: the limit drawing, one Illustrative, the sheet, the loop, the holders and the corridor", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/products/kubar-protocol");
+    // The hero's drawing is decoration; the page says Illustrative once, on the receivable sheet.
+    await expect(page.locator("main section").first().locator("svg[aria-hidden='true']").first()).toBeAttached();
+    await expect(page.getByRole("button", { name: "Illustrative" })).toHaveCount(1);
+    const sheet = page.locator("dl").filter({ hasText: "Face value" });
+    await expect(sheet.getByText("$225,000", { exact: true })).toBeVisible();
+    // The loop: five steps in order, no party tags; the line draws once in view.
+    const loop = page.locator(".programme-loop");
+    await expect(loop.locator("ol > li")).toHaveCount(5);
+    await expect(loop.locator("ol > li").first()).toContainText("The exporter, or its platform, submits the shipment");
+    await expect(loop.locator("ol > li").first()).not.toContainText("Exporter\n");
+    await expect(loop).toHaveAttribute("data-phase", "armed");
+    await loop.scrollIntoViewIfNeeded();
+    await expect(loop).toHaveAttribute("data-phase", "playing");
+    // A card only raises: a tap or click focuses it, Tab skips it.
+    const card = loop.locator(".loop-card").nth(2);
+    await expect(card).toHaveAttribute("tabindex", "-1");
+    // Who holds what: the financier is the petrol card.
+    await expect(page.locator('[data-ground="petrol"]').filter({ hasText: "You, the financier" })).toHaveCount(1);
+    // Programme 1: Next in a dashed box; the venue has no numbers.
+    await expect(page.locator("dl.border-dashed")).toContainText("Chemicals and pharmaceutical formulations");
+    await expect(page.locator("section", { has: page.getByRole("heading", { name: "The venue comes last." }) }).locator(".t-code")).toHaveCount(0);
+  });
+
+  test("nothing scrolls sideways from 1200 to 1440", async ({ page }) => {
+    for (const width of [1200, 1280, 1366, 1440]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto("/products/kubar-protocol");
+      expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth), `${width}`).toBe(0);
+    }
   });
 
   test("at 390 and 768 nothing scrolls sideways and axe is clean", async ({ page }) => {
