@@ -3,7 +3,7 @@
 Extracted from Figma, Kubar Protocol · 1440 (frame 167:6), 13 Nov 2026, in reading order, after the last status words were removed that night. Bracketed tags are text styles (../tokens/README.md). Header and footer: 00-header-footer.md.
 
 ## Hero
-[Label] Kubar Protocol · For banks, finance companies, insurers and funds      (kept: names who the page is for)
+(14 Nov: the kicker line above the headline is removed. REDRAW-2026-11-14.md, section 3.)
 [Display] Underwrite once. Buy every receivable that fits.
 [BodyL] Kubar runs the programme around your limit: origination, the evidence package, the data your insurer needs and the matching of every payment. You buy each receivable without recourse for the buyer’s credit, insured in your own name.
 [UI] Start a programme conversation                  (filled button → /contact?intent=institution)

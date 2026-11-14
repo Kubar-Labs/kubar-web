@@ -18,7 +18,7 @@ export function Terms({ columns, rows, className }: { columns: string[]; rows: [
       <thead role="rowgroup" className="max-lg:sr-only">
         <tr role="row" className="border-b-2 border-rule-strong">
           {columns.map((column) => (
-            <th key={column} role="columnheader" scope="col" className="t-tag pr-6 pb-2 font-medium text-ink-muted last:pr-0">{column}</th>
+            <th key={column} role="columnheader" scope="col" className="t-fine pr-6 pb-2 font-normal text-ink-muted last:pr-0">{column}</th>
           ))}
         </tr>
       </thead>

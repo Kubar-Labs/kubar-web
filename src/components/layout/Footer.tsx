@@ -63,7 +63,7 @@ export function Footer() {
         >
           {groups.map((group) => (
             <div key={group.label} className="flex flex-col gap-1">
-              <p className="t-tag pb-2 text-ink-muted">{group.label}</p>
+              <p className="t-fine pb-2 text-ink-muted">{group.label}</p>
               <ul className="flex flex-col gap-1">
                 {group.links.map((link) => (
                   <li key={link.href} className="flex">

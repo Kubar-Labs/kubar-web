@@ -226,20 +226,45 @@ test.describe("registers below desktop", () => {
 });
 
 test.describe("Home (build step 3, in progress)", () => {
-  test("footnote 1 has one target, reached from the headline and from the ledger", async ({ page }) => {
+  test("footnote 1 appears once, under the foundations, and every marker 1 links to it", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
     await expect(page.locator("#fn-1")).toHaveCount(1);
-    await expect(page.locator('a[href="#fn-1"]')).toHaveCount(2);
-    await page.locator("#fnref-1").click();
+    await expect(page.locator("#fn-1")).toContainText("Kubar’s own ITFS registration is targeted for 2027");
+    // REDRAW-2026-11-14.md 9.6: the status footnote sits under the foundations, not in the hero.
+    const foundationsY = (await page.getByRole("heading", { name: "An exchange needs more than a venue." }).boundingBox())!.y;
+    expect((await page.locator("#fn-1").boundingBox())!.y).toBeGreaterThan(foundationsY);
+    const markers = page.locator("a.footnote-marker", { hasText: "¹" });
+    expect(await markers.count()).toBeGreaterThan(2);
+    for (const marker of await markers.all()) await expect(marker).toHaveAttribute("href", "#fn-1");
+    // Back to text returns to whichever marker the reader followed.
+    await page.locator("#fnref-1-ledger").click();
     await expect(page).toHaveURL(/#fn-1$/);
+    await page.locator("#fn-1").getByRole("link", { name: "Back to text" }).click();
+    await expect(page).toHaveURL(/#fnref-1-ledger$/);
   });
 
-  test("at 390 the status footnote sits before the record, with no sideways scroll", async ({ page }) => {
+  test("How we estimate this opens footnote 2, and its marker opens it too", async ({ page }) => {
+    await page.goto("/");
+    const disclosure = page.locator("details", { hasText: "How we estimate this" });
+    await expect(disclosure).not.toHaveAttribute("open", "");
+    await expect(page.locator("#fn-2")).toBeHidden();
+    await expect(page.locator("#fn-3")).toBeVisible();
+    await page.getByText("How we estimate this").click();
+    await expect(page.locator("#fn-2")).toBeVisible();
+    await page.getByText("How we estimate this").click();
+    await expect(page.locator("#fn-2")).toBeHidden();
+    await page.locator("#fnref-2").click();
+    await expect(page.locator("#fn-2")).toBeVisible();
+    await expect(page.locator("#fn-2")).toBeFocused();
+  });
+
+  test("at 390 the hero carries no footnote, with no sideways scroll", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/");
     const footnoteY = (await page.locator("#fn-1").boundingBox())!.y;
     const recordY = (await page.getByText("Record RCV-0001").boundingBox())!.y;
-    expect(footnoteY).toBeLessThan(recordY);
+    expect(footnoteY).toBeGreaterThan(recordY);
     expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
     await page.emulateMedia({ reducedMotion: "reduce" });
     await expectNoAxeViolations(page);
@@ -449,7 +474,8 @@ test.describe("About (build step 4)", () => {
     await expect(portraits).toHaveCount(6);
     for (const img of await portraits.all()) {
       await img.scrollIntoViewIfNeeded();
-      await expect(img).toHaveJSProperty("complete", true);
+      // The first request for each size makes the optimiser transcode an 800 × 1000 PNG.
+      await expect(img).toHaveJSProperty("complete", true, { timeout: 15_000 });
       expect(await img.evaluate((el: HTMLImageElement) => el.naturalWidth)).toBeGreaterThan(0);
       expect(await img.evaluate((el: HTMLImageElement) => el.currentSrc)).toMatch(/\/_next\/image\?url=%2Fpeople%2F.+&w=\d+&q=75$/);
     }

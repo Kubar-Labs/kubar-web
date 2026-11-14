@@ -44,8 +44,31 @@ test.describe("what the site never shows", () => {
         () => [...document.querySelectorAll("main *, header *, footer *")].filter((el) => parseFloat(getComputedStyle(el).borderTopLeftRadius) > 0).length,
       );
       expect(rounded).toBe(0);
-      const shadows = await page.evaluate(() => [...document.querySelectorAll("main *, header *, footer *")].filter((el) => getComputedStyle(el).boxShadow !== "none").length);
-      expect(shadows).toBe(0);
+      // REDRAW-2026-11-14.md rule 5: no hairline between sections; the header keeps its own rule.
+      const ruled = await page.evaluate(() =>
+        [...document.querySelectorAll("main > section, main > div > section")].filter((el) => {
+          const style = getComputedStyle(el);
+          return parseFloat(style.borderBottomWidth) > 0 || parseFloat(style.borderTopWidth) > 0;
+        }).length,
+      );
+      expect(ruled).toBe(0);
+      // A shadow only as one of the three elevations (REDRAW-2026-11-14.md, section 2).
+      const strayShadows = await page.evaluate(() => {
+        const probe = document.createElement("div");
+        document.body.appendChild(probe);
+        const allowed = ["--elevation-1", "--elevation-2", "--elevation-3"].map((name) => {
+          probe.style.boxShadow = `var(${name})`;
+          return getComputedStyle(probe).boxShadow;
+        });
+        probe.remove();
+        return [...document.querySelectorAll("main *, header *, footer *")]
+          .map((el) => getComputedStyle(el).boxShadow)
+          .filter((shadow) => shadow !== "none" && !allowed.includes(shadow));
+      });
+      expect(strayShadows).toEqual([]);
+      // No kicker line above a page's headline (REDRAW-2026-11-14.md, section 3).
+      const beforeH1 = await page.evaluate(() => document.querySelector("main h1")?.previousElementSibling?.textContent ?? "");
+      expect(beforeH1).toBe("");
     });
   }
 
@@ -94,8 +117,14 @@ test.describe("keyboard", () => {
       await page.waitForTimeout(500); // abbreviations are marked after hydration
       const expected = await page.evaluate(
         () =>
-          [...document.querySelectorAll<HTMLElement>("a[href], button, input, select, textarea, [tabindex='0']")].filter(
-            (el) => el.getClientRects().length > 0 && el.tabIndex >= 0 && getComputedStyle(el).visibility !== "hidden" && !el.closest("[aria-hidden='true']"),
+          [...document.querySelectorAll<HTMLElement>("a[href], button, input, select, textarea, summary, [tabindex='0']")].filter(
+            (el) =>
+              el.getClientRects().length > 0 &&
+              el.tabIndex >= 0 &&
+              getComputedStyle(el).visibility !== "hidden" &&
+              !el.closest("[aria-hidden='true']") &&
+              // The content of a closed disclosure isn't rendered, so it isn't a stop.
+              !el.closest("details:not([open]) > :not(summary)"),
           ).length,
       );
       const seen = new Set<string>();

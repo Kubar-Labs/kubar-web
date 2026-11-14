@@ -28,7 +28,7 @@ export function EvidenceSources({
         {elements.map((item, i) => (
           <li key={item.element} className="absolute left-0 flex w-[519px] flex-col gap-0.5 py-2" style={{ top: 56 * i }}>
             <span className="t-body-sm text-ink">{item.element}</span>
-            <span className="t-tag text-ink-muted">{from(item.from)}</span>
+            <span className="t-fine text-ink-muted">{from(item.from)}</span>
           </li>
         ))}
       </ul>

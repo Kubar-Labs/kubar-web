@@ -236,7 +236,7 @@ export function Header({ copy }: { /** The "header" messages. */ copy: unknown }
         <DoubleRule />
         <nav aria-label={t("primaryNav")} className="page-container flex flex-col gap-8 pt-6 pb-10">
           <div>
-            <p className="t-tag pb-2 text-ink-muted">{t("products")}</p>
+            <p className="t-fine pb-2 text-ink-muted">{t("products")}</p>
             <ul>
               {products.map((product, index) => (
                 <li key={product.href} className={cn("border-t border-rule", index === products.length - 1 && "border-b")}>

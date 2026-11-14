@@ -3,7 +3,7 @@
 Extracted from Figma, How it works · 1440 (frame 172:6), 13 Nov 2026, in reading order. Bracketed tags are text styles (../tokens/README.md). Header and footer: 00-header-footer.md.
 
 ## Hero
-[Label] How it works
+(14 Nov: the kicker line above the headline is removed. REDRAW-2026-11-14.md, section 3.)
 [Display] From the port to the record.
 [BodyL] One illustrative receivable, followed step by step: who does what, the documents behind it and where the money moves. A $225k rice invoice to a buyer in the UAE, due 75 days after shipment.
 [Fine] Illustrative
@@ -48,7 +48,11 @@ At 768 and 390 the ledger ends with the line: Kubar is in the data path of every
 
 ## The evidence package  (the evidence stack; see Motion)
 [H2] Who relies on the record.
-[BodyL] The financier buys on it. The insurer prices on it. The exporter’s bank closes the shipping bill against it. And where the exporter qualifies, the government’s interest subvention is filed on it.
+(14 Nov: the lead is gone. Its four sentences are the four relying parties in the drawing, under the record, each with a dashed arrow down from it. The fourth is reworded to stand alone, approved in principle by Vaibhav on 14 Nov. REDRAW-2026-11-14.md, section 6.)
+[Body] The financier buys on it.
+[Body] The insurer prices on it.
+[Body] The exporter’s bank closes the shipping bill against it.
+[Body] The government’s interest subvention is filed on it, where the exporter qualifies.
 Eight document cards that lock into the record one after another (component "Evidence stack", 127:2464); the last card is open:
 [Code] Doc 01  [UI] Commercial invoice
 [Code] Doc 02  [UI] Shipping bill
@@ -84,7 +88,7 @@ Same drawing as Kubar Protocol (component "Money path", 120:1167):
 
 ## If a buyer doesn’t pay
 [H2] If a buyer doesn’t pay, the financier claims under its own policy.
-[BodyL] Kubar flags the late payment straight away, checks with the exporter for any dispute and sends the insurer the notices the policy requires. The financier, as the insured, lodges the claim with the evidence package behind it. The exporter answers only for its own side of the trade: disputes, returns, set-off, fraud and its warranties. Kubar holds none of the risk.
+(14 Nov: the paragraph beside the heading is cut; it repeated the flow. With no lead, the heading runs 800 wide at desktop.)
 A ruled register (component "If a buyer doesn’t pay", 133:2422), no boxes or arrows:
 [Tag] If a buyer doesn’t pay
 01 | Kubar | Flags the late payment straight away

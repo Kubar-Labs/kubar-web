@@ -128,7 +128,7 @@ export function StoryView({
                 {illustrative}
               </div>
               <p className="flex items-center gap-3 pt-4">
-                <span className="t-tag text-ink-muted">{t("stateLabel")}</span>
+                <span className="t-fine text-ink-muted">{t("stateLabel")}</span>
                 <span className="t-label text-ink-muted">{t("counter", { n: String(state).padStart(2, "0") })}</span>
               </p>
               <div key={state} className="story-fade flex flex-col">
@@ -142,18 +142,18 @@ export function StoryView({
                 <p className={cn("pt-4 text-ink", long ? "t-body" : "t-body-lg min-h-[90px]")}>{current.what}</p>
                 {long && current.documents ? (
                   <div className="flex flex-col gap-1 pt-3 pb-6">
-                    <p className="t-tag text-ink-muted">{t("documents")}</p>
+                    <p className="t-fine text-ink-muted">{t("documents")}</p>
                     <p className="t-body text-ink">{current.documents}</p>
                   </div>
                 ) : (
-                  <p className="t-tag pt-3 pb-6 text-ink-muted">
+                  <p className="t-fine pt-3 pb-6 text-ink-muted">
                     {t("party", { party: long ? (current.party ?? "") : planned ? t("planned") : (current.party ?? "") })}
                   </p>
                 )}
                 <div className="flex gap-3 border-t border-rule py-4">
                   <PathLine kind="data" />
                   <div className="flex min-w-0 flex-1 flex-col gap-2">
-                    <p className="t-tag text-ink">{t("dataPath")}</p>
+                    <p className="t-fine text-ink-muted">{t("dataPath")}</p>
                     <p className="t-body min-h-[26px] text-ink">{planned ? t("planned") : current.data}</p>
                   </div>
                 </div>
@@ -161,8 +161,8 @@ export function StoryView({
                   <PathLine kind="money" />
                   <div className="flex min-w-0 flex-1 flex-col gap-2">
                     <p className="flex items-center gap-2">
-                      <span className="t-tag text-ink">{t("moneyPath")}</span>
-                      <span className="t-label text-accent">{t("holdsNone")}</span>
+                      <span className="t-fine text-ink-muted">{t("moneyPath")}</span>
+                      <span className="t-fine text-accent">{t("holdsNone")}</span>
                     </p>
                     <p className={cn("t-body text-ink", !long && "min-h-[78px]")}>{money ?? "—"}</p>
                   </div>
@@ -173,21 +173,14 @@ export function StoryView({
                 <TextLink href={`#${skipTo}`} kind="anchor">{t("skip")}</TextLink>
                 {long ? null : <TextLink href="/how-it-works" kind="arrow">{t("seeHow")}</TextLink>}
               </div>
-              {long ? null : (
-              <ul aria-hidden="true" className="flex flex-col gap-3 pt-10">
-                <li className="flex items-center gap-3"><PathLine kind="data" /><span className="t-tag text-ink-muted">{t("legend.data")}</span></li>
-                <li className="flex items-center gap-3"><PathLine kind="money" /><span className="t-tag text-ink-muted">{t("legend.money")}</span></li>
-                <li className="flex items-center gap-3"><span className="h-3 w-7 bg-action" /><span className="t-tag text-ink-muted">{t("legend.kubar")}</span></li>
-              </ul>
-              )}
             </div>
             {long ? (
               <div className="flex flex-col">
                 <LanesDiagram state={state} parties={t.raw("parties") as string[]} labels={t.raw("lanes") as LaneLabels} />
               <ul aria-hidden="true" className="flex flex-wrap gap-x-8 gap-y-3 pt-6 pl-[45px]">
-                <li className="flex items-center gap-3"><PathLine kind="data" /><span className="t-tag text-ink-muted">{t("legend.data")}</span></li>
-                <li className="flex items-center gap-3"><PathLine kind="money" /><span className="t-tag text-ink-muted">{t("legend.money")}</span></li>
-                <li className="flex items-center gap-3"><span className="h-3 w-7 bg-action" /><span className="t-tag text-ink-muted">{t("legend.kubar")}</span></li>
+                <li className="flex items-center gap-3"><PathLine kind="data" /><span className="t-fine text-ink-muted">{t("legend.data")}</span></li>
+                <li className="flex items-center gap-3"><PathLine kind="money" /><span className="t-fine text-ink-muted">{t("legend.money")}</span></li>
+                <li className="flex items-center gap-3"><span className="h-3 w-7 bg-action" /><span className="t-fine text-ink-muted">{t("legend.kubar")}</span></li>
               </ul>
               </div>
             ) : (

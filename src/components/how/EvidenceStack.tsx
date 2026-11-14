@@ -27,6 +27,8 @@ export type EvidenceStackCopy = {
   counter: string;
   stateNo: string;
   state: string;
+  /** The four parties that rely on the record (14 Nov: the lead moved into the drawing). */
+  relying: string[];
   after: string[];
 };
 
@@ -91,7 +93,7 @@ export function EvidenceStack({
             </p>
             {i === last ? (
               <div className="flex flex-col gap-2 border-t border-rule px-4 py-3">
-                <p className="t-tag text-ink-muted">{copy.from}</p>
+                <p className="t-fine text-ink-muted">{copy.from}</p>
                 <p className="t-body text-ink">{copy.proves}</p>
               </div>
             ) : null}
@@ -120,7 +122,7 @@ export function EvidenceStack({
           ))}
         </ul>
         <p className="flex flex-wrap items-center gap-x-3 border-t border-rule pt-3">
-          <span className="t-tag text-ink-muted">{copy.stateLabel}</span>
+          <span className="t-fine text-ink-muted">{copy.stateLabel}</span>
           <span className="t-label text-ink-muted">{copy.counter}</span>
           <span className="flex items-baseline gap-2 text-accent">
             <span className="t-code">{copy.stateNo}</span>
@@ -129,6 +131,13 @@ export function EvidenceStack({
         </p>
       </div>
 
+      {/* The four relying parties, under the record (REDRAW-2026-11-14.md, How it works). The dashed
+          arrows down from the record come with the isometric stack in build step 5. */}
+      <ul className="grid gap-6 pt-10 md:grid-cols-2 lg:grid-cols-4">
+        {copy.relying.map((line) => (
+          <li key={line} className="t-body text-ink">{line}</li>
+        ))}
+      </ul>
       <div className="flex flex-col gap-3 pt-10 lg:w-[628px]">
         {copy.after.map((line) => (
           <p key={line} className="t-body-sm text-ink-muted">{line}</p>

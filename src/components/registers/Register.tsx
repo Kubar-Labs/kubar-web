@@ -49,7 +49,7 @@ function RegisterTable({ columns, widths, total, rows, first, stackLabels, hideH
       <thead role="rowgroup" className={hideHeads ? "sr-only" : "max-lg:sr-only"}>
         <tr role="row" className="border-b-2 border-rule-strong">
           {columns.map((column) => (
-            <th key={column} role="columnheader" scope="col" className="t-tag pr-6 pb-2 font-medium text-ink-muted last:pr-0">
+            <th key={column} role="columnheader" scope="col" className="t-fine pr-6 pb-2 font-normal text-ink-muted last:pr-0">
               {column}
             </th>
           ))}
@@ -72,14 +72,14 @@ function RegisterTable({ columns, widths, total, rows, first, stackLabels, hideH
                   key={c}
                   role="rowheader"
                   scope="row"
-                  className={cn("align-baseline font-medium lg:py-4 lg:pr-6", first === "name" ? "t-ui text-ink" : "t-tag text-ink-muted")}
+                  className={cn("align-baseline font-medium lg:py-4 lg:pr-6", first === "name" ? "t-ui text-ink" : "t-fine font-normal text-ink-muted")}
                 >
                   {cell}
                 </th>
               ) : (
                 <td key={c} role="cell" className="t-body-sm align-baseline text-ink lg:py-4 lg:pr-6 lg:last:pr-0">
                   {stackLabels ? (
-                    <span aria-hidden="true" className="t-tag block pb-1 text-ink-muted lg:hidden">
+                    <span aria-hidden="true" className="t-fine block pb-1 text-ink-muted lg:hidden">
                       {columns[c]}
                     </span>
                   ) : null}

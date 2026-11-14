@@ -13,13 +13,15 @@ import { Record } from "@/components/registers/Record";
 import { RouteRows, type Route } from "@/components/registers/RouteRows";
 import { Standing } from "@/components/registers/Standing";
 import { Footnote, FootnoteMarker } from "@/components/ui/Footnote";
+import { FootnoteDisclosure } from "@/components/ui/FootnoteDisclosure";
 import { TextLink } from "@/components/ui/TextLink";
 
 /*
  * Home (Figma 160:6 at 1440, 166:3363 at 768, 162:1295 at 390): the
- * reference page. Sections are joined by one hairline; the band is the one
- * petrol section. Footnote ¹ (the status line) sits under the hero and again
- * under Foundations first, as in the design.
+ * reference page. Sections are separated by space; the band is the one
+ * petrol section. Footnote ¹ (the status line) appears once, under
+ * Foundations first; every marker ¹ on the page links to it, the hero's
+ * included (REDRAW-2026-11-14.md, section 9.6).
  */
 const FN_STATUS = "fn-1";
 
@@ -30,10 +32,9 @@ export default function Home() {
 
   return (
     <>
-      {/* Hero. Desktop: display and routes (600) beside the record, the
-          footnote under both. Below desktop: display, subline, routes, the
-          anchor, the footnote (on the first screen), then the record. */}
-      <section className="border-b border-rule-strong">
+      {/* Hero. Desktop: display and routes (600) beside the record. Below
+          desktop: display, subline, routes, the anchor, then the record. */}
+      <section>
         <div className="page-container flex flex-col gap-6 pt-8 pb-12 lg:grid lg:grid-cols-[600px_minmax(0,1fr)] lg:items-start lg:gap-x-20 lg:gap-y-[72px] lg:pt-16 lg:pb-[72px]">
           <div className="flex flex-col gap-6 lg:gap-12">
             <h1 className="t-display text-ink">
@@ -48,9 +49,6 @@ export default function Home() {
               {t("followAnchor")}
             </TextLink>
           </div>
-          <Footnote n={1} id={FN_STATUS} backTo="fnref-1" className="lg:col-span-2 lg:row-start-2 lg:max-w-[628px]">
-            {footnotes("status")}
-          </Footnote>
           <Record className="min-w-0 lg:col-start-2 lg:row-start-1" />
         </div>
       </section>
@@ -65,7 +63,9 @@ export default function Home() {
             footnoteId={(n) => ({ target: `fn-${n}`, refId: `fnref-${n}` })}
           />
           <div className="flex flex-col gap-4 lg:max-w-[628px]">
-            <Footnote n={2} id="fn-2" backTo="fnref-2">{t("gap.footnote2")}</Footnote>
+            <FootnoteDisclosure summary={t("gap.estimateLink")}>
+              <Footnote n={2} id="fn-2" backTo="fnref-2">{t("gap.footnote2")}</Footnote>
+            </FootnoteDisclosure>
             <Footnote n={3} id="fn-3" backTo="fnref-3">{t("gap.footnote3")}</Footnote>
           </div>
         </div>
@@ -90,16 +90,16 @@ export default function Home() {
             exchangeHead={t("foundations.exchangeHead")}
             exchanges={t.raw("foundations.exchanges") as string[]}
             rows={t.raw("foundations.rows") as ComparisonRow[]}
-            footnote={(suffix) => ({ target: "fn-1-foundations", refId: `fnref-1-${suffix}` })}
+            footnote={(suffix) => ({ target: FN_STATUS, refId: `fnref-1-${suffix}` })}
           />
           <FoundationsStack
             className="lg:w-[543px] lg:shrink-0"
             label={t("foundations.stackLabel")}
             slabs={t.raw("foundations.slabs") as Slab[]}
-            footnote={(suffix) => ({ target: "fn-1-foundations", refId: `fnref-1-${suffix}` })}
+            footnote={(suffix) => ({ target: FN_STATUS, refId: `fnref-1-${suffix}` })}
           />
         </div>
-        <Footnote n={1} id="fn-1-foundations" backTo="fnref-1-stack-where" className="lg:max-w-[628px]">
+        <Footnote n={1} id={FN_STATUS} backTo="fnref-1" className="lg:max-w-[628px]">
           {footnotes("status")}
         </Footnote>
       </Section>
@@ -114,7 +114,7 @@ export default function Home() {
 
       <Section labelledBy="standing-heading" className="flex flex-col gap-10 lg:gap-16">
         <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-20">
-          <SectionHead id="standing-heading" heading={t("standing.heading")} lead={t("standing.lead")} layout="stacked" />
+          <SectionHead id="standing-heading" heading={t("standing.heading")} layout="stacked" />
           <Standing className="min-w-0 flex-1" />
         </div>
         <FinanceProgrammes />

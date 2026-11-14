@@ -17,7 +17,7 @@
   --rani-600: #AD2468;
   --rani-300: #F496BA;
   --rani-100: #F7E9F0;
-  --paper-100: #F7F7F5;
+  --paper-100: #FFFFFF; /* white from 14 Nov (REDRAW-2026-11-14.md, section 2) */
   --paper-200: #ECECE8;
   --white: #FFFFFF;
   --black: #000000;
@@ -48,8 +48,14 @@
   --font-sans: "Schibsted Grotesk", system-ui, sans-serif;
   --font-mono: "Geist Mono", ui-monospace, monospace;
 
+  /* Elevation (REDRAW-2026-11-14.md, section 2): a shadow means an object.
+     Raised surfaces are white with a 1 px --color-rule border; corners stay square. */
+  --elevation-1: 0 1px 2px rgb(2 39 50 / .08), 0 6px 16px rgb(2 39 50 / .08); /* resting */
+  --elevation-2: 0 2px 4px rgb(2 39 50 / .08), 0 14px 36px rgb(2 39 50 / .12); /* raised */
+  --elevation-3: 0 4px 8px rgb(2 39 50 / .08), 0 24px 56px rgb(2 39 50 / .16); /* lifted: the current sheet, the picked card */
+
   /* Type, mobile first */
-  --text-display: 46px; --text-display--line-height: 50px;
+  --text-display: 40px; --text-display--line-height: 44px; /* phone 40/44 from 14 Nov */
   --text-h2: 30px; --text-h2--line-height: 36px;
   --text-h3: 24px; --text-h3--line-height: 30px;
   --text-h4: 19px; --text-h4--line-height: 25px;
@@ -128,6 +134,7 @@
     --text-line: 48px; --text-line--line-height: 58px;
     --text-lead: 30px; --text-lead--line-height: 40px;
     --text-figure: 56px; --text-figure--line-height: 60px;
+    --text-figure-lg: 96px; --text-figure-lg--line-height: 100px; /* Mono/Figure large: desktop only, once (Home, "About $80bn") */
     --text-record: 19px; --text-record--line-height: 27px;
     --text-body-lg: 20px; --text-body-lg--line-height: 30px;
     --text-body: 17px; --text-body--line-height: 26px;

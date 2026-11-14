@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils";
  * Technology: the mark with its name centred under it (Sans/Fine, at most
  * 160 wide); seven across at desktop, two per row below.
  */
-type FinanceEntry = { id: string; name: string; kind: string };
+type FinanceEntry = { id: string; name: string };
 type TechEntry = { id: string; name: string };
 
 export function FinanceProgrammes({ className }: { className?: string }) {
@@ -31,10 +31,7 @@ export function FinanceProgrammes({ className }: { className?: string }) {
             <li key={entry.id} className="flex items-center gap-4 border-b border-rule py-3 lg:gap-6">
               <ProgrammeMark id={entry.id} name={entry.name} className="lg:hidden" scale={120 / 176} />
               <ProgrammeMark id={entry.id} name={entry.name} className="hidden lg:block" />
-              <span className="flex min-w-0 flex-1 flex-col gap-0.5 lg:flex-row lg:items-center lg:gap-6">
-                <span className="t-ui flex-1 text-ink">{entry.name}</span>
-                <span className="t-tag whitespace-nowrap text-ink-muted">{entry.kind}</span>
-              </span>
+              <span className="t-ui min-w-0 flex-1 text-ink">{entry.name}</span>
             </li>
           ))}
         </ul>
@@ -48,7 +45,7 @@ export function TechnologyProgrammes({ className }: { className?: string }) {
   const entries = t.raw("technology") as TechEntry[];
   return (
     <div className={cn("flex flex-col gap-8 lg:gap-10", className)}>
-      <p className="t-label text-ink-muted">{t("technologyLabel")}</p>
+      <p className="t-fine text-ink-muted">{t("technologyLabel")}</p>
       <ul className="grid grid-cols-[repeat(2,minmax(0,167px))] gap-4 md:grid-cols-[repeat(auto-fill,167px)] lg:grid-cols-[repeat(7,176px)] lg:gap-x-2 lg:gap-y-8">
         {entries.map((entry) => (
           <li key={entry.id} className="flex flex-col items-center gap-2">

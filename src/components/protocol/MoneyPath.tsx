@@ -62,7 +62,7 @@ export function MoneyPath({
         <p className={cn("t-body-sm absolute bottom-[240px] left-[536px] text-ink", wide ? "w-[309px]" : "w-[264px]")}>{payments[0]}</p>
         <p className="t-body-sm absolute bottom-[160px] left-[325px] w-[200px] text-ink">{payments[1]}</p>
         <p className={cn("t-body-sm absolute bottom-[80px] left-[536px] text-ink", wide ? "w-[309px]" : "w-[264px]")}>{payments[2]}</p>
-        <p className="t-tag absolute top-[218px] left-[21px] w-[178px] text-accent">{kubarNote}</p>
+        <p className="t-fine absolute top-[218px] left-[21px] w-[178px] text-accent">{kubarNote}</p>
       </div>
       {/* Below desktop (Figma 120:1141): the three payments as a register,
           each with its from and to on one line. */}
@@ -78,8 +78,8 @@ export function MoneyPath({
           {payments.map((payment, i) => (
             <tr key={payment} role="row" className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-rule py-4">
               <th role="rowheader" scope="row" className="t-body-sm w-full font-normal text-ink">{payment}</th>
-              <td role="cell" className="t-tag text-ink">{parties[routes[i][0]]}</td>
-              <td role="cell" className="t-tag flex items-center gap-3 text-ink">
+              <td role="cell" className="t-fine text-ink-muted">{parties[routes[i][0]]}</td>
+              <td role="cell" className="t-fine flex items-center gap-3 text-ink-muted">
                 <svg width="28" height="14" viewBox="0 0 28 14" aria-hidden="true" className="shrink-0 text-ink">
                   <g fill="currentColor">
                     <rect x="0" y="6" width="19" height="2" />
@@ -92,7 +92,7 @@ export function MoneyPath({
           ))}
         </tbody>
       </table>
-      <p className="t-tag border-b-2 border-rule-strong py-4 text-accent lg:hidden">
+      <p className="t-fine border-b-2 border-rule-strong py-4 text-accent lg:hidden">
         {parties[0]}: {kubarNote}
       </p>
       <p className="t-body-sm pt-4 text-ink-muted lg:pt-0">{under}</p>

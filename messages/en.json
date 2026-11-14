@@ -69,8 +69,7 @@
       "heading": "Follow one receivable from shipment to settlement."
     },
     "standing": {
-      "heading": "Standing and memberships.",
-      "lead": "Kubar acts as the financier’s origination and servicing agent. It never holds the money or the credit risk."
+      "heading": "Standing and memberships."
     },
     "gap": {
       "heading": "The missing piece isn’t capital.",
@@ -92,7 +91,8 @@
       "scaleNote": "Drawn to scale. $126.92M is about 0.16% of the bar above.",
       "scaleAlt": "A bar for about $80bn a year above a hairline for $126.92M in total, drawn to the same scale.",
       "footnote2": "Kubar’s estimate: India’s merchandise exports in FY 2025–26, $441.78bn (Ministry of Commerce and Industry), × 75% on open-account terms (Kubar’s planning assumption) × 48.55%, the share of MSME-related products in merchandise exports in 2024–25 (Ministry of MSME, in Parliament) × 50% financeable after screens for tenor, insurable buyers and related parties (Kubar’s planning assumption).",
-      "footnote3": "IFSCA Bulletin, April–June 2026: ITFS transactions in IFSC reached 2,857, with a total value of $126.92M, as of June 2026."
+      "footnote3": "IFSCA Bulletin, April–June 2026: ITFS transactions in IFSC reached 2,857, with a total value of $126.92M, as of June 2026.",
+      "estimateLink": "How we estimate this"
     },
     "band": {
       "line": "Kubar is in the data path of every step and in the money path of none.",
@@ -118,14 +118,6 @@
           "footnoteOnLast": true
         },
         {
-          "label": "The public",
-          "cells": [
-            "Not admitted",
-            "Not admitted",
-            "Not admitted"
-          ]
-        },
-        {
           "label": "Today",
           "cells": [
             "Running",
@@ -140,28 +132,24 @@
         {
           "name": "The venue, last",
           "line": "An ITFS for institutional financiers only, with Kubar as its neutral operator",
-          "where": "State 08 · Planned",
+          "where": "Planned",
           "planned": true
         },
         {
           "name": "A record of performance",
-          "line": "Every receivable that settles adds to a priced loss history",
-          "where": "State 07"
+          "line": "Every receivable that settles adds to a priced loss history"
         },
         {
           "name": "A clean payment path",
-          "line": "The buyer pays the financier’s account; the exporter’s bank closes the shipping bill",
-          "where": "State 06"
+          "line": "The buyer pays the financier’s account; the exporter’s bank closes the shipping bill"
         },
         {
           "name": "Standing buyers",
-          "line": "A financier underwrites a programme once and buys every receivable that fits inside its limit",
-          "where": "State 05"
+          "line": "A financier underwrites a programme once and buys every receivable that fits inside its limit"
         },
         {
           "name": "A common standard for what qualifies",
-          "line": "Every receivable has a shipping bill, an invoice that names the financier’s account, a buyer on an approved insurance limit and the buyer’s acknowledgement",
-          "where": "States 02 · 03 · 04"
+          "line": "Every receivable has a shipping bill, an invoice that names the financier’s account, a buyer on an approved insurance limit and the buyer’s acknowledgement"
         }
       ]
     },
@@ -323,7 +311,7 @@
   },
   "record": {
     "title": "Record RCV-0001",
-    "summary": "$225,000 rice invoice to a buyer in the UAE, due 75 days after shipment. 90% of face paid at purchase; the balance, less the financier’s discount and charges, when the buyer pays.",
+    "summary": "$225,000 rice invoice to a buyer in the UAE, due 75 days after shipment.",
     "description": "Illustrative record of one export receivable: six documents filed; state 05 of 8, purchased.",
     "columns": {
       "no": "No.",
@@ -377,8 +365,6 @@
       }
     ],
     "provesLabel": "Proves",
-    "stateLabel": "State",
-    "counter": "05 of 08",
     "currentState": "05 Purchased"
   },
   "ledger": {
@@ -488,33 +474,27 @@
     "finance": [
       {
         "id": "gift-ifih",
-        "name": "GIFT IFIH Young Builders Program",
-        "kind": "Programme"
+        "name": "GIFT IFIH Young Builders Program"
       },
       {
         "id": "bharatnetra",
-        "name": "BharatNetra Startup Accelerator (GFTN)",
-        "kind": "Accelerator"
+        "name": "BharatNetra Startup Accelerator (GFTN)"
       },
       {
         "id": "stpi-finglobe",
-        "name": "STPI FinGlobe",
-        "kind": "Incubation"
+        "name": "STPI FinGlobe"
       },
       {
         "id": "meity-startup-hub",
-        "name": "MeitY GENESIS Entrepreneur in Residence",
-        "kind": "Residency"
+        "name": "MeitY GENESIS Entrepreneur in Residence"
       },
       {
         "id": "t-hub",
-        "name": "T-Hub, RubriX Cohort 5",
-        "kind": "Incubation"
+        "name": "T-Hub, RubriX Cohort 5"
       },
       {
         "id": "pusa-krishi",
-        "name": "Pusa Krishi Incubation Programme 2026–27",
-        "kind": "Incubation"
+        "name": "Pusa Krishi Incubation Programme 2026–27"
       }
     ],
     "technologyLabel": "Technology programmes, grants and credits",
@@ -622,7 +602,6 @@
       "description": "Underwrite once, then buy every export receivable that fits: without recourse for the buyer’s credit, insured in your name, with the evidence behind each one."
     },
     "hero": {
-      "kicker": "Kubar Protocol · For banks, finance companies, insurers and funds",
       "headline": "Underwrite once. Buy every receivable that fits.",
       "sub": "Kubar runs the programme around your limit: origination, the evidence package, the data your insurer needs and the matching of every payment. You buy each receivable without recourse for the buyer’s credit, insured in your own name.",
       "button": "Start a programme conversation",
@@ -1090,7 +1069,6 @@
       "description": "Embed NavDhan SDK so your exporters can finance their export receivables inside your platform. Financiers buy; Kubar runs the programme."
     },
     "hero": {
-      "kicker": "NavDhan SDK · For trade platforms and marketplaces",
       "headline": "Trade finance inside the software your exporters already use.",
       "sub": "Embed NavDhan SDK and your exporters can check eligibility, apply and be paid for their export receivables without leaving your platform. Financiers buy; Kubar runs the programme; you keep the relationship.",
       "button": "Talk about an integration"
@@ -1237,7 +1215,6 @@
       "description": "Follow one illustrative export receivable from shipment to settlement: who does what, the documents behind each step and where the money moves."
     },
     "hero": {
-      "kicker": "How it works",
       "headline": "From the port to the record.",
       "sub": "One illustrative receivable, followed step by step: who does what, the documents behind it and where the money moves. A $225k rice invoice to a buyer in the UAE, due 75 days after shipment.",
       "institutions": "For financial institutions",
@@ -1323,7 +1300,6 @@
     },
     "evidence": {
       "heading": "Who relies on the record.",
-      "lead": "The financier buys on it. The insurer prices on it. The exporter’s bank closes the shipping bill against it. And where the exporter qualifies, the government’s interest subvention is filed on it.",
       "docLabel": "Doc {no}",
       "documents": [
         {
@@ -1379,6 +1355,12 @@
       "after": [
         "Each element carries its source, its time and who signed it. Any change after signing shows.",
         "The record is built on Corda, a permissioned ledger: one shared record of each receivable, who holds which rights after the purchase, and its payment and loss history."
+      ],
+      "relying": [
+        "The financier buys on it.",
+        "The insurer prices on it.",
+        "The exporter’s bank closes the shipping bill against it.",
+        "The government’s interest subvention is filed on it, where the exporter qualifies."
       ]
     },
     "money": {
@@ -1405,7 +1387,6 @@
     },
     "unpaid": {
       "heading": "If a buyer doesn’t pay, the financier claims under its own policy.",
-      "lead": "Kubar flags the late payment straight away, checks with the exporter for any dispute and sends the insurer the notices the policy requires. The financier, as the insured, lodges the claim with the evidence package behind it. The exporter answers only for its own side of the trade: disputes, returns, set-off, fraud and its warranties. Kubar holds none of the risk.",
       "title": "If a buyer doesn’t pay",
       "columns": {
         "no": "No.",
@@ -1607,7 +1588,6 @@
       "description": "Kubar Labs is building the institutional exchange for cross-border trade finance, foundations first. The team and our standing."
     },
     "hero": {
-      "kicker": "About Kubar Labs",
       "headline": "Foundations first.",
       "sub": "Kubar Labs is building the institutional exchange<marker></marker> for cross-border trade finance, from GIFT City. We started with the asset: export receivables an international financier can buy again and again, insured in its own name. A venue needs something financiers will bid on, so we build that first: receivables with cover, documents, a clean payment path and a history."
     },

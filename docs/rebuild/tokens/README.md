@@ -10,29 +10,30 @@ Two modes. **Paper** is the default for every page. **Petrol** is only the band 
 
 Rules that come with the palette:
 - Rani (`--color-accent`) marks what a reader must not miss: footnote markers, the current state, "Illustrative", errors, the current-row marker. Never a button, never decoration, never the logo.
-- Every corner is square (`--radius-none`). No shadows anywhere.
+- Every corner is square (`--radius-none`). Three elevation shadows (`--elevation-1` resting, `--elevation-2` raised, `--elevation-3` lifted), only where REDRAW-2026-11-14.md names an object: a shadow means an object, never a way to group text.
 - Hairlines (`--color-rule`) are decorative; a control's boundary is always `--color-rule-control`.
 
 ## Type
 
 Three families, self-hosted as woff2 (production builds use local font files; see AGENTS.md):
-- **Newsreader** (serif): the display headline, the band's line, the record's summary. Regular only. Check optical sizing in the browser (Newsreader has an `opsz` axis; the display should use the large optical size).
+- **Newsreader** (serif): only the sentence inside a record (`Serif/Record`). Regular only. Since 14 Nov the display headline and the band's line are Schibsted Grotesk Medium.
 - **Schibsted Grotesk** (sans): headings (Medium 500), body (Regular 400), UI (Medium 500).
-- **Geist Mono** (mono): labels, tags, codes, figures, status words. Regular and Medium. Already in `src/app/fonts/geist-mono-latin.woff2`.
+- **Geist Mono** (mono): only where it carries a reference: identifiers, numbers in a sequence, states and counters, figures, the "Drawn to scale" caption and the timeline's day labels (REDRAW-2026-11-14.md, section 9.1). Every other small label is `Sans/Fine`. Regular and Medium.
 
-Budget: fonts 300 KB or less in total, two preloaded (Newsreader for the display, Schibsted Grotesk Regular). Subset to Latin.
+Budget: fonts 300 KB or less in total, two preloaded (Schibsted Grotesk and Geist Mono since 14 Nov; Newsreader loads on demand for the record). Subset to Latin.
 
 Text styles, and the short tags used in `../copy/*.md`:
 
 | Tag | Figma style | Family, weight | Size / line height (desktop · tablet · mobile) | Tracking, case |
 |---|---|---|---|---|
-| Display | Serif/Display | Newsreader 400 | 56/60 · 48/52 · 46/50 | -0.02em |
+| Display | Heading/Display | Schibsted 500 | 56/60 · 48/52 · 40/44 | -0.02em |
 | H2 | Heading/H2 | Schibsted 500 | 44/50 · 36/42 · 30/36 | -0.01em |
 | H3 | Heading/H3 | Schibsted 500 | 28/34 · 26/32 · 24/30 | -0.005em |
 | H4 | Heading/H4 | Schibsted 500 | 22/28 · 20/26 · 19/25 | 0 |
-| Line | Serif/Line | Newsreader 400 | 48/58 · 36/44 · 28/36 | 0, roman |
+| Line | Heading/Line | Schibsted 500 | 48/58 · 36/44 · 28/36 | -0.01em |
 | Lead | Sans/Lead | Schibsted 400 | 30/40 · 26/36 · 22/30 | 0 |
 | Figure | Mono/Figure | Geist Mono 400 | 56/60 · 46/50 · 36/40 | -0.02em, tabular-nums |
+| Figure large | Mono/Figure large | Geist Mono 400 | 96/100, desktop only | -0.03em, tabular-nums |
 | Record | Serif/Record | Newsreader 400 | 19/27 · 18/26 · 17/25 | 0 |
 | BodyL | Sans/Body large | Schibsted 400 | 20/30 · 19/29 · 18/28 | 0 |
 | Body | Sans/Body | Schibsted 400 | 17/26 · 17/26 · 16/25 | 0 |
@@ -50,7 +51,7 @@ Text styles, and the short tags used in `../copy/*.md`:
 
 No italics anywhere. Mono capitals only for State (status words in the record and ledger). Labels never carry section numbers and never sit above a heading.
 
-**Tablet display size: decided.** Vaibhav chose 48/52 at tablet on 13 Nov 2026 (the Figma variable still says 64/68). tokens.css carries 48/52.
+**Display sizes: decided.** Phone 40/44 from 14 Nov (REDRAW-2026-11-14.md). Vaibhav chose 48/52 at tablet on 13 Nov 2026 (the Figma variable still says 64/68). tokens.css carries 48/52.
 
 ## Layout
 

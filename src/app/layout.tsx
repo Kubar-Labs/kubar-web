@@ -4,6 +4,7 @@ import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { SkipLink } from "@/components/layout/SkipLink";
 import { AbbreviationTips } from "@/components/ui/AbbreviationTips";
+import { FootnoteLinks } from "@/components/ui/FootnoteLinks";
 import { organisationLogo, socialImage } from "@/app/page-metadata";
 import { fontVariables } from "./fonts";
 import "./globals.css";
@@ -89,6 +90,7 @@ export default async function RootLayout({
         </main>
         <Footer />
         <AbbreviationTips expansions={abbreviations} />
+        <FootnoteLinks />
         {agentationToolbar}
       </body>
     </html>

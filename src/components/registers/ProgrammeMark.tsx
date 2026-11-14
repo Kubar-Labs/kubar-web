@@ -9,14 +9,15 @@ import { cn } from "@/lib/utils";
  * ink (a vector is still to come), so it takes --color-partner-mark.
  * Alt is the programme's name as written in its row (HANDOFF section 8).
  */
-type Mark = { width: number; height: number; mask?: { left: number; top: number } };
+/** `mask`: the mark is a raster drawn as an alpha mask over ink (T-Hub). */
+type Mark = { width: number; height: number; mask?: boolean };
 
 export const PROGRAMME_MARKS: Record<string, Mark> = {
   "gift-ifih": { width: 83.3, height: 27.5 },
   bharatnetra: { width: 110.3, height: 22 },
   "stpi-finglobe": { width: 78.7, height: 31.7 },
   "meity-startup-hub": { width: 90.4, height: 35 },
-  "t-hub": { width: 58, height: 48, mask: { left: 13, top: 8 } },
+  "t-hub": { width: 58, height: 48, mask: true },
   "pusa-krishi": { width: 101.2, height: 29.7 },
   google: { width: 83, height: 26.6 },
   nvidia: { width: 102.4, height: 19.8 },
@@ -61,8 +62,9 @@ export function ProgrammeMark({ id, name, scale = 1, boxWidth, className }: Prog
           aria-label={name}
           className="absolute bg-partner-mark"
           style={{
-            left: mark.mask.left * scale,
-            top: mark.mask.top * scale,
+            // Centred in its box like every other mark (REDRAW-2026-11-14.md, section 3).
+            left: (width - w) / 2,
+            top: (height - h) / 2,
             width: w,
             height: h,
             maskImage: `url(/programmes/${id}.png)`,

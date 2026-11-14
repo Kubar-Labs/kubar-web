@@ -3,7 +3,7 @@
 Extracted from Figma, About · 1440 (frame 173:6), 13 Nov 2026, in reading order. Bracketed tags are text styles (../tokens/README.md). Header and footer: 00-header-footer.md. The "Where we are" section is removed and must not be built.
 
 ## Hero
-[Label] About Kubar Labs
+(14 Nov: the kicker line above the headline is removed. REDRAW-2026-11-14.md, section 3.)
 [Display] Foundations first.
 [BodyL] Kubar Labs is building the institutional exchange¹ for cross-border trade finance, from GIFT City. We started with the asset: export receivables an international financier can buy again and again, insured in its own name. A venue needs something financiers will bid on, so we build that first: receivables with cover, documents, a clean payment path and a history.
 [Fine] ¹ Kubar’s own ITFS registration is targeted for 2027; until then Kubar acts as the financier’s origination and servicing agent.
@@ -46,7 +46,7 @@ Sandbox | Priority entry to the IFSCA FinTech Innovation Sandbox through GIFT IF
 Membership | Member of FACE, an RBI-recognised self-regulatory organisation for fintech
 Award | FinVision Award for Most Innovative Startup in Fintech, FinTech Edge 2026, NIBM Pune
 Award | Winner, Popular Choice Award, Startup Mahakumbh 2025
-Programme rows (logo, name, kind): GIFT IFIH Young Builders Program (Programme) · BharatNetra Startup Accelerator (GFTN) (Accelerator) · STPI FinGlobe (Incubation) · MeitY GENESIS Entrepreneur in Residence (Residency) · T-Hub, RubriX Cohort 5 (Incubation) · Pusa Krishi Incubation Programme 2026–27 (Incubation)
+Programme marks (logo and name, no kind labels from 14 Nov): GIFT IFIH Young Builders Program · BharatNetra Startup Accelerator (GFTN) · STPI FinGlobe · MeitY GENESIS Entrepreneur in Residence · T-Hub, RubriX Cohort 5 · Pusa Krishi Incubation Programme 2026–27
 [Label] Technology programmes, grants and credits, then the fourteen technology entries exactly as on Home (copy/01-home.md).
 
 ## GIFT City

@@ -61,7 +61,7 @@ export function LegalPage({ copy }: { copy: LegalCopy }) {
       </div>
       <div className="flex flex-col gap-10 pt-10 lg:flex-row lg:items-start lg:gap-6 lg:pt-16">
         <nav aria-labelledby="contents-heading" className="lg:sticky lg:top-[calc(var(--header-height)+24px)] lg:w-[302px] lg:shrink-0">
-          <h2 id="contents-heading" className="t-tag pb-3 text-ink-muted">{copy.contents}</h2>
+          <h2 id="contents-heading" className="t-fine pb-3 text-ink-muted">{copy.contents}</h2>
           <ol className="flex flex-col gap-1">
             {copy.sections.map((section) => (
               <li key={section.n}>

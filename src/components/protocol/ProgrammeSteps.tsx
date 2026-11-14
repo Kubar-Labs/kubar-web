@@ -25,7 +25,7 @@ export function ProgrammeSteps({
 }) {
   return (
     <table className={cn("w-full border-collapse text-left", className)}>
-      <caption className="t-tag border-b-2 border-rule-strong pb-3 text-left text-ink-muted">{heading}</caption>
+      <caption className="t-fine border-b-2 border-rule-strong pb-3 text-left text-ink-muted">{heading}</caption>
       <thead className="sr-only">
         <tr>
           <th scope="col">{columns.no}</th>
@@ -43,7 +43,7 @@ export function ProgrammeSteps({
                 <span className="mt-2 block border-l-2 border-accent pl-3">{note.text}</span>
               ) : null}
             </th>
-            <td className="t-tag w-[112px] py-4 align-top text-ink-muted lg:w-auto">{step.who}</td>
+            <td className="t-fine w-[112px] py-4 align-top text-ink-muted lg:w-auto">{step.who}</td>
           </tr>
         ))}
       </tbody>

@@ -28,14 +28,14 @@ export function MoneyTimeline({ copy, className }: { copy: TimelineCopy; classNa
     <div className={className}>
       {/* Desktop: the drawing. */}
       <div role="img" aria-label={copy.alt} className="relative hidden h-[590px] w-[737px] lg:block">
-        <p className="t-tag absolute top-0 left-0 text-ink-muted">{copy.title}</p>
-        <p className="t-label absolute -top-1 right-0 text-accent">{copy.holdsNone}</p>
+        <p className="t-fine absolute top-0 left-0 text-ink-muted">{copy.title}</p>
+        <p className="t-fine absolute -top-1 right-0 text-accent">{copy.holdsNone}</p>
         <span className={guide} style={{ left: 90 }} />
         <span className={guide} style={{ left: 153 }} />
         <span className={guide} style={{ left: 680 }} />
         <span className="absolute top-[280px] left-5 h-px w-[717px] bg-rule-strong" />
-        <p className="t-tag absolute top-[258px] left-0 text-ink-muted">{copy.received}</p>
-        <p className="t-tag absolute top-[290px] left-0 text-ink-muted">{copy.paidOut}</p>
+        <p className="t-fine absolute top-[256px] left-0 text-ink-muted">{copy.received}</p>
+        <p className="t-fine absolute top-[288px] left-0 text-ink-muted">{copy.paidOut}</p>
         <span className="absolute top-[281px] left-[139px] h-[182px] w-7 bg-ink" />
         <span className="absolute top-[78px] left-[666px] h-[203px] w-7 bg-ink" />
         <span className="absolute top-[281px] left-[700px] h-5 w-7 border border-dashed border-ink-muted" />
@@ -55,13 +55,13 @@ export function MoneyTimeline({ copy, className }: { copy: TimelineCopy; classNa
       {/* Below desktop: the same words as a stacked register. */}
       <div className="lg:hidden">
         <div className="flex items-baseline justify-between gap-4 border-b-2 border-rule-strong pb-2">
-          <p className="t-tag text-ink-muted">{copy.title}</p>
-          <p className="t-label text-accent">{copy.holdsNone}</p>
+          <p className="t-fine text-ink-muted">{copy.title}</p>
+          <p className="t-fine text-accent">{copy.holdsNone}</p>
         </div>
         <dl>
           {stacked.map(([label, text], i) => (
             <div key={label} className={cn("flex flex-col gap-1 py-4", i === stacked.length - 1 ? "border-b-2 border-rule-strong" : "border-b border-rule")}>
-              <dt className="t-tag text-ink-muted">{label}</dt>
+              <dt className="t-fine text-ink-muted">{label}</dt>
               <dd className="t-body-sm text-ink">{text}</dd>
             </div>
           ))}

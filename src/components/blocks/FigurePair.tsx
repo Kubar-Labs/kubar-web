@@ -23,7 +23,7 @@ export function FigurePair({ figures, scaleNote, scaleAlt, footnoteId }: FigureP
       <dl className="flex flex-col gap-10 lg:flex-row lg:gap-6">
         {figures.map((figure) => (
           <div key={figure.figure} className="flex flex-1 flex-col gap-3 border-t-2 border-rule-strong pt-5">
-            <dt className="t-tag text-ink-muted">{figure.period}</dt>
+            <dt className="t-fine text-ink-muted">{figure.period}</dt>
             <dd className="flex flex-col gap-3">
               <span className="t-figure whitespace-nowrap text-ink">{figure.figure}</span>
               <span className="t-body-sm text-ink-muted">

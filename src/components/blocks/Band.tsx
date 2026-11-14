@@ -14,7 +14,7 @@ type BandProps = { id?: string; line: string; link?: { label: string; href: stri
 export function Band({ id, line, link, ground = "petrol" }: BandProps) {
   const paper = ground === "paper";
   return (
-    <section id={id} data-ground={paper ? undefined : "petrol"} className={paper ? "border-b border-rule-strong" : undefined}>
+    <section id={id} data-ground={paper ? undefined : "petrol"}>
       <div className={paper ? "page-container py-(--section-space)" : "page-container py-(--band-space)"}>
         <div className="flex gap-5 lg:gap-8">
           <span aria-hidden="true" className="w-0.5 shrink-0 bg-accent" />

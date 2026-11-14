@@ -27,19 +27,19 @@ export function EmbedSketch({ copy }: { copy: SketchCopy }) {
   return (
     <div className="flex flex-col border border-rule-strong bg-raised lg:w-[519px]">
       <div className="flex items-center justify-between gap-3 border-b border-rule px-4 py-3">
-        <p className="t-tag text-ink-muted">{copy.platform}</p>
+        <p className="t-fine text-ink-muted">{copy.platform}</p>
         <Illustrative />
       </div>
       <div role="img" aria-label={copy.alt} className="flex items-stretch">
         <div className="hidden w-[170px] shrink-0 flex-col border-r border-rule p-4 lg:flex">
-          <p className="t-tag pb-2 text-ink-muted">{copy.shipment}</p>
+          <p className="t-fine pb-2 text-ink-muted">{copy.shipment}</p>
           {copy.records.map((record) => (
             <p key={record} className="t-body-sm border-b border-rule py-2 text-ink">{record}</p>
           ))}
         </div>
         <div className="min-w-0 flex-1 p-4">
           <div className="flex flex-col gap-3 border border-rule-strong bg-page p-4">
-            <p className="t-tag text-ink">{copy.sdk}</p>
+            <p className="t-fine text-ink">{copy.sdk}</p>
             <div className="flex flex-col gap-2">
               <p className="t-ui-sm text-ink">{copy.eligibility}</p>
               <ul className="flex flex-wrap gap-x-4 gap-y-2">

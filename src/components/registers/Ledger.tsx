@@ -62,7 +62,7 @@ export function Ledger({ current = "05", footnote, states: ownStates, className 
   const states = ownStates ?? (t.raw("states") as State[]);
   const last = states.length - 1;
   const cell = "align-baseline lg:py-4 lg:pr-4 lg:last:pr-0";
-  const mobileLabel = "t-tag lg:hidden";
+  const mobileLabel = "t-fine lg:hidden";
 
   return (
     <table role="table" className={cn("w-full table-fixed border-collapse text-left max-lg:block", className)}>
@@ -81,7 +81,7 @@ export function Ledger({ current = "05", footnote, states: ownStates, className 
               key={key}
               role="columnheader"
               scope="col"
-              className={cn("t-tag pr-4 pb-2 font-medium last:pr-0", key === "dataPath" ? "text-accent" : "text-ink-muted")}
+              className={cn("t-fine pr-4 pb-2 font-normal last:pr-0", key === "dataPath" ? "text-accent" : "text-ink-muted")}
             >
               {t(`columns.${key}`)}
             </th>
@@ -126,7 +126,7 @@ export function Ledger({ current = "05", footnote, states: ownStates, className 
                 className={cn(
                   cell,
                   "max-lg:col-start-2",
-                  isPlanned ? "t-state text-ink-muted" : "t-tag text-ink-muted",
+                  isPlanned ? "t-state text-ink-muted" : "t-fine text-ink-muted",
                 )}
               >
                 {isPlanned ? (row.party ?? t("planned")) : row.party}

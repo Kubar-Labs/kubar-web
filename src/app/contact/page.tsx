@@ -24,7 +24,7 @@ export default function Contact() {
 
   return (
     <>
-      <section className="border-b border-rule-strong">
+      <section>
         <div className="page-container flex flex-col gap-10 pt-8 pb-12 lg:gap-16 lg:pt-16 lg:pb-[72px]">
           <div className="flex flex-col gap-8">
             <h1 className="t-display text-ink">{t("hero.headline")}</h1>
@@ -45,7 +45,7 @@ export default function Contact() {
       </Section>
 
       <Section labelledBy="direct-heading" className="flex flex-col gap-10 lg:gap-16">
-        <h2 id="direct-heading" className="t-label text-ink-muted">{t("direct.label")}</h2>
+        <h2 id="direct-heading" className="t-fine text-ink-muted">{t("direct.label")}</h2>
         <Register
           className="lg:max-w-[845px]"
           first="label"

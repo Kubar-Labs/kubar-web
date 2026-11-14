@@ -48,12 +48,17 @@
 
   --ease-standard: var(--ease-standard);
   --ease-exit: var(--ease-exit);
+
+  /* The three elevations (REDRAW-2026-11-14.md, section 2): shadow-elevation-1 … 3. */
+  --shadow-elevation-1: var(--elevation-1);
+  --shadow-elevation-2: var(--elevation-2);
+  --shadow-elevation-3: var(--elevation-3);
 }
 
 /* Text styles: one utility per Figma text style (docs/rebuild/tokens/README.md). */
 @utility t-display {
-  font-family: var(--font-serif);
-  font-weight: 400;
+  font-family: var(--font-sans);
+  font-weight: 500;
   font-size: var(--text-display);
   line-height: var(--text-display--line-height);
   letter-spacing: -0.02em;
@@ -79,10 +84,11 @@
   line-height: var(--text-h4--line-height);
 }
 @utility t-line {
-  font-family: var(--font-serif);
-  font-weight: 400;
+  font-family: var(--font-sans);
+  font-weight: 500;
   font-size: var(--text-line);
   line-height: var(--text-line--line-height);
+  letter-spacing: -0.01em;
 }
 @utility t-lead {
   font-family: var(--font-sans);
@@ -96,6 +102,15 @@
   font-size: var(--text-figure);
   line-height: var(--text-figure--line-height);
   letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+/* Mono/Figure large: desktop only, used once (Home, "About $80bn"). */
+@utility t-figure-lg {
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: var(--text-figure-lg);
+  line-height: var(--text-figure-lg--line-height);
+  letter-spacing: -0.03em;
   font-variant-numeric: tabular-nums;
 }
 @utility t-record {

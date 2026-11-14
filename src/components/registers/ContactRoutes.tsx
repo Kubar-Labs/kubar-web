@@ -25,9 +25,9 @@ export function ContactRoutes({
     <table role="table" className={cn("w-full table-fixed border-collapse text-left max-lg:block", className)}>
       <thead role="rowgroup" className="max-lg:sr-only">
         <tr role="row" className="border-b-2 border-rule-strong">
-          <th role="columnheader" scope="col" className={cn("t-tag pr-6 pb-2 font-medium text-ink-muted", width)}>{columns.who}</th>
-          <th role="columnheader" scope="col" className={cn("t-tag pb-2 font-medium text-ink-muted", width, three && "pr-6")}>{columns.step}</th>
-          {three ? <th role="columnheader" scope="col" className="t-tag w-1/3 pb-2 font-medium text-ink-muted">{columns.goesTo}</th> : null}
+          <th role="columnheader" scope="col" className={cn("t-fine pr-6 pb-2 font-normal text-ink-muted", width)}>{columns.who}</th>
+          <th role="columnheader" scope="col" className={cn("t-fine pb-2 font-normal text-ink-muted", width, three && "pr-6")}>{columns.step}</th>
+          {three ? <th role="columnheader" scope="col" className="t-fine w-1/3 pb-2 font-normal text-ink-muted">{columns.goesTo}</th> : null}
         </tr>
       </thead>
       <tbody role="rowgroup" className="max-lg:block max-lg:border-t-2 max-lg:border-rule-strong">

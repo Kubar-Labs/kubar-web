@@ -1,9 +1,9 @@
 import { cn } from "@/lib/utils";
 
 /*
- * Page anatomy after option B (HANDOFF section 4): sections are joined by one
- * hairline in --color-rule-strong, with --section-space above and below.
- * No section numbers and no label above a heading.
+ * Page anatomy (HANDOFF section 4, REDRAW-2026-11-14.md rule 5): sections are
+ * separated by space alone, --section-space above and below, with no hairline
+ * between them. No section numbers and no label above a heading.
  *
  * Section head (Figma C4 91:288): at desktop the heading (400 wide) with its
  * lead beside it (680), 80 apart; "stacked" keeps the lead under the heading
@@ -19,7 +19,7 @@ type SectionProps = {
 
 export function Section({ id, labelledBy, className, children }: SectionProps) {
   return (
-    <section id={id} aria-labelledby={labelledBy} className="border-b border-rule-strong">
+    <section id={id} aria-labelledby={labelledBy}>
       <div className={cn("page-container py-(--section-space)", className)}>{children}</div>
     </section>
   );
@@ -50,7 +50,7 @@ export function SectionHead({ id, heading, lead, layout = "beside", className }:
         {heading}
       </h2>
       {lead ? (
-        <p className={cn("t-body-lg text-ink-muted", layout === "beside" && "lg:max-w-[680px]")}>{lead}</p>
+        <p className={cn("t-body-lg text-ink-muted max-lg:max-w-(--measure)", layout === "beside" && "lg:max-w-[680px]")}>{lead}</p>
       ) : null}
     </div>
   );

@@ -32,7 +32,7 @@ export default function HowItWorks() {
 
   return (
     <>
-      <PageHero kicker={t("hero.kicker")} headline={t("hero.headline")} sub={t("hero.sub")}>
+      <PageHero headline={t("hero.headline")} sub={t("hero.sub")}>
         <Illustrative align="start" className="pt-4" />
         <div className="flex flex-col items-start gap-4 pt-6 lg:flex-row lg:items-center lg:gap-8">
           <TextLink href="/products/kubar-protocol" kind="arrow" size="large">{t("hero.institutions")}</TextLink>
@@ -56,7 +56,7 @@ export default function HowItWorks() {
       </Section>
 
       <Section id="evidence" labelledBy="evidence-heading" className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-20">
-        <SectionHead id="evidence-heading" heading={t("evidence.heading")} lead={t("evidence.lead")} layout="stacked" />
+        <SectionHead id="evidence-heading" heading={t("evidence.heading")} layout="stacked" />
         <EvidenceStack
           className="min-w-0 flex-1"
           copy={t.raw("evidence") as EvidenceStackCopy}
@@ -78,7 +78,7 @@ export default function HowItWorks() {
       </Section>
 
       <Section labelledBy="unpaid-heading" className="flex flex-col gap-10 lg:gap-16">
-        <SectionHead id="unpaid-heading" heading={t("unpaid.heading")} lead={t("unpaid.lead")} />
+        <SectionHead id="unpaid-heading" heading={t("unpaid.heading")} layout="wide" />
         <div className="flex flex-col gap-6 lg:max-w-[1062px]">
           <UnpaidRegister
             title={t("unpaid.title")}
@@ -124,7 +124,7 @@ export default function HowItWorks() {
         <ul className="flex flex-col gap-8">
           {routes.map((route) => (
             <li key={route.href} className="flex flex-col items-start gap-2">
-              <p className="t-tag text-ink-muted">{route.tag}</p>
+              <p className="t-fine text-ink-muted">{route.tag}</p>
               <TextLink href={route.href} kind="arrow" size="large">{route.label}</TextLink>
             </li>
           ))}

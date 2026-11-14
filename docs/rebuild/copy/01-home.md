@@ -8,7 +8,7 @@ Extracted from Figma, Home · 1440 (frame 160:6), 13 Nov 2026, in reading order.
 [UIL] For trade platforms                   → /products/navdhan-sdk
 [Tag] Record RCV-0001
 [Fine] Illustrative                         (rani, dotted underline; opens "An example receivable, not a real transaction." in place)
-[Record] $225,000 rice invoice to a buyer in the UAE, due 75 days after shipment. 90% of face paid at purchase; the balance, less the financier’s discount and charges, when the buyer pays.
+[Record] $225,000 rice invoice to a buyer in the UAE, due 75 days after shipment.
 [Tag] No.
 [Tag] Document
 [Tag] Source
@@ -37,14 +37,10 @@ Extracted from Figma, Home · 1440 (frame 160:6), 13 Nov 2026, in reading order.
 [UI] Purchase confirmation
 [BodyS] The financier
 [State] Filed                              (row 06 is current: inset ground, rani marker, rani status)
-[Tag] Proves
+[Fine] Proves
 [BodyS] The financier bought the receivable, without recourse for the buyer’s credit
-[Tag] State
-[Label] 05 of 08
 [Tag] 05 Purchased                          (rani)
-[Fine] ¹
-[Fine] Kubar’s own ITFS registration is targeted for 2027; until then Kubar acts as the financier’s origination and servicing agent.
-[Fine] Back to text
+(14 Nov: the record's summary is one sentence and "State 05 of 08" is gone. The status footnote ¹ is no longer in the hero; marker ¹ on "exchange" links to the one under the foundations. REDRAW-2026-11-14.md, sections 6 and 9.6.)
 
 ## The gap
 [H2] The missing piece isn’t capital.
@@ -57,6 +53,7 @@ Extracted from Figma, Home · 1440 (frame 160:6), 13 Nov 2026, in reading order.
 [BodyS] financed in total on GIFT City’s trade-finance platforms (ITFS): 2,857 transactions to June 2026.³
         (drawing: a full-width 8 px bar for $80bn over a hairline track holding a 1 px tick for $126.92M, both to scale)
 [Code] Drawn to scale. $126.92M is about 0.16% of the bar above.
+[UI] How we estimate this                  (a disclosure link with a plus; footnote ² opens under it. New words, approved 14 Nov)
 [Fine] ²
 [Fine] Kubar’s estimate: India’s merchandise exports in FY 2025–26, $441.78bn (Ministry of Commerce and Industry), × 75% on open-account terms (Kubar’s planning assumption) × 48.55%, the share of MSME-related products in merchandise exports in 2024–25 (Ministry of MSME, in Parliament) × 50% financeable after screens for tenor, insurable buyers and related parties (Kubar’s planning assumption).
 [Fine] Back to text
@@ -81,9 +78,7 @@ Extracted from Figma, Home · 1440 (frame 160:6), 13 Nov 2026, in reading order.
 [Body] The financier pays 90% of face to the exporter’s own bank
 [UI] Skip the story                         (anchor to the next section)
 [UI] See how it works                       → /how-it-works
-[Tag] Data path: documents and records      (legend)
-[Tag] Money path: only between banks
-[Tag] Kubar: the one filled column
+(14 Nov: the story panel's three-line legend is removed; "Data path: documents and records" and "Money path: only between banks" move to the Who takes part map.)
 [UI] Exporter
 [UI] Kubar                                  (the one filled column: petrol ground, white mark and name)
 [UI] Insurer
@@ -114,10 +109,6 @@ The 1440 frame shows the story at state 05. The text for all eight states is the
 [BodyS] Only banks and other financial institutions permitted by the RBI finance MSME invoices
 [BodyS] Distribution companies, generators, traders and large consumers buy and sell electricity
 [BodyS] Only institutional financiers would buy export receivables, on Kubar’s planned venue¹
-[Tag] The public
-[BodyS] Not admitted
-[BodyS] Not admitted
-[BodyS] Not admitted
 [Tag] Today
 [BodyS] Running
 [BodyS] Running
@@ -125,19 +116,15 @@ The 1440 frame shows the story at state 05. The text for all eight states is the
 [Tag] Five foundations, built from the bottom up
 [UIL] The venue, last
 [BodyS] An ITFS for institutional financiers only, with Kubar as its neutral operator¹
-[Tag] State 08 · Planned¹
+[Tag] Planned¹                              (rani)
 [UIL] A record of performance
 [BodyS] Every receivable that settles adds to a priced loss history
-[Tag] State 07
 [UIL] A clean payment path
 [BodyS] The buyer pays the financier’s account; the exporter’s bank closes the shipping bill
-[Tag] State 06
 [UIL] Standing buyers
 [BodyS] A financier underwrites a programme once and buys every receivable that fits inside its limit
-[Tag] State 05
 [UIL] A common standard for what qualifies
 [BodyS] Every receivable has a shipping bill, an invoice that names the financier’s account, a buyer on an approved insurance limit and the buyer’s acknowledgement
-[Tag] States 02 · 03 · 04
 [Fine] ¹
 [Fine] Kubar’s own ITFS registration is targeted for 2027; until then Kubar acts as the financier’s origination and servicing agent.
 [Fine] Back to text
@@ -168,7 +155,7 @@ The 1440 frame shows the story at state 05. The text for all eight states is the
 
 ## Standing
 [H2] Standing and memberships.
-[BodyL] Kubar acts as the financier’s origination and servicing agent. It never holds the money or the credit risk.
+(14 Nov: the lead under the heading is removed on Home; it stays on About.)
 [Tag] Kind
 [Tag] Entry
 [Tag] Sandbox
@@ -179,13 +166,13 @@ The 1440 frame shows the story at state 05. The text for all eight states is the
 [BodyS] FinVision Award for Most Innovative Startup in Fintech, FinTech Edge 2026, NIBM Pune
 [Tag] Award
 [BodyS] Winner, Popular Choice Award, Startup Mahakumbh 2025
-        (programme rows: logo, name, kind; two lists of three at desktop)
-[UI] GIFT IFIH Young Builders Program            [Tag] Programme
-[UI] BharatNetra Startup Accelerator (GFTN)      [Tag] Accelerator
-[UI] STPI FinGlobe                               [Tag] Incubation
-[UI] MeitY GENESIS Entrepreneur in Residence     [Tag] Residency
-[UI] T-Hub, RubriX Cohort 5                      [Tag] Incubation
-[UI] Pusa Krishi Incubation Programme 2026–27    [Tag] Incubation
+        (programme marks: logo and name, six in one row at desktop; no kind labels from 14 Nov)
+[UI] GIFT IFIH Young Builders Program
+[UI] BharatNetra Startup Accelerator (GFTN)
+[UI] STPI FinGlobe
+[UI] MeitY GENESIS Entrepreneur in Residence
+[UI] T-Hub, RubriX Cohort 5
+[UI] Pusa Krishi Incubation Programme 2026–27
 
 ## People
 [H2] The people building it.

@@ -3,7 +3,7 @@
 Extracted from Figma, NavDhan SDK · 1440 (frame 170:6), 13 Nov 2026, in reading order. Bracketed tags are text styles (../tokens/README.md). Header and footer: 00-header-footer.md. The "Where it stands" section is removed and must not be built; no "In build" labels anywhere.
 
 ## Hero
-[Label] NavDhan SDK · For trade platforms and marketplaces      (kept: names who the page is for)
+(14 Nov: the kicker line above the headline is removed. REDRAW-2026-11-14.md, section 3.)
 [Display] Trade finance inside the software your exporters already use.
 [BodyL] Embed NavDhan SDK and your exporters can check eligibility, apply and be paid for their export receivables without leaving your platform. Financiers buy; Kubar runs the programme; you keep the relationship.
 [UI] Talk about an integration                     (filled button → /contact?intent=platform)

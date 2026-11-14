@@ -25,7 +25,6 @@ export default function NavdhanSdk() {
   return (
     <>
       <PageHero
-        kicker={t("hero.kicker")}
         headline={t("hero.headline")}
         sub={t("hero.sub")}
         button={{ label: t("hero.button"), href: CONTACT }}

@@ -11,7 +11,9 @@ import { cn } from "@/lib/utils";
  * the angled rani marker in the margin, fading after 2 s (globals.css).
  *
  * Ids are per page: a page passes the same `id` to a footnote and to the
- * markers that point at it, and each marker its own `refId`.
+ * markers that point at it, and each marker its own `refId`. One footnote
+ * may have several markers (the status line ¹ appears once per page), so
+ * FootnoteLinks points "Back to text" at the marker the reader followed.
  */
 const SUPERSCRIPTS = ["⁰", "¹", "²", "³", "⁴", "⁵", "⁶", "⁷", "⁸", "⁹"];
 export const superscript = (n: number) => SUPERSCRIPTS[n] ?? String(n);
@@ -54,7 +56,7 @@ type FootnoteProps = {
 export function Footnote({ n, id, backTo, children, className }: FootnoteProps) {
   const t = useTranslations("common");
   return (
-    <div id={id} className={cn("footnote t-fine relative flex gap-1", className)}>
+    <div id={id} tabIndex={-1} className={cn("footnote t-fine relative flex gap-1 outline-offset-4", className)}>
       <span aria-hidden="true" className="shrink-0 text-accent">
         {superscript(n)}
       </span>
@@ -65,6 +67,7 @@ export function Footnote({ n, id, backTo, children, className }: FootnoteProps) 
         </p>
         <a
           href={`#${backTo}`}
+          data-footnote-back=""
           className="inline-flex min-h-6 items-center self-start text-ink underline decoration-1 [text-underline-position:from-font] hover:decoration-2"
         >
           {t("backToText")}

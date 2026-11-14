@@ -18,10 +18,10 @@ export function Standing({ className, narrowKind = false }: { className?: string
     <table role="table" className={cn("w-full table-fixed border-collapse text-left max-lg:block", className)}>
       <thead role="rowgroup" className="max-lg:sr-only">
         <tr role="row" className="border-b-2 border-rule-strong">
-          <th role="columnheader" scope="col" className={cn("t-tag pr-6 pb-2 font-medium text-ink-muted", narrowKind ? "lg:w-[25.68%]" : "w-1/2")}>
+          <th role="columnheader" scope="col" className={cn("t-fine pr-6 pb-2 font-normal text-ink-muted", narrowKind ? "lg:w-[25.68%]" : "w-1/2")}>
             {t("columns.kind")}
           </th>
-          <th role="columnheader" scope="col" className={cn("t-tag pb-2 font-medium text-ink-muted", !narrowKind && "w-1/2")}>
+          <th role="columnheader" scope="col" className={cn("t-fine pb-2 font-normal text-ink-muted", !narrowKind && "w-1/2")}>
             {t("columns.entry")}
           </th>
         </tr>
@@ -36,7 +36,7 @@ export function Standing({ className, narrowKind = false }: { className?: string
               "max-lg:flex max-lg:flex-col max-lg:gap-1 max-lg:py-4",
             )}
           >
-            <th role="rowheader" scope="row" className="t-tag align-baseline font-medium text-ink-muted lg:py-4 lg:pr-6">
+            <th role="rowheader" scope="row" className="t-fine align-baseline font-normal text-ink-muted lg:py-4 lg:pr-6">
               {row.kind}
             </th>
             <td role="cell" className="t-body-sm align-baseline text-ink lg:py-4">

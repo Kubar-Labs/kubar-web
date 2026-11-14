@@ -2,8 +2,10 @@ import { cn } from "@/lib/utils";
 
 /*
  * Person card, Compact (Figma C4 23:64) and the Home people row.
- * Portrait 4:5 in colour, square corners (nothing changes colour on hover);
- * the name with a small up-right arrow, the role in Mono/Tag. The whole card
+ * Portrait 4:5 on a transparent background, square corners, greyscale at
+ * rest and in colour on hover and keyboard focus of the card, over 200 ms
+ * (no transition with reduced motion; REDRAW-2026-11-14.md, section 9.9).
+ * The name with a small up-right arrow, the role in Sans/Fine. The whole card
  * links to the person's LinkedIn and opens in a new tab. Six across at
  * desktop; below desktop a sideways-scrolling row of 193 px cards.
  *
@@ -14,9 +16,10 @@ import { cn } from "@/lib/utils";
  * and the quality is one next.config.ts allows.
  */
 const PORTRAIT_WIDTHS = [256, 384, 640, 828];
-const optimised = (id: string, width: number) => `/_next/image?url=${encodeURIComponent(`/people/${id}.jpg`)}&w=${width}&q=75`;
+const optimised = (id: string, width: number) => `/_next/image?url=${encodeURIComponent(`/people/${id}.png`)}&w=${width}&q=75`;
 
-function Portrait({ id, alt, sizes }: { id: string; alt: string; sizes: string }) {
+/** `colour`: the group classes that bring the card's portrait into colour. */
+function Portrait({ id, alt, sizes, colour }: { id: string; alt: string; sizes: string; colour: string }) {
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
@@ -28,7 +31,10 @@ function Portrait({ id, alt, sizes }: { id: string; alt: string; sizes: string }
       height={1000}
       loading="lazy"
       decoding="async"
-      className="aspect-4/5 w-full bg-inset object-cover"
+      className={cn(
+        "aspect-4/5 w-full object-cover grayscale transition-[filter] duration-(--duration-disclose) ease-standard motion-reduce:transition-none",
+        colour,
+      )}
     />
   );
 }
@@ -61,7 +67,12 @@ export function PeopleRow({
             aria-label={linkLabel(person.name)}
             className="group flex flex-col"
           >
-            <Portrait id={person.id} alt={`${person.name}, ${person.role}`} sizes="(min-width: 1200px) 193px, 193px" />
+            <Portrait
+              id={person.id}
+              alt={`${person.name}, ${person.role}`}
+              sizes="(min-width: 1200px) 193px, 193px"
+              colour="group-hover:grayscale-0 group-focus-visible:grayscale-0"
+            />
             <span className="flex flex-col gap-1 pt-3">
               <span className="flex items-center gap-1">
                 <span className="t-ui text-ink decoration-1 [text-underline-position:from-font] group-hover:underline">
@@ -71,7 +82,7 @@ export function PeopleRow({
                   <path d="M4.8 11.2L11.2 4.8M11.2 10.4V4.8H5.6" />
                 </svg>
               </span>
-              <span className="t-tag text-ink-muted">{person.role}</span>
+              <span className="t-fine text-ink-muted">{person.role}</span>
             </span>
           </a>
         </li>
@@ -82,7 +93,8 @@ export function PeopleRow({
 
 /*
  * Person card, Full (Figma C4 23:64), About "The team.": the portrait
- * (302 wide, 4:5, colour), the name, the role in Mono/Tag, one line, and a
+ * (302 wide, 4:5; greyscale until the card is hovered or its link has
+ * focus), the name, the role in Sans/Fine, one line, and a
  * LinkedIn link that opens in a new tab. Three across at desktop, two at
  * tablet; on mobile the cards stack and stay 302 wide.
  */
@@ -102,11 +114,11 @@ export function PeopleCards({
   return (
     <ul className={cn("grid max-w-[302px] grid-cols-1 gap-x-6 gap-y-12 md:max-w-[628px] md:grid-cols-2 lg:max-w-[954px] lg:grid-cols-3", className)}>
       {people.map((person) => (
-        <li key={person.id} className="flex flex-col">
-          <Portrait id={person.id} alt="" sizes="302px" />
+        <li key={person.id} className="group/card flex flex-col">
+          <Portrait id={person.id} alt="" sizes="302px" colour="group-hover/card:grayscale-0 group-focus-within/card:grayscale-0" />
           <div className="flex flex-col items-start gap-1.5 pt-4">
             <h3 className="t-ui text-ink">{person.name}</h3>
-            <p className="t-tag text-ink-muted">{person.role}</p>
+            <p className="t-fine text-ink-muted">{person.role}</p>
             <p className="t-body-sm text-ink">{person.line}</p>
             <a
               href={person.linkedin}

@@ -64,7 +64,7 @@ export function RecordView({
         <thead className="max-lg:sr-only" role="rowgroup">
           <tr role="row" className="border-b border-rule-strong">
             {(["no", "document", "source", "status"] as const).map((key) => (
-              <th key={key} role="columnheader" scope="col" className="t-tag pr-4 pb-2 font-medium text-ink-muted last:pr-0">
+              <th key={key} role="columnheader" scope="col" className="t-fine pr-4 pb-2 font-normal text-ink-muted last:pr-0">
                 {t(`columns.${key}`)}
               </th>
             ))}
@@ -123,16 +123,10 @@ export function RecordView({
       </table>
 
       <div aria-hidden="true" className="flex items-baseline gap-2 border-b border-rule py-3">
-        <span className="t-tag w-12 shrink-0 text-ink-muted">{t("provesLabel")}</span>
+        <span className="t-fine w-12 shrink-0 text-ink-muted">{t("provesLabel")}</span>
         <span className="t-body-sm min-h-[66px] flex-1 text-ink lg:min-h-[44px]">{documents[active].proves}</span>
       </div>
-      <div className="flex items-center justify-between gap-3 pt-3">
-        <p className="flex items-center gap-3">
-          <span className="t-tag text-ink-muted">{t("stateLabel")}</span>
-          <span className="t-label text-ink-muted">{t("counter")}</span>
-        </p>
-        <p className="t-tag text-accent">{t("currentState")}</p>
-      </div>
+      <p className="t-tag pt-3 text-accent">{t("currentState")}</p>
     </div>
   );
 }

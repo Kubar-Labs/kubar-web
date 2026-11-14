@@ -56,7 +56,7 @@ export function ExchangeComparison({
               <span className="sr-only">{exchangeHead}</span>
             </th>
             {exchanges.map((name) => (
-              <th key={name} scope="col" className="t-tag pb-3 pl-3 font-medium text-ink-muted">
+              <th key={name} scope="col" className="t-h4 pb-3 pl-3 font-medium text-ink">
                 {name}
               </th>
             ))}
@@ -65,7 +65,7 @@ export function ExchangeComparison({
         <tbody>
           {rows.map((row, r) => (
             <tr key={row.label} className={r === rows.length - 1 ? "border-b-2 border-rule-strong" : "border-b border-rule"}>
-              <th scope="row" className="t-tag py-4 align-top font-medium text-ink-muted">
+              <th scope="row" className="t-fine py-4 align-top font-normal text-ink-muted">
                 {row.label}
               </th>
               {row.cells.map((_, i) => (
@@ -86,7 +86,7 @@ export function ExchangeComparison({
             <dl className="flex flex-col gap-3">
               {rows.map((row) => (
                 <div key={row.label} className="flex flex-col gap-1">
-                  <dt className="t-tag text-ink-muted">{row.label}</dt>
+                  <dt className="t-fine text-ink-muted">{row.label}</dt>
                   <dd className={cellClass(row, i)}>
                     {row.cells[i]}
                     {row.footnoteOnLast && i === row.cells.length - 1 ? (
@@ -119,7 +119,7 @@ export function FoundationsStack({
 }) {
   return (
     <div className={cn("flex flex-col gap-6", className)}>
-      <p className="t-tag text-ink-muted">{label}</p>
+      <p className="t-fine text-ink-muted">{label}</p>
       <div className="flex gap-6">
         {/* The bottom-up arrow in the gutter (desktop). */}
         <span aria-hidden="true" className="relative hidden w-0 shrink-0 lg:block">
@@ -147,7 +147,7 @@ export function FoundationsStack({
               {slab.where && statusOnly ? (
                 <p className="t-state shrink-0 whitespace-nowrap text-ink-muted">{slab.where}</p>
               ) : slab.where ? (
-                <p className="t-tag shrink-0 whitespace-nowrap text-ink lg:pt-[18px]">
+                <p className="t-tag shrink-0 whitespace-nowrap text-accent lg:pt-[18px]">
                   {slab.where}
                   {slab.planned ? <FootnoteMarker n={1} {...footnote("stack-where")} /> : null}
                 </p>

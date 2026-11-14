@@ -31,7 +31,6 @@ export default function About() {
   return (
     <>
       <PageHero
-        kicker={t("hero.kicker")}
         headline={t("hero.headline")}
         sub={t.rich("hero.sub", { marker: () => <FootnoteMarker n={1} target="fn-1" refId="fnref-1" /> })}
       >

@@ -4,8 +4,10 @@ import localFont from "next/font/local";
  * Self-hosted, Latin-subset woff2 files (see src/app/fonts/). Newsreader and
  * Schibsted Grotesk are instanced from the Fontsource variable builds (OFL-1.1)
  * to the axes the site uses: Newsreader keeps its optical-size axis at weight
- * 400; Schibsted Grotesk keeps weights 400 to 500. Only these two are
- * preloaded (performance budget: fonts ≤ 300 KB, two preloaded).
+ * 400; Schibsted Grotesk keeps weights 400 to 500. Since 14 Nov the display
+ * and the band are Schibsted Grotesk, and Newsreader sets only the sentence
+ * inside a record, so Schibsted Grotesk and Geist Mono are the two preloaded
+ * (performance budget: fonts ≤ 300 KB, two preloaded).
  */
 export const newsreader = localFont({
   src: "./fonts/newsreader-latin-opsz-400.woff2",
@@ -13,7 +15,7 @@ export const newsreader = localFont({
   style: "normal",
   variable: "--font-newsreader",
   display: "swap",
-  preload: true,
+  preload: false,
   fallback: ["Georgia", "serif"],
   adjustFontFallback: "Times New Roman",
 });
@@ -35,7 +37,7 @@ export const geistMono = localFont({
   style: "normal",
   variable: "--font-geist-mono",
   display: "swap",
-  preload: false,
+  preload: true,
   fallback: ["ui-monospace", "monospace"],
   adjustFontFallback: false,
 });

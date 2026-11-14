@@ -28,8 +28,8 @@ export function WhoTakesPart({
       </colgroup>
       <thead role="rowgroup" className="max-lg:sr-only">
         <tr role="row" className="border-b-2 border-rule-strong">
-          <th role="columnheader" scope="col" className="t-tag pr-6 pb-2 font-medium text-ink-muted">{columns.party}</th>
-          <th role="columnheader" scope="col" className="t-tag pr-6 pb-2 font-medium text-ink-muted">{columns.role}</th>
+          <th role="columnheader" scope="col" className="t-fine pr-6 pb-2 font-normal text-ink-muted">{columns.party}</th>
+          <th role="columnheader" scope="col" className="t-fine pr-6 pb-2 font-normal text-ink-muted">{columns.role}</th>
           <th role="columnheader" scope="col"><span className="sr-only">{columns.more}</span></th>
         </tr>
       </thead>

@@ -40,8 +40,8 @@ export function PlatformLanes({
       <table className="w-full border-collapse text-left lg:absolute lg:top-[50px] lg:left-0 lg:w-[519px]">
         <thead className="max-lg:sr-only">
           <tr className="border-b-2 border-rule-strong">
-            <th scope="col" className="t-tag w-[109px] pb-2 font-medium text-ink-muted">{columns.step}</th>
-            <th scope="col" className="t-tag pb-2 font-medium text-ink-muted">{columns.what}</th>
+            <th scope="col" className="t-fine w-[109px] pb-2 font-normal text-ink-muted">{columns.step}</th>
+            <th scope="col" className="t-fine pb-2 font-normal text-ink-muted">{columns.what}</th>
           </tr>
         </thead>
         <tbody className="max-lg:border-t-2 max-lg:border-rule-strong">
@@ -65,10 +65,10 @@ export function PlatformLanes({
         ))}
         <span className="absolute top-[114px] left-[600.5px] size-2.5 bg-ink" />
         <span className="absolute top-[199px] left-[600.5px] size-2.5 bg-ink" />
-        <span className="t-tag absolute top-[196px] left-[617px] text-ink-muted">{paths.sdk}</span>
-        <span className="t-tag absolute top-[262px] left-[617px] w-[170px] text-ink-muted">{paths.consent}</span>
-        <span className="t-tag absolute top-[376px] left-[814px] text-ink-muted">{paths.evidence}</span>
-        <span className="t-tag absolute top-[461px] left-[617px] text-ink-muted">{paths.status}</span>
+        <span className="t-fine absolute top-[196px] left-[617px] text-ink-muted">{paths.sdk}</span>
+        <span className="t-fine absolute top-[262px] left-[617px] w-[170px] text-ink-muted">{paths.consent}</span>
+        <span className="t-fine absolute top-[376px] left-[814px] text-ink-muted">{paths.evidence}</span>
+        <span className="t-fine absolute top-[461px] left-[617px] text-ink-muted">{paths.status}</span>
         <span className="absolute top-[395px] left-[995.5px] size-2.5 bg-ink" />
         <span className="absolute top-[480px] left-[995.5px] size-2.5 bg-ink" />
         <svg className="absolute inset-0" width={1062} height={528} viewBox="0 0 1062 528" fill="none">
