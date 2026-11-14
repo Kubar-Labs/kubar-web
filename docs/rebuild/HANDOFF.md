@@ -20,7 +20,7 @@ Everything you need to build is in this folder:
 2. **The copy is signed off.** Use the words in `copy/` exactly, including curly quotes, non-breaking hyphens in "set‑off" and the superscript footnote markers. If something reads wrong, or a line doesn't fit, flag it to Vaibhav; don't rewrite it. The only copy changes made in this handoff are listed in section 5 (metadata) and follow his decisions.
 3. **Figures only as written.** $80bn, $126.92M, 2,857, $441.78bn and the rest come from the model of record and the sources register; never round, restate or add a figure.
 4. **Nothing that expires.** The site is updated about once a quarter. No status words ("In build", "In preparation" and the like), no "as at" dates, no progress sections. The one exception is the venue's "Planned" with its footnote ¹.
-5. **Never** use the State Emblem or the national flag; never name a financier or partner beyond what the copy names; never suggest retail access. The footnote ¹ (the ITFS registration line) travels with every mention of the venue.
+5. **Never** use the State Emblem or the national flag; never name a financier or partner beyond what the copy names; never suggest retail access. The footnote ¹ (the ITFS registration line) appears once on each page that discusses the venue, and every marker ¹ on that page links to it; on Home it is the one under the foundations, and the hero has none (REDRAW-2026-11-14.md, section 9.6).
 6. **kubar.tech only.** navdhan.app is a separate site and stays untouched.
 7. **Read the Next.js docs in node_modules first** (AGENTS.md: this Next.js has breaking changes).
 
