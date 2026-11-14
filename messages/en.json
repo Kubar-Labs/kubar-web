@@ -1307,20 +1307,6 @@
       "from": "From · The financier",
       "proves": "The financier owns the receivable",
       "record": "Record RCV-0001 · Evidence package",
-      "elements": [
-        "Commercial invoice",
-        "Shipping bill",
-        "Bill of lading",
-        "Inspection report",
-        "Credit-insurance cover",
-        "Buyer’s acknowledgement",
-        "No-objection",
-        "Purchase confirmation"
-      ],
-      "stateLabel": "State",
-      "counter": "05 of 08",
-      "stateNo": "05",
-      "state": "Purchased",
       "after": [
         "Each element carries its source, its time and who signed it. Any change after signing shows.",
         "The record is built on Corda, a permissioned ledger: one shared record of each receivable, who holds which rights after the purchase, and its payment and loss history."
@@ -1370,13 +1356,6 @@
     },
     "unpaid": {
       "heading": "If a buyer doesn’t pay.",
-      "title": "If a buyer doesn’t pay",
-      "columns": {
-        "no": "No.",
-        "party": "Party",
-        "step": "Step",
-        "branch": "Where"
-      },
       "rows": [
         {
           "no": "01",
@@ -1462,14 +1441,28 @@
           "The mandate from the financier"
         ]
       ],
-      "link": "Who holds what"
+      "link": "Who holds what",
+      "map": {
+        "lines": {
+          "policy": "The policy",
+          "mandate": "The mandate",
+          "purchase": "Purchase agreement",
+          "platform": "Agreement with Kubar",
+          "services": "Services agreement"
+        },
+        "tags": {
+          "financier": "Programme terms",
+          "bank": "Its no-objection",
+          "buyer": "Its acknowledgement"
+        },
+        "key": [
+          "A line is an agreement between the two parties it joins.",
+          "A tag is a paper one party signs on its own."
+        ]
+      }
     },
     "terms": {
       "heading": "The terms on this site.",
-      "columns": [
-        "Term",
-        "Meaning"
-      ],
       "rows": [
         [
           "Receivable",

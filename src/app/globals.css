@@ -681,10 +681,7 @@
     .is-lifted .iso-lift-shadow {
       opacity: 0;
     }
-    /* The lift becomes a colour change. */
-    .is-lifted :is(.iso-sheet, .iso-sheet-current) > rect:first-child {
-      fill: var(--color-accent-soft);
-    }
+    /* The lift becomes a colour change: unlayered, at the end of this file. */
   }
 
   /* Lines that draw (Arrow.tsx; sections 7 and 9.4). With no script, reduced
@@ -745,6 +742,147 @@
   @keyframes limit-settle {
     from {
       transform: translateY(-40px);
+    }
+  }
+
+  /* How it works hero (IsoSteps): on page load the blocks rise in order, 01
+     to 08, 60 ms apart; 08's petrol top fades in over its white one last. */
+  .steps-rise {
+    animation: steps-rise var(--duration-write) var(--ease-standard) both;
+    animation-delay: calc(var(--i) * 60ms);
+  }
+  .steps-petrol {
+    animation: iso-fade var(--duration-disclose) var(--ease-standard) both;
+    animation-delay: calc(7 * 60ms + var(--duration-write));
+  }
+  /* Below the fold on load (phones): hold, then play when in view. */
+  [data-phase="armed"] :is(.steps-rise, .steps-petrol) {
+    animation: none;
+    opacity: 0;
+  }
+  @keyframes steps-rise {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+  }
+  /* The numbers on the steps: 13 px at full size, about 11 px at 0.625 (the
+     390 frame), in the drawing's own units: 25.3 - 12.3 × (width / 560). */
+  .iso-steps .iso-text-code {
+    font-size: clamp(13px, 25.3px - 2.196cqw, 17.6px);
+  }
+
+  /* Drawings that play when they come into view (PlayOnce): a sheet drops in
+     from 24 px above, 80 ms after the one before it (--i); a row fades in as
+     its sheet lands. As the Home hero stack, but on entering view. */
+  [data-phase="armed"] .phase-drop {
+    opacity: 0;
+    transform: translateY(-24px);
+  }
+  [data-phase="playing"] .phase-drop {
+    transition:
+      opacity var(--duration-write) var(--ease-standard),
+      transform var(--duration-write) var(--ease-standard);
+    transition-delay: calc(var(--i) * 80ms);
+  }
+  [data-phase="armed"] .phase-fade {
+    opacity: 0;
+  }
+  [data-phase="playing"] .phase-fade {
+    transition: opacity var(--duration-disclose) var(--ease-standard);
+    transition-delay: calc(var(--i) * 80ms + var(--duration-write));
+  }
+
+  /* The evidence stack (IsoEvidence): hover, focus or a tap on a row lifts
+     its sheet 14 px and fades in its --elevation-3 shadow, as on Home.
+     PickStage sets data-picked to the row's document. */
+  .iso-evidence[data-picked="01"] .iso-lift[data-doc="01"],
+  .iso-evidence[data-picked="02"] .iso-lift[data-doc="02"],
+  .iso-evidence[data-picked="03"] .iso-lift[data-doc="03"],
+  .iso-evidence[data-picked="04"] .iso-lift[data-doc="04"],
+  .iso-evidence[data-picked="05"] .iso-lift[data-doc="05"],
+  .iso-evidence[data-picked="06"] .iso-lift[data-doc="06"],
+  .iso-evidence[data-picked="07"] .iso-lift[data-doc="07"],
+  .iso-evidence[data-picked="08"] .iso-lift[data-doc="08"] {
+    transform: translateY(-14px);
+  }
+  .iso-evidence[data-picked="01"] .iso-lift[data-doc="01"] .iso-lift-shadow,
+  .iso-evidence[data-picked="02"] .iso-lift[data-doc="02"] .iso-lift-shadow,
+  .iso-evidence[data-picked="03"] .iso-lift[data-doc="03"] .iso-lift-shadow,
+  .iso-evidence[data-picked="04"] .iso-lift[data-doc="04"] .iso-lift-shadow,
+  .iso-evidence[data-picked="05"] .iso-lift[data-doc="05"] .iso-lift-shadow,
+  .iso-evidence[data-picked="06"] .iso-lift[data-doc="06"] .iso-lift-shadow,
+  .iso-evidence[data-picked="07"] .iso-lift[data-doc="07"] .iso-lift-shadow,
+  .iso-evidence[data-picked="08"] .iso-lift[data-doc="08"] .iso-lift-shadow {
+    opacity: 1;
+  }
+
+  /* Each party signs for its own part (SignsMap): a picked card keeps its
+     lines and labels; the others dim to 30%, as on Home's party map. */
+  .signs-map {
+    --gap: 160px;
+  }
+  @media (min-width: 1280px) {
+    .signs-map {
+      --gap: 184px;
+    }
+  }
+  .signs-map .sign-line {
+    transition: opacity var(--duration-hover) var(--ease-standard);
+  }
+  .signs-map[data-picked="financier"] .sign-line:not([data-touches~="financier"]),
+  .signs-map[data-picked="insurer"] .sign-line:not([data-touches~="insurer"]),
+  .signs-map[data-picked="exporter"] .sign-line:not([data-touches~="exporter"]),
+  .signs-map[data-picked="bank"] .sign-line:not([data-touches~="bank"]),
+  .signs-map[data-picked="buyer"] .sign-line:not([data-touches~="buyer"]),
+  .signs-map[data-picked="platform"] .sign-line:not([data-touches~="platform"]),
+  .signs-map[data-picked="kubar"] .sign-line:not([data-touches~="kubar"]) {
+    opacity: 0.3;
+  }
+
+  /* If a buyer doesn't pay (UnpaidFlow): each beat fades in at its --beat;
+     the fork's stem draws down and its bar out from the stem (transform). */
+  [data-phase="armed"] .flow-beat {
+    opacity: 0;
+  }
+  [data-phase="playing"] .flow-beat {
+    transition: opacity var(--duration-write) var(--ease-standard) var(--beat, 0ms);
+  }
+  .fork-stem {
+    transform-origin: top;
+  }
+  .fork-bar {
+    transform-origin: 720px 0; /* the stem, 870 - 150 */
+  }
+  [data-phase="armed"] .fork-stem {
+    transform: scaleY(0);
+  }
+  [data-phase="armed"] .fork-bar {
+    transform: scaleX(0);
+  }
+  [data-phase="playing"] :is(.fork-stem, .fork-bar) {
+    transition: transform var(--duration-write) var(--ease-standard) var(--beat, 0ms);
+  }
+  /* Print: drawings that wait to come into view are printed in their end state. */
+  @media print {
+    .phase-drop,
+    .phase-fade,
+    .flow-beat,
+    .steps-rise,
+    .steps-petrol,
+    .fork-stem,
+    .fork-bar {
+      opacity: 1 !important;
+      transform: none !important;
+      animation: none !important;
+    }
+  }
+  /* Reduced motion, after the rules above: the steps stand still (the
+     evidence lift becomes a colour change at the end of the file). */
+  @media (prefers-reduced-motion: reduce) {
+    .steps-rise,
+    .steps-petrol {
+      animation: none;
     }
   }
 
@@ -1003,5 +1141,27 @@
   }
   .story-ledger {
     display: block;
+  }
+  /* A sheet's lift becomes a colour change (section 7). Unlayered, so it wins
+     over the sheet's own fill utility. Home: the lifted sheet; How it works:
+     the sheet whose row is under the pointer or focus (--lift-fill). */
+  .is-lifted :is(.iso-sheet, .iso-sheet-current) > rect:first-child {
+    fill: var(--color-accent-soft);
+  }
+  .iso-evidence .iso-lift {
+    transform: none !important;
+  }
+  .iso-evidence .iso-lift-shadow {
+    opacity: 0 !important;
+  }
+  .iso-evidence[data-picked="01"] .iso-lift[data-doc="01"] :is(.iso-sheet, .iso-sheet-current) > rect:first-child,
+  .iso-evidence[data-picked="02"] .iso-lift[data-doc="02"] :is(.iso-sheet, .iso-sheet-current) > rect:first-child,
+  .iso-evidence[data-picked="03"] .iso-lift[data-doc="03"] :is(.iso-sheet, .iso-sheet-current) > rect:first-child,
+  .iso-evidence[data-picked="04"] .iso-lift[data-doc="04"] :is(.iso-sheet, .iso-sheet-current) > rect:first-child,
+  .iso-evidence[data-picked="05"] .iso-lift[data-doc="05"] :is(.iso-sheet, .iso-sheet-current) > rect:first-child,
+  .iso-evidence[data-picked="06"] .iso-lift[data-doc="06"] :is(.iso-sheet, .iso-sheet-current) > rect:first-child,
+  .iso-evidence[data-picked="07"] .iso-lift[data-doc="07"] :is(.iso-sheet, .iso-sheet-current) > rect:first-child,
+  .iso-evidence[data-picked="08"] .iso-lift[data-doc="08"] :is(.iso-sheet, .iso-sheet-current) > rect:first-child {
+    fill: var(--color-accent-soft);
   }
 }

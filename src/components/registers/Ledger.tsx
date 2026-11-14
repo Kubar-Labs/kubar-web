@@ -81,7 +81,7 @@ export function Ledger({ current = "05", footnote, states: ownStates, className 
               key={key}
               role="columnheader"
               scope="col"
-              className={cn("t-fine pr-4 pb-2 font-normal last:pr-0", key === "dataPath" ? "text-accent" : "text-ink-muted")}
+              className="t-fine pr-4 pb-2 font-normal text-ink-muted last:pr-0"
             >
               {t(`columns.${key}`)}
             </th>
@@ -133,7 +133,7 @@ export function Ledger({ current = "05", footnote, states: ownStates, className 
                 {isPlanned ? (row.party ?? t("planned")) : row.party}
               </td>
               <td role="cell" className={cn(cell, "max-lg:col-start-2 max-lg:flex max-lg:flex-col max-lg:gap-1")}>
-                <span aria-hidden="true" className={cn(mobileLabel, "text-accent")}>
+                <span aria-hidden="true" className={cn(mobileLabel, "text-ink-muted")}>
                   {t("dataPathLabel")}
                 </span>
                 <PathCell text={row.data} planned={isPlanned ? t("planned") : undefined} />

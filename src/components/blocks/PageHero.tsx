@@ -17,14 +17,29 @@ type PageHeroProps = {
   /** A drawing set beside the words at desktop (lower right) and under them below desktop. */
   aside?: React.ReactNode;
   /**
-   * "beside": the words (720) and the drawing side by side, centred on each
-   * other, 60 apart (Kubar Protocol, Figma 167:52); below desktop the drawing
-   * sits 40 under the words, centred.
+   * "beside": the words and the drawing side by side, centred on each other,
+   * 60 apart (Kubar Protocol, Figma 167:52: 720 and 474; How it works,
+   * 258:1827: 660 and 560); below desktop the drawing sits 40 under the
+   * words, centred. Laptops narrower than the frame shrink both columns.
    */
   asidePlacement?: "lower-right" | "beside";
+  /** "beside": the words' and the drawing's widths at 1440. */
+  besideWidths?: [number, number];
+  /** "beside": classes for the drawing's box (its spacing below desktop). */
+  asideClassName?: string;
 };
 
-export function PageHero({ headline, sub, button, link, children, aside, asidePlacement = "lower-right" }: PageHeroProps) {
+export function PageHero({
+  headline,
+  sub,
+  button,
+  link,
+  children,
+  aside,
+  asidePlacement = "lower-right",
+  besideWidths = [720, 474],
+  asideClassName,
+}: PageHeroProps) {
   const words = (
     <>
       <h1 className="t-display text-ink">{headline}</h1>
@@ -50,9 +65,12 @@ export function PageHero({ headline, sub, button, link, children, aside, asidePl
   if (aside && asidePlacement === "beside") {
     return (
       <section>
-        <div className="page-container flex flex-col gap-10 pt-8 pb-12 lg:flex-row lg:items-center lg:gap-[60px] lg:pt-16 lg:pb-[72px]">
-          <div className="flex flex-col lg:w-[720px] lg:min-w-0 lg:shrink">{words}</div>
-          <div className="mx-auto w-full max-w-[474px] lg:mx-0 lg:min-w-0 lg:shrink lg:basis-[474px]">{aside}</div>
+        <div
+          className="page-container flex flex-col gap-10 pt-8 pb-12 lg:flex-row lg:items-center lg:gap-[60px] lg:pt-16 lg:pb-[72px]"
+          style={{ ["--hero-words" as string]: `${besideWidths[0]}px`, ["--hero-aside" as string]: `${besideWidths[1]}px` }}
+        >
+          <div className="flex flex-col lg:w-(--hero-words) lg:min-w-0 lg:shrink">{words}</div>
+          <div className={cn("mx-auto w-full max-w-(--hero-aside) lg:mx-0 lg:min-w-0 lg:shrink lg:basis-(--hero-aside)", asideClassName)}>{aside}</div>
         </div>
       </section>
     );

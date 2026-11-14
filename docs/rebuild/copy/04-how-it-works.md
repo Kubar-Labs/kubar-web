@@ -4,6 +4,7 @@ Extracted from Figma, How it works · 1440 (frame 172:6), 13 Nov 2026, in readin
 
 ## Hero
 (14 Nov: the kicker line above the headline is removed. REDRAW-2026-11-14.md, section 3.)
+(Build step 5: the words sit beside "Eight states · isometric steps" (258:1829), eight blocks numbered 01 to 08, 08 in petrol; the numbers are part of the drawing.)
 [Display] From the port to the record.
 [BodyL] One illustrative receivable, followed step by step: who does what, the documents behind it and where the money moves. A $225k rice invoice to a buyer in the UAE, due 75 days after shipment.
 (After step 3, REDRAW-2026-11-14.md section 10: "Illustrative" is cut in all three places on this page, since the lead already says "illustrative".)
@@ -54,6 +55,7 @@ At 768 and 390 the ledger ends with the line: Kubar is in the data path of every
 [Body] The exporter’s bank closes the shipping bill against it.
 [Body] The government’s interest subvention is filed on it, where the exporter qualifies.
 Eight document cards that lock into the record one after another (component "Evidence stack", 127:2464); the last card is open:
+(Build step 5, REDRAW-2026-11-14.md section 5: drawn as "Evidence package · isometric" (258:1864): the record's identifier, then eight sheets, Doc 08 on top, each tied to its row (number and name); under the stack "From · The financier" beside the line below it, then the four relying parties, then the two notes.)
 [Code] Doc 01  [UI] Commercial invoice
 [Code] Doc 02  [UI] Shipping bill
 [Code] Doc 03  [UI] Bill of lading, electronic where issued
@@ -66,6 +68,7 @@ Eight document cards that lock into the record one after another (component "Evi
 [Body] The financier owns the receivable
 The record they lock into:
 (After step 3, REDRAW-2026-11-14.md section 10: ", 8 of 8" in the record's title and "05 Purchased" under the stack are cut.)
+(Build step 5: section 5's drawing has no record card, so the element list and the State line below are not on the page; the record's title is the identifier above the stack, and the eight rows carry the documents. Flagged to Vaibhav, 15 Nov.)
 [Tag] Record RCV-0001 · Evidence package
 [BodyS] Commercial invoice · Shipping bill · Bill of lading · Inspection report · Credit-insurance cover · Buyer’s acknowledgement · No-objection · Purchase confirmation   (each with a filled square)
 [Tag] State
@@ -92,6 +95,7 @@ Below 1200, the three payments as rows, each with its from and to (Figma 120:114
 [H2] If a buyer doesn’t pay.
 (14 Nov: the paragraph beside the heading is cut; it repeated the flow. With no lead, the heading runs 800 wide at desktop.)
 A ruled register (component "If a buyer doesn’t pay", 133:2422), no boxes or arrows:
+(Build step 5, REDRAW-2026-11-14.md section 5: drawn as "If a buyer doesn’t pay · flow" (259:2120): steps 01 to 03 in a row, a fork under step 03 labelled "No dispute" and "A dispute", steps 04 and 05 on the first branch and 06 on the second, then "Kubar holds none of the risk" in Sans/UI large, ink. The register's title below is not drawn in the flow (it repeats the heading); flagged to Vaibhav, 15 Nov. Step numbers and branch labels are in the secondary colour, REDRAW section 11.4.)
 [Tag] If a buyer doesn’t pay
 01 | Kubar | Flags the late payment straight away
 02 | Kubar | Checks with the exporter for any dispute
@@ -114,6 +118,10 @@ Buyer | Acknowledges the notice; pays the financier’s account | Its acknowledg
 Trade platform | Brings exporters and their shipment data through NavDhan SDK | Its agreement with Kubar
 Kubar | Designs the pool, checks and documents each receivable, matches payments, services and reports | The mandate from the financier
 (first column [UI], the others [BodyS])
+(Build step 5, Vaibhav, 15 Nov: from 1200 up the register is drawn as a map, Figma 287:2806; below 1200 the stacked register stays, and the table stays in the page for screen readers at every width. Seven cards, each with the party's name and its "Does" sentence above, unchanged. The map's own strings, all taken from the table's wording:
+  five agreements, a label on each line: "The policy" (Insurer–Financier), "The mandate" (Financier–Kubar), "Purchase agreement" (Financier–Exporter), "Agreement with Kubar" (Trade platform–Kubar), "Services agreement" (Kubar–Exporter);
+  three papers a party signs alone, a tag in its card: "Programme terms" (Financier), "Its no-objection" (Exporter’s bank), "Its acknowledgement" (Buyer);
+  the key: "A line is an agreement between the two parties it joins." and "A tag is a paper one party signs on its own.")
 [UI] Who holds what                 → /products/kubar-protocol#who-holds-what
 
 ## Terms  (glossary; each term is also the target of first-use abbreviation tooltips across the site)

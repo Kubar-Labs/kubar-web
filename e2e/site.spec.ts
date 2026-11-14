@@ -210,9 +210,9 @@ test.describe("primitives and registers (build step 2), on Home", () => {
     );
   });
 
-  // How it works and NavDhan SDK still carry the tag until steps 5 and 6 rebuild them.
+  // NavDhan SDK still carries the tag until step 6 rebuilds it (How it works lost it in step 5).
   test("Illustrative opens its note in place and closes again", async ({ page }) => {
-    await page.goto("/how-it-works");
+    await page.goto("/products/navdhan-sdk");
     const tag = page.getByRole("button", { name: "Illustrative" }).first();
     await expect(tag).toHaveAttribute("aria-expanded", "false");
     await tag.click();
@@ -779,7 +779,7 @@ test.describe("How it works (build step 4)", () => {
     await scrollToState(page, 1);
     await page.getByRole("link", { name: "Skip the story" }).click();
     await expect(page).toHaveURL(/#evidence$/);
-    // Let the evidence stack arrive (the record waits at 40% until it has), then check state 06.
+    // Let the evidence stack play, then check state 06.
     await page.locator("#evidence ol").scrollIntoViewIfNeeded();
     await page.waitForTimeout(1500);
     await scrollToState(page, 6);
@@ -788,16 +788,21 @@ test.describe("How it works (build step 4)", () => {
     await expectNoAxeViolations(page);
   });
 
-  test("the evidence stack arrives and ends fully shown", async ({ page }) => {
+  test("the evidence stack plays once in view and ends fully shown", async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto("/how-it-works");
-    await page.locator("#evidence").scrollIntoViewIfNeeded();
+    const drawing = page.locator(".iso-evidence");
+    await expect(drawing).toHaveAttribute("data-phase", "armed");
+    await drawing.scrollIntoViewIfNeeded();
     await page.locator("#evidence ol").scrollIntoViewIfNeeded();
-    const cards = page.locator("#evidence ol > li");
-    await expect(cards).toHaveCount(8);
-    await expect(cards.last()).toContainText("The financier owns the receivable");
-    await expect(cards.last()).toHaveCSS("opacity", "1");
-    await expect(page.getByText("Record RCV-0001 · Evidence package", { exact: true }).locator("xpath=../..")).toHaveCSS("opacity", "1");
+    await expect(drawing).toHaveAttribute("data-phase", "playing");
+    const rows = page.locator("#evidence ol > li");
+    await expect(rows).toHaveCount(8);
+    await expect(rows.first()).toContainText("Doc 08Purchase confirmation");
+    await expect(rows.last()).toContainText("Doc 01Commercial invoice");
+    await expect(rows.first()).toHaveCSS("opacity", "1");
+    await expect(rows.last()).toHaveCSS("opacity", "1");
+    await expect(page.getByText("The financier owns the receivable", { exact: true })).toBeVisible();
   });
 
   test("with reduced motion at 390 and 768 the ledger shows, nothing scrolls sideways and axe is clean", async ({ page }) => {
@@ -809,6 +814,204 @@ test.describe("How it works (build step 4)", () => {
       await expect(page.locator(".story-ledger").getByText("Kubar is in the data path of every step and in the money path of none.")).toBeVisible();
       expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
       await expectNoAxeViolations(page);
+    }
+  });
+});
+
+test.describe("How it works (build step 5)", () => {
+  const box = async (page: Page, selector: string) => (await page.locator(selector).first().boundingBox())!;
+
+  test("the hero's eight steps, no Illustrative tag, and the cuts of section 10", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/how-it-works");
+    const steps = page.locator("svg.iso-steps");
+    await expect(steps).toHaveAttribute("aria-hidden", "true");
+    await expect(steps.locator(".steps-rise")).toHaveCount(8);
+    await expect(steps.locator(".steps-petrol")).toHaveCount(1);
+    await expect(page.getByRole("button", { name: "Illustrative" })).toHaveCount(0);
+    await expect(page.getByText("Illustrative", { exact: true })).toHaveCount(0);
+    // The lead and the meta description keep "illustrative" in words.
+    await expect(page.getByText(/^One illustrative receivable, followed step by step/)).toBeVisible();
+    // Section 10: the two shortened headings, no legend line for Kubar, nothing under the evidence stack's rows but the financier's line.
+    await expect(page.getByRole("heading", { name: "What happens to a receivable.", exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "If a buyer doesn’t pay.", exact: true })).toBeVisible();
+    await expect(page.getByText("Kubar: the one filled column")).toHaveCount(0);
+    await expect(page.locator("#evidence").getByText("05 Purchased")).toHaveCount(0);
+    await expect(page.locator("#evidence").getByText(/8 of 8/)).toHaveCount(0);
+    await expect(page.locator("#evidence").getByText("Record RCV-0001 · Evidence package", { exact: true })).toBeVisible();
+    // The glossary has no column heads; each term is its row's header.
+    const glossary = page.locator("table").filter({ has: page.locator("#term-itfs") });
+    await expect(glossary.getByRole("columnheader")).toHaveCount(0);
+    await expect(glossary.getByRole("rowheader")).toHaveCount(19);
+  });
+
+  test("a row lifts its sheet on hover and on a tap, and Tab skips the rows", async ({ page, browser }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/how-it-works");
+    const sheet = (doc: string) => page.locator(`.iso-evidence svg:visible .iso-lift[data-doc="${doc}"]`);
+    const row = page.locator('.iso-evidence li[data-doc="03"]');
+    await expect(row).toHaveAttribute("tabindex", "-1");
+    await row.hover();
+    await expect(sheet("03")).toHaveCSS("transform", "matrix(1, 0, 0, 1, 0, -14)");
+    await expect(sheet("05")).toHaveCSS("transform", "none");
+    // A phone: the rows sit under the stack, and a tap lifts the sheet.
+    const phone = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+    const tab = await phone.newPage();
+    await tab.goto("/how-it-works");
+    const tapped = tab.locator('.iso-evidence li[data-doc="06"]');
+    await tapped.scrollIntoViewIfNeeded();
+    await tapped.tap();
+    await expect(tab.locator('.iso-evidence svg:visible .iso-lift[data-doc="06"]')).toHaveCSS("transform", "matrix(1, 0, 0, 1, 0, -14)");
+    const stack = (await tab.locator(".iso-evidence svg:visible").first().boundingBox())!;
+    expect((await tapped.boundingBox())!.y).toBeGreaterThan(stack.y + stack.height);
+    await phone.close();
+  });
+
+  test("with reduced motion the drawings stand still and a lift is a colour change", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.setViewportSize({ width: 1440, height: 900 });
+    for (const path of ["/", "/how-it-works"]) {
+      await page.goto(path);
+      const scope = path === "/" ? ".iso-record" : ".iso-evidence";
+      const row = page.locator(`${scope} li`).nth(2);
+      await row.scrollIntoViewIfNeeded();
+      await row.hover();
+      const lifted = page.locator(`${scope} svg:visible .iso-lift`).nth(path === "/" ? 3 : 5);
+      await expect(lifted, path).toHaveCSS("transform", "none");
+      await expect(lifted.locator("rect").nth(2), path).not.toHaveCSS("fill", "rgb(255, 255, 255)");
+    }
+    await expect(page.locator(".steps-rise").first()).toHaveCSS("animation-name", "none");
+    await expect(page.locator(".iso-evidence")).toHaveAttribute("data-phase", "done");
+    await expect(page.locator(".unpaid-flow")).toHaveAttribute("data-phase", "done");
+  });
+
+  test("If a buyer doesn't pay: three steps, a fork, two branches, no rani", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/how-it-works");
+    const flow = page.locator(".unpaid-flow");
+    // It starts undrawn below the fold and plays once in view.
+    await expect(flow).toHaveAttribute("data-phase", "armed");
+    await flow.scrollIntoViewIfNeeded();
+    await expect(flow).toHaveAttribute("data-phase", "playing");
+    await expect(flow.locator("ol > li")).toHaveCount(6);
+    await expect(flow.getByText("No dispute", { exact: true })).toBeVisible();
+    await expect(flow.getByText("A dispute", { exact: true })).toBeVisible();
+    await expect(flow.getByText("Kubar holds none of the risk", { exact: true })).toBeVisible();
+    // Rule 11.4: numbers and branch labels in the secondary colour, not rani.
+    for (const text of ["01", "06", "No dispute", "A dispute"]) {
+      const color = await flow.getByText(text, { exact: true }).evaluate((el) => getComputedStyle(el).color);
+      expect(color, text).not.toBe("rgb(173, 36, 104)");
+    }
+    // Desktop: 01 to 03 in a row, 04 and 05 on the next row with 06 at the right edge, under the fork.
+    const at = async (no: string) => (await flow.locator("li", { hasText: new RegExp(`^${no}`) }).locator("div").first().boundingBox())!;
+    const [s1, s3, s4, s5, s6] = await Promise.all(["01", "03", "04", "05", "06"].map(at));
+    expect(Math.round(s3.y)).toBe(Math.round(s1.y));
+    expect(s4.y).toBeGreaterThan(s1.y + s1.height + 100);
+    expect(Math.round(s5.y)).toBe(Math.round(s4.y));
+    expect(Math.round(s6.y)).toBe(Math.round(s4.y));
+    expect(Math.round(s6.x + s6.width)).toBe(1360);
+    await expect(flow.locator(".fork-bar")).toBeVisible();
+    // Phone: one column, in reading order, the fork's lines gone.
+    await page.setViewportSize({ width: 390, height: 844 });
+    const order = await Promise.all(["01", "02", "03", "04", "05", "06"].map(at));
+    for (let i = 1; i < order.length; i++) expect(order[i].y).toBeGreaterThan(order[i - 1].y + order[i - 1].height);
+    await expect(flow.locator(".fork-bar")).toBeHidden();
+  });
+
+  test("Each party signs: a map from 1200 up, the register below it, the table always there for screen readers", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/how-it-works");
+    const map = page.locator(".signs-map");
+    await expect(map).toBeVisible();
+    await expect(map.locator("> div")).toHaveAttribute("aria-hidden", "true");
+    await expect(map.locator("[data-party]")).toHaveCount(7);
+    await expect(map.locator("[tabindex]")).toHaveCount(0);
+    for (const text of ["The policy", "The mandate", "Purchase agreement", "Agreement with Kubar", "Services agreement", "Programme terms", "Its no-objection", "Its acknowledgement", "A line is an agreement between the two parties it joins.", "A tag is a paper one party signs on its own."]) {
+      await expect(map.getByText(text, { exact: true }), text).toBeVisible();
+    }
+    // 304 × 204 cards, 184 between columns, 100 between rows; Kubar under the Financier, in petrol.
+    const card = async (party: string) => (await map.locator(`[data-party="${party}"]`).boundingBox())!;
+    const [insurer, financier, kubar, exporter, bank] = await Promise.all(["insurer", "financier", "kubar", "exporter", "bank"].map(card));
+    expect([Math.round(insurer.width), Math.round(insurer.height)]).toEqual([304, 204]);
+    expect(Math.round(financier.x - insurer.x - insurer.width)).toBe(184);
+    expect(Math.round(kubar.y - financier.y - financier.height)).toBe(100);
+    expect(Math.round(kubar.x)).toBe(Math.round(financier.x));
+    expect(Math.round(bank.x)).toBe(Math.round(kubar.x));
+    expect(exporter.x).toBeGreaterThan(kubar.x + kubar.width);
+    await expect(map.locator('[data-party="kubar"]')).toHaveCSS("background-color", "rgb(2, 39, 50)");
+    // The table is still in the page, read but not shown.
+    const table = page.getByRole("table").filter({ has: page.getByRole("columnheader", { name: "Signs" }) });
+    await expect(table.getByRole("row")).toHaveCount(8);
+    expect((await table.boundingBox())!.width).toBeLessThanOrEqual(1);
+    // A card keeps its own lines and labels and dims the others.
+    await map.locator('[data-party="insurer"]').hover();
+    await expect(map).toHaveAttribute("data-picked", "insurer");
+    await expect(map.getByText("The policy", { exact: true })).toHaveCSS("opacity", "1");
+    await expect(map.getByText("Services agreement", { exact: true })).toHaveCSS("opacity", "0.3");
+    await page.mouse.move(5, 5);
+    await expect(map.getByText("Services agreement", { exact: true })).toHaveCSS("opacity", "1");
+    // 1200: the same composition, narrower.
+    await page.setViewportSize({ width: 1200, height: 900 });
+    const [f2, k2, e2] = await Promise.all(["financier", "kubar", "exporter"].map(card));
+    expect(Math.round(k2.x)).toBe(Math.round(f2.x));
+    expect(Math.round(e2.x + e2.width)).toBe(1120);
+    // Below 1200: the stacked register, no map.
+    await page.setViewportSize({ width: 768, height: 1024 });
+    await expect(map).toBeHidden();
+    await expect(table).toBeVisible();
+  });
+
+  test("a tap on a card of the signs map picks it", async ({ browser }) => {
+    const tablet = await browser.newContext({ viewport: { width: 1376, height: 1032 }, hasTouch: true });
+    const page = await tablet.newPage();
+    await page.goto("/how-it-works");
+    const map = page.locator(".signs-map");
+    await map.locator('[data-party="exporter"]').scrollIntoViewIfNeeded();
+    await map.locator('[data-party="exporter"]').tap();
+    await expect(map).toHaveAttribute("data-picked", "exporter");
+    await expect(map.getByText("The policy", { exact: true })).toHaveCSS("opacity", "0.3");
+    await expect(map.getByText("Purchase agreement", { exact: true })).toHaveCSS("opacity", "1");
+    await tablet.close();
+  });
+
+  test("laptops keep the 1440 composition from 1200 up, and nothing scrolls sideways", async ({ page }) => {
+    for (const width of [1200, 1280, 1366, 1440]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto("/how-it-works");
+      // The hero: the steps beside the words.
+      const words = await box(page, "main h1");
+      const steps = await box(page, "svg.iso-steps");
+      expect(steps.x, `${width}: steps beside the words`).toBeGreaterThan(words.x + words.width);
+      expect(steps.x + steps.width, `${width}: steps inside the page`).toBeLessThanOrEqual(width);
+      // The evidence: the rows beside the stack, the drawing beside the heading.
+      const heading = await box(page, "#evidence-heading");
+      const stack = await box(page, ".iso-evidence svg:visible");
+      const row = await box(page, '.iso-evidence li[data-doc="08"]');
+      expect(stack.x, `${width}: stack beside the heading`).toBeGreaterThan(heading.x + heading.width);
+      expect(row.x, `${width}: rows beside the stack`).toBeGreaterThan(stack.x + stack.width);
+      // The fork: steps 01 to 03 in one row.
+      const first = await box(page, ".unpaid-flow ol > li:nth-child(1) > div");
+      const third = await box(page, ".unpaid-flow ol > li:nth-child(3) > div");
+      expect(Math.round(third.y), `${width}: one row`).toBe(Math.round(first.y));
+      expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth), `${width}`).toBe(0);
+    }
+  });
+
+  test("tablets and phones keep the drawings as the 768 and 390 frames draw them", async ({ page }) => {
+    for (const [width, beside] of [[768, true], [390, false], [375, false]] as const) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto("/how-it-works");
+      const words = await box(page, "main section:first-of-type .flex.flex-col a");
+      const steps = await box(page, "svg.iso-steps");
+      expect(steps.y, `${width}: steps under the routes`).toBeGreaterThan(words.y);
+      const stack = await box(page, ".iso-evidence svg:visible");
+      const row = await box(page, '.iso-evidence li[data-doc="08"]');
+      if (beside) expect(row.x, `${width}: rows beside`).toBeGreaterThan(stack.x + stack.width);
+      else expect(row.y, `${width}: rows under`).toBeGreaterThan(stack.y + stack.height);
+      // References stay whole.
+      const id = page.locator(".iso-evidence").getByText("RCV-0001", { exact: true });
+      await expect(id).toHaveCSS("white-space", "nowrap");
+      expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth), `${width}`).toBe(0);
     }
   });
 });

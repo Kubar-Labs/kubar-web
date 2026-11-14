@@ -170,7 +170,7 @@ describe("copy matches docs/rebuild/copy word for word", () => {
   });
 
   it("carries every How it works line (04-how-it-works.md)", () => {
-    const skip = new Set(["Back to text", "Illustrative", "Term", "Meaning", "Party", "Does", "Signs", "State", "Skip the story", "Settled", "Purchased"]);
+    const skip = new Set(["Back to text", "Party", "Does", "Signs", "State", "Skip the story", "Settled", "Purchased"]);
     const lanes = /^(Lane heads|Row numbers|Legend|Path labels)/;
     for (const line of pageFragments("04-how-it-works.md")) {
       if (skip.has(line) || lanes.test(line)) continue;

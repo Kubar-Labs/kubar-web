@@ -3,26 +3,21 @@ import { cn } from "@/lib/utils";
 /*
  * Terms (How it works, "The terms on this site."): the glossary as a
  * register. Term in Sans/UI, meaning in Body small. Each row has an id
- * ("term-…") so a first use elsewhere on the site can point at it.
+ * ("term-…") so a first use elsewhere on the site can point at it. No column
+ * heads: "Term" and "Meaning" named nothing (REDRAW-2026-11-14.md, section
+ * 10); each row's term is its row header.
  */
 export const termId = (term: string) =>
   `term-${term.toLowerCase().replace(/[’']/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}`;
 
-export function Terms({ columns, rows, className }: { columns: string[]; rows: [string, React.ReactNode][]; className?: string }) {
+export function Terms({ rows, className }: { rows: [string, React.ReactNode][]; className?: string }) {
   return (
     <table role="table" className={cn("w-full table-fixed border-collapse text-left max-lg:block", className)}>
       <colgroup>
         <col className="lg:w-[326px]" />
         <col />
       </colgroup>
-      <thead role="rowgroup" className="max-lg:sr-only">
-        <tr role="row" className="border-b-2 border-rule-strong">
-          {columns.map((column) => (
-            <th key={column} role="columnheader" scope="col" className="t-fine pr-6 pb-2 font-normal text-ink-muted last:pr-0">{column}</th>
-          ))}
-        </tr>
-      </thead>
-      <tbody role="rowgroup" className="max-lg:block max-lg:border-t-2 max-lg:border-rule-strong">
+      <tbody role="rowgroup" className="border-t-2 border-rule-strong max-lg:block">
         {rows.map(([term, meaning], r) => (
           <tr
             key={term}
