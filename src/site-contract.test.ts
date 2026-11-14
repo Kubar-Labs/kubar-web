@@ -121,7 +121,7 @@ describe("copy matches docs/rebuild/copy word for word", () => {
   });
 
   it("carries every Home line from the gap to Contact (01-home.md)", () => {
-    const skip = new Set(["¹", "²", "³", "Back to text", "01 … 08", "Illustrative", "05", "Purchased"]);
+    const skip = new Set(["¹", "²", "³", "Back to text", "01 … 08", "05", "Purchased"]);
     for (const heading of ["The gap", "One receivable", "Band · closing line", "Foundations first", "Who takes part", "People", "Contact"]) {
       for (let line of sectionLines("01-home.md", heading)) {
         if (skip.has(line) || line === "—") continue;
@@ -153,7 +153,7 @@ describe("copy matches docs/rebuild/copy word for word", () => {
   const flat = allMessages.replace(/<marker><\/marker>/g, "¹");
 
   it("carries every Kubar Protocol line (02-kubar-protocol.md)", () => {
-    const skip = new Set(["Back to text", "Illustrative", "Element", "Party", "Institution", "Field"]);
+    const skip = new Set(["Back to text", "Element", "Party", "Institution", "Field"]);
     for (const line of pageFragments("02-kubar-protocol.md")) {
       if (skip.has(line)) continue;
       expect(flat.includes(JSON.stringify(line).slice(1, -1)), `missing: ${line}`).toBe(true);
@@ -161,7 +161,7 @@ describe("copy matches docs/rebuild/copy word for word", () => {
   });
 
   it("carries every NavDhan SDK line (03-navdhan-sdk.md)", () => {
-    const skip = new Set(["Illustrative", "Capability", "Step"]);
+    const skip = new Set(["Capability", "Step"]);
     for (const line of pageFragments("03-navdhan-sdk.md")) {
       if (skip.has(line)) continue;
       expect(flat.includes(JSON.stringify(line).slice(1, -1)), `missing: ${line}`).toBe(true);

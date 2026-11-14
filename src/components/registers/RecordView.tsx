@@ -9,7 +9,8 @@ import { cx as cn } from "@/lib/cx";
  * Record RCV-0001 · isometric (Figma 245:3225 at 1440, 248:3239 at 768,
  * 248:3731 at 390; REDRAW-2026-11-14.md, Home hero).
  *
- * The head (identifier and Illustrative), the summary in Serif/Record, then
+ * The head (the identifier; no Illustrative tag since 15 Nov: the summary
+ * says "An example" in words), the summary in Serif/Record, then
  * the six documents as sheets stacked 46 px apart, 06 on top and current
  * (rani edge, lifted shadow). Each sheet is tied by a hairline to its row:
  * number, document, source, FILED. Under them the Proves line ("05
@@ -60,13 +61,10 @@ function SheetContent({ no, current }: { no: string; current: boolean }) {
 
 export function RecordView({
   copy,
-  illustrative,
   className,
 }: {
   /** The "record" messages. */
   copy: unknown;
-  /** The Illustrative tag, rendered on the server. */
-  illustrative: React.ReactNode;
   className?: string;
 }) {
   const t = reader(copy);
@@ -80,11 +78,8 @@ export function RecordView({
 
   return (
     <div data-no-abbr className={cn("iso-record flex flex-col", className)}>
-      <div className="flex items-baseline justify-between gap-4">
-        <p className="t-tag text-ink">{t("title")}</p>
-        {illustrative}
-      </div>
-      <p className="t-record pt-1 text-ink">{t("summary")}</p>
+      <p className="t-tag text-ink">{t("title")}</p>
+      <p className="t-record pt-2 text-ink">{t("summary")}</p>
       <p id={descriptionId} className="sr-only">
         {t("description")}
       </p>

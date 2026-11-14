@@ -10,7 +10,7 @@ Extracted from Figma, NavDhan SDK · 1440 (frame 170:6), 13 Nov 2026, in reading
 
 Beside it, the embed sketch (component "Embed sketch", 140:2523): a schematic, not a screenshot. At 768 and 390 the "Shipment" column of the sketch is dropped and only the SDK panel shows.
 [Tag] Your platform
-[Fine] Illustrative
+(15 Nov, REDRAW-2026-11-14.md section 10: no Illustrative tag on the sketch; applied when this page is built.)
 [Tag] Shipment
 [BodyS] Booking
 [BodyS] Invoice

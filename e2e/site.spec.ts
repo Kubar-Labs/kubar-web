@@ -199,8 +199,20 @@ test.describe("primitives and registers (build step 2), on Home", () => {
     await expect(page.locator(".iso-record svg")).toHaveAttribute("aria-hidden", "true");
   });
 
-  test("Illustrative opens its note in place and closes again", async ({ page }) => {
+  test("Home marks its example in words, with no Illustrative tag", async ({ page }) => {
     await page.goto("/");
+    await expect(page.getByRole("button", { name: "Illustrative" })).toHaveCount(0);
+    await expect(
+      page.getByText("An example: a $225,000 rice invoice to a buyer in the UAE, due 75 days after shipment.", { exact: true }),
+    ).toBeVisible();
+    await expect(page.locator(".iso-record ol").first()).toHaveAccessibleDescription(
+      "An example record of one export receivable, with six documents filed.",
+    );
+  });
+
+  // How it works and NavDhan SDK still carry the tag until steps 5 and 6 rebuild them.
+  test("Illustrative opens its note in place and closes again", async ({ page }) => {
+    await page.goto("/how-it-works");
     const tag = page.getByRole("button", { name: "Illustrative" }).first();
     await expect(tag).toHaveAttribute("aria-expanded", "false");
     await tag.click();
@@ -595,12 +607,21 @@ test.describe("Kubar Protocol (redraw step 4)", () => {
     await expect(page.getByRole("heading", { level: 3 })).toHaveCount(17);
   });
 
-  test("redraw: the limit drawing, one Illustrative, the sheet, the loop, the holders and the corridor", async ({ page }) => {
+  test("redraw: the limit drawing, the sheet marked An example, the loop, the holders and the corridor", async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto("/products/kubar-protocol");
-    // The hero's drawing is decoration; the page says Illustrative once, on the receivable sheet.
+    // The hero's drawing is decoration. No Illustrative tag (15 Nov): the sheet's top row says "An example" in plain words.
     await expect(page.locator("main section").first().locator("svg[aria-hidden='true']").first()).toBeAttached();
-    await expect(page.getByRole("button", { name: "Illustrative" })).toHaveCount(1);
+    await expect(page.getByRole("button", { name: "Illustrative" })).toHaveCount(0);
+    const example = page.getByText("An example", { exact: true });
+    await expect(example).toHaveCount(1);
+    await expect(example).toBeVisible();
+    await expect(example).toHaveClass(/t-fine/);
+    await expect(example).toHaveClass(/text-ink-muted/);
+    const title = page.getByText("Receivable RCV-0001", { exact: true });
+    const [t, e] = [(await title.boundingBox())!, (await example.boundingBox())!];
+    expect(Math.abs(t.y + t.height / 2 - (e.y + e.height / 2)), "on the title's row").toBeLessThan(4);
+    expect(e.x, "at the right of the row").toBeGreaterThan(t.x + t.width);
     const sheet = page.locator("dl").filter({ hasText: "Face value" });
     await expect(sheet.getByText("$225,000", { exact: true })).toBeVisible();
     // The loop: five steps in order, no party tags; the line draws once in view.

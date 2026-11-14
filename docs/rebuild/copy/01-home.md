@@ -6,9 +6,9 @@ Extracted from Figma, Home · 1440 (frame 160:6), 13 Nov 2026, in reading order.
 [Display] Building the institutional exchange¹ for cross-border trade finance.
 [UIL] For financial institutions            → /products/kubar-protocol
 [UIL] For trade platforms                   → /products/navdhan-sdk
+(15 Nov, REDRAW-2026-11-14.md section 10: no Illustrative tag; the record's line says "An example" in words. Its accessible description: "An example record of one export receivable, with six documents filed.")
 [Tag] Record RCV-0001
-[Fine] Illustrative                         (rani, dotted underline; opens "An example receivable, not a real transaction." in place)
-[Record] $225,000 rice invoice to a buyer in the UAE, due 75 days after shipment.
+[Record] An example: a $225,000 rice invoice to a buyer in the UAE, due 75 days after shipment.
 (14 Nov: the record becomes the isometric stack of six sheets with a row tied to each, 06 on top, so its column heads "No.", "Document", "Source" and "Status" are not shown.)
 [Code] 01
 [UI] Commercial invoice

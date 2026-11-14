@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
  * account"; Financier and Cover as plain text; "Next" in a dashed box. On
  * phones the cards stack and the arrow points down. The labels are Sans/Fine
  * in the secondary colour at every width (rani is kept for footnote markers,
- * the current state, Illustrative and errors).
+ * the current state and errors).
  */
 type Row = [label: string, value: string];
 

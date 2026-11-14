@@ -13,7 +13,7 @@ Extracted from Figma, Kubar Protocol · 1440 (frame 167:6), 13 Nov 2026, in read
 [H2] What you buy.
 (Step 4: the register becomes the receivable sheet, REDRAW-2026-11-14.md, Kubar Protocol: its column heads "Field" and "Entry" are not shown; the face value is the sheet's figure.)
 [Tag] Receivable RCV-0001
-[Fine] Illustrative
+[Fine] An example                (15 Nov: plain words in muted Sans/Fine where the Illustrative tag was, at the right of the sheet's top row; not a button)
 [Tag] Face value                 [BodyS] $225,000
 [Tag] Goods                      [BodyS] Rice, shipped from India
 [Tag] Buyer                      [BodyS] An importer in the UAE, on an approved insurance limit
@@ -43,7 +43,7 @@ At 768 and 390 the small drawing (the day 0 and day 75 bars, 350 wide) sits abov
 
 ## How a programme runs
 [H2] How a programme runs.
-(After step 3, REDRAW-2026-11-14.md section 10: the party tags on both lists are cut, since each sentence names who acts; "Illustrative" is cut from the loop. In the hero drawing and the evidence drawing it is cut too: it shows once, on the receivable sheet.)
+(After step 3, REDRAW-2026-11-14.md section 10: the party tags on both lists are cut, since each sentence names who acts; "Illustrative" is cut from the loop. In the hero drawing and the evidence drawing it is cut too. Since 15 Nov there is no tag at all: the receivable sheet says "An example" in plain words.)
 Step 4 (REDRAW-2026-11-14.md, Kubar Protocol): "Set up once" as six numbered dots on a line; "Then, for every receivable" as five raised cards round an ellipse; below desktop the cards run in a column with a return arrow.
 [Tag] Set up once
 [Code] 01  [BodyS] Kubar proposes the pool and its rules

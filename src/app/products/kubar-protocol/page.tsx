@@ -16,13 +16,12 @@ import { ReceivableSheet } from "@/components/protocol/ReceivableSheet";
 import { VenueRegister } from "@/components/protocol/VenueRegister";
 import { Register } from "@/components/registers/Register";
 import { Footnote, FootnoteMarker } from "@/components/ui/Footnote";
-import { Illustrative } from "@/components/ui/Illustrative";
 
 /*
  * Kubar Protocol (Figma 167:6 at 1440, 169:1931 at 768, 168:684 at 390;
  * REDRAW-2026-11-14.md, Kubar Protocol, and the copy changes of section 10).
- * "Illustrative" shows once, on the receivable sheet, where the example first
- * shows a figure.
+ * No Illustrative tag (15 Nov): the receivable sheet says "An example" in
+ * plain words where the example first shows a figure.
  */
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -59,7 +58,7 @@ export default function KubarProtocol() {
           <ReceivableSheet
             className="lg:w-[519px] lg:shrink-0"
             title={t("whatYouBuy.title")}
-            illustrative={<Illustrative />}
+            example={t("whatYouBuy.example")}
             rows={t.raw("whatYouBuy.rows") as string[][]}
           />
           {/* Side by side from 1280 up, the timeline taking the rest of the row (737 at 1440, about 580 at 1280);

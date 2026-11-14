@@ -299,8 +299,8 @@
   },
   "record": {
     "title": "Record RCV-0001",
-    "summary": "$225,000 rice invoice to a buyer in the UAE, due 75 days after shipment.",
-    "description": "Illustrative record of one export receivable: six documents filed; state 05 of 8, purchased.",
+    "summary": "An example: a $225,000 rice invoice to a buyer in the UAE, due 75 days after shipment.",
+    "description": "An example record of one export receivable, with six documents filed.",
     "columns": {
       "no": "No.",
       "document": "Document",
@@ -587,6 +587,7 @@
     "whatYouBuy": {
       "heading": "What you buy.",
       "title": "Receivable RCV-0001",
+      "example": "An example",
       "rows": [
         [
           "Face value",
