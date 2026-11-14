@@ -15,6 +15,7 @@ import { usePlayOnce } from "@/lib/usePlayOnce";
 export function PickStage({
   item,
   from,
+  hover: hovers = true,
   className,
   children,
 }: {
@@ -22,6 +23,8 @@ export function PickStage({
   item: string;
   /** The attribute on an item that holds its key. */
   from: string;
+  /** false: only a click, a tap or focus picks (Kubar Protocol's loop stepper). */
+  hover?: boolean;
   className?: string;
   children: React.ReactNode;
 }) {
@@ -42,10 +45,10 @@ export function PickStage({
   };
   // Only a mouse hovers: a touch picks with its tap, and keeps its pick when the finger lifts.
   const hover = (event: React.PointerEvent) => {
-    if (event.pointerType === "mouse") pick(event);
+    if (hovers && event.pointerType === "mouse") pick(event);
   };
   const leave = (event: React.PointerEvent) => {
-    if (event.pointerType === "mouse") setPicked(null);
+    if (hovers && event.pointerType === "mouse") setPicked(null);
   };
   return (
     <div

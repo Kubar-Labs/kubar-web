@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { createPageMetadata } from "@/app/page-metadata";
 import { NextStep, Questions } from "@/components/blocks/Closing";
 import { PageHero } from "@/components/blocks/PageHero";
+import { OnThisPage, type IndexItem } from "@/components/layout/OnThisPage";
 import { Section, SectionHead } from "@/components/blocks/Section";
 import { EvidenceSources } from "@/components/protocol/EvidenceSources";
 import { MoneyPath } from "@/components/protocol/MoneyPath";
@@ -13,6 +14,8 @@ import { LimitDrawing } from "@/components/protocol/LimitDrawing";
 import { MoneyTimeline, type TimelineCopy } from "@/components/protocol/MoneyTimeline";
 import { ProgrammeRuns, type ProgrammeStep } from "@/components/protocol/ProgrammeRuns";
 import { ReceivableSheet } from "@/components/protocol/ReceivableSheet";
+import { BuyerLimit } from "@/components/protocol/BuyerLimit";
+import { LossHistory, type LossHistoryCopy } from "@/components/protocol/LossHistory";
 import { VenueRegister } from "@/components/protocol/VenueRegister";
 import { Register } from "@/components/registers/Register";
 import { Footnote, FootnoteMarker } from "@/components/ui/Footnote";
@@ -40,6 +43,7 @@ function withMarker(text: string, marker: React.ReactNode) {
 export default function KubarProtocol() {
   const t = useTranslations("kubarProtocol");
   const footnotes = useTranslations("footnotes");
+  const common = useTranslations("common");
 
   return (
     <>
@@ -51,6 +55,9 @@ export default function KubarProtocol() {
         aside={<LimitDrawing className="block h-auto w-full overflow-visible" />}
         asidePlacement="beside"
       />
+      <div className="page-container">
+        <OnThisPage label={common("onThisPage")} items={t.raw("index") as IndexItem[]} />
+      </div>
 
       <Section labelledBy="buy-heading" className="flex flex-col gap-10 lg:gap-16">
         <SectionHead id="buy-heading" heading={t("whatYouBuy.heading")} layout="wide" />
@@ -83,20 +90,16 @@ export default function KubarProtocol() {
       <Section labelledBy="evidence-heading" className="flex flex-col gap-10 lg:gap-16">
         <SectionHead id="evidence-heading" heading={t("evidence.heading")} lead={t("evidence.lead")} />
         <div className="flex flex-col gap-12 lg:max-w-[1062px]">
-          {/* The ten elements show once, in the drawing; the register stays as a table for screen readers. */}
+          {/* The ten elements show once: each row is a button that opens its "Checked against" line. */}
           <EvidenceSources
-            elements={(t.raw("evidence.rows") as string[][]).map(([element, from, checked]) => ({ element, from, checked }))}
-            from={(source) => t("evidence.from", { source })}
+            elements={(t.raw("evidence.rows") as string[][]).map(([element, source, checked]) => ({
+              element,
+              from: t("evidence.from", { source }),
+              checked,
+            }))}
             checkedLabel={(t.raw("evidence.columns") as string[])[2]}
             record={t("evidence.record")}
             readers={t.raw("evidence.readers") as string[]}
-          />
-          <Register
-            className="sr-only"
-            columns={t.raw("evidence.columns") as string[]}
-            widths={[326, 326, 410]}
-            rows={t.raw("evidence.rows") as string[][]}
-            stackLabels
           />
           <div className="flex flex-col gap-3 lg:max-w-[628px]">
             {(t.raw("evidence.after") as string[]).map((line) => (
@@ -106,8 +109,10 @@ export default function KubarProtocol() {
         </div>
       </Section>
 
-      <Section labelledBy="insurance-heading">
+      <Section labelledBy="insurance-heading" className="flex flex-col gap-10 lg:gap-16">
         <SectionHead id="insurance-heading" heading={t("insurance.heading")} lead={t("insurance.lead")} />
+        {/* Under the lead, in the lead's column; narrower laptops move it left so its labels fit. */}
+        <BuyerLimit className="lg:ml-[clamp(300px,calc(100%-800px),480px)]" labels={t.raw("insurance.labels") as [string, string, string]} />
       </Section>
 
       <Section labelledBy="payment-heading" className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-20">
@@ -124,8 +129,11 @@ export default function KubarProtocol() {
         />
       </Section>
 
-      <Section labelledBy="loss-heading">
-        <SectionHead id="loss-heading" heading={t("lossHistory.heading")} lead={t("lossHistory.lead")} />
+      {/* The drawing's labels carry the lead, which stays as its description for screen readers. */}
+      <Section labelledBy="loss-heading" className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-10 min-[1366px]:gap-20">
+        {/* Laptops narrow the heading's column a little, so the drawing's labels keep their lines. */}
+        <SectionHead id="loss-heading" heading={t("lossHistory.heading")} layout="stacked" className="lg:w-[clamp(340px,calc(100%-800px),400px)]" />
+        <LossHistory className="min-w-0 flex-1" copy={t.raw("lossHistory.drawing") as LossHistoryCopy} description={t("lossHistory.lead")} />
       </Section>
 
       <Section id="who-holds-what" labelledBy="holds-heading" className="flex flex-col gap-10 lg:gap-16">

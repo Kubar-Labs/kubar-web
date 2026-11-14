@@ -33,7 +33,17 @@ function Sheet({ label, current }: { label: string; current?: boolean }) {
   );
 }
 
-export function LimitDrawing({ className }: { className?: string }) {
+export function LimitDrawing({
+  className,
+  still = false,
+  full = false,
+}: {
+  className?: string;
+  /** No settling movement (the insurance section's copy of the box). */
+  still?: boolean;
+  /** The frame's whole 500 × 440, so overlays in its coordinates line up. */
+  full?: boolean;
+}) {
   // The floor's corners, projected: top, right, front, left.
   const half = 0.866 * SIDE;
   const floor = (y: number) => ({ top: [CX, y], right: [CX + half, y + SIDE / 2], front: [CX, y + SIDE], left: [CX - half, y + SIDE / 2] });
@@ -43,7 +53,7 @@ export function LimitDrawing({ className }: { className?: string }) {
   const edge = "limit-edge";
 
   return (
-    <svg aria-hidden="true" viewBox="13 25 474 415" width={474} height={415} className={className}>
+    <svg aria-hidden="true" viewBox={full ? "0 0 500 440" : "13 25 474 415"} width={full ? 500 : 474} height={full ? 440 : 415} className={className}>
       <GroundShadow cx={250} cy={400} rx={180} ry={45} />
       {/* The floor and the back of the box. */}
       <path d={`${line(base.top, base.right, base.front, base.left)} Z`} className="fill-inset" />
@@ -64,7 +74,7 @@ export function LimitDrawing({ className }: { className?: string }) {
       <path d={line(rim.right, base.right)} className={edge} />
       <path d={line(rim.left, rim.front, rim.right)} className={edge} />
       {/* The next receivable that fits. */}
-      <g className="limit-settle">
+      <g className={still ? undefined : "limit-settle"}>
         <IsoSheetShape x={CX} y={45} w={SHEET} h={SHEET} current>
           <Sheet label="RCV-0003" current />
         </IsoSheetShape>

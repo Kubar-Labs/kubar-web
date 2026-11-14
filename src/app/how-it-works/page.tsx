@@ -3,6 +3,7 @@ import { useTranslations } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import { createPageMetadata } from "@/app/page-metadata";
 import { PageHero } from "@/components/blocks/PageHero";
+import { OnThisPage, type IndexItem } from "@/components/layout/OnThisPage";
 import { Section, SectionHead } from "@/components/blocks/Section";
 import { IsoEvidence, type EvidenceCopy } from "@/components/how/IsoEvidence";
 import { StoryStack, StoryStackAfter } from "@/components/how/StoryStack";
@@ -37,6 +38,7 @@ const FN_STATUS = "fn-1";
 export default function HowItWorks() {
   const t = useTranslations("howItWorks");
   const footnotes = useTranslations("footnotes");
+  const common = useTranslations("common");
   const states = t.raw("rail.states") as LedgerState[];
   const evidence = t.raw("evidence") as EvidenceCopy;
   const routes = t.raw("next.routes") as { tag: string; label: string; href: string }[];
@@ -57,6 +59,9 @@ export default function HowItWorks() {
           <TextLink href="/products/navdhan-sdk" kind="arrow" size="large">{t("hero.platforms")}</TextLink>
         </div>
       </PageHero>
+      <div className="page-container">
+        <OnThisPage label={common("onThisPage")} items={t.raw("index") as IndexItem[]} />
+      </div>
 
       {/* The rail: the pinned story at every width (REDRAW section 3a); the
           ledger with reduced motion or on a very short screen. */}

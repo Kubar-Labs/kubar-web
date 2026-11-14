@@ -108,7 +108,10 @@ export function StoryView({
         ? long
           ? svh - headerHeight() - 256 >= 250
           : (svh - headerHeight() - 64 - 48) / 8 >= 44
-        : (0.45 * svh - 40 - 24) / 8 >= 22;
+        : long && !window.matchMedia("(min-width: 768px)").matches
+          ? // On a phone the pinned stack and its list would take over half of a short screen.
+            svh >= 620
+          : (0.45 * svh - 40 - 24) / 8 >= 22;
       setFits(ok);
     };
     const schedule = () => {

@@ -757,6 +757,15 @@
     }
   }
 
+  /* Kubar Protocol's loss history: when it comes into view, RCV-0003 comes
+     down to its drawn place above the stack over the scene duration. */
+  [data-phase="armed"] .loss-settle {
+    transform: translateY(-40px);
+  }
+  [data-phase="playing"] .loss-settle {
+    transition: transform var(--duration-scene) var(--ease-standard);
+  }
+
   /* How it works hero (IsoSteps): on page load the blocks rise in order, 01
      to 08, 60 ms apart; 08's petrol top fades in over its white one last. */
   .steps-rise {
@@ -852,24 +861,6 @@
     opacity: 0.3;
   }
 
-  /* Kubar Protocol's evidence list (EvidenceSources): the picked row shows
-     its "Checked against" line, one at a time. */
-  .evidence-sources .evidence-checked {
-    display: none;
-  }
-  .evidence-sources[data-picked="0"] li[data-el="0"] .evidence-checked,
-  .evidence-sources[data-picked="1"] li[data-el="1"] .evidence-checked,
-  .evidence-sources[data-picked="2"] li[data-el="2"] .evidence-checked,
-  .evidence-sources[data-picked="3"] li[data-el="3"] .evidence-checked,
-  .evidence-sources[data-picked="4"] li[data-el="4"] .evidence-checked,
-  .evidence-sources[data-picked="5"] li[data-el="5"] .evidence-checked,
-  .evidence-sources[data-picked="6"] li[data-el="6"] .evidence-checked,
-  .evidence-sources[data-picked="7"] li[data-el="7"] .evidence-checked,
-  .evidence-sources[data-picked="8"] li[data-el="8"] .evidence-checked,
-  .evidence-sources[data-picked="9"] li[data-el="9"] .evidence-checked {
-    display: flex;
-  }
-
   /* If a buyer doesn't pay (UnpaidFlow): each beat fades in at its --beat;
      the fork's stem draws down and its bar out from the stem (transform). */
   [data-phase="armed"] .flow-beat {
@@ -958,6 +949,13 @@
   .raise-card:is(:hover, :focus)::before {
     opacity: 1;
   }
+  .programme-loop[data-picked="01"] .loop-card[data-step="01"]::before,
+  .programme-loop[data-picked="02"] .loop-card[data-step="02"]::before,
+  .programme-loop[data-picked="03"] .loop-card[data-step="03"]::before,
+  .programme-loop[data-picked="04"] .loop-card[data-step="04"]::before,
+  .programme-loop[data-picked="05"] .loop-card[data-step="05"]::before {
+    opacity: 1;
+  }
   /* The loop at desktop: the ellipse draws clockwise from 01 over 900 ms; each
      arrowhead and card appears as the line reaches it; then one small sheet
      travels the loop and stops by 05. Drawn as it ends without script, with
@@ -1003,6 +1001,23 @@
       transition:
         opacity var(--duration-hover) var(--ease-standard) 900ms,
         offset-distance 1800ms var(--ease-standard) 900ms;
+    }
+    /* The stepper: a picked card (click, tap or focus) calls the sheet to it
+       and is raised. The sheet rests just before each card on the ellipse. */
+    .programme-loop[data-picked] .loop-sheet {
+      opacity: 1;
+      transition: offset-distance var(--duration-scene) var(--ease-standard);
+    }
+    .programme-loop[data-picked="01"] .loop-sheet { offset-distance: 92%; }
+    .programme-loop[data-picked="02"] .loop-sheet { offset-distance: 12%; }
+    .programme-loop[data-picked="03"] .loop-sheet { offset-distance: 32%; }
+    .programme-loop[data-picked="04"] .loop-sheet { offset-distance: 52%; }
+    .programme-loop[data-picked="05"] .loop-sheet { offset-distance: 72%; }
+    .programme-loop[data-picked] :is(.loop-head, .loop-card) {
+      opacity: 1;
+    }
+    .programme-loop[data-picked] .loop-line {
+      stroke-dashoffset: 0;
     }
   }
 
@@ -1180,6 +1195,12 @@
       left: calc(100% + 23px);
       height: 57.8%;
       max-width: calc(100cqw - 100% - 23px);
+    }
+  }
+  /* Tablets: the rows share the height evenly, so a name on two lines keeps its distance. */
+  @media (min-width: 768px) and (max-width: 1199.98px) {
+    .story-stack .stack-rows {
+      justify-content: space-between;
     }
   }
   @media (max-width: 767.98px) {

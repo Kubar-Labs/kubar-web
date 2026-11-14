@@ -81,7 +81,18 @@ export const STACK_SMALL: StackGeometry = {
   content: "small",
 };
 
-export function SheetContent({ no, current, size }: { no: string; current: boolean; size: StackGeometry["content"] }) {
+export function SheetContent({
+  no,
+  current,
+  size,
+  numberClassName,
+}: {
+  no: string;
+  current: boolean;
+  size: StackGeometry["content"];
+  /** For the number printed on the sheet (the story's small stack hides it on phones). */
+  numberClassName?: string;
+}) {
   const large = size === "large";
   return (
     <>
@@ -90,7 +101,7 @@ export function SheetContent({ no, current, size }: { no: string; current: boole
       <rect x={15} y={47} width={large ? 160 : 150} height={3} className="fill-rule" />
       {large ? <rect x={15} y={57} width={176} height={3} className="fill-rule" /> : null}
       <rect x={large ? 197 : 177} y={15} width={36} height={36} className="fill-inset" />
-      <text x={15} y={large ? 133 : 124} className={cn("iso-text-code", current ? "fill-accent" : "fill-ink-muted")}>
+      <text x={15} y={large ? 133 : 124} className={cn("iso-text-code", current ? "fill-accent" : "fill-ink-muted", numberClassName)}>
         {no}
       </text>
     </>

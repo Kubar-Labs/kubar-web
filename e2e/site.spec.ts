@@ -583,6 +583,12 @@ test.describe("pinned story (redraw step 3)", () => {
       for (const [width, height] of sizes) {
         await page.setViewportSize({ width, height });
         await page.goto(path);
+        // How it works on a short phone: the pinned stack would take over half the screen, so the ledger shows.
+        if (path === "/how-it-works" && width < 768 && height < 620) {
+          await expect(page.locator(".story"), `${width}x${height}`).toHaveAttribute("data-story-fits", "false");
+          await expect(page.locator(".story-ledger .iso-evidence ol > li")).toHaveCount(8);
+          continue;
+        }
         await storyLive(page);
         const lanes = page.locator(".story-on :is(.lanes, .story-stack)");
         await scrollToState(page, 3);
@@ -737,35 +743,95 @@ test.describe("Kubar Protocol (redraw step 4)", () => {
     await expect(page.getByRole("row", { name: /Face value, on the due date/ })).toContainText("Buyer");
   });
 
-  test("the evidence package shows its ten elements once; a row opens its Checked against line, one at a time", async ({ page, browser }) => {
+  test("the evidence package shows its ten elements once; a row is a button that opens its Checked against line", async ({ page, browser }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto("/products/kubar-protocol");
     const list = page.locator(".evidence-sources");
-    const rows = list.locator("li[data-el]");
+    const rows = list.getByRole("button");
     await expect(rows).toHaveCount(10);
-    await expect(list.locator("[tabindex]")).toHaveCount(0);
-    // The register is in the page for screen readers, not shown.
-    const table = page.getByRole("table").filter({ has: page.getByRole("columnheader", { name: "Checked against" }) });
-    await expect(table.getByRole("row")).toHaveCount(11);
-    expect((await table.boundingBox())!.width).toBeLessThanOrEqual(1);
-    await expect(page.getByText("The invoice: goods, quantity, value and buyer", { exact: true }).locator("visible=true")).toHaveCount(0);
-    // Hover opens one row's line; moving to another closes it.
+    await expect(page.getByRole("columnheader", { name: "Checked against" })).toHaveCount(0);
+    const line = (text: string) => list.getByText(text, { exact: true });
+    await expect(rows.nth(2)).toHaveAttribute("aria-expanded", "false");
+    await expect(line("The invoice: goods, quantity, value and buyer")).toBeHidden();
+    // Hover opens nothing; a click does, and the plus turns to a minus.
     await rows.nth(2).hover();
-    await expect(rows.nth(2).getByText("The invoice: goods, quantity, value and buyer", { exact: true })).toBeVisible();
-    await expect(rows.nth(2).getByText("Checked against", { exact: true })).toBeVisible();
-    await rows.nth(5).hover();
-    await expect(rows.nth(5).getByText("Headroom on the buyer’s limit", { exact: true })).toBeVisible();
-    await expect(rows.nth(2).getByText("The invoice: goods, quantity, value and buyer", { exact: true })).toBeHidden();
-    // A tap does the same on a phone, where the register is hidden too.
+    await expect(line("The invoice: goods, quantity, value and buyer")).toBeHidden();
+    const icon = () => rows.nth(2).locator("svg path").getAttribute("d");
+    const plus = await icon();
+    await rows.nth(2).click();
+    await expect(rows.nth(2)).toHaveAttribute("aria-expanded", "true");
+    await expect(line("The invoice: goods, quantity, value and buyer")).toBeVisible();
+    expect(await icon()).not.toBe(plus);
+    // One at a time, from the keyboard too.
+    await rows.nth(5).focus();
+    await page.keyboard.press("Enter");
+    await expect(line("Headroom on the buyer’s limit")).toBeVisible();
+    await expect(line("The invoice: goods, quantity, value and buyer")).toBeHidden();
+    await expect(rows.nth(2)).toHaveAttribute("aria-expanded", "false");
+    await page.keyboard.press("Space");
+    await expect(line("Headroom on the buyer’s limit")).toBeHidden();
+    await expectNoAxeViolations(page);
+    // A tap on a phone.
     const phone = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
     const tab = await phone.newPage();
     await tab.goto("/products/kubar-protocol");
-    const tapped = tab.locator(".evidence-sources li[data-el]").nth(7);
+    const tapped = tab.locator(".evidence-sources").getByRole("button").nth(7);
     await tapped.scrollIntoViewIfNeeded();
     await tapped.tap();
-    await expect(tapped.getByText("The bank’s letter", { exact: true })).toBeVisible();
+    await expect(tab.locator(".evidence-sources").getByText("The bank’s letter", { exact: true })).toBeVisible();
+    expect((await tapped.boundingBox())!.height).toBeGreaterThanOrEqual(44);
     expect(await tab.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
     await phone.close();
+  });
+
+  test("the loss history and the buyer limit are drawn, with their labels as lists", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/products/kubar-protocol");
+    const loss = page.locator(".loss-history");
+    await expect(loss.locator("svg").first()).toHaveAttribute("aria-hidden", "true");
+    await expect(loss.locator("ul > li")).toHaveText(["Settled", "The loss historyRecorded by buyer, exporter and commodity", "It lets an insurer price the pool", "It brings in the next financier"]);
+    // The lead isn't shown; it describes the drawing for screen readers.
+    const lead = page.getByText(/^Recorded by buyer, exporter and commodity, it lets an insurer price the pool/);
+    await expect(lead).toHaveClass(/sr-only/);
+    // RCV-0003 waits 40 px higher, then comes down once in view.
+    await expect(loss).toHaveAttribute("data-phase", "armed");
+    await loss.scrollIntoViewIfNeeded();
+    await expect(loss).toHaveAttribute("data-phase", "playing");
+    await expect(loss.locator(".loss-settle")).toHaveCSS("transform", "none");
+    // Insurance: the lead stays, the box sits under it with three labels and no movement.
+    const insurance = page.locator("section", { has: page.locator("#insurance-heading") });
+    await expect(insurance.getByText(/^The credit-insurance policy is yours/)).toBeVisible();
+    await expect(insurance.locator("ul > li")).toHaveText(["An approved buyer limit", "Headroom", "Receivables bought"]);
+    await expect(insurance.locator(".limit-settle")).toHaveCount(0);
+    // Below 1200 the labels sit under each drawing.
+    await page.setViewportSize({ width: 390, height: 844 });
+    for (const scope of [loss, insurance]) {
+      const art = (await scope.locator("svg").first().boundingBox())!;
+      const first = (await scope.locator("ul > li").first().boundingBox())!;
+      expect(first.y).toBeGreaterThan(art.y + art.height - 1);
+    }
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
+  });
+
+  test("the loop stepper: a click on a card calls the travelling sheet to it and raises the card", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/products/kubar-protocol");
+    const loop = page.locator(".programme-loop");
+    await loop.scrollIntoViewIfNeeded();
+    const sheet = loop.locator(".loop-sheet");
+    const card = (no: string) => loop.locator(`.loop-card[data-step="${no}"]`);
+    await card("02").hover();
+    await expect(loop).not.toHaveAttribute("data-picked", "02");
+    await card("02").click();
+    await expect(loop).toHaveAttribute("data-picked", "02");
+    await expect(sheet).toHaveCSS("offset-distance", "12%");
+    expect(await card("02").evaluate((el) => getComputedStyle(el, "::before").opacity)).toBe("1");
+    await card("04").click();
+    await expect(sheet).toHaveCSS("offset-distance", "52%");
+    // A click elsewhere sends it back to rest by 05.
+    await page.locator("#runs-heading").click();
+    await expect(loop).not.toHaveAttribute("data-picked", /.+/);
+    await expect(sheet).toHaveCSS("offset-distance", "72%");
   });
 
   test("the questions are an accordion below 768, first one open, and stay open from 768 up", async ({ page }) => {
@@ -1130,6 +1196,51 @@ test.describe("How it works (build step 5)", () => {
       expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth), `${width}`).toBe(0);
     }
   });
+});
+
+test.describe("On this page index (section 12, item 5)", () => {
+  for (const [path, first, count] of [["/products/kubar-protocol", "What you buy", 11], ["/how-it-works", "The rail", 5]] as const) {
+    test(`${path}: a row under the hero, then a button and a sheet once it has scrolled away`, async ({ page }) => {
+      await page.setViewportSize({ width: 1440, height: 900 });
+      await page.goto(path);
+      const header = () => page.evaluate(() => document.querySelector("header")!.getBoundingClientRect().height);
+      const before = await header();
+      const row = page.getByRole("navigation", { name: "On this page" });
+      await expect(row.getByRole("link")).toHaveCount(count);
+      await expect(row.getByRole("link").first()).toHaveText(first);
+      const button = page.getByRole("button", { name: "On this page" });
+      await expect(button).toHaveCount(0);
+      // Every link has a target on the page.
+      for (const href of await row.getByRole("link").evaluateAll((els) => els.map((el) => el.getAttribute("href")!))) {
+        await expect(page.locator(href)).toHaveCount(1);
+      }
+      // Past the row: the button; it opens the list with the current section marked.
+      const target = await row.getByRole("link").nth(2).getAttribute("href");
+      await page.locator(target!).scrollIntoViewIfNeeded();
+      await page.evaluate(() => window.scrollBy(0, 300));
+      await expect(button).toBeVisible();
+      expect(await header()).toBe(before);
+      await button.click();
+      const sheet = page.getByRole("dialog", { name: "On this page" });
+      await expect(sheet.getByRole("link")).toHaveCount(count);
+      await expect(sheet.locator('[aria-current="location"]')).toHaveCount(1);
+      await page.keyboard.press("Escape");
+      await expect(sheet).toBeHidden();
+      await expect(button).toBeFocused();
+      // A pick closes it and goes there.
+      await button.click();
+      await sheet.getByRole("link").last().click();
+      await expect(sheet).toBeHidden();
+      await expect(page).toHaveURL(/#[a-z0-9-]+-heading$/);
+      await expectNoAxeViolations(page);
+      // A phone: the button stays inside the screen.
+      await page.setViewportSize({ width: 390, height: 844 });
+      await expect(button).toBeVisible();
+      const box = (await button.boundingBox())!;
+      expect(box.x + box.width).toBeLessThanOrEqual(390);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
+    });
+  }
 });
 
 test.describe("About (build step 4)", () => {

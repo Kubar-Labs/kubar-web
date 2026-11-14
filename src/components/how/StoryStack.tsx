@@ -20,8 +20,11 @@ import { cn } from "@/lib/utils";
  *
  * Sizes come from the viewport, as the lanes' rows do: the stack's height
  * is what the screen leaves (--stack-h), its width follows, and the rows sit
- * beside it at the same proportions. Phones set a small stack beside the
- * rows, since eight rows under a full-width stack can't stay pinned.
+ * beside it at the same proportions (tablets space the rows evenly, so a
+ * name that wraps doesn't crowd the next). Phones set a small stack, without
+ * the numbers on its sheets, beside the rows, since eight rows under a
+ * full-width stack can't stay pinned; a phone screen under about 620 px
+ * tall gets the ledger and the complete stack instead.
  * Desktop pins the financier's line and the four relying lines under the
  * stack; below desktop they follow the cards (StoryStackAfter).
  *
@@ -36,7 +39,17 @@ const RELIES = [5, 7, 6, 6];
 const DOWN = straight(5, 0, 5, 28, 7);
 const SIDE = straight(0, 5, 22, 5, 7);
 
-function Sheets({ g, documents, className }: { g: StackGeometry; documents: EvidenceCopy["documents"]; className: string }) {
+function Sheets({
+  g,
+  documents,
+  className,
+  numberClassName,
+}: {
+  g: StackGeometry;
+  documents: EvidenceCopy["documents"];
+  className: string;
+  numberClassName?: string;
+}) {
   const last = documents.length - 1;
   return (
     <svg aria-hidden="true" viewBox={`0 0 ${g.width} ${g.height}`} className={cn("overflow-visible", className)}>
@@ -49,7 +62,7 @@ function Sheets({ g, documents, className }: { g: StackGeometry; documents: Evid
           <g key={doc.no} data-from={state} className="stack-land" style={{ ["--j" as string]: seen }}>
             <g className="iso-lift" data-doc={doc.no}>
               <IsoSheetShape x={g.x} y={g.top + (last - i) * g.step} w={g.sheet.w} h={g.sheet.h} current={i === last}>
-                <SheetContent no={doc.no} current={i === last} size={g.content} />
+                <SheetContent no={doc.no} current={i === last} size={g.content} numberClassName={numberClassName} />
               </IsoSheetShape>
             </g>
           </g>
@@ -94,8 +107,11 @@ export function StoryStack({ copy }: { copy: EvidenceCopy }) {
       </p>
       <div className="stack-box flex items-center gap-3 md:block">
         <Sheets g={STACK_DESKTOP} documents={copy.documents} className="hidden size-full lg:block" />
-        <Sheets g={STACK_SMALL} documents={copy.documents} className="block h-auto w-[30%] max-w-[110px] shrink-0 md:size-full md:max-w-none lg:hidden" />
-        <ol className="stack-rows flex min-w-0 flex-1 flex-col md:absolute md:block">
+        <Sheets g={STACK_SMALL} documents={copy.documents} className="block h-auto w-[30%] max-w-[110px] shrink-0 md:size-full md:max-w-none lg:hidden"
+          // On phones the stack is small: the list beside it carries the numbers.
+          numberClassName="max-md:hidden"
+        />
+        <ol className="stack-rows flex min-w-0 flex-1 flex-col md:absolute lg:block">
           {rows.map(({ doc, i }) => {
             const current = i === last;
             return (
@@ -104,7 +120,7 @@ export function StoryStack({ copy }: { copy: EvidenceCopy }) {
                 tabIndex={-1}
                 data-doc={doc.no}
                 data-from={LANDS[doc.no]}
-                className="relative flex cursor-default items-start gap-2 outline-offset-2 md:h-[12.5%] md:items-center md:gap-2.5 lg:gap-3"
+                className="relative flex cursor-default items-start gap-2 outline-offset-2 md:items-center md:gap-2.5 lg:h-[12.5%] lg:gap-3"
               >
                 <span aria-hidden="true" className={cn("iso-leader hidden md:block", current && "is-current")} />
                 <span className={cn("t-code shrink-0 whitespace-nowrap md:w-[49px]", current ? "text-accent" : "text-ink-muted")}>

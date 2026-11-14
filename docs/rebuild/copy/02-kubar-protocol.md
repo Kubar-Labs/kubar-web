@@ -3,6 +3,7 @@
 Extracted from Figma, Kubar Protocol · 1440 (frame 167:6), 13 Nov 2026, in reading order, after the last status words were removed that night. Bracketed tags are text styles (../tokens/README.md). Header and footer: 00-header-footer.md.
 
 ## Hero
+(15 Nov, REDRAW-2026-11-14.md section 12 item 5: under the hero, an "On this page" row: the label "On this page", then each section's name below as an anchor link: What you buy · How a programme runs · The evidence package · Insurance · The payment path · The loss history · Who holds what · Questions · Where you fit · Programme 1 · The venue. The same list opens from a fixed "On this page" button once the row has scrolled away.)
 (14 Nov: the kicker line above the headline is removed. REDRAW-2026-11-14.md, section 3.)
 [Display] Underwrite once. Buy every receivable that fits.
 [BodyL] Kubar runs the programme around your limit: origination, the evidence package, the data your insurer needs and the matching of every payment. You buy each receivable without recourse for the buyer’s credit, insured in your own name.
@@ -64,7 +65,7 @@ Step 4 (REDRAW-2026-11-14.md, Kubar Protocol): "Set up once" as six numbered dot
 [BodyS] Every receivable that fits, inside your limit
 
 ## The evidence package
-(15 Nov, REDRAW-2026-11-14.md section 13 B7: the ten elements show once. The visible table is gone at every width and stays in the page for screen readers. Each row of the drawing shows the element and its source; picking a row opens its "Checked against" line under it, one at a time, with the label "Checked against" from the table's column head.)
+(15 Nov, REDRAW-2026-11-14.md section 13 B7, as revised in the review of 95868f5: the ten elements show once. Each row is a button with the element and its source and a small plus at its right; a click, a tap or Enter/Space opens its "Checked against" line under it, one at a time, and the plus turns to a minus. The label "Checked against" is the old table's column head. The rows are tabbable, so there is no separate table.)
 [H2] Every element traces to a system the exporter doesn’t control.
 [BodyL] Financiers have lost money on paper they couldn’t verify. So each receivable comes with one record: you buy on it, the insurer prices on it, and the exporter’s bank closes the shipping bill against it.
 Drawing (desktop only; component "Evidence sources", 130:2584): ten elements, each with its source, joined by dashed data-path stubs to one spine and one arrow into the record.
@@ -83,7 +84,8 @@ Drawing (desktop only; component "Evidence sources", 130:2584): ten elements, ea
 [Body] The insurer prices on it
 [Body] The exporter’s bank closes the shipping bill against it
 Register (all sizes):
-[Tag] Element | [Tag] From | [Tag] Checked against
+(15 Nov, section 14: the table and its column heads "Element" and "From" are gone; each row below is a button showing the element and "From" its source, and opens the line:)
+[Tag] Checked against
 Identity of the exporter and the buyer | Government registries; screening | Kubar’s checks, kept on file
 Commercial invoice, with the instruction to pay you | The exporter | The shipping bill; the e-invoice reference where one applies
 Shipping bill | Indian Customs | The invoice: goods, quantity, value and buyer
@@ -99,6 +101,7 @@ Purchase and settlement | You and the exporter’s bank | Payment references; th
 [BodyS] The record is built on Corda, a permissioned ledger: one shared record of each receivable, who holds which rights after the purchase, and its payment and loss history.
 
 ## Insurance
+(15 Nov, section 12 item 2: under the lead, the hero's limit box at 0.8 scale with three labels: "An approved buyer limit", "Headroom" and "Receivables bought".)
 [H2] Cover in your name.
 [BodyL] The credit-insurance policy is yours: you are the insured, on buyer limits the insurer approves. Kubar insures nothing. It gives the insurer what it needs to set and keep those limits: the pool, each receivable as it’s bought and how each one paid. No receivable is bought without headroom on an approved limit.
 
@@ -121,6 +124,7 @@ Below 1200, the three payments as rows, each with its from and to (Figma 120:114
 [BodyS] Every payment carries the receivable’s reference, and Kubar matches each one to its receivable.
 
 ## The loss history
+(15 Nov, section 12 item 1: an isometric drawing beside the heading carries the lead, which is no longer shown and stays as the drawing's description for screen readers. Its labels: "Settled"; "The loss history", with "Recorded by buyer, exporter and commodity" under it; "It lets an insurer price the pool"; "It brings in the next financier".)
 [H2] Every receivable that settles adds to a priced loss history.
 [BodyL] Recorded by buyer, exporter and commodity, it lets an insurer price the pool, and it brings in the next financier.
 

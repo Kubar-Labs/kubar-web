@@ -1,6 +1,9 @@
-import { PickStage } from "@/components/how/PickStage";
+"use client";
+
+import { useId, useState } from "react";
+import { Icon } from "@/components/icons/Icon";
 import { KeepRefs } from "@/components/ui/KeepRefs";
-import { cn } from "@/lib/utils";
+import { cx as cn } from "@/lib/cx";
 
 /*
  * Evidence sources (Figma C4 130:2584; Kubar Protocol 1440 167:286, 768 and
@@ -10,14 +13,15 @@ import { cn } from "@/lib/utils";
  * the record. Tablets and phones: the elements stacked, one dashed arrow
  * down into the record. No pictograms.
  *
- * The ten elements show once (REDRAW-2026-11-14.md, section 13 B7): each
- * row has the element's name and source, and picking a row (hover or a tap)
- * opens its "Checked against" line under it, one at a time (PickStage sets
- * data-picked; globals.css, .evidence-sources). The visible register is
- * gone; the page keeps it as a table for screen readers, so these rows are
- * hidden from assistive technology and add no tab stops. The record card is
- * not hidden.
+ * The ten elements show once (REDRAW-2026-11-14.md, section 13 B7, and the
+ * review of 95868f5). Each row is a button with the element's name and
+ * source and a small plus at its right; a click, a tap or Enter/Space opens
+ * its "Checked against" line under it and turns the plus to a minus, as
+ * "How we estimate this" does. One row is open at a time. The rows are in
+ * the tab order and carry aria-expanded, so this list is the content for
+ * everyone and there is no separate table.
  */
+/** `from` is the whole line, "From Indian Customs". */
 export type EvidenceElement = { element: string; from: string; checked: string };
 
 const dashH = "bg-[repeating-linear-gradient(to_right,var(--color-ink-muted)_0_5px,transparent_5px_9px)]";
@@ -25,37 +29,53 @@ const dashV = "bg-[repeating-linear-gradient(to_bottom,var(--color-ink-muted)_0_
 
 export function EvidenceSources({
   elements,
-  from,
   checkedLabel,
   record,
   readers,
   className,
 }: {
   elements: EvidenceElement[];
-  from: (source: string) => string;
   /** "Checked against" */
   checkedLabel: string;
   record: string;
   readers: string[];
   className?: string;
 }) {
+  const [open, setOpen] = useState<number | null>(null);
+  const base = useId();
+
   return (
-    <PickStage item="li[data-el]" from="data-el" className={cn("evidence-sources relative flex flex-col gap-2 lg:block", className)}>
-      <ul aria-hidden="true" className="relative">
-        {elements.map((item, i) => (
-          <li key={item.element} data-el={i} className="relative flex cursor-default flex-col gap-0.5 py-2 pl-9 lg:w-[48.9%]">
-            <span className="t-body-sm text-ink">{item.element}</span>
-            <span className="t-fine text-ink-muted">{from(item.from)}</span>
-            <span className="evidence-checked t-fine flex-wrap gap-x-2 pt-0.5 text-ink-muted">
-              <span>{checkedLabel}</span>
-              <span className="t-body-sm text-ink">{item.checked}</span>
-            </span>
-            {/* The stub from this element to the spine. */}
-            <span className={cn("absolute top-[27px] left-[104.5%] hidden h-[1.5px] w-[21%] lg:block", dashH)} />
-          </li>
-        ))}
+    <div className={cn("evidence-sources relative flex flex-col gap-2 lg:block", className)}>
+      <ul className="relative">
+        {elements.map((item, i) => {
+          const shown = open === i;
+          const id = `${base}-${i}`;
+          return (
+            <li key={item.element} className="relative lg:w-[48.9%]">
+              <button
+                type="button"
+                aria-expanded={shown}
+                aria-controls={id}
+                onClick={() => setOpen(shown ? null : i)}
+                className="flex w-full items-start justify-between gap-4 py-2 pl-9 text-left outline-offset-2"
+              >
+                <span className="flex min-w-0 flex-col gap-0.5">
+                  <span className="t-body-sm text-ink">{item.element}</span>
+                  <span className="t-fine text-ink-muted">{item.from}</span>
+                </span>
+                <Icon name={shown ? "minus" : "plus"} className="mt-0.5 shrink-0 text-ink-muted" />
+              </button>
+              <p id={id} hidden={!shown} className="t-fine flex flex-wrap gap-x-2 pb-2 pl-9 text-ink-muted">
+                <span>{checkedLabel}</span>
+                <span className="t-body-sm text-ink">{item.checked}</span>
+              </p>
+              {/* The stub from this element to the spine. */}
+              <span aria-hidden="true" className={cn("absolute top-[27px] left-[104.5%] hidden h-[1.5px] w-[21%] lg:block", dashH)} />
+            </li>
+          );
+        })}
         {/* The spine, from the first stub to the last. */}
-        <li role="presentation" className={cn("absolute top-[27px] bottom-[28px] left-[61.4%] hidden w-[1.5px] lg:block", dashV)} />
+        <li role="presentation" aria-hidden="true" className={cn("absolute top-[27px] bottom-[28px] left-[61.4%] hidden w-[1.5px] lg:block", dashV)} />
       </ul>
 
       {/* Desktop: one arrow from the spine into the record. */}
@@ -82,6 +102,6 @@ export function EvidenceSources({
           ))}
         </ul>
       </div>
-    </PickStage>
+    </div>
   );
 }

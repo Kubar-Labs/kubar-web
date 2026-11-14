@@ -1,7 +1,7 @@
 import { Fragment } from "react";
 import { Arrow, straight } from "@/components/drawings/Arrow";
 import { FitStage } from "@/components/drawings/FitStage";
-import { PlayOnce } from "@/components/drawings/PlayOnce";
+import { PickStage } from "@/components/how/PickStage";
 import { ReturnArrow } from "@/components/map/ReturnArrow";
 import { TextLink } from "@/components/ui/TextLink";
 import { cn } from "@/lib/utils";
@@ -108,7 +108,9 @@ export function ProgrammeRuns({
       <SetUpOnce heading={setUp.heading} steps={setUp.steps} link={link} />
 
       <FitStage width={760} height={660} className="lg:max-w-[760px] lg:min-w-0 lg:flex-1">
-      <PlayOnce className="programme-loop relative flex flex-col gap-5 lg:block lg:h-[660px] lg:w-[760px] lg:shrink-0">
+      {/* The stage plays the loop once; after that a click, a tap or focus on a card moves the
+          travelling sheet to it and raises the card (section 12, item 6). */}
+      <PickStage item=".loop-card[data-step]" from="data-step" hover={false} className="programme-loop relative flex flex-col gap-5 lg:block lg:h-[660px] lg:w-[760px] lg:shrink-0">
         <h3 className="t-h4 text-ink lg:absolute lg:top-0 lg:left-0">{each.heading}</h3>
 
         {/* Desktop: the ellipse, its five direction arrows and the travelling sheet. */}
@@ -177,7 +179,7 @@ export function ProgrammeRuns({
           </p>
           <p className="t-body-sm text-ink">{refsLine}</p>
         </div>
-      </PlayOnce>
+      </PickStage>
       </FitStage>
     </div>
   );

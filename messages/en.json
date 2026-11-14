@@ -292,7 +292,8 @@
     "backToText": "Back to text",
     "illustrative": "Illustrative",
     "illustrativeNote": "An example receivable, not a real transaction.",
-    "sending": "Sending…"
+    "sending": "Sending…",
+    "onThisPage": "On this page"
   },
   "footnotes": {
     "status": "Kubar’s own ITFS registration is targeted for 2027; until then Kubar acts as the financier’s origination and servicing agent."
@@ -781,7 +782,12 @@
     },
     "insurance": {
       "heading": "Cover in your name.",
-      "lead": "The credit-insurance policy is yours: you are the insured, on buyer limits the insurer approves. Kubar insures nothing. It gives the insurer what it needs to set and keep those limits: the pool, each receivable as it’s bought and how each one paid. No receivable is bought without headroom on an approved limit."
+      "lead": "The credit-insurance policy is yours: you are the insured, on buyer limits the insurer approves. Kubar insures nothing. It gives the insurer what it needs to set and keep those limits: the pool, each receivable as it’s bought and how each one paid. No receivable is bought without headroom on an approved limit.",
+      "labels": [
+        "An approved buyer limit",
+        "Headroom",
+        "Receivables bought"
+      ]
     },
     "payment": {
       "heading": "The money moves only between banks.",
@@ -821,7 +827,16 @@
     },
     "lossHistory": {
       "heading": "Every receivable that settles adds to a priced loss history.",
-      "lead": "Recorded by buyer, exporter and commodity, it lets an insurer price the pool, and it brings in the next financier."
+      "lead": "Recorded by buyer, exporter and commodity, it lets an insurer price the pool, and it brings in the next financier.",
+      "drawing": {
+        "settled": "Settled",
+        "history": "The loss history",
+        "recorded": "Recorded by buyer, exporter and commodity",
+        "outcomes": [
+          "It lets an insurer price the pool",
+          "It brings in the next financier"
+        ]
+      }
     },
     "holds": {
       "heading": "You hold the receivable, the policy and the account.",
@@ -982,7 +997,53 @@
       "button": "Start a programme conversation",
       "orEmail": "Or email",
       "email": "partnerships@kubar.tech"
-    }
+    },
+    "index": [
+      {
+        "id": "buy-heading",
+        "label": "What you buy"
+      },
+      {
+        "id": "runs-heading",
+        "label": "How a programme runs"
+      },
+      {
+        "id": "evidence-heading",
+        "label": "The evidence package"
+      },
+      {
+        "id": "insurance-heading",
+        "label": "Insurance"
+      },
+      {
+        "id": "payment-heading",
+        "label": "The payment path"
+      },
+      {
+        "id": "loss-heading",
+        "label": "The loss history"
+      },
+      {
+        "id": "holds-heading",
+        "label": "Who holds what"
+      },
+      {
+        "id": "questions-heading",
+        "label": "Questions"
+      },
+      {
+        "id": "fit-heading",
+        "label": "Where you fit"
+      },
+      {
+        "id": "programme1-heading",
+        "label": "Programme 1"
+      },
+      {
+        "id": "venue-heading",
+        "label": "The venue"
+      }
+    ]
   },
   "navdhanSdk": {
     "meta": {
@@ -1499,7 +1560,29 @@
           "href": "/contact?intent=platform"
         }
       ]
-    }
+    },
+    "index": [
+      {
+        "id": "rail-heading",
+        "label": "The rail"
+      },
+      {
+        "id": "money-heading",
+        "label": "The money path"
+      },
+      {
+        "id": "unpaid-heading",
+        "label": "If a buyer doesn’t pay"
+      },
+      {
+        "id": "who-heading",
+        "label": "Who does what"
+      },
+      {
+        "id": "terms-heading",
+        "label": "Terms"
+      }
+    ]
   },
   "about": {
     "meta": {
