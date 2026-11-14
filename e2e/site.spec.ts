@@ -9,6 +9,24 @@ import { expect, test, type Page } from "@playwright/test";
 const publicRoutes = ["/", "/products/kubar-protocol", "/products/navdhan-sdk", "/how-it-works", "/about", "/contact", "/legal/privacy", "/legal/terms"] as const;
 const OG_IMAGE = /^https:\/\/kubar\.tech\/media\/kubar-labs-social-bd9a99c9\.png(?:\?.*)?$/;
 
+/**
+ * The pinned story (REDRAW-2026-11-14.md, section 3a): wait until its observer
+ * is live, then scroll so state n's card has just crossed the 45% line.
+ */
+async function storyLive(page: Page) {
+  await page.locator(".story-on ol[data-live]").first().waitFor({ state: "attached" });
+}
+async function scrollToState(page: Page, n: number) {
+  await page.evaluate((n) => {
+    const story = document.querySelector(".story-on")!;
+    const slot = story.querySelectorAll("ol > li")[n - 1];
+    const header = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--header-height"));
+    const pin = matchMedia("(min-width: 1200px)").matches ? 0 : (story.firstElementChild as HTMLElement).offsetHeight;
+    const line = header + pin + 0.45 * (innerHeight - header - pin);
+    window.scrollTo({ top: slot.getBoundingClientRect().top + scrollY - line + 20, behavior: "instant" });
+  }, n);
+}
+
 async function expectNoAxeViolations(page: Page) {
   const results = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
@@ -273,7 +291,7 @@ test.describe("Home (build step 3, in progress)", () => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/");
     const footnoteY = (await page.locator("#fn-1").boundingBox())!.y;
-    const recordY = (await page.getByText("Record RCV-0001").boundingBox())!.y;
+    const recordY = (await page.locator(".iso-record").getByText("Record RCV-0001").boundingBox())!.y;
     expect(footnoteY).toBeGreaterThan(recordY);
     expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
     await page.emulateMedia({ reducedMotion: "reduce" });
@@ -302,30 +320,35 @@ test.describe("Home, complete (build step 3)", () => {
   });
 
   test("with reduced motion the ledger shows and nothing is pinned", async ({ page }) => {
-    await page.setViewportSize({ width: 1440, height: 900 });
-    await page.emulateMedia({ reducedMotion: "reduce" });
-    await page.goto("/");
-    await expect(page.locator("[data-story-state]")).toHaveCount(0);
-    await expect(page.getByRole("columnheader", { name: "What happens" })).toBeVisible();
+    for (const width of [1440, 390]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await page.goto("/");
+      await expect(page.locator(".story-on")).toBeHidden();
+      await expect(page.getByRole("columnheader", { name: "What happens" })).toBeVisible();
+    }
   });
 
   test("the pinned story steps through eight states on scroll and can be skipped", async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto("/");
+    await storyLive(page);
     const story = page.locator("[data-story-state]");
     await expect(story).toHaveAttribute("data-story-state", "1");
-    // The register stays in the DOM for assistive technology.
-    await expect(page.getByRole("columnheader", { name: "What happens" })).toBeAttached();
-    const top = await story.evaluate((el) => el.getBoundingClientRect().top + window.scrollY);
+    // The eight states are cards in reading order; the ledger waits as the fallback.
+    await expect(story.locator("ol > li")).toHaveCount(8);
+    await expect(page.locator(".story-ledger")).toBeHidden();
     for (const state of [3, 6, 8]) {
-      await page.evaluate((y) => window.scrollTo(0, y), top - 105 + 420 * (state - 1) + 100);
+      await scrollToState(page, state);
       await expect(story).toHaveAttribute("data-story-state", String(state));
+      await expect(story.locator('[aria-current="step"]')).toHaveCount(1);
+      await expect(story.locator("ol > li").nth(state - 1).locator(".story-card")).toHaveAttribute("aria-current", "step");
     }
     await expect(page.getByText("Registry entry, planned")).toBeVisible();
-    await page.evaluate((y) => window.scrollTo(0, y), top);
+    await scrollToState(page, 1);
     await page.getByRole("link", { name: "Skip the story" }).click();
     await expect(page).toHaveURL(/#closing-line$/);
-    await page.waitForTimeout(500); // let the panel's 200 ms cross-fade finish before measuring contrast
+    await page.waitForTimeout(500); // let the cards' 200 ms change finish before measuring contrast
     await expectNoAxeViolations(page);
   });
 
@@ -410,6 +433,37 @@ test.describe("Home drawings (redraw step 2)", () => {
     await expect(page.locator(".iso-foundations")).toHaveAttribute("data-phase", "done");
   });
 
+  test("a foundation label highlights its block's top face on hover and tap, and Tab skips it", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/");
+    // The computed fill, not whether :has() matches (a fill utility once beat the rule).
+    const soft = await page.evaluate(() => {
+      const probe = document.createElement("div");
+      probe.style.color = "var(--color-accent-soft)";
+      document.body.appendChild(probe);
+      const colour = getComputedStyle(probe).color;
+      probe.remove();
+      return colour;
+    });
+    const label = page.locator('.iso-foundations li[data-level="2"]');
+    const face = page.locator('.iso-top[data-level="2"]');
+    const fill = () => face.evaluate((el) => getComputedStyle(el).fill);
+    await expect(label).toHaveAttribute("tabindex", "-1");
+    expect(await fill()).not.toBe(soft);
+    await label.hover();
+    await expect.poll(fill).toBe(soft);
+    await page.mouse.move(0, 0);
+    await expect.poll(fill).not.toBe(soft);
+    // A click or tap focuses the label, so phones keep the highlight.
+    await label.click();
+    await expect(label).toBeFocused();
+    await expect.poll(fill).toBe(soft);
+    // Tab skips the labels and the map's Buyers card; the record's rows stay in the route.
+    await expect(page.locator('[data-party="buyers"]')).toHaveAttribute("tabindex", "-1");
+    await expect(page.locator(".iso-record ol li").first()).toHaveAttribute("tabindex", "0");
+  });
+
   test("standing is four statements with their kinds, and the programmes sit in one row at desktop", async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto("/");
@@ -422,6 +476,61 @@ test.describe("Home drawings (redraw step 2)", () => {
     await expect(marks).toHaveCount(6);
     const tops = await marks.evaluateAll((els) => els.map((el) => Math.round(el.getBoundingClientRect().top)));
     expect(new Set(tops).size).toBe(1);
+  });
+});
+
+test.describe("pinned story (redraw step 3)", () => {
+  const sizes = [[1440, 790], [1366, 650], [1536, 730], [1280, 590], [820, 1050], [390, 664], [375, 548]] as const;
+  const overflow = (page: Page) => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  const state = (page: Page) => page.locator("[data-story-state]");
+
+  for (const path of ["/", "/how-it-works"]) {
+    test(`${path} pins the drawing at every required viewport, also as the address bar hides and shows`, async ({ page }) => {
+      for (const [width, height] of sizes) {
+        await page.setViewportSize({ width, height });
+        await page.goto(path);
+        await storyLive(page);
+        const lanes = page.locator(".story-on .lanes");
+        await scrollToState(page, 3);
+        await expect(state(page), `${width}x${height}`).toHaveAttribute("data-story-state", "3");
+        const pinned = Math.round((await lanes.boundingBox())!.y);
+        await scrollToState(page, 5);
+        await expect(state(page), `${width}x${height}`).toHaveAttribute("data-story-state", "5");
+        expect(Math.round((await lanes.boundingBox())!.y), `${width}x${height} pinned`).toBe(pinned);
+        // The address bar hides: a taller viewport. The story stays, still pinned.
+        await page.setViewportSize({ width, height: height + 56 });
+        await scrollToState(page, 6);
+        await expect(state(page), `${width}x${height + 56}`).toHaveAttribute("data-story-state", "6");
+        await expect(page.locator(".story-on")).toBeVisible();
+        expect(Math.round((await lanes.boundingBox())!.y), `${width}x${height + 56} pinned`).toBe(pinned);
+        // And shows again.
+        await page.setViewportSize({ width, height });
+        await scrollToState(page, 7);
+        await expect(state(page), `${width}x${height}`).toHaveAttribute("data-story-state", "7");
+        expect(Math.round((await lanes.boundingBox())!.y), `${width}x${height} pinned again`).toBe(pinned);
+        expect(await overflow(page), `${width}x${height}`).toBe(0);
+      }
+    });
+
+    test(`${path}: the lanes fit their column, with no sideways scroll at 1200, 1280 and 1366`, async ({ page }) => {
+      for (const width of [1200, 1280, 1366]) {
+        await page.setViewportSize({ width, height: 800 });
+        await page.goto(path);
+        expect(await overflow(page), `${width}`).toBe(0);
+        const lanes = (await page.locator(".story-on .lanes").boundingBox())!;
+        expect(lanes.x + lanes.width, `${width}`).toBeLessThanOrEqual(width);
+      }
+    });
+  }
+
+  test("a screen too short for the smallest rows gets the ledger", async ({ page }) => {
+    for (const [width, height] of [[844, 390], [375, 500], [1280, 520]] as const) {
+      await page.setViewportSize({ width, height });
+      await page.goto("/");
+      await expect(page.locator(".story"), `${width}x${height}`).toHaveAttribute("data-story-fits", "false");
+      await expect(page.locator(".story-on")).toBeHidden();
+      await expect(page.getByRole("columnheader", { name: "What happens" })).toBeVisible();
+    }
   });
 });
 
@@ -492,20 +601,20 @@ test.describe("How it works (build step 4)", () => {
   test("the rail steps through eight states with the documents line, and skips to the evidence", async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto("/how-it-works");
+    await storyLive(page);
     const story = page.locator("[data-story-state]");
     await expect(story).toHaveAttribute("data-story-state", "1");
     await expect(page.getByRole("link", { name: "See how it works" })).toHaveCount(0);
-    const top = await story.evaluate((el) => el.getBoundingClientRect().top + window.scrollY);
-    await page.evaluate((y) => window.scrollTo(0, y), top - 105 + 420 * 5 + 100);
+    await scrollToState(page, 6);
     await expect(story).toHaveAttribute("data-story-state", "6");
-    await expect(story.getByText("Payment reference; closure of the shipping bill")).toBeVisible();
-    await page.evaluate((y) => window.scrollTo(0, y), top);
+    await expect(story.locator('[aria-current="step"]')).toContainText("Payment reference; closure of the shipping bill");
+    await scrollToState(page, 1);
     await page.getByRole("link", { name: "Skip the story" }).click();
     await expect(page).toHaveURL(/#evidence$/);
     // Let the evidence stack arrive (the record waits at 40% until it has), then check state 06.
     await page.locator("#evidence ol").scrollIntoViewIfNeeded();
     await page.waitForTimeout(1500);
-    await page.evaluate((y) => window.scrollTo(0, y), top - 105 + 420 * 5 + 100);
+    await scrollToState(page, 6);
     await expect(story).toHaveAttribute("data-story-state", "6");
     await page.waitForTimeout(500);
     await expectNoAxeViolations(page);
@@ -523,13 +632,13 @@ test.describe("How it works (build step 4)", () => {
     await expect(page.getByText("Record RCV-0001 · Evidence package, 8 of 8").locator("xpath=../..")).toHaveCSS("opacity", "1");
   });
 
-  test("at 390 and 768 the ledger shows, nothing scrolls sideways and axe is clean", async ({ page }) => {
+  test("with reduced motion at 390 and 768 the ledger shows, nothing scrolls sideways and axe is clean", async ({ page }) => {
     for (const width of [390, 768]) {
       await page.setViewportSize({ width, height: 900 });
       await page.emulateMedia({ reducedMotion: "reduce" });
       await page.goto("/how-it-works");
-      await expect(page.locator("[data-story-state]")).toHaveCount(0);
-      await expect(page.getByText("Kubar is in the data path of every step and in the money path of none.")).toBeVisible();
+      await expect(page.locator(".story-on")).toBeHidden();
+      await expect(page.locator(".story-ledger").getByText("Kubar is in the data path of every step and in the money path of none.")).toBeVisible();
       expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
       await expectNoAxeViolations(page);
     }

@@ -60,6 +60,7 @@ Extracted from Figma, Home · 1440 (frame 160:6), 13 Nov 2026, in reading order.
 
 ## One receivable  (the pinned story; see ../HANDOFF.md, Motion)
 [H2] Follow one receivable from shipment to settlement.
+(14 Nov, option B: only the lanes drawing is pinned; each state is a card that scrolls past it, so the panel's "State" label goes and each card carries its own counter, "05 of 08". REDRAW-2026-11-14.md, section 3a.)
 [Tag] Record RCV-0001
 [Fine] Illustrative
 [Tag] State

@@ -12,6 +12,7 @@ Extracted from Figma, How it works · 1440 (frame 172:6), 13 Nov 2026, in readin
 
 ## The rail  (pinned story, eight steps; see ../HANDOFF.md, Motion)
 [H2] What happens to a receivable, in order.
+(14 Nov, option B: only the lanes drawing is pinned; each state is a card that scrolls past it, so the panel's "State" label goes and each card carries its own counter. The legend follows the cards. On tablets and phones the closing line below ends the cards too. REDRAW-2026-11-14.md, section 3a.)
 Desktop: the story panel (left) beside the lanes (right), as on Home but with the How it works panel (documents line, Sans/Body). The 1440 frame shows state 06:
 [Tag] Record RCV-0001
 [Fine] Illustrative

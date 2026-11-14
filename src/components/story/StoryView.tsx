@@ -1,24 +1,31 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { LanesDiagram, type LaneLabels } from "@/components/story/LanesDiagram";
 import { TextLink } from "@/components/ui/TextLink";
 import { reader } from "@/lib/copy";
 import { cx as cn } from "@/lib/cx";
 
 /*
- * The pinned story (Home "Follow one receivable…"; HANDOFF section 7).
- * Desktop only: the story panel (Figma 119:1280) beside the lanes diagram,
- * pinned under the header while the page scrolls through eight steps; each
- * step writes the next state's row and changes the panel. It never traps
- * scroll: the pin is CSS position: sticky inside a tall track, and the state
- * is read from how far the track has scrolled, so a fast scroll lands on the
- * nearest state. "Skip the story" jumps past it.
+ * The pinned story, option B (REDRAW-2026-11-14.md, sections 3a and 9.2;
+ * prototype docs/rebuild/prototypes/pinned-story-options.html; Figma
+ * 266:4120 for phones).
  *
- * The story only switches on in the browser, at desktop width, with a
- * viewport tall enough to hold it and without prefers-reduced-motion. In
- * every other case (and without JavaScript, and for screen readers) the
- * ledger register passed as `children` carries the same eight states.
+ * Only the lanes drawing is pinned (position: sticky). The eight states are
+ * cards in normal flow that scroll past it: beside the drawing at desktop,
+ * below it on tablets and phones. Nothing traps or drives the scroll. A
+ * state becomes current when its card crosses a line 45% of the way down the
+ * space left for the text; an IntersectionObserver watches that line, not a
+ * scroll handler. The current card is raised (--elevation-2); the others sit
+ * flat in the secondary text colour; the change takes 200 ms.
+ *
+ * The drawing (Lanes) is rendered on the server and follows the
+ * data-story-state set here, in CSS. Its rows are sized from the viewport in
+ * svh (globals.css, .lanes). When even the smallest rows don't fit (a
+ * viewport under about 545 px tall), or with prefers-reduced-motion, the
+ * ledger passed as
+ * `children` shows instead. Reduced motion is decided in CSS, so it holds
+ * without script too; the height check needs script, and without it the
+ * cards still carry every word.
  */
 export type LedgerState = {
   no: string;
@@ -31,25 +38,23 @@ export type LedgerState = {
   documents?: string | null;
 };
 
-const STEP = 420; // px of scroll per state
-const QUERY = "(min-width: 1200px) and (min-height: 820px) and (prefers-reduced-motion: no-preference)";
+const DESKTOP = "(min-width: 1200px)";
 
-function PathLine({ kind }: { kind: "data" | "money" }) {
+/** The 22 px line before "Data path" and "Money path" on a card. */
+function PathGlyph({ kind }: { kind: "data" | "money" }) {
   return (
-    <svg width="28" height="14" viewBox="0 0 28 14" fill="none" aria-hidden="true" className={cn("shrink-0", kind === "data" ? "text-ink-muted" : "text-ink")}>
+    <svg aria-hidden="true" width="22" height="8" viewBox="0 0 22 8" className="shrink-0 overflow-visible">
       {kind === "data" ? (
-        <g stroke="currentColor" strokeWidth={1.5}>
-          <line x1="0" y1="8" x2="27" y2="8" strokeDasharray="5 4" />
-          <path d="M22.7 2.7L28 8L22.7 13.3" strokeLinecap="round" strokeLinejoin="round" />
-        </g>
+        <line x1="0" x2="22" y1="4" y2="4" className="stroke-ink-muted" strokeWidth={1.5} strokeDasharray="5 3" />
       ) : (
-        <g fill="currentColor">
-          <rect x="0" y="7" width="19" height="2" />
-          <path d="M28 8L18 2.23V13.77Z" />
-        </g>
+        <line x1="0" x2="22" y1="4" y2="4" className="stroke-ink" strokeWidth={2} />
       )}
     </svg>
   );
+}
+
+function headerHeight() {
+  return parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--header-height")) || 0;
 }
 
 export function StoryView({
@@ -57,140 +62,222 @@ export function StoryView({
   states,
   illustrative,
   marker,
+  lanes,
   skipTo,
   variant = "home",
+  closing,
   children,
 }: {
   /** Id of the section after the story. */
   skipTo: string;
   /** The "story" messages. */
   copy: unknown;
-  /** The eight states the panel steps through. */
+  /** The eight states. */
   states: LedgerState[];
   /** The Illustrative tag and state 08's footnote marker, rendered on the server. */
   illustrative: React.ReactNode;
   marker: React.ReactNode;
-  /** "howItWorks": the sentence in Sans/Body, the documents in place of the party, no link to How it works. */
+  /** The lanes drawing, rendered on the server; it follows data-story-state in CSS. */
+  lanes: React.ReactNode;
+  /** "howItWorks": the sentence in Sans/Body, the documents in place of the party, the legend, no link to How it works. */
   variant?: "home" | "howItWorks";
-  /** The ledger register. */
+  /** How it works: the line that ends the eight states on tablets and phones. */
+  closing?: string;
+  /** The ledger register: the fallback. */
   children: React.ReactNode;
 }) {
   const t = reader(copy);
   const long = variant === "howItWorks";
-  const trackRef = useRef<HTMLDivElement>(null);
-  const [enabled, setEnabled] = useState(false);
+  const pinRef = useRef<HTMLDivElement>(null);
+  const stepsRef = useRef<HTMLOListElement>(null);
   const [state, setState] = useState(1);
+  const [fits, setFits] = useState(true);
 
+  // Do the smallest rows fit? Measured against 100svh, which stays put while
+  // a phone's address bar shows and hides, so the story never flips to the
+  // ledger mid-scroll.
   useEffect(() => {
-    const query = window.matchMedia(QUERY);
-    const sync = () => setEnabled(query.matches);
-    sync();
-    query.addEventListener("change", sync);
-    return () => query.removeEventListener("change", sync);
+    const probe = document.createElement("div");
+    probe.style.cssText = "position:fixed;top:0;left:0;width:0;height:100svh;visibility:hidden;pointer-events:none";
+    document.body.appendChild(probe);
+    let frame = 0;
+    const check = () => {
+      frame = 0;
+      const svh = probe.getBoundingClientRect().height;
+      const ok = window.matchMedia(DESKTOP).matches
+        ? (svh - headerHeight() - 64 - 48) / 8 >= 44
+        : (0.45 * svh - 40 - 24) / 8 >= 22;
+      setFits(ok);
+    };
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(check);
+    };
+    schedule();
+    window.addEventListener("resize", schedule);
+    return () => {
+      window.removeEventListener("resize", schedule);
+      if (frame) cancelAnimationFrame(frame);
+      probe.remove();
+    };
   }, []);
 
+  // Which state is current: the card crossing the 45% line.
   useEffect(() => {
-    if (!enabled) return;
+    const list = stepsRef.current;
+    if (!fits || !list) return;
+    const steps = [...list.children] as HTMLElement[];
+    let observer: IntersectionObserver | null = null;
     let frame = 0;
-    const read = () => {
+    const build = () => {
       frame = 0;
-      const track = trackRef.current;
-      if (!track) return;
-      const stickyTop = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--header-height")) + 24;
-      const scrolled = stickyTop - track.getBoundingClientRect().top;
-      setState(Math.min(8, Math.max(1, Math.floor(scrolled / STEP) + 1)));
+      observer?.disconnect();
+      const height = window.innerHeight;
+      const top = headerHeight() + (window.matchMedia(DESKTOP).matches ? 0 : (pinRef.current?.offsetHeight ?? 0));
+      const line = Math.round(top + 0.45 * (height - top));
+      observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            const index = steps.indexOf(entry.target as HTMLElement);
+            if (entry.isIntersecting) setState(index + 1);
+            else if (index === 0 && entry.boundingClientRect.top >= line) setState(1);
+            else if (index === steps.length - 1 && entry.boundingClientRect.bottom <= line) setState(steps.length);
+          }
+        },
+        // A one-pixel band at the line.
+        { rootMargin: `${-line}px 0px ${-(height - line - 1)}px 0px` },
+      );
+      for (const step of steps) observer.observe(step);
+      list.dataset.live = "true";
     };
-    const onScroll = () => {
-      if (!frame) frame = requestAnimationFrame(read);
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(build);
     };
-    read();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
+    schedule();
+    // The line moves when the viewport resizes (an address bar too) and when the pin's height changes.
+    window.addEventListener("resize", schedule);
+    const pinObserver = new ResizeObserver(schedule);
+    if (pinRef.current) pinObserver.observe(pinRef.current);
     return () => {
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
+      window.removeEventListener("resize", schedule);
+      pinObserver.disconnect();
+      observer?.disconnect();
       if (frame) cancelAnimationFrame(frame);
     };
-  }, [enabled]);
+  }, [fits]);
 
-  const current = states[state - 1];
-  const planned = state === 8;
-  const money = current.money;
+  const idRow = (className: string) => (
+    <div className={cn("flex items-center justify-between gap-4", className)}>
+      <p className="t-tag text-ink">{t("record")}</p>
+      {illustrative}
+    </div>
+  );
 
   return (
-    <>
-      {enabled ? (
-        <div ref={trackRef} data-no-abbr data-story-state={state} style={{ height: 692 + STEP * 8 }}>
-          <div className="sticky top-[calc(var(--header-height)+24px)] flex items-start gap-6">
-            <div className="flex w-[411px] shrink-0 flex-col">
-              <div className="flex items-center justify-between border-b-2 border-rule-strong pb-3">
-                <p className="t-tag text-ink-muted">{t("record")}</p>
-                {illustrative}
-              </div>
-              <p className="flex items-center gap-3 pt-4">
-                <span className="t-fine text-ink-muted">{t("stateLabel")}</span>
-                <span className="t-label text-ink-muted">{t("counter", { n: String(state).padStart(2, "0") })}</span>
-              </p>
-              <div key={state} className="story-fade flex flex-col">
-                <p className={cn("flex items-baseline gap-3 pt-4", planned ? "text-ink-muted" : "text-accent")}>
-                  <span className="t-code">{current.no}</span>
-                  <span className="t-state">
-                    {current.state}
-                    {planned ? marker : null}
-                  </span>
-                </p>
-                <p className={cn("pt-4 text-ink", long ? "t-body" : "t-body-lg min-h-[90px]")}>{current.what}</p>
-                {long && current.documents ? (
-                  <div className="flex flex-col gap-1 pt-3 pb-6">
-                    <p className="t-fine text-ink-muted">{t("documents")}</p>
-                    <p className="t-body text-ink">{current.documents}</p>
-                  </div>
-                ) : (
-                  <p className="t-fine pt-3 pb-6 text-ink-muted">
-                    {t("party", { party: long ? (current.party ?? "") : planned ? t("planned") : (current.party ?? "") })}
-                  </p>
-                )}
-                <div className="flex gap-3 border-t border-rule py-4">
-                  <PathLine kind="data" />
-                  <div className="flex min-w-0 flex-1 flex-col gap-2">
-                    <p className="t-fine text-ink-muted">{t("dataPath")}</p>
-                    <p className="t-body min-h-[26px] text-ink">{planned ? t("planned") : current.data}</p>
-                  </div>
-                </div>
-                <div className="flex gap-3 border-t border-rule py-4">
-                  <PathLine kind="money" />
-                  <div className="flex min-w-0 flex-1 flex-col gap-2">
-                    <p className="flex items-center gap-2">
-                      <span className="t-fine text-ink-muted">{t("moneyPath")}</span>
-                      <span className="t-fine text-accent">{t("holdsNone")}</span>
-                    </p>
-                    <p className={cn("t-body text-ink", !long && "min-h-[78px]")}>{money ?? "—"}</p>
-                  </div>
-                </div>
-              </div>
-              <div aria-hidden="true" className="h-0.5 bg-rule-strong" />
-              <div className="flex items-center gap-12 pt-8">
-                <TextLink href={`#${skipTo}`} kind="anchor">{t("skip")}</TextLink>
-                {long ? null : <TextLink href="/how-it-works" kind="arrow">{t("seeHow")}</TextLink>}
-              </div>
-            </div>
-            {long ? (
-              <div className="flex flex-col">
-                <LanesDiagram state={state} parties={t.raw("parties") as string[]} labels={t.raw("lanes") as LaneLabels} />
-              <ul aria-hidden="true" className="flex flex-wrap gap-x-8 gap-y-3 pt-6 pl-[45px]">
-                <li className="flex items-center gap-3"><PathLine kind="data" /><span className="t-fine text-ink-muted">{t("legend.data")}</span></li>
-                <li className="flex items-center gap-3"><PathLine kind="money" /><span className="t-fine text-ink-muted">{t("legend.money")}</span></li>
-                <li className="flex items-center gap-3"><span className="h-3 w-7 bg-action" /><span className="t-fine text-ink-muted">{t("legend.kubar")}</span></li>
-              </ul>
-              </div>
-            ) : (
-              <LanesDiagram state={state} parties={t.raw("parties") as string[]} labels={t.raw("lanes") as LaneLabels} />
-            )}
-          </div>
+    <div className="story" data-story-fits={fits ? "true" : "false"}>
+      <div data-no-abbr data-story-state={state} className="story-on lg:grid lg:grid-cols-[411px_minmax(0,1fr)] lg:items-start lg:gap-x-6">
+        {/* The pinned drawing. Phones and tablets pin the record's id row with it, on a
+            ground that reaches the screen's edges so the cards pass under it. */}
+        <div
+          ref={pinRef}
+          className="sticky top-(--header-height) z-10 -mx-(--page-margin) bg-page px-(--page-margin) pt-4 pb-3 lg:col-start-2 lg:row-start-1 lg:top-[calc(var(--header-height)+24px)] lg:mx-0 lg:bg-transparent lg:p-0"
+        >
+          {idRow("mb-3 lg:hidden")}
+          {lanes}
         </div>
-      ) : null}
-      {/* The register: shown when the story is off; always in the DOM. */}
-      <div className={enabled ? "sr-only" : undefined}>{children}</div>
-    </>
+
+        <div className="flex flex-col lg:col-start-1 lg:row-start-1">
+          {idRow("mb-4 hidden border-b border-rule-strong pb-2.5 lg:flex")}
+          <TextLink href={`#${skipTo}`} kind="anchor" className="mt-1 mb-4 self-start lg:mt-0 lg:mb-5">
+            {t("skip")}
+          </TextLink>
+
+          <ol ref={stepsRef}>
+            {states.map((step, index) => {
+              const n = index + 1;
+              const current = n === state;
+              const planned = n === 8;
+              const tone = current ? "text-ink" : "text-ink-muted";
+              const data = planned ? (step.data ?? t("planned")) : step.data;
+              return (
+                <li
+                  key={step.no}
+                  // Each card's slot runs to the next card, so the slots tile the
+                  // column and one always holds the line. Phones and tablets: a
+                  // short gap, so the current card stays in view below the
+                  // drawing until the next one reaches the line. Desktop: about
+                  // 60svh a state.
+                  className={cn("pb-[min(96px,12svh)] lg:pb-6", n < states.length && "lg:min-h-[60svh]")}
+                >
+                  <div
+                    aria-current={current ? "step" : undefined}
+                    data-current={current ? "" : undefined}
+                    className="story-card flex flex-col gap-3 border border-rule bg-raised px-[18px] pt-3.5 pb-4 lg:px-6 lg:pt-5 lg:pb-[22px]"
+                  >
+                    <p className="flex items-baseline justify-between gap-3">
+                      <span className={cn("flex items-baseline gap-2 transition-colors duration-(--duration-disclose)", current && !planned ? "text-accent" : "text-ink-muted")}>
+                        <span className="t-code">{step.no}</span>
+                        <span className="t-state">
+                          {step.state}
+                          {planned ? marker : null}
+                        </span>
+                      </span>
+                      <span className="t-label shrink-0 text-ink-muted">{t("counter", { n: step.no })}</span>
+                    </p>
+                    <p className={cn("transition-colors duration-(--duration-disclose)", long ? "t-body" : "t-ui-lg", tone)}>{step.what}</p>
+                    {long && step.documents ? (
+                      <div className="flex flex-col gap-0.5 border-t border-rule pt-2.5">
+                        <p className="t-fine text-ink-muted">{t("documents")}</p>
+                        <p className={cn("t-body-sm transition-colors duration-(--duration-disclose)", tone)}>{step.documents}</p>
+                      </div>
+                    ) : (
+                      <p className="t-fine text-ink-muted">
+                        {t("party", { party: long ? (step.party ?? "") : planned ? t("planned") : (step.party ?? "") })}
+                      </p>
+                    )}
+                    {data ? (
+                      <div className="flex flex-col gap-0.5 border-t border-rule pt-2.5">
+                        <p className={cn("t-fine flex items-center gap-2 transition-colors duration-(--duration-disclose)", tone)}>
+                          <PathGlyph kind="data" />
+                          {t("dataPath")}
+                        </p>
+                        <p className={cn("t-body-sm transition-colors duration-(--duration-disclose)", tone)}>{data}</p>
+                      </div>
+                    ) : null}
+                    {step.money ? (
+                      <div className="flex flex-col gap-0.5 border-t border-rule pt-2.5">
+                        <p className={cn("t-fine flex flex-wrap items-center gap-x-2 transition-colors duration-(--duration-disclose)", tone)}>
+                          <PathGlyph kind="money" />
+                          {t("moneyPath")}
+                          <span className="text-accent">{t("holdsNone")}</span>
+                        </p>
+                        <p className={cn("t-body-sm transition-colors duration-(--duration-disclose)", tone)}>{step.money}</p>
+                      </div>
+                    ) : null}
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
+
+          {/* Room for the last card to reach the line. */}
+          <div aria-hidden="true" className="h-[25svh] lg:h-[30svh]" />
+          {closing ? <p className="t-body-sm mb-6 text-ink lg:hidden">{closing}</p> : null}
+          {long ? (
+            <ul className="flex flex-col gap-1">
+              <li className="t-fine flex items-center gap-3 text-ink-muted"><PathGlyph kind="data" />{t("legend.data")}</li>
+              <li className="t-fine flex items-center gap-3 text-ink-muted"><PathGlyph kind="money" />{t("legend.money")}</li>
+              <li className="t-fine flex items-center gap-3 text-ink-muted"><span aria-hidden="true" className="h-2 w-[22px] shrink-0 bg-action" />{t("legend.kubar")}</li>
+            </ul>
+          ) : (
+            <TextLink href="/how-it-works" kind="arrow" className="self-start">
+              {t("seeHow")}
+            </TextLink>
+          )}
+        </div>
+      </div>
+
+      {/* The ledger: shown instead with reduced motion or on a very short screen. */}
+      <div className="story-ledger">{children}</div>
+    </div>
   );
 }

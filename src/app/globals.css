@@ -95,6 +95,8 @@
   font-weight: 400;
   font-size: var(--text-lead);
   line-height: var(--text-lead--line-height);
+  /* No word left alone on a last line (leads and running text). */
+  text-wrap: pretty;
 }
 @utility t-figure {
   font-family: var(--font-mono);
@@ -118,24 +120,32 @@
   font-weight: 400;
   font-size: var(--text-record);
   line-height: var(--text-record--line-height);
+  /* No word left alone on a last line (leads and running text). */
+  text-wrap: pretty;
 }
 @utility t-body-lg {
   font-family: var(--font-sans);
   font-weight: 400;
   font-size: var(--text-body-lg);
   line-height: var(--text-body-lg--line-height);
+  /* No word left alone on a last line (leads and running text). */
+  text-wrap: pretty;
 }
 @utility t-body {
   font-family: var(--font-sans);
   font-weight: 400;
   font-size: var(--text-body);
   line-height: var(--text-body--line-height);
+  /* No word left alone on a last line (leads and running text). */
+  text-wrap: pretty;
 }
 @utility t-body-sm {
   font-family: var(--font-sans);
   font-weight: 400;
   font-size: var(--text-body-sm);
   line-height: var(--text-body-sm--line-height);
+  /* No word left alone on a last line (leads and running text). */
+  text-wrap: pretty;
 }
 @utility t-fine {
   font-family: var(--font-sans);
@@ -554,7 +564,10 @@
   .iso-block {
     filter: drop-shadow(0 2px 4px rgb(2 39 50 / 0.08)) drop-shadow(0 14px 36px rgb(2 39 50 / 0.12)); /* --elevation-2 */
   }
+  /* The top face's resting fill is set here, not with a fill utility: the
+     utilities layer would beat the highlight below whatever its specificity. */
   .iso-top {
+    fill: var(--color-raised);
     transition: fill var(--duration-hover) var(--ease-standard);
   }
   /* A picked label (hover, focus, tap) highlights its block's top face. */
@@ -576,6 +589,12 @@
   }
   [data-phase="playing"] .scale-sliver {
     transition: opacity var(--duration-disclose) var(--ease-standard) calc(var(--duration-scene) + 200ms);
+  }
+  /* Visible strokes stay 1 px, with 6/5 dashes, however small the drawing
+     renders (it is about half size at 390). The reveal mask keeps scaling. */
+  .iso-leader-line,
+  .iso-venue {
+    vector-effect: non-scaling-stroke;
   }
   .iso-leader-line {
     stroke: var(--color-rule);
@@ -697,22 +716,128 @@
     opacity: 0.3;
   }
 
-  /* The pinned story. A lanes row writes in over --duration-write: its
-     words fade and its lines draw from their origin. The panel's state text
-     cross-fades over --duration-disclose. */
+  /* The pinned story, option B (StoryView.tsx, Lanes.tsx; REDRAW section
+     3a). The lanes drawing is sized here: rows from the viewport in svh,
+     columns from the drawing's own width. Phones and tablets: party boxes
+     40 px high, rows of 22 to 40 px, the drawing at most 45% of 100svh.
+     Desktop: party boxes 56 px, rows of 44 to 74 px, the drawing filling the
+     height under the header less 48 px. */
+  .lanes {
+    --party-h: 50px;
+    --box-h: 40px;
+    --box-inset: 2px;
+    --gutter: 0px;
+    --row-h: clamp(22px, (45svh - 40px - 24px) / 8, 40px);
+    --dy: 6px;
+    position: relative;
+    height: calc(var(--party-h) + 8 * var(--row-h));
+  }
+  @media (min-width: 1200px) {
+    .lanes {
+      --party-h: 64px;
+      --box-h: 56px;
+      --box-inset: 4px;
+      --gutter: 36px;
+      --row-h: clamp(44px, (100svh - var(--header-height) - 64px - 48px) / 8, 74px);
+      --dy: 7px;
+    }
+  }
+  .lane-current {
+    transition: transform var(--duration-write) var(--ease-standard);
+  }
+  /* A card is raised while its state is current: --elevation-2 on a
+     pseudo-element that fades, so only opacity moves (200 ms). */
+  .story-card {
+    position: relative;
+  }
+  .story-card::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    box-shadow: var(--elevation-2);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--duration-disclose) var(--ease-standard);
+  }
+  .story-card[data-current]::before {
+    opacity: 1;
+  }
+  /* A lanes row writes in over --duration-write: its words fade and its
+     lines draw from their origin. */
   .lane-row {
     opacity: 0;
     transition: opacity var(--duration-write) var(--ease-standard);
-  }
-  .lane-row.is-written {
-    opacity: 1;
   }
   .lane-row svg {
     clip-path: inset(0 100% 0 0);
     transition: clip-path var(--duration-write) var(--ease-standard);
   }
-  .lane-row.is-written svg {
+  /* Which rows are written and which number is current follow the story's
+     data-story-state (StoryView sets it; the drawing is server-rendered).
+     Row 01 is written from the start. */
+  .lane-row[data-row="1"],
+  :is([data-story-state="2"],[data-story-state="3"],[data-story-state="4"],[data-story-state="5"],[data-story-state="6"],[data-story-state="7"],[data-story-state="8"]) .lane-row[data-row="2"],
+  :is([data-story-state="3"],[data-story-state="4"],[data-story-state="5"],[data-story-state="6"],[data-story-state="7"],[data-story-state="8"]) .lane-row[data-row="3"],
+  :is([data-story-state="4"],[data-story-state="5"],[data-story-state="6"],[data-story-state="7"],[data-story-state="8"]) .lane-row[data-row="4"],
+  :is([data-story-state="5"],[data-story-state="6"],[data-story-state="7"],[data-story-state="8"]) .lane-row[data-row="5"],
+  :is([data-story-state="6"],[data-story-state="7"],[data-story-state="8"]) .lane-row[data-row="6"],
+  :is([data-story-state="7"],[data-story-state="8"]) .lane-row[data-row="7"],
+  :is([data-story-state="8"]) .lane-row[data-row="8"] {
+    opacity: 1;
+  }
+  .lane-row[data-row="1"] svg,
+  :is([data-story-state="2"],[data-story-state="3"],[data-story-state="4"],[data-story-state="5"],[data-story-state="6"],[data-story-state="7"],[data-story-state="8"]) .lane-row[data-row="2"] svg,
+  :is([data-story-state="3"],[data-story-state="4"],[data-story-state="5"],[data-story-state="6"],[data-story-state="7"],[data-story-state="8"]) .lane-row[data-row="3"] svg,
+  :is([data-story-state="4"],[data-story-state="5"],[data-story-state="6"],[data-story-state="7"],[data-story-state="8"]) .lane-row[data-row="4"] svg,
+  :is([data-story-state="5"],[data-story-state="6"],[data-story-state="7"],[data-story-state="8"]) .lane-row[data-row="5"] svg,
+  :is([data-story-state="6"],[data-story-state="7"],[data-story-state="8"]) .lane-row[data-row="6"] svg,
+  :is([data-story-state="7"],[data-story-state="8"]) .lane-row[data-row="7"] svg,
+  :is([data-story-state="8"]) .lane-row[data-row="8"] svg {
     clip-path: inset(0 0 0 0);
+  }
+  .lane-no {
+    color: var(--color-ink-muted);
+    transition: color var(--duration-write) var(--ease-standard);
+  }
+  :is([data-story-state="2"],[data-story-state="3"],[data-story-state="4"],[data-story-state="5"],[data-story-state="6"],[data-story-state="7"],[data-story-state="8"]) .lane-no[data-row="1"],
+  :is([data-story-state="3"],[data-story-state="4"],[data-story-state="5"],[data-story-state="6"],[data-story-state="7"],[data-story-state="8"]) .lane-no[data-row="2"],
+  :is([data-story-state="4"],[data-story-state="5"],[data-story-state="6"],[data-story-state="7"],[data-story-state="8"]) .lane-no[data-row="3"],
+  :is([data-story-state="5"],[data-story-state="6"],[data-story-state="7"],[data-story-state="8"]) .lane-no[data-row="4"],
+  :is([data-story-state="6"],[data-story-state="7"],[data-story-state="8"]) .lane-no[data-row="5"],
+  :is([data-story-state="7"],[data-story-state="8"]) .lane-no[data-row="6"],
+  :is([data-story-state="8"]) .lane-no[data-row="7"] {
+    color: var(--color-ink);
+  }
+  [data-story-state="1"] .lane-no[data-row="1"],
+  [data-story-state="2"] .lane-no[data-row="2"],
+  [data-story-state="3"] .lane-no[data-row="3"],
+  [data-story-state="4"] .lane-no[data-row="4"],
+  [data-story-state="5"] .lane-no[data-row="5"],
+  [data-story-state="6"] .lane-no[data-row="6"],
+  [data-story-state="7"] .lane-no[data-row="7"],
+  [data-story-state="8"] .lane-no[data-row="8"] {
+    color: var(--color-accent);
+  }
+  [data-story-state="2"] .lane-current {
+    transform: translateY(calc(1 * var(--row-h)));
+  }
+  [data-story-state="3"] .lane-current {
+    transform: translateY(calc(2 * var(--row-h)));
+  }
+  [data-story-state="4"] .lane-current {
+    transform: translateY(calc(3 * var(--row-h)));
+  }
+  [data-story-state="5"] .lane-current {
+    transform: translateY(calc(4 * var(--row-h)));
+  }
+  [data-story-state="6"] .lane-current {
+    transform: translateY(calc(5 * var(--row-h)));
+  }
+  [data-story-state="7"] .lane-current {
+    transform: translateY(calc(6 * var(--row-h)));
+  }
+  [data-story-state="8"] .lane-current {
+    transform: translateY(calc(7 * var(--row-h)));
   }
   .story-fade {
     animation: story-fade var(--duration-disclose) var(--ease-standard);
@@ -721,5 +846,27 @@
     from {
       opacity: 0;
     }
+  }
+}
+
+/* The pinned story or its ledger (StoryView.tsx). Unlayered, so it wins over
+   the layout utilities on the story. The ledger shows with reduced motion
+   (decided here, so it holds without script) or when even the smallest rows
+   don't fit the screen (data-story-fits, set by script). */
+.story-ledger {
+  display: none;
+}
+.story[data-story-fits="false"] .story-on {
+  display: none;
+}
+.story[data-story-fits="false"] .story-ledger {
+  display: block;
+}
+@media (prefers-reduced-motion: reduce) {
+  .story-on {
+    display: none;
+  }
+  .story-ledger {
+    display: block;
   }
 }

@@ -117,7 +117,7 @@ export function IsoFoundations({
                   <g className="iso-block">
                     <polygon points={shape.left} className="fill-[var(--petrol-100)]" />
                     <polygon points={shape.right} className="fill-[var(--petrol-50)]" />
-                    <polygon points={shape.top} data-level={level} className="iso-top fill-raised" />
+                    <polygon points={shape.top} data-level={level} className="iso-top" />
                   </g>
                   <line x1={shape.leaderX} x2={584} y1={shape.leaderY} y2={shape.leaderY} className="iso-leader-line hidden lg:inline" />
                 </g>
@@ -131,7 +131,9 @@ export function IsoFoundations({
             return (
               <li
                 key={f.name}
-                tabIndex={f.planned ? undefined : 0}
+                // Not a tab stop: the highlight only points at the block (the
+                // words are all here), so a tap or click focuses it but Tab skips it.
+                tabIndex={f.planned ? undefined : -1}
                 data-level={levelOf(i)}
                 style={{ ["--label-top" as string]: `${shape.leaderY - 14}px` }}
                 className="flex flex-col gap-1 border-t border-rule py-4 outline-offset-4 lg:absolute lg:right-0 lg:left-0 lg:top-(--label-top) lg:border-0 lg:py-0"

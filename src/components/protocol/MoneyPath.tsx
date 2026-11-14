@@ -1,5 +1,4 @@
 import { KubarMark } from "@/components/brand/KubarMark";
-import { MoneyArrow } from "@/components/story/LanesDiagram";
 import { cn } from "@/lib/utils";
 
 /*
@@ -10,6 +9,16 @@ import { cn } from "@/lib/utils";
  * no payment, no release" as plain rani words. Desktop: the drawing (800 ×
  * 380). Below desktop: the same three payments as a register with from and to.
  */
+/** A payment: a solid 2 px arrow with a filled head (as in the lanes drawing). */
+function MoneyArrow({ from, to, y }: { from: number; to: number; y: number }) {
+  return (
+    <g className="text-ink" fill="currentColor">
+      <rect x={from} y={y - 1} width={to - from - 9} height={2} />
+      <path d={`M${to} ${y}L${to - 10} ${y - 5.77}V${y + 5.77}Z`} />
+    </g>
+  );
+}
+
 const LIFELINES = [106, 317, 528, 739];
 const BOXES = [44, 255, 466, 677];
 

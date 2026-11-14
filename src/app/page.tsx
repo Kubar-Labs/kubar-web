@@ -74,8 +74,8 @@ export default function Home() {
         </div>
       </Section>
 
-      {/* Follow one receivable: the pinned story at desktop; the ledger
-          below desktop, with reduced motion and for screen readers. */}
+      {/* Follow one receivable: the pinned story at every width (REDRAW
+          section 3a); the ledger with reduced motion or on a very short screen. */}
       <Section id="one-receivable" labelledBy="one-receivable-heading" className="flex flex-col gap-10 lg:gap-16">
         <SectionHead id="one-receivable-heading" heading={t("oneReceivable.heading")} layout="wide" />
         <Story skipTo="closing-line" footnote={{ target: FN_STATUS, refId: "fnref-1-story" }}>

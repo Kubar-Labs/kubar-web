@@ -40,11 +40,11 @@ export default function HowItWorks() {
         </div>
       </PageHero>
 
-      {/* The rail: the pinned story at desktop; the ledger below desktop,
-          with reduced motion and for screen readers. */}
+      {/* The rail: the pinned story at every width (REDRAW section 3a); the
+          ledger with reduced motion or on a very short screen. */}
       <Section labelledBy="rail-heading" className="flex flex-col gap-10 lg:gap-16">
         <SectionHead id="rail-heading" heading={t("rail.heading")} layout="wide" />
-        <Story variant="howItWorks" states={states} skipTo="evidence" footnote={{ target: FN_STATUS, refId: "fnref-1-story" }}>
+        <Story variant="howItWorks" states={states} closing={t("rail.closing")} skipTo="evidence" footnote={{ target: FN_STATUS, refId: "fnref-1-story" }}>
           <div className="flex flex-col gap-6">
             <Ledger states={states} footnote={{ target: FN_STATUS, refId: "fnref-1-ledger" }} />
             <p className="t-body-sm text-ink">{t("rail.closing")}</p>

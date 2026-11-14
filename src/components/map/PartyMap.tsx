@@ -130,7 +130,9 @@ export function PartyMap({
                 <div
                   data-party={key}
                   data-ground={kubar ? "petrol" : undefined}
-                  tabIndex={party.link ? undefined : 0}
+                  // Buyers has no link: a tap or click focuses the card for the
+                  // dimming, but Tab skips it (the dimming shows nothing new).
+                  tabIndex={party.link ? undefined : -1}
                   className={cn(
                     "map-card mr-7 flex flex-col gap-4 border border-rule px-5 py-[18px] outline-offset-2 lg:mr-0 lg:justify-between lg:px-6 lg:py-[22px]",
                     kubar ? "bg-page [--lift-rest:var(--elevation-3)]" : "bg-raised",
