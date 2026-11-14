@@ -35,7 +35,7 @@ export function MoneyTimeline({ copy, className }: { copy: TimelineCopy; classNa
   return (
     <div className={className}>
       {/* Desktop: the drawing at its column's width. */}
-      <div role="img" aria-label={copy.alt} className="relative hidden h-[590px] w-full lg:block">
+      <div role="img" aria-label={copy.alt} className="relative hidden h-[594px] w-full lg:block">
         <p className="t-fine absolute top-0 left-0 text-ink-muted">{copy.title}</p>
         <p className="t-fine absolute -top-1 right-0 text-accent">{copy.holdsNone}</p>
         {[AT.ship, AT.buy, AT.due].map((x) => (
@@ -79,7 +79,7 @@ export function MoneyTimeline({ copy, className }: { copy: TimelineCopy; classNa
         <p className="t-code absolute top-[494px] -translate-x-full whitespace-nowrap text-ink-muted" style={{ left: `calc(${pct(AT.due)} + 13px)` }}>
           {copy.due}
         </p>
-        <p className="t-fine absolute top-[550px] left-0 w-[600px] max-w-full text-ink-muted">{copy.note}</p>
+        <p className="t-body-sm absolute top-[550px] left-0 w-[640px] max-w-full text-ink-muted">{copy.note}</p>
       </div>
 
       {/* Tablets and phones (Figma 123:1157): the small drawing, then the words as a list. */}
@@ -109,7 +109,7 @@ export function MoneyTimeline({ copy, className }: { copy: TimelineCopy; classNa
             </div>
           ))}
         </dl>
-        <p className="t-fine pt-1 text-ink-muted">{copy.note}</p>
+        <p className="t-body-sm pt-1 text-ink-muted">{copy.note}</p>
       </div>
     </div>
   );

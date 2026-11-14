@@ -83,14 +83,16 @@ export default function KubarProtocol() {
       <Section labelledBy="evidence-heading" className="flex flex-col gap-10 lg:gap-16">
         <SectionHead id="evidence-heading" heading={t("evidence.heading")} lead={t("evidence.lead")} />
         <div className="flex flex-col gap-12 lg:max-w-[1062px]">
+          {/* The ten elements show once, in the drawing; the register stays as a table for screen readers. */}
           <EvidenceSources
-            elements={t.raw("evidence.elements") as { element: string; from: string }[]}
+            elements={(t.raw("evidence.rows") as string[][]).map(([element, from, checked]) => ({ element, from, checked }))}
             from={(source) => t("evidence.from", { source })}
+            checkedLabel={(t.raw("evidence.columns") as string[])[2]}
             record={t("evidence.record")}
             readers={t.raw("evidence.readers") as string[]}
-            alt={t("evidence.alt")}
           />
           <Register
+            className="sr-only"
             columns={t.raw("evidence.columns") as string[]}
             widths={[326, 326, 410]}
             rows={t.raw("evidence.rows") as string[][]}

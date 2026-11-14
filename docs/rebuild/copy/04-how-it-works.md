@@ -20,8 +20,7 @@ Desktop: the story panel (left) beside the lanes (right), as on Home but with th
 [State] Settled
 [Label] 06 of 08
 [Body] On the due date the buyer pays the financier’s collection account, quoting the receivable’s reference. Kubar matches the payment. The financier pays the exporter the balance, less its discount and charges, and the exporter’s bank closes the shipping bill. Where the exporter qualifies, the government’s interest subvention on export factoring is filed on the financier’s data and paid to the exporter.
-[Tag] Documents
-[Body] Payment reference; closure of the shipping bill
+(15 Nov, REDRAW-2026-11-14.md section 13 A: the story is told on the evidence stack, which is the pinned drawing in place of the lanes; the lanes stay on Home only. The card loses its Documents block, "Documents" over "Payment reference; closure of the shipping bill" (and "Purchase confirmation" on state 05), and its legend; the stack's labels carry the documents. Each card keeps its sentence, its data path and its money path.)
 [Tag] Data path · Kubar
 [Body] Payment matched; closure tracked
 [Tag] Money path
@@ -48,7 +47,7 @@ The eight states, as the ledger shows them at 768 and 390 (and on desktop with r
 At 768 and 390 the ledger ends with the line: Kubar is in the data path of every step and in the money path of none.
 
 ## The evidence package  (the evidence stack; see Motion)
-[H2] Who relies on the record.
+(15 Nov, section 13 A: the separate section and its H2 "Who relies on the record." are gone. The stack below is the story's pinned drawing. Each state's documents land as its card passes, bottom up: state 01 brings Doc 01 to 03, state 02 Doc 04 and 05, state 03 Doc 06, state 04 Doc 07, state 05 Doc 08. The relying lines appear with their states: "The financier buys on it." at 05; the exporter's bank and the subvention lines at 06; "The insurer prices on it." at 07. Once shown, each stays. The two notes stay under the stack. With reduced motion or on a short screen the complete stack shows with the ledger.)
 (14 Nov: the lead is gone. Its four sentences are the four relying parties in the drawing, under the record, each with a dashed arrow down from it. The fourth is reworded to stand alone, approved in principle by Vaibhav on 14 Nov. REDRAW-2026-11-14.md, section 6.)
 [Body] The financier buys on it.
 [Body] The insurer prices on it.
@@ -60,9 +59,10 @@ Eight document cards that lock into the record one after another (component "Evi
 [Code] Doc 02  [UI] Shipping bill
 [Code] Doc 03  [UI] Bill of lading, electronic where issued
 [Code] Doc 04  [UI] Inspection report, where the programme requires one
-[Code] Doc 05  [UI] Credit-insurance cover
-[Code] Doc 06  [UI] Buyer’s acknowledgement
-[Code] Doc 07  [UI] No-objection
+[Code] Doc 05  [UI] No-objection
+[Code] Doc 06  [UI] Credit-insurance cover
+[Code] Doc 07  [UI] Buyer’s acknowledgement
+(15 Nov, section 13 A: Doc 05 to 07 renumbered so the documents land in order; the names are unchanged.)
 [Code] Doc 08  [UI] Purchase confirmation
 [Tag] From · The financier
 [Body] The financier owns the receivable

@@ -546,10 +546,6 @@
     "moneyPath": "Money path",
     "holdsNone": "Kubar holds none",
     "skip": "Skip the story",
-    "legend": {
-      "data": "Data path: documents and records",
-      "money": "Money path: only between banks"
-    },
     "parties": [
       "Exporter",
       "Kubar",
@@ -570,8 +566,7 @@
       "s6balance": "The balance",
       "s7": "Added to the loss history",
       "s8": "Registry entry, planned"
-    },
-    "documents": "Documents"
+    }
   },
   "kubarProtocol": {
     "meta": {
@@ -716,48 +711,6 @@
       "heading": "Every element traces to a system the exporter doesn’t control.",
       "lead": "Financiers have lost money on paper they couldn’t verify. So each receivable comes with one record: you buy on it, the insurer prices on it, and the exporter’s bank closes the shipping bill against it.",
       "from": "From {source}",
-      "elements": [
-        {
-          "element": "Identity of the exporter and the buyer",
-          "from": "Government registries; screening"
-        },
-        {
-          "element": "Commercial invoice, with the instruction to pay you",
-          "from": "The exporter"
-        },
-        {
-          "element": "Shipping bill",
-          "from": "Indian Customs"
-        },
-        {
-          "element": "Bill of lading, electronic where the carrier issues one",
-          "from": "The carrier"
-        },
-        {
-          "element": "Inspection report, where the programme requires one",
-          "from": "The inspection agency"
-        },
-        {
-          "element": "Insurance limit",
-          "from": "The insurer"
-        },
-        {
-          "element": "Buyer’s acknowledgement",
-          "from": "The buyer"
-        },
-        {
-          "element": "No-objection",
-          "from": "The exporter’s bank"
-        },
-        {
-          "element": "Programme checks",
-          "from": "Kubar"
-        },
-        {
-          "element": "Purchase and settlement",
-          "from": "You and the exporter’s bank"
-        }
-      ],
       "record": "Record RCV-0001",
       "readers": [
         "You buy on it",
@@ -824,8 +777,7 @@
       "after": [
         "Each element carries its source, its time and who signed it, and any change after signing shows. You and the insurer each get your own read access.",
         "The record is built on Corda, a permissioned ledger: one shared record of each receivable, who holds which rights after the purchase, and its payment and loss history."
-      ],
-      "alt": "Ten elements of the evidence package, each from its own source, flow into one record."
+      ]
     },
     "insurance": {
       "heading": "Cover in your name.",
@@ -1199,8 +1151,7 @@
           "what": "The exporter ships the rice and issues its invoice. The invoice carries the assignment notice: the instruction to pay the financier’s account.",
           "party": "The exporter, and its trade platform if it uses one",
           "data": "Shipment and invoice data received",
-          "money": null,
-          "documents": null
+          "money": null
         },
         {
           "no": "02",
@@ -1208,8 +1159,7 @@
           "what": "Kubar checks the shipping bill against the invoice (goods, quantity, value and buyer), checks who the exporter and the buyer are, runs the programme’s rules and files everything in one evidence package. The exporter’s bank’s no-objection is on file.",
           "party": "Kubar",
           "data": "Evidence package assembled and checked",
-          "money": null,
-          "documents": null
+          "money": null
         },
         {
           "no": "03",
@@ -1217,8 +1167,7 @@
           "what": "The buyer’s limit with the insurer is checked for headroom. The cover is in the financier’s name.",
           "party": "The insurer",
           "data": "Limit and headroom confirmed",
-          "money": null,
-          "documents": null
+          "money": null
         },
         {
           "no": "04",
@@ -1226,8 +1175,7 @@
           "what": "The buyer acknowledges the notice: it will pay the financier’s account.",
           "party": "The buyer",
           "data": "Acknowledgement filed",
-          "money": null,
-          "documents": null
+          "money": null
         },
         {
           "no": "05",
@@ -1235,8 +1183,7 @@
           "what": "The financier accepts the receivable under its programme limit, without recourse for the buyer’s credit, and pays the purchase price. The credit decision is the financier’s own.",
           "party": "The financier",
           "data": "Package delivered; purchase recorded",
-          "money": "The financier pays 90% of face to the exporter’s own bank",
-          "documents": "Purchase confirmation"
+          "money": "The financier pays 90% of face to the exporter’s own bank"
         },
         {
           "no": "06",
@@ -1244,8 +1191,7 @@
           "what": "On the due date the buyer pays the financier’s collection account, quoting the receivable’s reference. Kubar matches the payment. The financier pays the exporter the balance, less its discount and charges, and the exporter’s bank closes the shipping bill. Where the exporter qualifies, the government’s interest subvention on export factoring is filed on the financier’s data and paid to the exporter.",
           "party": "The buyer, the financier and the exporter’s bank",
           "data": "Payment matched; closure tracked",
-          "money": "The buyer pays $225,000 to the financier; the financier pays the exporter the balance, less its discount and charges",
-          "documents": "Payment reference; closure of the shipping bill"
+          "money": "The buyer pays $225,000 to the financier; the financier pays the exporter the balance, less its discount and charges"
         },
         {
           "no": "07",
@@ -1253,8 +1199,7 @@
           "what": "The outcome joins the loss history, by buyer, exporter and commodity.",
           "party": "Kubar",
           "data": "Added to the loss history",
-          "money": null,
-          "documents": null
+          "money": null
         },
         {
           "no": "08",
@@ -1262,13 +1207,11 @@
           "what": "Once the venue is registered, a receivable can move from one institutional financier to another, with a registry entry in place of a fresh assignment.",
           "party": "Institutional financiers",
           "data": null,
-          "money": null,
-          "documents": null
+          "money": null
         }
       ]
     },
     "evidence": {
-      "heading": "Who relies on the record.",
       "docLabel": "Doc {no}",
       "documents": [
         {
@@ -1289,15 +1232,15 @@
         },
         {
           "no": "05",
-          "name": "Credit-insurance cover"
+          "name": "No-objection"
         },
         {
           "no": "06",
-          "name": "Buyer’s acknowledgement"
+          "name": "Credit-insurance cover"
         },
         {
           "no": "07",
-          "name": "No-objection"
+          "name": "Buyer’s acknowledgement"
         },
         {
           "no": "08",

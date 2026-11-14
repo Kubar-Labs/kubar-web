@@ -120,7 +120,7 @@ export function SignsMap({ rows, copy, className }: { rows: string[][]; copy: Si
         })}
         <div className="col-start-1 row-start-3 flex flex-col gap-1.5 self-end">
           {copy.key.map((line) => (
-            <p key={line} className="t-fine whitespace-nowrap text-ink-muted">
+            <p key={line} className="t-body-sm whitespace-nowrap text-ink-muted">
               {line}
             </p>
           ))}

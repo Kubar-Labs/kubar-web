@@ -36,7 +36,7 @@ export function ScaleCard({
   const figure = (item: Figure, large: boolean, extra?: string) => (
     <p className={cn("flex flex-col gap-3", extra)}>
       <span className={cn("whitespace-nowrap", large ? "t-figure text-ink lg:t-figure-lg" : "t-figure text-accent")}>{item.figure}</span>
-      <span className="t-body-sm text-ink">
+      <span className="t-body text-ink">
         {item.caption}
         <FootnoteMarker n={item.footnote} {...footnoteId(item.footnote)} />
       </span>
@@ -56,7 +56,7 @@ export function ScaleCard({
         <div role="img" aria-label={scaleAlt} className="scale-bar h-12 origin-left bg-action lg:h-16" />
         <div className="scale-sliver flex items-center gap-3 lg:gap-4">
           <span aria-hidden="true" className="h-12 w-[max(1px,0.16%)] shrink-0 bg-accent lg:h-16" />
-          <p className="t-code text-ink-muted">{scaleNote}</p>
+          <p className="t-fine text-ink-muted">{scaleNote}</p>
         </div>
       </div>
     </PlayOnce>

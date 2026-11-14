@@ -7,7 +7,8 @@ import { cx as cn } from "@/lib/cx";
  * colour change. Kinds: Arrow (another page), Anchor (down this page),
  * External (leaves kubar.tech, new tab, up-right arrow, "(opens in a new
  * tab)" in its accessible name) and Plain (footer lists, legal links).
- * Every link is at least 24 px tall.
+ * Every link is at least 24 px tall; on touch screens a standalone link's
+ * tap area is at least 44 px tall (REDRAW-2026-11-14.md, section 13 B9).
  */
 type Kind = "arrow" | "anchor" | "external" | "plain";
 
@@ -41,6 +42,9 @@ export function TextLink({
   const icon = kindIcon[kind];
   const classes = cn(
     "group inline-flex min-h-6 items-center gap-2 py-0.5 text-ink",
+    // A standalone link takes a 44 px tap area on touch screens, with no change to its look
+    // (globals.css). Plain links sit in lists and running text, where the areas would overlap.
+    kind !== "plain" && "tap-area",
     size === "large" ? "t-ui-lg" : "t-ui",
     className,
   );

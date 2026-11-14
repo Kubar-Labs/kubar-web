@@ -242,6 +242,21 @@
     }
   }
 }
+/* A standalone text link's tap area on touch screens: at least 44 px tall,
+   centred on the link, with no change to how it looks. */
+@utility tap-area {
+  @media (pointer: coarse) {
+    position: relative;
+    &::after {
+      content: "";
+      position: absolute;
+      inset-inline: 0;
+      top: 50%;
+      height: 44px;
+      transform: translateY(-50%);
+    }
+  }
+}
 @utility measure {
   max-width: var(--measure);
 }
@@ -583,10 +598,7 @@
     transition: opacity var(--duration-hover) var(--ease-standard);
   }
   @media (min-width: 1200px) {
-    .iso-foundations:has(li[data-level="0"]:is(:hover, :focus)) .iso-top-edge[data-level="0"],
-    .iso-foundations:has(li[data-level="1"]:is(:hover, :focus)) .iso-top-edge[data-level="1"],
-    .iso-foundations:has(li[data-level="2"]:is(:hover, :focus)) .iso-top-edge[data-level="2"],
-    .iso-foundations:has(li[data-level="3"]:is(:hover, :focus)) .iso-top-edge[data-level="3"] {
+    .iso-foundations li:is(:hover, :focus) .iso-top-edge {
       opacity: 1;
     }
   }
@@ -838,6 +850,24 @@
   .signs-map[data-picked="platform"] .sign-line:not([data-touches~="platform"]),
   .signs-map[data-picked="kubar"] .sign-line:not([data-touches~="kubar"]) {
     opacity: 0.3;
+  }
+
+  /* Kubar Protocol's evidence list (EvidenceSources): the picked row shows
+     its "Checked against" line, one at a time. */
+  .evidence-sources .evidence-checked {
+    display: none;
+  }
+  .evidence-sources[data-picked="0"] li[data-el="0"] .evidence-checked,
+  .evidence-sources[data-picked="1"] li[data-el="1"] .evidence-checked,
+  .evidence-sources[data-picked="2"] li[data-el="2"] .evidence-checked,
+  .evidence-sources[data-picked="3"] li[data-el="3"] .evidence-checked,
+  .evidence-sources[data-picked="4"] li[data-el="4"] .evidence-checked,
+  .evidence-sources[data-picked="5"] li[data-el="5"] .evidence-checked,
+  .evidence-sources[data-picked="6"] li[data-el="6"] .evidence-checked,
+  .evidence-sources[data-picked="7"] li[data-el="7"] .evidence-checked,
+  .evidence-sources[data-picked="8"] li[data-el="8"] .evidence-checked,
+  .evidence-sources[data-picked="9"] li[data-el="9"] .evidence-checked {
+    display: flex;
   }
 
   /* If a buyer doesn't pay (UnpaidFlow): each beat fades in at its --beat;
@@ -1111,6 +1141,76 @@
   }
   [data-story-state="8"] .lane-current {
     transform: translateY(calc(7 * var(--row-h)));
+  }
+  /* How it works tells the story on its evidence stack (StoryStack; REDRAW
+     section 13 A). The stack's height is what the screen leaves, its width
+     follows, and the rows sit beside it at the same proportions. Desktop:
+     the height under the header less the record row and the relying lines
+     pinned under it. Tablets: at most 45% of 100svh. Phones: a small stack
+     beside the rows. */
+  @media (min-width: 768px) {
+    .story-stack {
+      --stack-h: clamp(240px, 45svh - 48px, 467px);
+    }
+    .story-stack .stack-box {
+      position: relative;
+      height: var(--stack-h);
+      width: calc(var(--stack-h) * 336 / 467);
+    }
+    .story-stack .stack-rows {
+      top: 26.55%;
+      left: calc(100% + 20px);
+      height: 58.24%;
+      width: max-content;
+      max-width: calc(100cqw - 100% - 20px);
+    }
+    .story-stack .iso-leader {
+      top: 50%;
+    }
+  }
+  @media (min-width: 1200px) {
+    .story-stack {
+      --stack-h: clamp(250px, 100svh - var(--header-height) - 256px, 526px);
+    }
+    .story-stack .stack-box {
+      width: calc(var(--stack-h) * 360 / 526);
+    }
+    .story-stack .stack-rows {
+      top: 27%;
+      left: calc(100% + 23px);
+      height: 57.8%;
+      max-width: calc(100cqw - 100% - 23px);
+    }
+  }
+  @media (max-width: 767.98px) {
+    .story-stack .stack-rows {
+      gap: clamp(2px, (45svh - 226px) / 7, 8px);
+    }
+  }
+  /* What a state brings stays hidden until its card passes, then stays.
+     A sheet lands from 24 px above; words fade in. */
+  .story-on [data-from] {
+    opacity: 0;
+    transition: opacity var(--duration-write) var(--ease-standard);
+    transition-delay: calc(var(--j, 0) * 80ms);
+  }
+  .story-on .stack-land[data-from] {
+    transform: translateY(-24px);
+    transition:
+      opacity var(--duration-write) var(--ease-standard),
+      transform var(--duration-write) var(--ease-standard);
+    transition-delay: calc(var(--j, 0) * 80ms);
+  }
+  [data-story-state="1"] :is([data-from="1"]),
+  [data-story-state="2"] :is([data-from="1"], [data-from="2"]),
+  [data-story-state="3"] :is([data-from="1"], [data-from="2"], [data-from="3"]),
+  [data-story-state="4"] :is([data-from="1"], [data-from="2"], [data-from="3"], [data-from="4"]),
+  [data-story-state="5"] :is([data-from="1"], [data-from="2"], [data-from="3"], [data-from="4"], [data-from="5"]),
+  [data-story-state="6"] :is([data-from="1"], [data-from="2"], [data-from="3"], [data-from="4"], [data-from="5"], [data-from="6"]),
+  [data-story-state="7"] :is([data-from="1"], [data-from="2"], [data-from="3"], [data-from="4"], [data-from="5"], [data-from="6"], [data-from="7"]),
+  [data-story-state="8"] :is([data-from="1"], [data-from="2"], [data-from="3"], [data-from="4"], [data-from="5"], [data-from="6"], [data-from="7"], [data-from="8"]) {
+    opacity: 1;
+    transform: none;
   }
   .story-fade {
     animation: story-fade var(--duration-disclose) var(--ease-standard);

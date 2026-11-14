@@ -143,7 +143,7 @@ export function ProgrammeRuns({
                 >
                   <span className="t-code text-accent">{step.no}</span>
                   <span className="t-body-sm text-ink">{step.text}</span>
-                  {step.no === noteAfter ? <span className="t-fine text-ink-muted">{note}</span> : null}
+                  {step.no === noteAfter ? <span className="t-body-sm text-ink-muted">{note}</span> : null}
                 </div>
                 {i < last ? (
                   <div aria-hidden="true" className="flex h-9 justify-center lg:hidden">

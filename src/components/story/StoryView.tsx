@@ -34,8 +34,6 @@ export type LedgerState = {
   party: string | null;
   data: string | null;
   money: string | null;
-  /** How it works only: the documents behind the step. */
-  documents?: string | null;
 };
 
 const DESKTOP = "(min-width: 1200px)";
@@ -65,6 +63,7 @@ export function StoryView({
   skipTo,
   variant = "home",
   closing,
+  after,
   children,
 }: {
   /** Id of the section after the story. */
@@ -77,8 +76,10 @@ export function StoryView({
   marker: React.ReactNode;
   /** The lanes drawing, rendered on the server; it follows data-story-state in CSS. */
   lanes: React.ReactNode;
-  /** "howItWorks": the sentence in Sans/Body, the documents in place of the party, the legend, no link to How it works. */
+  /** "howItWorks": the sentence in Sans/Body, and the evidence stack as the pinned drawing (sized by its own rule). */
   variant?: "home" | "howItWorks";
+  /** What follows the cards, under the drawing's column at desktop. */
+  after?: React.ReactNode;
   /** How it works: the line that ends the eight states on tablets and phones. */
   closing?: string;
   /** The ledger register: the fallback. */
@@ -102,8 +103,11 @@ export function StoryView({
     const check = () => {
       frame = 0;
       const svh = probe.getBoundingClientRect().height;
+      // The lanes need their smallest rows; the evidence stack its smallest height (globals.css, .story-stack).
       const ok = window.matchMedia(DESKTOP).matches
-        ? (svh - headerHeight() - 64 - 48) / 8 >= 44
+        ? long
+          ? svh - headerHeight() - 256 >= 250
+          : (svh - headerHeight() - 64 - 48) / 8 >= 44
         : (0.45 * svh - 40 - 24) / 8 >= 22;
       setFits(ok);
     };
@@ -117,7 +121,7 @@ export function StoryView({
       if (frame) cancelAnimationFrame(frame);
       probe.remove();
     };
-  }, []);
+  }, [long]);
 
   // Which state is current: the card crossing the 45% line.
   useEffect(() => {
@@ -176,7 +180,7 @@ export function StoryView({
               so the cards pass under it (story-pin, globals.css). */}
           <div
             ref={pinRef}
-            className="story-pin sticky top-(--header-height) z-10 -mx-(--page-margin) bg-page px-(--page-margin) pt-4 pb-3 lg:col-start-2 lg:row-start-1 lg:top-[calc(var(--header-height)+24px)] lg:mx-0 lg:bg-transparent lg:p-0"
+            className="story-pin @container sticky top-(--header-height) z-10 -mx-(--page-margin) bg-page px-(--page-margin) pt-4 pb-3 lg:col-start-2 lg:row-start-1 lg:top-[calc(var(--header-height)+24px)] lg:mx-0 lg:bg-transparent lg:p-0"
           >
             {idRow("mb-3 lg:hidden")}
             {lanes}
@@ -184,7 +188,8 @@ export function StoryView({
 
           <div className="flex flex-col lg:col-start-1 lg:row-start-1">
             {idRow("mb-4 hidden border-b border-rule-strong pb-2.5 lg:block")}
-            <TextLink href={`#${skipTo}`} kind="anchor" className="mt-1 mb-4 self-start lg:mt-0 lg:mb-5">
+            {/* Home's link has no arrow (section 13 B3); How it works keeps the frame's. */}
+            <TextLink href={`#${skipTo}`} kind={long ? "anchor" : "plain"} className="mt-1 mb-4 self-start lg:mt-0 lg:mb-5">
               {t("skip")}
             </TextLink>
 
@@ -224,15 +229,7 @@ export function StoryView({
                         <span className="t-label shrink-0 text-ink-muted">{t("counter", { n: step.no })}</span>
                       </p>
                       <p className={cn("transition-colors duration-(--duration-disclose)", long ? "t-body" : "t-ui-lg", tone)}>{step.what}</p>
-                      {/* Home's cards name who acts in the sentence; How it works adds the documents. */}
-                      {long && step.documents ? (
-                        <div className="flex flex-col gap-0.5 border-t border-rule pt-2.5">
-                          <p className="t-fine text-ink-muted">{t("documents")}</p>
-                          <p className={cn("t-body-sm transition-colors duration-(--duration-disclose)", tone)}>{step.documents}</p>
-                        </div>
-                      ) : long && step.party ? (
-                        <p className="t-fine text-ink-muted">{t("party", { party: step.party })}</p>
-                      ) : null}
+                      {/* Each sentence names who acts; on How it works the stack's labels carry the documents. */}
                       {data ? (
                         <div className="flex flex-col gap-0.5 border-t border-rule pt-2.5">
                           <p className={cn("t-fine flex items-center gap-2 transition-colors duration-(--duration-disclose)", tone)}>
@@ -260,15 +257,8 @@ export function StoryView({
           </div>
         </div>
 
-        {long ? (
-          <div className="flex flex-col gap-6 pt-2 lg:w-[411px]">
-            {closing ? <p className="t-body-sm text-ink lg:hidden">{closing}</p> : null}
-            <ul className="flex flex-col gap-1">
-              <li className="t-fine flex items-center gap-3 text-ink-muted"><PathGlyph kind="data" />{t("legend.data")}</li>
-              <li className="t-fine flex items-center gap-3 text-ink-muted"><PathGlyph kind="money" />{t("legend.money")}</li>
-            </ul>
-          </div>
-        ) : null}
+        {closing ? <p className="t-body-sm pt-2 text-ink lg:hidden">{closing}</p> : null}
+        {after ? <div className="pt-6 lg:ml-[435px] lg:pt-2">{after}</div> : null}
       </div>
 
       {/* The ledger: shown instead with reduced motion or on a very short screen. */}

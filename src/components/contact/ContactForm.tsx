@@ -323,7 +323,7 @@ export function ContactForm({ copy }: { copy: ContactFormCopy }) {
           {copy.send}
         </Button>
         <div className="flex flex-col items-start gap-1">
-          <p className="t-fine text-ink-muted">{copy.notice}</p>
+          <p className="t-body-sm text-ink-muted">{copy.notice}</p>
           <TextLink href="/legal/privacy" kind="arrow">{copy.privacy}</TextLink>
         </div>
       </div>

@@ -9,7 +9,7 @@ import { RouteCards, type HomeRoute } from "@/components/blocks/RouteCards";
 import { PartyMap, type Party } from "@/components/map/PartyMap";
 import { Story } from "@/components/story/Story";
 import { Ledger } from "@/components/registers/Ledger";
-import { FinanceProgrammes, TechnologyProgrammes } from "@/components/registers/Programmes";
+import { FinanceProgrammes } from "@/components/registers/Programmes";
 import { Record } from "@/components/registers/Record";
 import { RouteRows, type Route } from "@/components/registers/RouteRows";
 import { Standing } from "@/components/registers/Standing";
@@ -138,9 +138,6 @@ export default function Home() {
         <RouteCards className="min-w-0 flex-1" routes={t.raw("contact.rows") as HomeRoute[]} />
       </Section>
 
-      <Section>
-        <TechnologyProgrammes />
-      </Section>
     </>
   );
 }

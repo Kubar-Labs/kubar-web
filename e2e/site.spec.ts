@@ -19,7 +19,8 @@ async function storyLive(page: Page) {
 async function scrollToState(page: Page, n: number) {
   await page.evaluate((n) => {
     const story = document.querySelector(".story-on")!;
-    const slot = story.querySelectorAll("ol > li")[n - 1];
+    // The cards' own slots (How it works has a second list in the pinned stack).
+    const slot = story.querySelectorAll(".story-card")[n - 1].parentElement!;
     const header = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--header-height"));
     const pin = matchMedia("(min-width: 1200px)").matches ? 0 : story.querySelector<HTMLElement>(".story-pin")!.offsetHeight;
     const line = header + pin + 0.45 * (innerHeight - header - pin);
@@ -222,6 +223,47 @@ test.describe("primitives and registers (build step 2), on Home", () => {
     await expect(page.getByText("An example receivable, not a real transaction.").first()).toBeHidden();
   });
 
+  test("Home after the 15 Nov audit: larger captions, no skip arrow, no technology programmes, 44 px tap areas", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/");
+    await expect(page.getByText(/^a year of Indian SME and mid-market export receiva/).first()).toHaveCSS("font-size", "17px");
+    const note = page.getByText("Drawn to scale. $126.92M is about 0.16% of the bar above.", { exact: true });
+    await expect(note).toHaveCSS("font-size", "13px");
+    expect(await note.evaluate((el) => getComputedStyle(el).fontFamily)).not.toMatch(/mono/i);
+    await expect(page.getByRole("link", { name: "Skip the story" }).locator("svg")).toHaveCount(0);
+    await expect(page.getByText("Technology programmes, grants and credits")).toHaveCount(0);
+    await page.goto("/about");
+    await expect(page.getByText("Technology programmes, grants and credits")).toBeVisible();
+    // On a touch screen (pointer: coarse) a standalone link's tap area is 44 px tall; the link looks the same.
+    // Headless Chromium doesn't report a coarse pointer, so read the rule itself.
+    await page.goto("/");
+    const link = page.locator("main a.tap-area:visible").first();
+    await expect(link).toBeVisible();
+    expect((await link.boundingBox())!.height).toBeLessThan(44);
+    const rule = await page.evaluate(() => {
+      for (const sheet of [...document.styleSheets]) {
+        const walk = (rules: CSSRuleList, coarse: boolean): string | null => {
+          for (const r of [...rules]) {
+            if (r instanceof CSSMediaRule) {
+              const found = walk(r.cssRules, coarse || /pointer:\s*coarse/.test(r.conditionText));
+              if (found) return found;
+            } else if ("cssRules" in r && (r as CSSGroupingRule).cssRules?.length && !(r instanceof CSSStyleRule)) {
+              const found = walk((r as CSSGroupingRule).cssRules, coarse);
+              if (found) return found;
+            } else if (coarse && r instanceof CSSStyleRule && /\.tap-area::?after/.test(r.selectorText)) {
+              return `${r.style.position} ${r.style.height}`;
+            }
+          }
+          return null;
+        };
+        const found = walk(sheet.cssRules, false);
+        if (found) return found;
+      }
+      return null;
+    });
+    expect(rule).toBe("absolute 44px");
+  });
+
   test("a footnote marker goes to its footnote, and Back to text returns to the marker", async ({ page }) => {
     await page.goto("/");
     const marker = page.locator("#fnref-1");
@@ -244,7 +286,8 @@ test.describe("primitives and registers (build step 2), on Home", () => {
   });
 
   test("programme marks carry their programme's name", async ({ page }) => {
-    await page.goto("/");
+    // The technology programmes show on About only (section 13 B4); the finance programmes on both.
+    await page.goto("/about");
     for (const name of ["GIFT IFIH Young Builders Program", "Claude for Startups", "MongoDB for Startups"]) {
       await expect(page.getByRole("img", { name, exact: true }).first()).toBeAttached();
     }
@@ -410,9 +453,9 @@ test.describe("Home drawings (redraw step 2)", () => {
     await expect(map.locator('[data-party="kubar"]').getByRole("link", { name: "About" })).toHaveAttribute("href", "/about");
     // Hovering Kubar dims the two money arrows and the data arrow between exporters and platforms.
     await map.locator('[data-party="kubar"]').hover();
-    await page.waitForTimeout(300);
-    const dimmed = await arrows.evaluateAll((els) => els.filter((el) => getComputedStyle(el).opacity === "0.3").map((el) => el.getAttribute("data-touches")));
-    expect(dimmed.sort()).toEqual(["buyers financiers", "exporters platforms", "financiers exporters"]);
+    // Wait for the dimmed state itself, not for a fixed time.
+    const dimmed = () => arrows.evaluateAll((els) => els.filter((el) => getComputedStyle(el).opacity === "0.3").map((el) => el.getAttribute("data-touches")).sort());
+    await expect.poll(dimmed).toEqual(["buyers financiers", "exporters platforms", "financiers exporters"]);
   });
 
   test("below desktop the map is one column with the return arrow up the right side", async ({ page }) => {
@@ -541,7 +584,7 @@ test.describe("pinned story (redraw step 3)", () => {
         await page.setViewportSize({ width, height });
         await page.goto(path);
         await storyLive(page);
-        const lanes = page.locator(".story-on .lanes");
+        const lanes = page.locator(".story-on :is(.lanes, .story-stack)");
         await scrollToState(page, 3);
         await expect(state(page), `${width}x${height}`).toHaveAttribute("data-story-state", "3");
         const pinned = Math.round((await lanes.boundingBox())!.y);
@@ -564,7 +607,7 @@ test.describe("pinned story (redraw step 3)", () => {
         await expect(state(page), `${width}x${height}`).toHaveAttribute("data-story-state", "8");
         expect(Math.round((await lanes.boundingBox())!.y), `${width}x${height} pinned at 08`).toBe(pinned);
         await page.evaluate(() => {
-          const last = document.querySelectorAll(".story-on ol > li")[7].getBoundingClientRect();
+          const last = document.querySelectorAll(".story-on .story-card")[7].parentElement!.getBoundingClientRect();
           window.scrollTo({ top: last.bottom + scrollY - 40, behavior: "instant" });
         });
         expect((await lanes.boundingBox())!.y, `${width}x${height} released`).toBeLessThan(pinned - 100);
@@ -577,7 +620,7 @@ test.describe("pinned story (redraw step 3)", () => {
         await page.setViewportSize({ width, height: 800 });
         await page.goto(path);
         expect(await overflow(page), `${width}`).toBe(0);
-        const lanes = (await page.locator(".story-on .lanes").boundingBox())!;
+        const lanes = (await page.locator(".story-on :is(.lanes, .story-stack)").boundingBox())!;
         expect(lanes.x + lanes.width, `${width}`).toBeLessThanOrEqual(width);
       }
     });
@@ -694,6 +737,56 @@ test.describe("Kubar Protocol (redraw step 4)", () => {
     await expect(page.getByRole("row", { name: /Face value, on the due date/ })).toContainText("Buyer");
   });
 
+  test("the evidence package shows its ten elements once; a row opens its Checked against line, one at a time", async ({ page, browser }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/products/kubar-protocol");
+    const list = page.locator(".evidence-sources");
+    const rows = list.locator("li[data-el]");
+    await expect(rows).toHaveCount(10);
+    await expect(list.locator("[tabindex]")).toHaveCount(0);
+    // The register is in the page for screen readers, not shown.
+    const table = page.getByRole("table").filter({ has: page.getByRole("columnheader", { name: "Checked against" }) });
+    await expect(table.getByRole("row")).toHaveCount(11);
+    expect((await table.boundingBox())!.width).toBeLessThanOrEqual(1);
+    await expect(page.getByText("The invoice: goods, quantity, value and buyer", { exact: true }).locator("visible=true")).toHaveCount(0);
+    // Hover opens one row's line; moving to another closes it.
+    await rows.nth(2).hover();
+    await expect(rows.nth(2).getByText("The invoice: goods, quantity, value and buyer", { exact: true })).toBeVisible();
+    await expect(rows.nth(2).getByText("Checked against", { exact: true })).toBeVisible();
+    await rows.nth(5).hover();
+    await expect(rows.nth(5).getByText("Headroom on the buyer’s limit", { exact: true })).toBeVisible();
+    await expect(rows.nth(2).getByText("The invoice: goods, quantity, value and buyer", { exact: true })).toBeHidden();
+    // A tap does the same on a phone, where the register is hidden too.
+    const phone = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+    const tab = await phone.newPage();
+    await tab.goto("/products/kubar-protocol");
+    const tapped = tab.locator(".evidence-sources li[data-el]").nth(7);
+    await tapped.scrollIntoViewIfNeeded();
+    await tapped.tap();
+    await expect(tapped.getByText("The bank’s letter", { exact: true })).toBeVisible();
+    expect(await tab.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
+    await phone.close();
+  });
+
+  test("the questions are an accordion below 768, first one open, and stay open from 768 up", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/products/kubar-protocol");
+    const questions = page.locator("section", { has: page.locator("#questions-heading") });
+    const buttons = questions.getByRole("button");
+    await expect(buttons).toHaveCount(10);
+    await expect(buttons.first()).toHaveAttribute("aria-expanded", "true");
+    await expect(buttons.nth(1)).toHaveAttribute("aria-expanded", "false");
+    await expect(questions.locator("p:visible")).toHaveCount(1);
+    await buttons.nth(3).click();
+    await expect(buttons.nth(3)).toHaveAttribute("aria-expanded", "true");
+    await expect(buttons.first()).toHaveAttribute("aria-expanded", "false");
+    await expect(questions.locator("p:visible")).toHaveCount(1);
+    expect((await buttons.nth(1).boundingBox())!.height).toBeGreaterThanOrEqual(44);
+    await page.setViewportSize({ width: 768, height: 1024 });
+    await expect(questions.getByRole("button")).toHaveCount(0);
+    await expect(questions.locator("p:visible")).toHaveCount(10);
+  });
+
   test("tablets and phones keep the small money timeline and the evidence drawing", async ({ page }) => {
     for (const [width, height] of [[390, 844], [768, 1024], [820, 1180]] as const) {
       await page.setViewportSize({ width, height });
@@ -766,43 +859,65 @@ test.describe("How it works (build step 4)", () => {
     await expect(page.locator("#who-holds-what")).toBeInViewport();
   });
 
-  test("the rail steps through eight states with the documents line, and skips to the evidence", async ({ page }) => {
+  test("the rail tells the story on the evidence stack: documents land state by state, relying lines follow", async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto("/how-it-works");
     await storyLive(page);
     const story = page.locator("[data-story-state]");
+    const stack = page.locator(".story-on .story-stack");
+    const row = (no: string) => stack.locator(`li[data-doc="${no}"]`);
+    const relying = (text: string) => stack.getByText(text, { exact: true }).locator("xpath=ancestor::li[1]");
     await expect(story).toHaveAttribute("data-story-state", "1");
+    await expect(page.locator(".story-on .lanes")).toHaveCount(0);
     await expect(page.getByRole("link", { name: "See how it works" })).toHaveCount(0);
+    // The documents in their new order, top down.
+    await expect(stack.locator("ol > li")).toHaveText([
+      "Doc 08Purchase confirmation",
+      "Doc 07Buyer’s acknowledgement",
+      "Doc 06Credit-insurance cover",
+      "Doc 05No-objection",
+      "Doc 04Inspection report, where the programme requires one",
+      "Doc 03Bill of lading, electronic where issued",
+      "Doc 02Shipping bill",
+      "Doc 01Commercial invoice",
+    ]);
+    // State 01: Doc 01 to 03.
+    for (const no of ["01", "02", "03"]) await expect(row(no)).toHaveCSS("opacity", "1");
+    for (const no of ["04", "08"]) await expect(row(no)).toHaveCSS("opacity", "0");
+    await scrollToState(page, 2);
+    for (const no of ["04", "05"]) await expect(row(no)).toHaveCSS("opacity", "1");
+    await expect(row("06")).toHaveCSS("opacity", "0");
+    await scrollToState(page, 3);
+    await expect(row("06")).toHaveCSS("opacity", "1");
+    await scrollToState(page, 4);
+    await expect(row("07")).toHaveCSS("opacity", "1");
+    await expect(row("08")).toHaveCSS("opacity", "0");
+    await expect(relying("The financier buys on it.")).toHaveCSS("opacity", "0");
+    await scrollToState(page, 5);
+    await expect(row("08")).toHaveCSS("opacity", "1");
+    await expect(stack.locator('svg:visible g[data-from="5"]')).toHaveCSS("opacity", "1");
+    await expect(relying("The financier buys on it.")).toHaveCSS("opacity", "1");
+    await expect(relying("The exporter’s bank closes the shipping bill against it.")).toHaveCSS("opacity", "0");
     await scrollToState(page, 6);
-    await expect(story).toHaveAttribute("data-story-state", "6");
-    await expect(story.locator('[aria-current="step"]')).toContainText("Payment reference; closure of the shipping bill");
+    await expect(relying("The exporter’s bank closes the shipping bill against it.")).toHaveCSS("opacity", "1");
+    await expect(relying("The government’s interest subvention is filed on it, where the exporter qualifies.")).toHaveCSS("opacity", "1");
+    await expect(relying("The insurer prices on it.")).toHaveCSS("opacity", "0");
+    await scrollToState(page, 7);
+    await expect(relying("The insurer prices on it.")).toHaveCSS("opacity", "1");
+    // Once shown, each stays.
+    await scrollToState(page, 8);
+    await expect(row("01")).toHaveCSS("opacity", "1");
+    await expect(relying("The financier buys on it.")).toHaveCSS("opacity", "1");
+    // The cards carry no Documents block and no legend; the notes sit under the stack.
+    await expect(page.locator(".story-on").getByText("Documents", { exact: true })).toHaveCount(0);
+    await expect(page.locator(".story-on").getByText("Data path: documents and records")).toHaveCount(0);
+    await expect(page.locator(".story-on").getByText(/^Each element carries its source/)).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Who relies on the record." })).toHaveCount(0);
+    // Skip the story goes to the next section.
     await scrollToState(page, 1);
     await page.getByRole("link", { name: "Skip the story" }).click();
-    await expect(page).toHaveURL(/#evidence$/);
-    // Let the evidence stack play, then check state 06.
-    await page.locator("#evidence ol").scrollIntoViewIfNeeded();
-    await page.waitForTimeout(1500);
-    await scrollToState(page, 6);
-    await expect(story).toHaveAttribute("data-story-state", "6");
-    await page.waitForTimeout(500);
+    await expect(page).toHaveURL(/#money$/);
     await expectNoAxeViolations(page);
-  });
-
-  test("the evidence stack plays once in view and ends fully shown", async ({ page }) => {
-    await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto("/how-it-works");
-    const drawing = page.locator(".iso-evidence");
-    await expect(drawing).toHaveAttribute("data-phase", "armed");
-    await drawing.scrollIntoViewIfNeeded();
-    await page.locator("#evidence ol").scrollIntoViewIfNeeded();
-    await expect(drawing).toHaveAttribute("data-phase", "playing");
-    const rows = page.locator("#evidence ol > li");
-    await expect(rows).toHaveCount(8);
-    await expect(rows.first()).toContainText("Doc 08Purchase confirmation");
-    await expect(rows.last()).toContainText("Doc 01Commercial invoice");
-    await expect(rows.first()).toHaveCSS("opacity", "1");
-    await expect(rows.last()).toHaveCSS("opacity", "1");
-    await expect(page.getByText("The financier owns the receivable", { exact: true })).toBeVisible();
   });
 
   test("with reduced motion at 390 and 768 the ledger shows, nothing scrolls sideways and axe is clean", async ({ page }) => {
@@ -812,6 +927,9 @@ test.describe("How it works (build step 4)", () => {
       await page.goto("/how-it-works");
       await expect(page.locator(".story-on")).toBeHidden();
       await expect(page.locator(".story-ledger").getByText("Kubar is in the data path of every step and in the money path of none.")).toBeVisible();
+      // The complete stack comes with the ledger.
+      await expect(page.locator(".story-ledger .iso-evidence ol > li")).toHaveCount(8);
+      await expect(page.locator(".story-ledger").getByText("The insurer prices on it.", { exact: true })).toBeVisible();
       expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
       await expectNoAxeViolations(page);
     }
@@ -836,9 +954,9 @@ test.describe("How it works (build step 5)", () => {
     await expect(page.getByRole("heading", { name: "What happens to a receivable.", exact: true })).toBeVisible();
     await expect(page.getByRole("heading", { name: "If a buyer doesn’t pay.", exact: true })).toBeVisible();
     await expect(page.getByText("Kubar: the one filled column")).toHaveCount(0);
-    await expect(page.locator("#evidence").getByText("05 Purchased")).toHaveCount(0);
-    await expect(page.locator("#evidence").getByText(/8 of 8/)).toHaveCount(0);
-    await expect(page.locator("#evidence").getByText("Record RCV-0001 · Evidence package", { exact: true })).toBeVisible();
+    await expect(page.getByText("05 Purchased")).toHaveCount(0);
+    await expect(page.getByText(/8 of 8/)).toHaveCount(0);
+    await expect(page.locator(".story-on").getByText("Record RCV-0001 · Evidence package", { exact: true })).toBeVisible();
     // The glossary has no column heads; each term is its row's header.
     const glossary = page.locator("table").filter({ has: page.locator("#term-itfs") });
     await expect(glossary.getByRole("columnheader")).toHaveCount(0);
@@ -848,22 +966,20 @@ test.describe("How it works (build step 5)", () => {
   test("a row lifts its sheet on hover and on a tap, and Tab skips the rows", async ({ page, browser }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto("/how-it-works");
-    const sheet = (doc: string) => page.locator(`.iso-evidence svg:visible .iso-lift[data-doc="${doc}"]`);
-    const row = page.locator('.iso-evidence li[data-doc="03"]');
+    const sheet = (doc: string) => page.locator(`.story-on .iso-evidence svg:visible .iso-lift[data-doc="${doc}"]`);
+    const row = page.locator('.story-on .iso-evidence li[data-doc="03"]');
     await expect(row).toHaveAttribute("tabindex", "-1");
     await row.hover();
     await expect(sheet("03")).toHaveCSS("transform", "matrix(1, 0, 0, 1, 0, -14)");
-    await expect(sheet("05")).toHaveCSS("transform", "none");
-    // A phone: the rows sit under the stack, and a tap lifts the sheet.
+    await expect(sheet("02")).toHaveCSS("transform", "none");
+    // A phone: a tap on a row lifts its sheet.
     const phone = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
     const tab = await phone.newPage();
     await tab.goto("/how-it-works");
-    const tapped = tab.locator('.iso-evidence li[data-doc="06"]');
+    const tapped = tab.locator('.story-on .iso-evidence li[data-doc="02"]');
     await tapped.scrollIntoViewIfNeeded();
     await tapped.tap();
-    await expect(tab.locator('.iso-evidence svg:visible .iso-lift[data-doc="06"]')).toHaveCSS("transform", "matrix(1, 0, 0, 1, 0, -14)");
-    const stack = (await tab.locator(".iso-evidence svg:visible").first().boundingBox())!;
-    expect((await tapped.boundingBox())!.y).toBeGreaterThan(stack.y + stack.height);
+    await expect(tab.locator('.story-on .iso-evidence svg:visible .iso-lift[data-doc="02"]')).toHaveCSS("transform", "matrix(1, 0, 0, 1, 0, -14)");
     await phone.close();
   });
 
@@ -872,7 +988,7 @@ test.describe("How it works (build step 5)", () => {
     await page.setViewportSize({ width: 1440, height: 900 });
     for (const path of ["/", "/how-it-works"]) {
       await page.goto(path);
-      const scope = path === "/" ? ".iso-record" : ".iso-evidence";
+      const scope = path === "/" ? ".iso-record" : ".story-ledger .iso-evidence";
       const row = page.locator(`${scope} li`).nth(2);
       await row.scrollIntoViewIfNeeded();
       await row.hover();
@@ -881,7 +997,7 @@ test.describe("How it works (build step 5)", () => {
       await expect(lifted.locator("rect").nth(2), path).not.toHaveCSS("fill", "rgb(255, 255, 255)");
     }
     await expect(page.locator(".steps-rise").first()).toHaveCSS("animation-name", "none");
-    await expect(page.locator(".iso-evidence")).toHaveAttribute("data-phase", "done");
+    await expect(page.locator(".story-ledger .iso-evidence")).toHaveAttribute("data-phase", "done");
     await expect(page.locator(".unpaid-flow")).toHaveAttribute("data-phase", "done");
   });
 
@@ -983,12 +1099,13 @@ test.describe("How it works (build step 5)", () => {
       const steps = await box(page, "svg.iso-steps");
       expect(steps.x, `${width}: steps beside the words`).toBeGreaterThan(words.x + words.width);
       expect(steps.x + steps.width, `${width}: steps inside the page`).toBeLessThanOrEqual(width);
-      // The evidence: the rows beside the stack, the drawing beside the heading.
-      const heading = await box(page, "#evidence-heading");
-      const stack = await box(page, ".iso-evidence svg:visible");
-      const row = await box(page, '.iso-evidence li[data-doc="08"]');
-      expect(stack.x, `${width}: stack beside the heading`).toBeGreaterThan(heading.x + heading.width);
-      expect(row.x, `${width}: rows beside the stack`).toBeGreaterThan(stack.x + stack.width);
+      // The story: the stack beside the cards, its rows beside it, inside the page.
+      const card = await box(page, ".story-on .story-card");
+      const stack = await box(page, ".story-on .iso-evidence svg:visible");
+      const row = await box(page, '.story-on .iso-evidence li[data-doc="01"]');
+      expect(stack.x, `${width}: stack beside the cards`).toBeGreaterThan(card.x + card.width);
+      expect(row.x, `${width}: rows beside the stack`).toBeGreaterThan(stack.x + stack.width - 30);
+      expect(row.x + row.width, `${width}: rows inside the page`).toBeLessThanOrEqual(width);
       // The fork: steps 01 to 03 in one row.
       const first = await box(page, ".unpaid-flow ol > li:nth-child(1) > div");
       const third = await box(page, ".unpaid-flow ol > li:nth-child(3) > div");
@@ -1004,13 +1121,12 @@ test.describe("How it works (build step 5)", () => {
       const words = await box(page, "main section:first-of-type .flex.flex-col a");
       const steps = await box(page, "svg.iso-steps");
       expect(steps.y, `${width}: steps under the routes`).toBeGreaterThan(words.y);
-      const stack = await box(page, ".iso-evidence svg:visible");
-      const row = await box(page, '.iso-evidence li[data-doc="08"]');
-      if (beside) expect(row.x, `${width}: rows beside`).toBeGreaterThan(stack.x + stack.width);
-      else expect(row.y, `${width}: rows under`).toBeGreaterThan(stack.y + stack.height);
+      // The stack stays pinned with its rows beside it; the complete stack waits with the ledger.
+      const stack = await box(page, ".story-on .iso-evidence svg:visible");
+      const row = await box(page, '.story-on .iso-evidence li[data-doc="01"]');
+      expect(row.x, `${width}: rows beside`).toBeGreaterThan(stack.x + stack.width - (beside ? 30 : 0));
       // References stay whole.
-      const id = page.locator(".iso-evidence").getByText("RCV-0001", { exact: true });
-      await expect(id).toHaveCSS("white-space", "nowrap");
+      await expect(page.locator(".story-ledger .iso-evidence .whitespace-nowrap").first()).toHaveText("RCV-0001");
       expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth), `${width}`).toBe(0);
     }
   });

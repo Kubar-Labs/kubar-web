@@ -70,7 +70,7 @@ export default function About() {
               <span key={name} className="text-ink-muted">{line}</span>,
             ])}
           />
-          <p className="t-fine pt-3 text-ink-muted">{t("team.advisers.note")}</p>
+          <p className="t-body-sm pt-3 text-ink-muted">{t("team.advisers.note")}</p>
         </div>
       </Section>
 

@@ -47,7 +47,24 @@ Member of FACE, an RBI-recognised self-regulatory organisation for fintech
 FinVision Award for Most Innovative Startup in Fintech, FinTech Edge 2026, NIBM Pune
 Winner, Popular Choice Award, Startup Mahakumbh 2025
 Programme marks (logo and name, no kind labels from 14 Nov): GIFT IFIH Young Builders Program · BharatNetra Startup Accelerator (GFTN) · STPI FinGlobe · MeitY GENESIS Entrepreneur in Residence · T-Hub, RubriX Cohort 5 · Pusa Krishi Incubation Programme 2026–27
-[Label] Technology programmes, grants and credits, then the fourteen technology entries exactly as on Home (copy/01-home.md).
+(15 Nov, section 13 B4: the technology programmes show on About only; the list moved here from copy/01-home.md, unchanged.)
+
+## Technology programmes
+[Label] Technology programmes, grants and credits
+[Fine] Google for Startups
+[Fine] NVIDIA Inception
+[Fine] Perplexity for Startups
+[Fine] OpenAI for Startups
+[Fine] Microsoft for Startups
+[Fine] STPI-Intel PRAGATI Accelerator
+[Fine] ElevenLabs Grants
+[Fine] Amplitude for Startups
+[Fine] Polkadot Blockchain Academy
+[Fine] Uniswap Hook Incubator
+[Fine] Sarvam Startup Program
+[Fine] Cloudflare for Startups
+[Fine] Claude for Startups
+[Fine] MongoDB for Startups
 
 ## GIFT City
 [H2] Why GIFT City.

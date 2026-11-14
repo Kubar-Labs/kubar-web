@@ -6,8 +6,10 @@ import { cn } from "@/lib/utils";
 
 /*
  * Evidence package · isometric (Figma 258:1864 at 1440, 260:2163 at 768,
- * 260:2412 at 390; REDRAW-2026-11-14.md, How it works "Who relies on the
- * record."). The record's identifier, then the eight documents as sheets
+ * 260:2412 at 390; REDRAW-2026-11-14.md, How it works). Since section 13 A
+ * the story is told on this stack (StoryStack pins it and lands the
+ * documents state by state); this is the complete stack, shown with the
+ * ledger when the story can't run: with reduced motion or on a short screen. The record's identifier, then the eight documents as sheets
  * stacked 38 px apart (34 below desktop), Doc 08 on top and current (rani
  * edge, lifted shadow). Each sheet is tied by a hairline to its row: number
  * and name. Desktop and tablet set the rows beside the stack; phones list
@@ -43,7 +45,7 @@ export type EvidenceCopy = {
   after: string[];
 };
 
-type Geometry = {
+export type StackGeometry = {
   sheet: { w: number; h: number };
   /** The sheets' top vertex, horizontally. */
   x: number;
@@ -57,7 +59,7 @@ type Geometry = {
 };
 
 // 1440 frame (sheets 250 × 150, drawn 346 × 200), from just under the id row.
-const DESKTOP: Geometry = {
+export const STACK_DESKTOP: StackGeometry = {
   sheet: { w: 250, h: 150 },
   x: 138.4,
   top: 28,
@@ -68,7 +70,7 @@ const DESKTOP: Geometry = {
   content: "large",
 };
 // 768 and 390 frames (sheets 230 × 140, drawn 320 × 185), with 20 px above sheet 08 for the drop and the lift.
-const SMALL: Geometry = {
+export const STACK_SMALL: StackGeometry = {
   sheet: { w: 230, h: 140 },
   x: 129,
   top: 20,
@@ -79,7 +81,7 @@ const SMALL: Geometry = {
   content: "small",
 };
 
-function SheetContent({ no, current, size }: { no: string; current: boolean; size: Geometry["content"] }) {
+export function SheetContent({ no, current, size }: { no: string; current: boolean; size: StackGeometry["content"] }) {
   const large = size === "large";
   return (
     <>
@@ -95,7 +97,7 @@ function SheetContent({ no, current, size }: { no: string; current: boolean; siz
   );
 }
 
-function Stack({ g, documents, className }: { g: Geometry; documents: EvidenceCopy["documents"]; className: string }) {
+function Stack({ g, documents, className }: { g: StackGeometry; documents: EvidenceCopy["documents"]; className: string }) {
   const last = documents.length - 1;
   return (
     <svg aria-hidden="true" viewBox={`0 0 ${g.width} ${g.height}`} width={g.width} height={g.height} className={cn("h-auto overflow-visible", className)}>
@@ -130,8 +132,8 @@ export function IsoEvidence({ copy, className }: { copy: EvidenceCopy; className
       </p>
 
       <div className="relative mt-1 lg:mt-0">
-        <Stack g={DESKTOP} documents={copy.documents} className="hidden w-[360px] lg:block" />
-        <Stack g={SMALL} documents={copy.documents} className="mx-auto block w-full max-w-[336px] md:mx-0 lg:hidden" />
+        <Stack g={STACK_DESKTOP} documents={copy.documents} className="hidden w-[360px] lg:block" />
+        <Stack g={STACK_SMALL} documents={copy.documents} className="mx-auto block w-full max-w-[336px] md:mx-0 lg:hidden" />
 
         <ol className="mt-6 md:absolute md:top-[124px] md:right-0 md:left-[356px] md:mt-0 lg:top-[142px] lg:left-[383px]">
           {rows.map(({ doc, i }) => {

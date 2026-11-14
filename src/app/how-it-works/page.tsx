@@ -5,6 +5,7 @@ import { createPageMetadata } from "@/app/page-metadata";
 import { PageHero } from "@/components/blocks/PageHero";
 import { Section, SectionHead } from "@/components/blocks/Section";
 import { IsoEvidence, type EvidenceCopy } from "@/components/how/IsoEvidence";
+import { StoryStack, StoryStackAfter } from "@/components/how/StoryStack";
 import { IsoSteps } from "@/components/how/IsoSteps";
 import { SignsMap, type SignsMapCopy } from "@/components/how/SignsMap";
 import { Terms } from "@/components/how/Terms";
@@ -19,9 +20,9 @@ import { TextLink } from "@/components/ui/TextLink";
 /*
  * How it works (Figma 172:6 at 1440, 172:1770 at 768, 172:760 at 390;
  * REDRAW-2026-11-14.md, section 5). The hero beside its eight isometric
- * steps; the rail as the pinned story at every width (section 3a); the
- * evidence package as an isometric stack; "If a buyer doesn't pay" as a
- * flow with a fork. No Illustrative tag (15 Nov): the lead says
+ * steps; the rail as the pinned story at every width (section 3a), told on
+ * the evidence stack, whose documents land state by state (section 13 A);
+ * "If a buyer doesn't pay" as a flow with a fork; the signs map. No Illustrative tag (15 Nov): the lead says
  * "illustrative" in words. From 1200 up the page keeps its 1440
  * composition, the drawings taking their column's width (section 11).
  */
@@ -37,6 +38,7 @@ export default function HowItWorks() {
   const t = useTranslations("howItWorks");
   const footnotes = useTranslations("footnotes");
   const states = t.raw("rail.states") as LedgerState[];
+  const evidence = t.raw("evidence") as EvidenceCopy;
   const routes = t.raw("next.routes") as { tag: string; label: string; href: string }[];
 
   return (
@@ -60,10 +62,20 @@ export default function HowItWorks() {
           ledger with reduced motion or on a very short screen. */}
       <Section labelledBy="rail-heading" className="flex flex-col gap-10 lg:gap-16">
         <SectionHead id="rail-heading" heading={t("rail.heading")} layout="wide" />
-        <Story variant="howItWorks" states={states} closing={t("rail.closing")} skipTo="evidence" footnote={{ target: FN_STATUS, refId: "fnref-1-story" }}>
+        <Story
+          variant="howItWorks"
+          states={states}
+          closing={t("rail.closing")}
+          skipTo="money"
+          footnote={{ target: FN_STATUS, refId: "fnref-1-story" }}
+          drawing={<StoryStack copy={evidence} />}
+          after={<StoryStackAfter copy={evidence} />}
+        >
+          {/* With reduced motion or on a short screen: the ledger, then the complete stack. */}
           <div className="flex flex-col gap-6">
             <Ledger states={states} footnote={{ target: FN_STATUS, refId: "fnref-1-ledger" }} />
             <p className="t-body-sm text-ink">{t("rail.closing")}</p>
+            <IsoEvidence className="pt-10 lg:max-w-[800px]" copy={evidence} />
           </div>
         </Story>
         <Footnote n={1} id={FN_STATUS} backTo="fnref-1-ledger" className="lg:max-w-[628px]">
@@ -71,13 +83,7 @@ export default function HowItWorks() {
         </Footnote>
       </Section>
 
-      <Section id="evidence" labelledBy="evidence-heading" className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-20">
-        {/* Laptops narrow the heading's column first, so the drawing keeps as much of its 800 as it can. */}
-        <SectionHead id="evidence-heading" heading={t("evidence.heading")} layout="stacked" className="lg:w-[clamp(300px,calc(100%-880px),400px)]" />
-        <IsoEvidence className="min-w-0 flex-1" copy={t.raw("evidence") as EvidenceCopy} />
-      </Section>
-
-      <Section labelledBy="money-heading" className="flex flex-col gap-10 lg:gap-16">
+      <Section id="money" labelledBy="money-heading" className="flex flex-col gap-10 lg:gap-16">
         <SectionHead id="money-heading" heading={t("money.heading")} layout="wide" />
         <MoneyPath
           wide

@@ -104,8 +104,10 @@ describe("copy matches docs/rebuild/copy word for word", () => {
     for (const line of lines) expect(has(line), `missing: ${line}`).toBe(true);
   });
 
-  it("carries the technology programmes (01-home.md)", () => {
-    for (const line of sectionLines("01-home.md", "Technology programmes")) {
+  it("carries the technology programmes (05-about.md; on About only since 15 Nov)", () => {
+    const lines = sectionLines("05-about.md", "Technology programmes");
+    expect(lines.length).toBeGreaterThan(10);
+    for (const line of lines) {
       expect(has(line), `missing: ${line}`).toBe(true);
     }
   });

@@ -64,6 +64,7 @@ Step 4 (REDRAW-2026-11-14.md, Kubar Protocol): "Set up once" as six numbered dot
 [BodyS] Every receivable that fits, inside your limit
 
 ## The evidence package
+(15 Nov, REDRAW-2026-11-14.md section 13 B7: the ten elements show once. The visible table is gone at every width and stays in the page for screen readers. Each row of the drawing shows the element and its source; picking a row opens its "Checked against" line under it, one at a time, with the label "Checked against" from the table's column head.)
 [H2] Every element traces to a system the exporter doesn’t control.
 [BodyL] Financiers have lost money on paper they couldn’t verify. So each receivable comes with one record: you buy on it, the insurer prices on it, and the exporter’s bank closes the shipping bill against it.
 Drawing (desktop only; component "Evidence sources", 130:2584): ten elements, each with its source, joined by dashed data-path stubs to one spine and one arrow into the record.
@@ -135,6 +136,7 @@ Kubar | Origination, the evidence package, servicing and reporting | Money or cr
 (first column [UI], the others [BodyS])
 
 ## Questions  (disclosure list: question opens its answer in place)
+(15 Nov, section 13 B8: below 768 the ten questions are an accordion with the first one open; from 768 up they stay open.)
 [H2] Questions a credit committee asks.
 [UIL] What am I buying?
 [Body] An export receivable: the amount an overseas buyer owes an Indian exporter under a shipped invoice. You buy it outright, inside your programme limit, without recourse for the buyer’s credit.

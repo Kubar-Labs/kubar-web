@@ -20,7 +20,8 @@ import { cn } from "@/lib/utils";
  * whose solid copy draws, since a dashed line can't draw with its own
  * dashoffset (section 9.4). On desktop, hover, focus or a click on a label
  * marks its block as the hero marks its current sheet: the face stays white
- * and its top edges turn rani at 2 px (CSS :has, globals.css). Below desktop
+ * and its top edges turn rani at 2 px (drawn over the block from inside the
+ * label; globals.css). Below desktop
  * there is no highlight: the labels sit under the drawing, in the blocks'
  * order (REDRAW section 10). The markup is rendered on the server;
  * PlayOnce only sets the motion phase.
@@ -118,7 +119,6 @@ export function IsoFoundations({
                     <polygon points={shape.left} className="fill-[var(--petrol-100)]" />
                     <polygon points={shape.right} className="fill-[var(--petrol-50)]" />
                     <polygon points={shape.top} className="iso-top" />
-                    <polygon points={shape.top} data-level={level} className="iso-top-edge" />
                   </g>
                   <line x1={shape.leaderX} x2={584} y1={shape.leaderY} y2={shape.leaderY} className="iso-leader-line hidden lg:inline" />
                 </g>
@@ -139,6 +139,20 @@ export function IsoFoundations({
                 style={{ ["--label-top" as string]: `${shape.leaderY - 14}px` }}
                 className="flex flex-col gap-1 border-t border-rule py-4 outline-offset-4 lg:absolute lg:right-0 lg:left-0 lg:top-(--label-top) lg:border-0 lg:py-0"
               >
+                {/* The block's rani top edges, laid over the drawing from inside its label, so a plain
+                    descendant rule shows them (Safari doesn't restyle :has(li:hover) on hover). Desktop only. */}
+                {f.planned ? null : (
+                  <svg
+                    aria-hidden="true"
+                    viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
+                    width={WIDTH}
+                    height={HEIGHT}
+                    style={{ top: `${14 - shape.leaderY}px` }}
+                    className="pointer-events-none absolute left-[-600px] hidden overflow-visible lg:block"
+                  >
+                    <polygon points={shape.top} data-level={levelOf(i)} className="iso-top-edge" />
+                  </svg>
+                )}
                 {f.planned && plannedStyle === "tag" ? (
                   <span className="t-tag text-accent lg:hidden">
                     {f.where}

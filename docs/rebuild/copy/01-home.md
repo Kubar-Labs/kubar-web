@@ -3,6 +3,7 @@
 Extracted from Figma, Home · 1440 (frame 160:6), 13 Nov 2026, in reading order. The bracketed tag is the text style (see ../tokens/README.md); "mixed" means the line carries more than one style (a link inside a sentence). Header and footer are in 00-header-footer.md. Hidden sections (Where we are) are not included and must not be built.
 
 ## Hero
+(15 Nov, REDRAW-2026-11-14.md section 13 B: the two figure captions in The gap are Sans/Body; "Drawn to scale…" is Sans/Fine, not mono; "Skip the story" has no arrow.)
 [Display] Building the institutional exchange¹ for cross-border trade finance.
 [UIL] For financial institutions            → /products/kubar-protocol
 [UIL] For trade platforms                   → /products/navdhan-sdk
@@ -182,21 +183,7 @@ The 1440 frame shows the story at state 05. The text for all eight states is the
 [UI] Press, or anything else                       [UI] Write to us                       → /contact?intent=other
 
 ## Technology programmes
-[Label] Technology programmes, grants and credits
-[Fine] Google for Startups
-[Fine] NVIDIA Inception
-[Fine] Perplexity for Startups
-[Fine] OpenAI for Startups
-[Fine] Microsoft for Startups
-[Fine] STPI-Intel PRAGATI Accelerator
-[Fine] ElevenLabs Grants
-[Fine] Amplitude for Startups
-[Fine] Polkadot Blockchain Academy
-[Fine] Uniswap Hook Incubator
-[Fine] Sarvam Startup Program
-[Fine] Cloudflare for Startups
-[Fine] Claude for Startups
-[Fine] MongoDB for Startups
+(15 Nov, REDRAW-2026-11-14.md section 13 B4: this section is removed from Home. The logos stay on About only; the list now lives in copy/05-about.md.)
 
 ## Only at 768 and 390
 

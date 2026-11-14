@@ -17,6 +17,8 @@ export function Story({
   states,
   variant,
   closing,
+  drawing,
+  after,
   children,
 }: {
   /** Id of the section after the story. */
@@ -27,6 +29,10 @@ export function Story({
   variant?: "home" | "howItWorks";
   /** How it works: the line that ends the eight states below desktop. */
   closing?: string;
+  /** The pinned drawing, in place of the lanes (How it works pins its evidence stack). */
+  drawing?: React.ReactNode;
+  /** What follows the cards, under the drawing's column at desktop. */
+  after?: React.ReactNode;
   /** The ledger register. */
   children: React.ReactNode;
 }) {
@@ -36,7 +42,8 @@ export function Story({
       copy={t.raw("story")}
       states={states ?? (t.raw("ledger.states") as LedgerState[])}
       marker={<FootnoteMarker n={1} {...footnote} />}
-      lanes={<Lanes parties={t.raw("story.parties") as string[]} labels={t.raw("story.lanes") as LaneLabels} />}
+      lanes={drawing ?? <Lanes parties={t.raw("story.parties") as string[]} labels={t.raw("story.lanes") as LaneLabels} />}
+      after={after}
       skipTo={skipTo}
       variant={variant}
       closing={closing}
