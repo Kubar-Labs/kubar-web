@@ -73,7 +73,7 @@ Same layout as the privacy notice.
 [Display] Terms of use
 [Fine] Last updated: 15 November 2026       (set 15 Nov)
 [Tag] Contents
-1. About these terms · 2. What the site is · 3. Kubar’s role · 4. Plans, status and examples · 5. Other people’s names and marks · 6. Our content · 7. Using the site · 8. No warranty · 9. Liability · 10. Privacy · 11. Changes · 12. Law and courts · 13. Contact
+1. About these terms · 2. What the site is · 3. Kubar’s role · 4. Plans and examples · 5. Other people’s names and marks · 6. Our content · 7. Using the site · 8. No warranty · 9. Liability · 10. Privacy · 11. Changes · 12. Law and courts · 13. Contact
 
 [H4] 1. About these terms
 kubar.tech is run by Kubar Protocol Private Limited, a company incorporated in India (CIN U70200WB2024PTC274850), with its registered office at Paras Market, Station Road, Barakar, West Bengal 713324 (“Kubar”). By using the site, you accept these terms.
@@ -84,9 +84,9 @@ The site gives information about Kubar Labs and its products, for institutions a
 [H4] 3. Kubar’s role
 Kubar acts as a financier’s origination and servicing agent. It doesn’t lend, hold client money or take credit risk. Any programme is governed by its own signed documents, not by this site.
 
-[H4] 4. Plans, status and examples
-Statements about plans, such as Kubar’s own ITFS registration, targeted for 2027, are intentions, not promises, and depend on approvals and agreements outside Kubar’s control. Status labels describe the position on the date shown. The illustrative receivable is an example, not a real transaction.
-      ← OPEN: "Status labels describe the position on the date shown" no longer matches the site (status labels and dated status sections were removed on 12 Nov). Build as written until Vaibhav or counsel changes it.
+[H4] 4. Plans and examples
+Statements about plans, such as Kubar’s own ITFS registration, targeted for 2027, are intentions, not promises, and depend on approvals and agreements outside Kubar’s control. The illustrative receivable is an example, not a real transaction.
+      (15 Nov: the status-label sentence is removed and the heading renamed; counsel's review of both legal pages is done.)
 
 [H4] 5. Other people’s names and marks
 Programme names and logos belong to their owners. They show programmes Kubar or its founder takes part in, and they don’t imply a partnership or an endorsement. Links to other sites are for convenience; we aren’t responsible for their content.

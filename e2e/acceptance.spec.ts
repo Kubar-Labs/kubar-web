@@ -27,8 +27,8 @@ test.describe("what the site never shows", () => {
       await page.goto(path);
       const text = (await page.locator("body").innerText()).replace(/\s+/g, " ");
       // Status labels from the old copy deck; only the venue keeps "Planned".
-      // The terms of use are built as written (HANDOFF open item 3) and say "Status labels".
-      expect(text).not.toMatch(/\b(In build|In preparation|In pilot|In use|Demonstrated)\b/);
+      // The terms of use no longer mention status labels either (15 Nov).
+      expect(text).not.toMatch(/\b(In build|In preparation|In pilot|In use|Demonstrated|Status labels)\b/);
       expect(text).not.toMatch(/\bas at\b/i);
       expect(text).not.toMatch(/What the labels mean/);
       // Never retail, never named partners' capital or emblems.

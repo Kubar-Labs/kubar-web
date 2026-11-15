@@ -1402,6 +1402,10 @@ test("legal pages carry their date and the retention period, with no placeholder
   }
   await page.goto("/legal/privacy");
   await expect(page.getByRole("main")).toContainText("We keep enquiries for 24 months after our last exchange");
+  await page.goto("/legal/terms");
+  await expect(page.getByRole("main").getByRole("heading", { name: "4. Plans and examples", exact: true })).toBeVisible();
+  await expect(page.getByRole("main").getByRole("link", { name: /Plans and examples$/ })).toBeVisible();
+  await expect(page.getByRole("main")).not.toContainText("status");
 });
 
 test("Home's map: a tap on the card with no link dims the arrows that don't touch it", async ({ browser }) => {
