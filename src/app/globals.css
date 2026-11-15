@@ -766,6 +766,29 @@
     transition: transform var(--duration-scene) var(--ease-standard);
   }
 
+  /* NavDhan SDK's layers (IsoLayers): when in view, the layers settle from
+     20 px apart to their drawn spacing, bottom first; the SDK tile lands last. */
+  [data-phase="armed"] .layer-settle {
+    transform: translateY(var(--from));
+  }
+  [data-phase="playing"] .layer-settle {
+    transition: transform var(--duration-write) var(--ease-standard) calc(var(--n) * 80ms);
+  }
+  [data-phase="armed"] .layer-tile {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  [data-phase="playing"] .layer-tile {
+    transition:
+      opacity var(--duration-write) var(--ease-standard) calc(3 * 80ms + var(--duration-write)),
+      transform var(--duration-write) var(--ease-standard) calc(3 * 80ms + var(--duration-write));
+  }
+  @media (min-width: 1200px) {
+    .iso-layers li:is(:hover, :focus) .iso-top-edge {
+      opacity: 1;
+    }
+  }
+
   /* How it works hero (IsoSteps): on page load the blocks rise in order, 01
      to 08, 60 ms apart; 08's petrol top fades in over its white one last. */
   .steps-rise {

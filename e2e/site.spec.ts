@@ -211,16 +211,13 @@ test.describe("primitives and registers (build step 2), on Home", () => {
     );
   });
 
-  // NavDhan SDK still carries the tag until step 6 rebuilds it (How it works lost it in step 5).
-  test("Illustrative opens its note in place and closes again", async ({ page }) => {
-    await page.goto("/products/navdhan-sdk");
-    const tag = page.getByRole("button", { name: "Illustrative" }).first();
-    await expect(tag).toHaveAttribute("aria-expanded", "false");
-    await tag.click();
-    await expect(tag).toHaveAttribute("aria-expanded", "true");
-    await expect(page.getByText("An example receivable, not a real transaction.").first()).toBeVisible();
-    await tag.click();
-    await expect(page.getByText("An example receivable, not a real transaction.").first()).toBeHidden();
+  // The Illustrative tag's open-and-close test went with the component in build step 6: no page has the tag.
+  test("no page carries an Illustrative tag", async ({ page }) => {
+    for (const path of publicRoutes) {
+      await page.goto(path);
+      await expect(page.getByRole("button", { name: "Illustrative" }), path).toHaveCount(0);
+      await expect(page.getByText("Illustrative", { exact: true }), path).toHaveCount(0);
+    }
   });
 
   test("Home after the 15 Nov audit: larger captions, no skip arrow, no technology programmes, 44 px tap areas", async ({ page }) => {
@@ -905,6 +902,116 @@ test.describe("NavDhan SDK (build step 4)", () => {
   });
 });
 
+test.describe("NavDhan SDK (build step 6)", () => {
+  test("the hero carries What you embed: picking a row marks it and outlines its part of the sketch", async ({ page, browser }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/products/navdhan-sdk");
+    const hero = page.locator("main section").first();
+    await expect(hero.getByRole("heading", { name: "What you embed." })).toBeVisible();
+    const rows = hero.getByRole("button", { pressed: undefined }).filter({ hasNot: page.locator("svg") });
+    const row = (name: string) => hero.getByRole("button", { name: new RegExp(`^${name}`) });
+    const sketch = hero.getByRole("img");
+    await expect(hero.locator("ul > li > button")).toHaveCount(6);
+    expect(await rows.count()).toBeGreaterThanOrEqual(6);
+    // Eligibility check is picked from the start.
+    await expect(row("Eligibility check")).toHaveAttribute("aria-pressed", "true");
+    const outlined = () => sketch.locator(".outline-2:visible");
+    await expect(outlined()).toHaveCount(1);
+    await expect(outlined()).toContainText("Buyer country");
+    await expect(row("Eligibility check")).toHaveCSS("border-left-color", "rgb(2, 39, 50)");
+    // Hover picks; the pick stays when the pointer leaves.
+    await row("Indicative offer").hover();
+    await expect(row("Indicative offer")).toHaveAttribute("aria-pressed", "true");
+    await expect(outlined()).toContainText("All-in price");
+    await page.mouse.move(5, 5);
+    await expect(row("Indicative offer")).toHaveAttribute("aria-pressed", "true");
+    // Shipment and document capture outlines the Shipment list.
+    await row("Shipment and document capture").click();
+    await expect(outlined()).toContainText("Bill of lading");
+    // The two rows with no part in the sketch swap the panel's content.
+    await expect(sketch.getByText("Identity check", { exact: true })).toBeHidden();
+    await row("Consented onboarding").focus();
+    await expect(sketch.getByText("Identity check", { exact: true })).toBeVisible();
+    await expect(sketch.getByText("Consent recorded", { exact: true })).toBeVisible();
+    await expect(sketch.getByText("Indicative offer", { exact: true })).toBeHidden();
+    await expect(sketch.getByText("Purchased", { exact: true })).toBeHidden();
+    await page.keyboard.press("Tab");
+    await page.keyboard.press("Tab");
+    await page.keyboard.press("Tab");
+    await page.keyboard.press("Tab");
+    await page.keyboard.press("Tab");
+    await expect(row("Events for your product")).toHaveAttribute("aria-pressed", "true");
+    await expect(sketch.getByText("Purchased", { exact: true })).toBeVisible();
+    await expect(sketch.getByText("Indicative offer", { exact: true })).toBeVisible();
+    // The sketch sits beside the list.
+    const list = (await hero.locator("ul").first().boundingBox())!;
+    const art = (await sketch.boundingBox())!;
+    expect(art.x).toBeGreaterThan(list.x + list.width);
+    await expectNoAxeViolations(page);
+    // Below 1200: the sketch, then the rows; a tap still picks.
+    const phone = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+    const tab = await phone.newPage();
+    await tab.goto("/products/navdhan-sdk");
+    const phoneHero = tab.locator("main section").first();
+    const phoneArt = (await phoneHero.getByRole("img").boundingBox())!;
+    const first = phoneHero.locator("ul > li > button").first();
+    expect((await first.boundingBox())!.y).toBeGreaterThan(phoneArt.y + phoneArt.height);
+    const tapped = phoneHero.getByRole("button", { name: /^Shipment and document capture/ });
+    await tapped.scrollIntoViewIfNeeded();
+    await tapped.tap();
+    await expect(tapped).toHaveAttribute("aria-pressed", "true");
+    await expect(phoneHero.getByRole("img").locator(".outline-2:visible")).toContainText("Booking");
+    expect(await tab.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
+    await phone.close();
+  });
+
+  test("two audiences side by side, no numbers on the rules, no column heads, the layers drawn", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/products/navdhan-sdk");
+    const a = (await page.getByRole("heading", { name: "Dollar finance beyond their bank limit." }).boundingBox())!;
+    const b = (await page.getByRole("heading", { name: "Finance in your product." }).boundingBox())!;
+    expect(Math.round(a.y)).toBe(Math.round(b.y));
+    expect(b.x).toBeGreaterThan(a.x + a.width);
+    await expect(page.getByRole("columnheader")).toHaveCount(0);
+    for (const gone of ["Capability", "Step", "What happens", "You keep the relationship"]) {
+      await expect(page.getByText(gone, { exact: true }), gone).toHaveCount(0);
+    }
+    const rules = page.locator("section", { has: page.locator("#rules-heading") });
+    await expect(rules.locator("ol > li")).toHaveCount(4);
+    await expect(rules.locator(".t-code")).toHaveCount(0);
+    const layers = page.locator(".iso-layers");
+    await expect(layers.locator("svg").first()).toHaveAttribute("aria-hidden", "true");
+    await expect(layers.locator("ol > li")).toHaveText(["NavDhan SDK", "Your platform", "Kubar Protocol", "Banks, insurers and funds"]);
+    await expect(layers).toHaveAttribute("data-phase", "armed");
+    await layers.scrollIntoViewIfNeeded();
+    await expect(layers).toHaveAttribute("data-phase", "playing");
+    // A label marks its layer on hover.
+    const label = layers.locator("ol > li").nth(2);
+    await label.hover();
+    await expect.poll(() => label.locator(".iso-top-edge").evaluate((el) => getComputedStyle(el).opacity)).toBe("1");
+    // Stacked below 1200.
+    await page.setViewportSize({ width: 768, height: 1024 });
+    const a2 = (await page.getByRole("heading", { name: "Dollar finance beyond their bank limit." }).boundingBox())!;
+    const b2 = (await page.getByRole("heading", { name: "Finance in your product." }).boundingBox())!;
+    expect(b2.y).toBeGreaterThan(a2.y + a2.height);
+  });
+
+  test("laptops keep the 1440 composition, and nothing scrolls sideways at any width", async ({ page }) => {
+    for (const width of [375, 390, 768, 1200, 1280, 1366, 1440]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto("/products/navdhan-sdk");
+      expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth), `${width}`).toBe(0);
+      if (width >= 1200) {
+        const hero = page.locator("main section").first();
+        const list = (await hero.locator("ul").first().boundingBox())!;
+        const art = (await hero.getByRole("img").boundingBox())!;
+        expect(art.x, `${width}: sketch beside the list`).toBeGreaterThan(list.x + list.width - 1);
+        expect(art.x + art.width, `${width}: sketch inside the page`).toBeLessThanOrEqual(width);
+      }
+    }
+  });
+});
+
 test.describe("How it works (build step 4)", () => {
   test("carries its metadata, routes, glossary and one status footnote", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
@@ -1199,7 +1306,7 @@ test.describe("How it works (build step 5)", () => {
 });
 
 test.describe("On this page index (section 12, item 5)", () => {
-  for (const [path, first, count] of [["/products/kubar-protocol", "What you buy", 11], ["/how-it-works", "The rail", 5]] as const) {
+  for (const [path, first, count] of [["/products/kubar-protocol", "What you buy", 11], ["/how-it-works", "What happens to a receivable", 5]] as const) {
     test(`${path}: a row under the hero, then a button and a sheet once it has scrolled away`, async ({ page }) => {
       await page.setViewportSize({ width: 1440, height: 900 });
       await page.goto(path);
@@ -1220,6 +1327,13 @@ test.describe("On this page index (section 12, item 5)", () => {
       await page.evaluate(() => window.scrollBy(0, 300));
       await expect(button).toBeVisible();
       expect(await header()).toBe(before);
+      // The button steps aside over anything pressable, so move on until it is clear.
+      const clear = () => button.evaluate((el) => getComputedStyle(el.parentElement!).opacity === "1" && getComputedStyle(el.parentElement!).pointerEvents !== "none");
+      for (let i = 0; i < 40 && !(await clear()); i++) {
+        await page.evaluate(() => window.scrollBy(0, 120));
+        await page.waitForTimeout(150);
+      }
+      expect(await clear()).toBe(true);
       await button.click();
       const sheet = page.getByRole("dialog", { name: "On this page" });
       await expect(sheet.getByRole("link")).toHaveCount(count);
@@ -1228,16 +1342,42 @@ test.describe("On this page index (section 12, item 5)", () => {
       await expect(sheet).toBeHidden();
       await expect(button).toBeFocused();
       // A pick closes it and goes there.
-      await button.click();
+      await button.focus();
+      await page.keyboard.press("Enter");
       await sheet.getByRole("link").last().click();
       await expect(sheet).toBeHidden();
       await expect(page).toHaveURL(/#[a-z0-9-]+-heading$/);
       await expectNoAxeViolations(page);
       // A phone: the button stays inside the screen.
       await page.setViewportSize({ width: 390, height: 844 });
-      await expect(button).toBeVisible();
       const box = (await button.boundingBox())!;
       expect(box.x + box.width).toBeLessThanOrEqual(390);
+      // It never sits over something a reader would press: with a link, a button, a field or the
+      // footer under it, it steps aside (hidden and out of reach); otherwise it shows. Checked by
+      // comparing rectangles all the way down the page.
+      const total = await page.evaluate(() => document.documentElement.scrollHeight);
+      let shownSomewhere = 0;
+      for (let top = 1200; top < total; top += 500) {
+        await page.evaluate((y) => window.scrollTo(0, y), top);
+        await page.waitForTimeout(200);
+        const state = await button.evaluate((el) => {
+          const float = el.parentElement!;
+          const r = el.getBoundingClientRect();
+          const under = [...document.querySelectorAll("a, button, input, select, textarea, summary, label, [tabindex]:not(main), [role='button'], footer")].some((other) => {
+            if (float.contains(other)) return false;
+            const o = other.getBoundingClientRect();
+            return o.width > 0 && o.height > 0 && o.left < r.right && o.right > r.left && o.top < r.bottom && o.bottom > r.top;
+          });
+          return { under, shown: getComputedStyle(float).opacity === "1" && getComputedStyle(float).pointerEvents !== "none" };
+        });
+        expect(state.shown, `at ${top}: shown only when nothing pressable is under it`).toBe(!state.under);
+        if (state.shown) shownSomewhere++;
+      }
+      expect(shownSomewhere).toBeGreaterThan(3);
+      await page.evaluate(() => window.scrollTo(0, 100000));
+      await page.waitForTimeout(250);
+      await expect(page.locator("footer")).toBeInViewport();
+      expect(await button.evaluate((el) => getComputedStyle(el.parentElement!).pointerEvents)).toBe("none");
       expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
     });
   }

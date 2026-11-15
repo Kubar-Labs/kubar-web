@@ -3,7 +3,7 @@
 Extracted from Figma, How it works · 1440 (frame 172:6), 13 Nov 2026, in reading order. Bracketed tags are text styles (../tokens/README.md). Header and footer: 00-header-footer.md.
 
 ## Hero
-(15 Nov, REDRAW-2026-11-14.md section 12 item 5: under the hero, an "On this page" row with each section's name below as an anchor link: The rail · The money path · If a buyer doesn’t pay · Who does what · Terms.)
+(15 Nov, REDRAW-2026-11-14.md section 12 item 5: under the hero, an "On this page" row with each section as an anchor link, in the words a visitor sees, never an internal section name (Vaibhav, 15 Nov): What happens to a receivable · Where the money moves · If a buyer doesn’t pay · Each party signs · The terms.)
 (14 Nov: the kicker line above the headline is removed. REDRAW-2026-11-14.md, section 3.)
 (Build step 5: the words sit beside "Eight states · isometric steps" (258:1829), eight blocks numbered 01 to 08, 08 in petrol; the numbers are part of the drawing.)
 [Display] From the port to the record.

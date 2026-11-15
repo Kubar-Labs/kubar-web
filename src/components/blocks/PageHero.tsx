@@ -27,6 +27,8 @@ type PageHeroProps = {
   besideWidths?: [number, number];
   /** "beside": classes for the drawing's box (its spacing below desktop). */
   asideClassName?: string;
+  /** A block under the words at the page's full width (NavDhan SDK: What you embed and the sketch). */
+  below?: React.ReactNode;
 };
 
 export function PageHero({
@@ -39,6 +41,7 @@ export function PageHero({
   asidePlacement = "lower-right",
   besideWidths = [720, 474],
   asideClassName,
+  below,
 }: PageHeroProps) {
   const words = (
     <>
@@ -80,6 +83,7 @@ export function PageHero({
     <section>
       <div className={cn("page-container relative pt-8 pb-12 lg:pt-16 lg:pb-[72px]", aside && "lg:min-h-[969px]")}>
         <div className="flex flex-col lg:max-w-[1063px]">{words}</div>
+        {below ? <div className="pt-10 lg:pt-[52px]">{below}</div> : null}
         {aside ? <div className="pt-10 lg:absolute lg:top-[408px] lg:right-(--page-margin) lg:pt-0">{aside}</div> : null}
       </div>
     </section>

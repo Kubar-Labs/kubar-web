@@ -12,10 +12,15 @@ import { cx as cn } from "@/lib/cx";
  * Once the row has scrolled out of view, a small fixed "On this page"
  * button shows at the bottom right. It opens the same list in a sheet,
  * marks the current section, and closes on Escape, on a pick or on a click
- * outside. Both are fixed or in normal flow under the hero, so neither
+ * outside. While a link, a button, a field or the footer is under it, the
+ * button steps aside, so it never covers something a reader would press.
+ * Both are fixed or in normal flow under the hero, so neither
  * changes the header's height or the pinned story's measurements.
  */
 export type IndexItem = { id: string; label: string };
+
+/** Anything a reader could press, and the footer: the fixed button never sits over one. */
+const PRESSABLE = "a, button, input, select, textarea, summary, label, [tabindex]:not(main), [role='button'], footer";
 
 export function OnThisPage({ label, items, className }: { label: string; items: IndexItem[]; className?: string }) {
   const rowRef = useRef<HTMLElement>(null);
@@ -24,6 +29,8 @@ export function OnThisPage({ label, items, className }: { label: string; items: 
   const [past, setPast] = useState(false);
   const [open, setOpen] = useState(false);
   const [current, setCurrent] = useState<string | null>(null);
+  const [covering, setCovering] = useState(false);
+  const floatRef = useRef<HTMLDivElement>(null);
 
   // The button shows once the row has gone above the screen.
   useEffect(() => {
@@ -37,6 +44,55 @@ export function OnThisPage({ label, items, className }: { label: string; items: 
     observer.observe(row);
     return () => observer.disconnect();
   }, []);
+
+  // The button never sits over a link, a button or a field, and stays clear of the footer:
+  // while one of them is under it, it steps aside.
+  useEffect(() => {
+    if (!past || open) return;
+    let frame = 0;
+    const check = () => {
+      frame = 0;
+      const button = buttonRef.current;
+      if (!button) return;
+      // While the button holds focus it stays, so a keyboard reader never loses sight of it.
+      if (document.activeElement === button) {
+        setCovering(false);
+        return;
+      }
+      const box = button.getBoundingClientRect();
+      let hit = false;
+      for (const el of document.querySelectorAll(PRESSABLE)) {
+        if (floatRef.current?.contains(el)) continue;
+        const r = el.getBoundingClientRect();
+        if (r.width > 0 && r.height > 0 && r.left < box.right && r.right > box.left && r.top < box.bottom && r.bottom > box.top) {
+          hit = true;
+          break;
+        }
+      }
+      setCovering(hit);
+    };
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(check);
+    };
+    schedule();
+    // The page moves under the button on scroll and resize, and when something opens or reflows.
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    document.addEventListener("click", schedule);
+    document.addEventListener("focusin", schedule);
+    document.addEventListener("focusout", schedule);
+    const resized = new ResizeObserver(schedule);
+    resized.observe(document.body);
+    return () => {
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+      document.removeEventListener("click", schedule);
+      document.removeEventListener("focusin", schedule);
+      document.removeEventListener("focusout", schedule);
+      resized.disconnect();
+      if (frame) cancelAnimationFrame(frame);
+    };
+  }, [past, open]);
 
   // Open: mark the section the reader is in, move focus into the sheet, close on Escape or a click outside.
   useEffect(() => {
@@ -87,7 +143,13 @@ export function OnThisPage({ label, items, className }: { label: string; items: 
       </nav>
 
       {past ? (
-        <div className="fixed right-4 bottom-4 z-30 flex flex-col items-end gap-2 md:right-6 md:bottom-6">
+        <div
+          ref={floatRef}
+          className={cn(
+            "fixed right-4 bottom-4 z-30 flex flex-col items-end gap-2 transition-opacity duration-(--duration-hover) md:right-6 md:bottom-6",
+            covering && !open && "pointer-events-none opacity-0",
+          )}
+        >
           {open ? (
             <div
               ref={sheetRef}
@@ -121,6 +183,7 @@ export function OnThisPage({ label, items, className }: { label: string; items: 
             ref={buttonRef}
             type="button"
             aria-expanded={open}
+            tabIndex={covering && !open ? -1 : undefined}
             onClick={toggle}
             className="t-ui-sm flex min-h-11 items-center border border-rule-strong bg-raised px-4 text-ink shadow-elevation-2 hover:bg-action-soft"
           >

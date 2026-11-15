@@ -10,12 +10,14 @@ import { cn } from "@/lib/utils";
  * process line. No money line touches the platform's lane. The lanes are
  * decorative for assistive technology: the register carries the steps.
  */
-export function NumberedRows({ items, className }: { items: string[]; className?: string }) {
+export function NumberedRows({ items, numbered = true, className }: { items: string[]; numbered?: boolean; className?: string }) {
   return (
-    <ol className={cn("border-t-2 border-rule-strong", className)}>
+    <ol className={cn("border-t-2 border-rule-strong", !numbered && "list-none", className)}>
       {items.map((item, i) => (
         <li key={item} className={cn("flex items-baseline gap-3 py-4 lg:gap-6", i === items.length - 1 ? "border-b-2 border-rule-strong" : "border-b border-rule")}>
-          <span aria-hidden="true" className="t-code w-6 shrink-0 text-ink lg:w-auto lg:flex-1">{String(i + 1).padStart(2, "0")}</span>
+          {numbered ? (
+            <span aria-hidden="true" className="t-code w-6 shrink-0 text-ink lg:w-auto lg:flex-1">{String(i + 1).padStart(2, "0")}</span>
+          ) : null}
           <span className="t-body flex-1 text-ink">{item}</span>
         </li>
       ))}
@@ -24,12 +26,10 @@ export function NumberedRows({ items, className }: { items: string[]; className?
 }
 
 export function PlatformLanes({
-  columns,
   steps,
   lanes,
   paths,
 }: {
-  columns: { step: string; what: string };
   steps: string[];
   lanes: string[];
   paths: { sdk: string; consent: string; evidence: string; status: string };
@@ -37,14 +37,10 @@ export function PlatformLanes({
   const box = "t-ui absolute top-0 flex h-[76px] w-[124px] items-center justify-center whitespace-nowrap";
   return (
     <div className="relative lg:h-[528px] lg:w-[1062px]">
-      <table className="w-full border-collapse text-left lg:absolute lg:top-[50px] lg:left-0 lg:w-[519px]">
-        <thead className="max-lg:sr-only">
-          <tr className="border-b-2 border-rule-strong">
-            <th scope="col" className="t-fine w-[109px] pb-2 font-normal text-ink-muted">{columns.step}</th>
-            <th scope="col" className="t-fine pb-2 font-normal text-ink-muted">{columns.what}</th>
-          </tr>
-        </thead>
-        <tbody className="max-lg:border-t-2 max-lg:border-rule-strong">
+      {/* No column heads ("Step" and "What happens" named nothing; REDRAW section 10). The rows keep
+          their places beside the lanes. */}
+      <table className="w-full border-collapse text-left lg:absolute lg:top-[78px] lg:left-0 lg:w-[519px]">
+        <tbody className="border-t-2 border-rule-strong">
           {steps.map((step, i) => (
             <tr key={step} className={i === steps.length - 1 ? "border-b-2 border-rule-strong" : "border-b border-rule"}>
               <td className="t-code w-9 py-4 align-baseline text-ink lg:w-[109px]">{String(i + 1).padStart(2, "0")}</td>

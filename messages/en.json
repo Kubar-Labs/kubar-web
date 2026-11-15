@@ -290,8 +290,6 @@
   "common": {
     "footnoteMarker": "Footnote {n}",
     "backToText": "Back to text",
-    "illustrative": "Illustrative",
-    "illustrativeNote": "An example receivable, not a real transaction.",
     "sending": "Sending…",
     "onThisPage": "On this page"
   },
@@ -1084,7 +1082,13 @@
         "Purchase",
         "Settlement"
       ],
-      "alt": "A schematic of your platform with the NavDhan SDK panel inside it: an eligibility check, an indicative offer with no figures, and the application’s four states."
+      "alt": "A schematic of your platform with the shipment’s own records and the NavDhan SDK panel inside it: an eligibility check, an indicative offer with no figures, and the application’s four states.",
+      "onboarding": [
+        "Identity check",
+        "Business check",
+        "Consent recorded"
+      ],
+      "purchased": "Purchased"
     },
     "exporters": {
       "heading": "Dollar finance beyond their bank limit.",
@@ -1096,10 +1100,6 @@
     },
     "does": {
       "heading": "What you embed.",
-      "columns": [
-        "Capability",
-        "What your exporter, or your platform, sees"
-      ],
       "rows": [
         [
           "Consented onboarding",
@@ -1129,10 +1129,6 @@
     },
     "runs": {
       "heading": "How it runs on your platform.",
-      "columns": {
-        "step": "Step",
-        "what": "What happens"
-      },
       "steps": [
         "Your exporter books and documents a shipment in your platform, as it does today.",
         "NavDhan SDK checks the shipment against the programme’s rules and shows an indicative offer.",
@@ -1165,24 +1161,12 @@
     "behind": {
       "heading": "Your exporters see NavDhan. Kubar Protocol runs behind it.",
       "lead": "The programme, the evidence package, insurance and payment matching run on Kubar Protocol, the infrastructure Kubar presents to banks, insurers and funds.",
-      "layers": [
-        {
-          "name": "Your platform",
-          "line": "You keep the relationship"
-        },
-        {
-          "name": "NavDhan SDK",
-          "line": "What you embed"
-        },
-        {
-          "name": "Kubar Protocol",
-          "line": "The programme, the evidence package, insurance and payment matching"
-        },
-        {
-          "name": "Banks, insurers and funds",
-          "line": "Financiers buy, insurers cover"
-        }
-      ],
+      "layers": {
+        "platform": "Your platform",
+        "sdk": "NavDhan SDK",
+        "protocol": "Kubar Protocol",
+        "base": "Banks, insurers and funds"
+      },
       "link": "See Kubar Protocol"
     },
     "next": {
@@ -1564,11 +1548,11 @@
     "index": [
       {
         "id": "rail-heading",
-        "label": "The rail"
+        "label": "What happens to a receivable"
       },
       {
         "id": "money-heading",
-        "label": "The money path"
+        "label": "Where the money moves"
       },
       {
         "id": "unpaid-heading",
@@ -1576,11 +1560,11 @@
       },
       {
         "id": "who-heading",
-        "label": "Who does what"
+        "label": "Each party signs"
       },
       {
         "id": "terms-heading",
-        "label": "Terms"
+        "label": "The terms"
       }
     ]
   },

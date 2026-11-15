@@ -8,9 +8,10 @@ Extracted from Figma, NavDhan SDK · 1440 (frame 170:6), 13 Nov 2026, in reading
 [BodyL] Embed NavDhan SDK and your exporters can check eligibility, apply and be paid for their export receivables without leaving your platform. Financiers buy; Kubar runs the programme; you keep the relationship.
 [UI] Talk about an integration                     (filled button → /contact?intent=platform)
 
-Beside it, the embed sketch (component "Embed sketch", 140:2523): a schematic, not a screenshot. At 768 and 390 the "Shipment" column of the sketch is dropped and only the SDK panel shows.
+(Build step 6, REDRAW-2026-11-14.md section 12 item 3: the hero carries "What you embed" (see that section below): the H3 and the six capabilities in the left column under the button, beside the sketch. Picking a row outlines its part of the sketch; "Eligibility check" is picked from the start.)
+The embed sketch (component "Embed sketch", 140:2523): a schematic, not a screenshot. Below 1200 the sketch comes first, with its Shipment list above the SDK panel, then the six rows.
 [Tag] Your platform
-(15 Nov, REDRAW-2026-11-14.md section 10: no Illustrative tag on the sketch; applied when this page is built.)
+(15 Nov, REDRAW-2026-11-14.md section 10: no Illustrative tag on the sketch.)
 [Tag] Shipment
 [BodyS] Booking
 [BodyS] Invoice
@@ -30,8 +31,15 @@ Beside it, the embed sketch (component "Embed sketch", 140:2523): a schematic, n
 [BodyS] Documents outstanding
 [BodyS] Purchase                           (current: rani square)
 [BodyS] Settlement                         (open square)
+(Build step 6, new strings, Vaibhav, 15 Nov. While "Consented onboarding" is picked, the SDK panel shows three filled marks in place of its content:)
+[BodyS] Identity check
+[BodyS] Business check
+[BodyS] Consent recorded
+(While "Events for your product" is picked, a small status shows beside "Invoice" in the Shipment list:)
+[State] Purchased
 
 ## For your exporters
+(Build step 6, section 13 C1: this and "For your platform" sit side by side as one two-column block from 1200 up, and stacked below that. The words don't change.)
 [H2] Dollar finance beyond their bank limit.
 [BodyL] Your exporters can sell their export receivables to institutional financiers, beyond the limits their own banks set, without recourse for the buyer’s credit. They keep their own bank, and their buyers keep their terms.
 
@@ -40,15 +48,15 @@ Beside it, the embed sketch (component "Embed sketch", 140:2523): a schematic, n
 [BodyL] Your users are financed where they already book and document their shipments. You make no credit decisions and hold no money: financiers buy, insurers cover and Kubar runs the programme. Kubar is paid through the programme, not by the platform, and terms with each platform are agreed in writing.
 
 ## What the SDK does
-[H2] What you embed.
-[Tag] Capability | [Tag] What your exporter, or your platform, sees        (two columns; no Status column)
+(Build step 6, section 12 item 3: this section is removed as a section. Its heading, as an H3, and its six rows sit in the hero beside the sketch. The column heads "Capability" and "What your exporter, or your platform, sees" are gone with the table.)
+[H3] What you embed.
 Consented onboarding | Identity and business checks, with consent recorded for each data source
 Shipment and document capture | Booking, invoice, inspection report and bill of lading, taken from your own records
 Eligibility check | Whether a shipment fits a programme’s rules: buyer country, terms, size and goods
 Indicative offer | The all-in price, shown against the exporter’s own alternative
 Application and status | Submission, documents outstanding, purchase and settlement
 Events for your product | Status updates you can show your users
-(first column [UI], the other [BodyS]; at 768 and 390 the rows stack with no column heads)
+(each row: the capability in [UIL], its sentence under it in muted [BodyS])
 
 ## From your side
 [H2] How it runs on your platform.
@@ -64,6 +72,7 @@ Lane labels (desktop): [UI] Your platform, [UI] Kubar Protocol, [UI] The financi
 
 ## Rules
 [H2] Rules the SDK follows.
+(Build step 6, REDRAW rule 7: not a sequence, so the numbers 01 to 04 below are not shown.)
 [Code] 01  [Body] Kubar never makes the credit decision, holds the money or carries the credit risk.
 [Code] 02  [Body] Consent is collected and recorded for each data source, in line with the Digital Personal Data Protection Act, 2023 and its Rules.
 [Code] 03  [Body] Offers show the all-in price and the alternative it’s measured against, with no nudge towards any one financier.
@@ -72,7 +81,7 @@ Lane labels (desktop): [UI] Your platform, [UI] Kubar Protocol, [UI] The financi
 ## Behind it
 [H2] Your exporters see NavDhan. Kubar Protocol runs behind it.
 [BodyL] The programme, the evidence package, insurance and payment matching run on Kubar Protocol, the infrastructure Kubar presents to banks, insurers and funds.
-Layer stack (component "Layer stack", 139:2456), top to bottom; Kubar Protocol is the filled layer:
+Layers · isometric (261:843), top to bottom; Kubar Protocol is the petrol layer, NavDhan SDK a small tile on Your platform:
 (After step 3, REDRAW-2026-11-14.md section 10: the four layer descriptions are cut, since each repeats the lead or the hero; the layer names stay.)
 [UI] Your platform
   [UI] NavDhan SDK              (nested inside Your platform)
