@@ -147,4 +147,18 @@ describe("contact email queue consumer", () => {
     expect(send).toHaveBeenCalledOnce();
     expect(retry).toHaveBeenCalledOnce();
   });
+  it("logs what the send binding said, with addresses masked and no form fields", async () => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const failure = Object.assign(new Error("destination someone@example.com is not a verified address"), { code: "E_RECIPIENT_NOT_ALLOWED" });
+    const send = vi.fn().mockRejectedValue(failure);
+    const { batch } = createBatch(payload);
+
+    await worker.queue?.(batch, { EMAIL: { send } });
+
+    const logged = JSON.parse(error.mock.calls[0][0] as string);
+    expect(logged.event).toBe("contact_email_delivery_failed");
+    expect(logged.errorCode).toBe("E_RECIPIENT_NOT_ALLOWED");
+    expect(logged.errorMessage).toBe("destination <address> is not a verified address");
+    expect(Object.keys(logged).sort()).toEqual(["attempt", "errorCode", "errorMessage", "errorType", "event", "messageId", "requestId"]);
+  });
 });

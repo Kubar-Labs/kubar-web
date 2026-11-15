@@ -17,6 +17,20 @@ function isContactEmailMessage(value: unknown): value is ContactEmailMessage {
   );
 }
 
+/**
+ * What the send binding said went wrong, for the logs: the error's code and
+ * message, with any email address masked and cut to 300 characters. Form
+ * fields are never logged.
+ */
+function errorDetail(error: unknown): { errorCode?: string; errorMessage?: string } {
+  if (!(error instanceof Error)) return {};
+  const code = (error as { code?: unknown }).code;
+  return {
+    ...(typeof code === "string" || typeof code === "number" ? { errorCode: String(code) } : {}),
+    errorMessage: error.message.replace(/[^\s<>@"']+@[^\s<>@"']+/g, "<address>").slice(0, 300),
+  };
+}
+
 export default {
   async queue(batch, env) {
     for (const message of batch.messages) {
@@ -46,6 +60,7 @@ export default {
             event: "contact_email_delivery_failed",
             ...log,
             errorType: error instanceof Error ? error.name : "UnknownError",
+            ...errorDetail(error),
           }),
         );
       }
@@ -65,6 +80,7 @@ export default {
               event: "contact_email_fallback_failed",
               ...log,
               errorType: error instanceof Error ? error.name : "UnknownError",
+              ...errorDetail(error),
             }),
           );
         }
