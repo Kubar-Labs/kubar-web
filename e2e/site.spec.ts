@@ -67,7 +67,7 @@ test("Home carries its metadata from the handoff", async ({ page }) => {
   await expect(page).toHaveTitle("Kubar Labs · Building the institutional exchange for cross-border trade finance");
   await expect(page.locator('meta[name="description"]')).toHaveAttribute(
     "content",
-    "Starting with the asset: export receivables an international financier can buy again and again, insured in its own name.",
+    "Indian export receivables, originated, insured and documented so an international financier can buy them again and again.",
   );
   await expect(page.locator('meta[property="og:title"]')).toHaveAttribute("content", "Kubar Labs");
 });
@@ -181,16 +181,16 @@ test.describe("primitives and registers (build step 2), on Home", () => {
   test.use({ viewport: { width: 1440, height: 900 } });
 
   // The record is now the isometric stack (REDRAW-2026-11-14.md, Home hero):
-  // an ordered list of six rows, 06 first, beside an aria-hidden drawing.
+  // an ordered list of eight rows, 08 first, beside an aria-hidden drawing.
   test("the record lifts a sheet and shows what its document proves on hover and focus, then returns to the current one", async ({ page }) => {
     await page.goto("/");
     const record = page.locator("ol[aria-describedby]").filter({ hasText: "Commercial invoice" });
     const rows = record.locator("li");
-    await expect(rows).toHaveCount(6);
+    await expect(rows).toHaveCount(8);
     await expect(rows.first()).toContainText("Purchase confirmation");
     await expect(rows.first()).toHaveAttribute("aria-current", "true");
     // Every row tells assistive technology what its document proves.
-    await expect(rows.nth(4)).toContainText("Proves: The goods were cleared for export, as invoiced");
+    await expect(rows.nth(6)).toContainText("Proves: The goods were cleared for export, as invoiced");
     const shown = page.locator('[aria-hidden="true"]').getByText("The financier bought the receivable, without recourse for the buyer’s credit");
     await expect(shown).toBeVisible();
     await expect(page.locator(".iso-lift.is-lifted")).toHaveCount(0);
@@ -200,7 +200,7 @@ test.describe("primitives and registers (build step 2), on Home", () => {
     await page.mouse.move(0, 0);
     await expect(shown).toBeVisible();
     await expect(page.locator(".iso-lift.is-lifted")).toHaveCount(0);
-    await rows.filter({ hasText: "Electronic bill of lading" }).focus();
+    await rows.filter({ hasText: "Bill of lading" }).focus();
     await expect(page.locator('[aria-hidden="true"]').getByText("The goods were shipped on board")).toBeVisible();
     await expect(page.locator(".iso-record svg")).toHaveAttribute("aria-hidden", "true");
   });
@@ -212,7 +212,7 @@ test.describe("primitives and registers (build step 2), on Home", () => {
       page.getByText("An example: a $225,000 rice invoice to a buyer in Singapore, due 75 days after shipment.", { exact: true }),
     ).toBeVisible();
     await expect(page.locator(".iso-record ol").first()).toHaveAccessibleDescription(
-      "An example record of one export receivable, with six documents filed.",
+      "An example record of one export receivable, with eight documents filed.",
     );
   });
 
@@ -1212,7 +1212,7 @@ test.describe("How it works (build step 5)", () => {
       const row = page.locator(`${scope} li`).nth(2);
       await row.scrollIntoViewIfNeeded();
       await row.hover();
-      const lifted = page.locator(`${scope} svg:visible .iso-lift`).nth(path === "/" ? 3 : 5);
+      const lifted = page.locator(`${scope} svg:visible .iso-lift`).nth(5);
       await expect(lifted, path).toHaveCSS("transform", "none");
       await expect(lifted.locator("rect").nth(2), path).not.toHaveCSS("fill", "rgb(255, 255, 255)");
     }
@@ -1857,7 +1857,7 @@ test.describe("Legal pages (build step 5)", () => {
 test.describe("Metadata, social card and structured data (build step 6)", () => {
   // HANDOFF section 5, word for word.
   const pages: [string, string, string][] = [
-    ["/", "Kubar Labs · Building the institutional exchange for cross-border trade finance", "Starting with the asset: export receivables an international financier can buy again and again, insured in its own name."],
+    ["/", "Kubar Labs · Building the institutional exchange for cross-border trade finance", "Indian export receivables, originated, insured and documented so an international financier can buy them again and again."],
     ["/products/kubar-protocol", "Kubar Protocol · Kubar Labs", "Underwrite once, then buy every export receivable that fits: without recourse for the buyer’s credit, insured in your name, with the evidence behind each one."],
     ["/products/navdhan-sdk", "NavDhan SDK · Kubar Labs", "Embed NavDhan SDK so your exporters can finance their export receivables inside your platform. Financiers buy; Kubar runs the programme."],
     ["/how-it-works", "How it works · Kubar Labs", "Follow one illustrative export receivable from shipment to settlement: who does what, the documents behind each step and where the money moves."],

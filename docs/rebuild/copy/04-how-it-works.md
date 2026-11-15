@@ -30,7 +30,6 @@ Desktop: the story panel (left) beside the lanes (right), as on Home but with th
 [UI] Skip the story                 (anchor past the rail)
 Legend: [Tag] Data path: documents and records · Money path: only between banks
 (After step 3, REDRAW-2026-11-14.md section 10: the legend line "Kubar: the one filled column" is cut.)
-Lane heads: [UI] Exporter, Kubar (filled), Insurer, Buyer, UAE, Financier, Exporter’s bank
 Row numbers: [Code] 01 … 08
 Path labels in the lanes: Shipment, invoice (01) · Evidence package checked (02) · Limit and headroom (03) · Acknowledgement (04) · Evidence package and 90% of face (05) · Payment matched, Face value and The balance (06)
 [Fine] ¹ Kubar’s own ITFS registration is targeted for 2027; until then Kubar acts as the financier’s origination and servicing agent.

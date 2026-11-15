@@ -36,7 +36,8 @@ const ORIGIN_X = 128; // the top vertex; the drawn sheet spans 7 to 327
 const STEP = 46; // between sheets, up the screen
 const WIDTH = 336;
 const TOP = 20; // room above sheet 06 for the lift and the drop
-const HEIGHT = TOP + 5 * STEP + 185 + 4 + 50; // to the foot of the ground shadow
+/** To the foot of the ground shadow, for a stack of `count` sheets. */
+const heightFor = (count: number) => TOP + (count - 1) * STEP + 185 + 4 + 50;
 
 function SheetContent({ no, current }: { no: string; current: boolean }) {
   return (
@@ -73,6 +74,7 @@ export function RecordView({
   const [lifted, setLifted] = useState<number | null>(null);
   const descriptionId = useId();
   const shown = lifted ?? current;
+  const HEIGHT = heightFor(documents.length);
   // Top to bottom: 06 first.
   const order = documents.map((doc, index) => ({ doc, index })).reverse();
 
@@ -92,7 +94,7 @@ export function RecordView({
           height={HEIGHT}
           className="mx-auto block h-auto w-full max-w-[336px] overflow-visible md:mx-0"
         >
-          <GroundShadow cx={ORIGIN_X + 39} cy={TOP + 5 * STEP + 135 + 35} rx={150} ry={35} />
+          <GroundShadow cx={ORIGIN_X + 39} cy={TOP + current * STEP + 135 + 35} rx={150} ry={35} />
           {documents.map((doc, index) => {
             const y = TOP + (current - index) * STEP;
             return (

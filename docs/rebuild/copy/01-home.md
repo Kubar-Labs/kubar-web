@@ -9,36 +9,40 @@ Extracted from Figma, Home · 1440 (frame 160:6), 13 Nov 2026, in reading order.
 [BodyL] Indian export receivables, originated, insured and documented so an international financier can buy them again and again.
 [UIL] For financial institutions            → /products/kubar-protocol
 [UIL] For trade platforms                   → /products/navdhan-sdk
-(15 Nov, REDRAW-2026-11-14.md section 10: no Illustrative tag; the record's line says "An example" in words. Its accessible description: "An example record of one export receivable, with six documents filed.")
+(16 Nov: the hero stays the record, now with eight documents so it matches How it works and leads into it. Figma 245:3225 at 1440, 248:3239 at 768, 353:3704 at 390. Eight sheets, 08 on top and current, with "FILED" on the top sheet only. Eight rows beside them, one line each: number and name. Under the sheets, for the picked document, "From" and "Proves", then the link; 08 is picked on load. Its accessible description: "An example record of one export receivable, with eight documents filed.")
 [Tag] Record RCV-0001
 [Record] An example: a $225,000 rice invoice to a buyer in Singapore, due 75 days after shipment.
-(14 Nov: the record becomes the isometric stack of six sheets with a row tied to each, 06 on top, so its column heads "No.", "Document", "Source" and "Status" are not shown.)
 [Code] 01
 [UI] Commercial invoice
-[BodyS] The exporter
-[State] Filed
 [Code] 02
 [UI] Shipping bill
-[BodyS] Indian Customs
-[State] Filed
 [Code] 03
-[UI] Electronic bill of lading
-[BodyS] The carrier
-[State] Filed
+[UI] Bill of lading
 [Code] 04
-[UI] Credit-insurance cover
-[BodyS] The insurer, in the financier’s name
-[State] Filed
+[UI] Inspection report
 [Code] 05
-[UI] Assignment notice, acknowledged
-[BodyS] The buyer
-[State] Filed
+[UI] No-objection
 [Code] 06
+[UI] Credit-insurance cover
+[Code] 07
+[UI] Buyer’s acknowledgement
+[Code] 08
 [UI] Purchase confirmation
+[State] Filed                              (on the top sheet, 08, only)
+[Fine] From
 [BodyS] The financier
-[State] Filed                              (row 06 is current: inset ground, rani marker, rani status)
 [Fine] Proves
 [BodyS] The financier bought the receivable, without recourse for the buyer’s credit
+[UI] See how it works                      → /how-it-works
+Each document's source and what it proves, shown under the sheets when its row is picked:
+01 Commercial invoice | The exporter | What was sold, to whom, for how much and when it’s due, with the instruction to pay the financier
+02 Shipping bill | Indian Customs | The goods were cleared for export, as invoiced
+03 Bill of lading | The carrier | The goods were shipped on board
+04 Inspection report | The inspection agency | The goods are as contracted, where the programme requires a check
+05 No-objection | The exporter’s bank | The exporter’s bank has no claim on this receivable
+06 Credit-insurance cover | The insurer, in the financier’s name | The buyer’s credit is covered, in the financier’s name
+07 Buyer’s acknowledgement | The buyer | The buyer will pay the financier’s account
+08 Purchase confirmation | The financier | The financier bought the receivable, without recourse for the buyer’s credit
 (After step 3, REDRAW-2026-11-14.md section 10: "05 Purchased" under the record is cut.)
 (14 Nov: the record's summary is one sentence and "State 05 of 08" is gone. The status footnote ¹ is no longer in the hero; marker ¹ on "exchange" links to the one under the foundations. REDRAW-2026-11-14.md, sections 6 and 9.6.)
 
@@ -193,7 +197,7 @@ The 1440 frame shows the story at state 05. The text for all eight states is the
 ## Only at 768 and 390
 
 Hero, under the display:
-(16 Nov: the subline is the same at every width now; see the Hero section above. "Starting with the asset…" stays only as the page's meta description.)
+(16 Nov: the subline is the same at every width now; see the Hero section above. The page's meta description and the social card carry the same sentence.)
 [UI] Follow one receivable                  (anchor to the ledger)
 
 The eight-state ledger (replaces the lanes and story panel at 768 and 390, and everywhere when reduced motion is on). Each state: number, name, what happens, party, data path. Money path cells follow the lanes.

@@ -273,7 +273,8 @@ test.describe("rendered words match docs/rebuild/copy", () => {
   }
 
   const pages: [string, string, RegExp][] = [
-    ["/", "01-home.md", /^(Kubar is in the data path|State 08 · Planned|05 of 08|01 … 08|Purchased|Back to text)/],
+    // "From" under the record and its link are placed in step 3.
+    ["/", "01-home.md", /^(Kubar is in the data path|State 08 · Planned|05 of 08|01 … 08|Purchased|Back to text|From$)/],
     // Words of 16 Nov whose place is built in a later step are skipped until then: the strip
     // (step 4), the controls (steps 6 and 8) and the eight things that can be held (step 9).
     [

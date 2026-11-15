@@ -67,7 +67,7 @@ Home at 1440 is the reference page. After 14 Nov most frames were updated at 144
 
 | Page | Route | Title | Meta description |
 |---|---|---|---|
-| Home | / | Kubar Labs · Building the institutional exchange for cross-border trade finance | Starting with the asset: export receivables an international financier can buy again and again, insured in its own name. |
+| Home | / | Kubar Labs · Building the institutional exchange for cross-border trade finance | Indian export receivables, originated, insured and documented so an international financier can buy them again and again. |
 | Kubar Protocol | /products/kubar-protocol | Kubar Protocol · Kubar Labs | Underwrite once, then buy every export receivable that fits: without recourse for the buyer's credit, insured in your name, with the evidence behind each one. |
 | NavDhan SDK | /products/navdhan-sdk | NavDhan SDK · Kubar Labs | Embed NavDhan SDK so your exporters can finance their export receivables inside your platform. Financiers buy; Kubar runs the programme. |
 | How it works | /how-it-works | How it works · Kubar Labs | Follow one illustrative export receivable from shipment to settlement: who does what, the documents behind each step and where the money moves. |

@@ -27,7 +27,7 @@ export const organisationLogo = "/media/kubar-mark-970208af.png";
 export const socialCard = {
   title: "Kubar Labs",
   description:
-    "Starting with the asset: export receivables an international financier can buy again and again, insured in its own name.",
+    "Indian export receivables, originated, insured and documented so an international financier can buy them again and again.",
 };
 
 /*

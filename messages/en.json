@@ -2,7 +2,7 @@
   "site": {
     "name": "Kubar Labs",
     "homeTitle": "Kubar Labs · Building the institutional exchange for cross-border trade finance",
-    "homeDescription": "Starting with the asset: export receivables an international financier can buy again and again, insured in its own name.",
+    "homeDescription": "Indian export receivables, originated, insured and documented so an international financier can buy them again and again.",
     "socialTitle": "Kubar Labs",
     "socialImageAlt": "Kubar Labs: Building the institutional exchange for cross-border trade finance."
   },
@@ -301,7 +301,7 @@
   "record": {
     "title": "Record RCV-0001",
     "summary": "An example: a $225,000 rice invoice to a buyer in Singapore, due 75 days after shipment.",
-    "description": "An example record of one export receivable, with six documents filed.",
+    "description": "An example record of one export receivable, with eight documents filed.",
     "columns": {
       "no": "No.",
       "document": "Document",
@@ -326,34 +326,50 @@
       },
       {
         "no": "03",
-        "document": "Electronic bill of lading",
+        "document": "Bill of lading",
         "source": "The carrier",
         "status": "Filed",
         "proves": "The goods were shipped on board"
       },
       {
         "no": "04",
+        "document": "Inspection report",
+        "source": "The inspection agency",
+        "status": "Filed",
+        "proves": "The goods are as contracted, where the programme requires a check"
+      },
+      {
+        "no": "05",
+        "document": "No-objection",
+        "source": "The exporter’s bank",
+        "status": "Filed",
+        "proves": "The exporter’s bank has no claim on this receivable"
+      },
+      {
+        "no": "06",
         "document": "Credit-insurance cover",
         "source": "The insurer, in the financier’s name",
         "status": "Filed",
         "proves": "The buyer’s credit is covered, in the financier’s name"
       },
       {
-        "no": "05",
-        "document": "Assignment notice, acknowledged",
+        "no": "07",
+        "document": "Buyer’s acknowledgement",
         "source": "The buyer",
         "status": "Filed",
         "proves": "The buyer will pay the financier’s account"
       },
       {
-        "no": "06",
+        "no": "08",
         "document": "Purchase confirmation",
         "source": "The financier",
         "status": "Filed",
         "proves": "The financier bought the receivable, without recourse for the buyer’s credit"
       }
     ],
-    "provesLabel": "Proves"
+    "provesLabel": "Proves",
+    "fromLabel": "From",
+    "link": "See how it works"
   },
   "ledger": {
     "columns": {

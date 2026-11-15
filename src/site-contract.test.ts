@@ -245,7 +245,7 @@ describe("copy matches docs/rebuild/copy word for word", () => {
   });
 
   it("keeps every record document with its Proves line (copy deck 4.2)", () => {
-    expect(messages.record.documents).toHaveLength(6);
+    expect(messages.record.documents).toHaveLength(8);
     for (const doc of messages.record.documents) expect(doc.proves.length).toBeGreaterThan(10);
   });
 
