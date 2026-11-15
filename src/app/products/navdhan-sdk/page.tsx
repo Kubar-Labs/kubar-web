@@ -5,6 +5,7 @@ import { createPageMetadata } from "@/app/page-metadata";
 import { NextStep } from "@/components/blocks/Closing";
 import { PageHero } from "@/components/blocks/PageHero";
 import { Section, SectionHead } from "@/components/blocks/Section";
+import { FitStage } from "@/components/drawings/FitStage";
 import { EmbedPicker, type SketchCopy } from "@/components/sdk/EmbedPicker";
 import { IsoLayers } from "@/components/sdk/IsoLayers";
 import { NumberedRows, PlatformLanes } from "@/components/sdk/PlatformLanes";
@@ -50,11 +51,14 @@ export default function NavdhanSdk() {
       <Section labelledBy="runs-heading" className="flex flex-col gap-10 lg:gap-16">
         <SectionHead id="runs-heading" heading={t("runs.heading")} layout="wide" />
         <div className="flex flex-col items-start gap-10">
-          <PlatformLanes
-            steps={t.raw("runs.steps") as string[]}
-            lanes={t.raw("runs.lanes") as string[]}
-            paths={t.raw("runs.paths") as { sdk: string; consent: string; evidence: string; status: string }}
-          />
+          {/* The drawing keeps its 1062 composition and is fitted to its column on narrower laptops (rule 11.1). */}
+          <FitStage width={1062} height={528} className="w-full">
+            <PlatformLanes
+              steps={t.raw("runs.steps") as string[]}
+              lanes={t.raw("runs.lanes") as string[]}
+              paths={t.raw("runs.paths") as { sdk: string; consent: string; evidence: string; status: string }}
+            />
+          </FitStage>
           <TextLink href="/how-it-works" kind="arrow">{t("runs.link")}</TextLink>
         </div>
       </Section>

@@ -1352,6 +1352,71 @@ test.describe("How it works (build step 5)", () => {
   });
 });
 
+test.describe("rule 11.4: rani only for footnote markers, the current state, errors and the one element a drawing is about", () => {
+  const RANI = "rgb(173, 36, 104)";
+  test("the loop's step numbers, Kubar holds none and Home's Planned are in the secondary colour", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    const colour = (locator: import("@playwright/test").Locator) => locator.first().evaluate((el) => getComputedStyle(el).color);
+    await page.goto("/products/kubar-protocol");
+    for (const no of ["01", "03", "05"]) expect(await colour(page.locator(`.loop-card[data-step="${no}"] .t-code`)), `loop ${no}`).not.toBe(RANI);
+    for (const el of await page.getByText("Kubar holds none", { exact: true }).all()) expect(await el.evaluate((x) => getComputedStyle(x).color)).not.toBe(RANI);
+    for (const path of ["/", "/how-it-works"]) {
+      await page.goto(path);
+      const notes = await page.getByText("Kubar holds none", { exact: true }).all();
+      expect(notes.length, path).toBeGreaterThan(0);
+      for (const el of notes) expect(await el.evaluate((x) => getComputedStyle(x).color), path).not.toBe(RANI);
+    }
+    await page.goto("/");
+    const planned = page.locator(".iso-foundations").getByText("Planned").locator("visible=true").first();
+    expect(await colour(planned)).not.toBe(RANI);
+    // The footnote marker beside it keeps rani.
+    expect(await colour(page.locator(".iso-foundations .footnote-marker:visible"))).toBe(RANI);
+  });
+
+  test("standalone links that had no tap area take one: Skip the story on Home, LinkedIn on the team cards, a lone address on Contact", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.getByRole("link", { name: "Skip the story" })).toHaveClass(/tap-area/);
+    await page.goto("/about");
+    await expect(page.getByRole("link", { name: "Rayansh Srivastava on LinkedIn (opens in a new tab)" })).toHaveClass(/tap-area/);
+    await page.goto("/contact");
+    await expect(page.getByRole("link", { name: "partnerships@kubar.tech", exact: true }).last()).toHaveClass(/tap-area/);
+    await expect(page.getByRole("link", { name: "keshav@kubar.tech" })).not.toHaveClass(/tap-area/);
+  });
+
+  test("NavDhan SDK's lanes drawing is fitted to its column on laptops", async ({ page }) => {
+    for (const width of [1200, 1280, 1440]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto("/products/navdhan-sdk");
+      const stage = page.locator(".fit-stage").filter({ hasText: "The financier" });
+      await expect.poll(async () => { const lane = (await stage.getByText("The financier", { exact: true }).boundingBox())!; return Math.round(lane.x + lane.width) <= width - 80; }, { message: `${width}: the last lane inside the content column` }).toBe(true);
+    }
+  });
+});
+
+test("legal pages carry their date and the retention period, with no placeholder left (15 Nov)", async ({ page }) => {
+  for (const path of ["/legal/privacy", "/legal/terms"]) {
+    await page.goto(path);
+    const main = page.getByRole("main");
+    await expect(main.getByText("Last updated: 15 November 2026", { exact: true })).toBeVisible();
+    expect(await main.innerText(), path).not.toMatch(/\[[^\]]*\]/);
+  }
+  await page.goto("/legal/privacy");
+  await expect(page.getByRole("main")).toContainText("We keep enquiries for 24 months after our last exchange");
+});
+
+test("Home's map: a tap on the card with no link dims the arrows that don't touch it", async ({ browser }) => {
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true });
+  const page = await context.newPage();
+  await page.goto("/");
+  const map = page.locator(".party-map");
+  await map.locator('[data-party="buyers"]').scrollIntoViewIfNeeded();
+  await map.locator('[data-party="buyers"]').tap();
+  await expect(map).toHaveAttribute("data-picked", "buyers");
+  await expect(map.locator('svg:visible .draw-arrow[data-touches="platforms kubar"]')).toHaveCSS("opacity", "0.3");
+  await expect(map.locator('svg:visible .draw-arrow[data-touches="buyers financiers"]')).toHaveCSS("opacity", "1");
+  await context.close();
+});
+
 test.describe("On this page index (section 12, item 5)", () => {
   for (const [path, first, count] of [["/products/kubar-protocol", "What you buy", 11], ["/how-it-works", "What happens to a receivable", 5]] as const) {
     test(`${path}: a row under the hero, then a button and a sheet once it has scrolled away`, async ({ page }) => {

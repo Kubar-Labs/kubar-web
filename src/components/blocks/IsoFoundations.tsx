@@ -73,7 +73,7 @@ export function IsoFoundations({
   /** Top of the stack first: the venue, then down to the common standard. */
   foundations: Foundation[];
   footnote: FootnoteRef;
-  /** Home sets "Planned¹" as a small rani label; About as the state word. */
+  /** Home sets "Planned¹" as a small muted tag (rule 11.4; only its footnote marker is rani); About as the state word. */
   plannedStyle?: "tag" | "state";
   /** Unique on the page: names the outline's mask. */
   id: string;
@@ -154,7 +154,7 @@ export function IsoFoundations({
                   </svg>
                 )}
                 {f.planned && plannedStyle === "tag" ? (
-                  <span className="t-tag text-accent lg:hidden">
+                  <span className="t-tag text-ink-muted lg:hidden">
                     {f.where}
                     <FootnoteMarker n={1} {...footnote("stack-where")} />
                   </span>
@@ -162,7 +162,7 @@ export function IsoFoundations({
                 <span className="flex items-baseline justify-between gap-4">
                   <span className="t-ui-lg text-ink">{f.name}</span>
                   {f.planned ? (
-                    <span className={cn(plannedStyle === "tag" ? "t-tag hidden text-accent lg:inline" : "t-state shrink-0 text-ink-muted")}>
+                    <span className={cn(plannedStyle === "tag" ? "t-tag hidden text-ink-muted lg:inline" : "t-state shrink-0 text-ink-muted")}>
                       {f.where}
                       {plannedStyle === "tag" ? <FootnoteMarker n={1} {...footnote("stack-where-desktop")} /> : null}
                     </span>

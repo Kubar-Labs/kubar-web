@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
  * works: Kubar, the buyer, the financier and the exporter's bank as columns
  * with lifelines; the three payments as solid 2 px arrows between the three
  * banks' columns. Nothing touches Kubar's column, which carries "Kubar holds
- * none" in rani on its grey chip.
+ * none" in the secondary colour on its grey chip (rule 11.4).
  *
  * Desktop: the lanes take their column's width (800 at 1440; 845 on How it
  * works): four equal columns, the labels wrapping to the room they have.
@@ -107,7 +107,7 @@ export function MoneyPath({
           </p>
         ))}
         <p
-          className="t-fine absolute top-[214px] max-w-[170px] -translate-x-1/2 bg-accent-soft px-2 py-1 text-accent"
+          className="t-fine absolute top-[214px] max-w-[170px] -translate-x-1/2 bg-accent-soft px-2 py-1 text-ink-muted"
           style={{ left: col(0) }}
         >
           {kubarNote}
@@ -138,7 +138,7 @@ export function MoneyPath({
       </table>
       <p className="flex items-center gap-3 border-b-2 border-rule-strong py-4 lg:hidden">
         <span className="t-fine text-ink">{parties[0]}</span>
-        <span className="t-fine bg-accent-soft px-2 py-1 text-accent">{kubarNote}</span>
+        <span className="t-fine bg-accent-soft px-2 py-1 text-ink-muted">{kubarNote}</span>
       </p>
       <p className="t-body-sm pt-4 text-ink-muted lg:pt-0">{under}</p>
     </div>

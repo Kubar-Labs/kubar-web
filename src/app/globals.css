@@ -725,17 +725,19 @@
     transition: opacity var(--duration-hover) var(--ease-standard) calc(var(--draw-delay, 0ms) + var(--duration-write));
   }
 
-  /* The who-takes-part map: a card under the pointer or focus dims the
-     arrows that don't touch it to 30%. */
+  /* The who-takes-part map: a card under the pointer or focus, or the last
+     one tapped, dims the arrows that don't touch it to 30%. PickStage sets
+     data-picked to the card's party (a `:has(…:hover)` rule isn't restyled
+     reliably in Safari). */
   .party-map .draw-arrow {
     transition: opacity var(--duration-hover) var(--ease-standard);
   }
-  .party-map:has([data-party="financiers"]:is(:hover, :focus-within)) .draw-arrow:not([data-touches~="financiers"]),
-  .party-map:has([data-party="insurers"]:is(:hover, :focus-within)) .draw-arrow:not([data-touches~="insurers"]),
-  .party-map:has([data-party="platforms"]:is(:hover, :focus-within)) .draw-arrow:not([data-touches~="platforms"]),
-  .party-map:has([data-party="exporters"]:is(:hover, :focus-within)) .draw-arrow:not([data-touches~="exporters"]),
-  .party-map:has([data-party="buyers"]:is(:hover, :focus-within)) .draw-arrow:not([data-touches~="buyers"]),
-  .party-map:has([data-party="kubar"]:is(:hover, :focus-within)) .draw-arrow:not([data-touches~="kubar"]) {
+  .party-map[data-picked="financiers"] .draw-arrow:not([data-touches~="financiers"]),
+  .party-map[data-picked="insurers"] .draw-arrow:not([data-touches~="insurers"]),
+  .party-map[data-picked="platforms"] .draw-arrow:not([data-touches~="platforms"]),
+  .party-map[data-picked="exporters"] .draw-arrow:not([data-touches~="exporters"]),
+  .party-map[data-picked="buyers"] .draw-arrow:not([data-touches~="buyers"]),
+  .party-map[data-picked="kubar"] .draw-arrow:not([data-touches~="kubar"]) {
     opacity: 0.3;
   }
 

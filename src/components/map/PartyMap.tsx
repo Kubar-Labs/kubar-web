@@ -1,5 +1,5 @@
 import { Arrow, straight } from "@/components/drawings/Arrow";
-import { PlayOnce } from "@/components/drawings/PlayOnce";
+import { PickStage } from "@/components/how/PickStage";
 import { ReturnArrow } from "@/components/map/ReturnArrow";
 import { TextLink } from "@/components/ui/TextLink";
 import { cn } from "@/lib/utils";
@@ -120,7 +120,7 @@ export function PartyMap({
   const byKey = Object.fromEntries(KEYS.map((key, i) => [key, parties[i]])) as Record<Key, Party>;
 
   return (
-    <PlayOnce className={cn("party-map flex flex-col gap-6 bg-inset p-4 md:p-8 lg:gap-8 lg:p-12", className)}>
+    <PickStage item="[data-party]" from="data-party" className={cn("party-map flex flex-col gap-6 bg-inset p-4 md:p-8 lg:gap-8 lg:p-12", className)}>
       <div className="relative">
         <div className="flex flex-col lg:grid lg:grid-cols-[minmax(0,1fr)_88px_minmax(0,1fr)_88px_minmax(0,1fr)] lg:grid-rows-[minmax(208px,auto)_96px_minmax(208px,auto)]">
           {ORDER.map((key, i) => {
@@ -179,6 +179,6 @@ export function PartyMap({
           <span className="t-fine text-ink-muted">{legend.data}</span>
         </li>
       </ul>
-    </PlayOnce>
+    </PickStage>
   );
 }

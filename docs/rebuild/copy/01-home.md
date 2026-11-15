@@ -69,7 +69,7 @@ Extracted from Figma, Home · 1440 (frame 160:6), 13 Nov 2026, in reading order.
 [Tag] Data path · Kubar
 [Body] Package delivered; purchase recorded
 [Tag] Money path
-[Label] Kubar holds none                    (rani)
+[Label] Kubar holds none                    (secondary colour; rule 11.4)
 [Body] The financier pays 90% of face to the exporter’s own bank
 [UI] Skip the story                         (anchor to the next section)
 (14 Nov: the story panel's three-line legend is removed; "Data path: documents and records" and "Money path: only between banks" move to the Who takes part map.)
@@ -110,7 +110,7 @@ The 1440 frame shows the story at state 05. The text for all eight states is the
 (After step 3, REDRAW-2026-11-14.md section 10: the panel title "Five foundations, built from the bottom up" is cut.)
 [UIL] The venue, last
 [BodyS] An ITFS for institutional financiers only, with Kubar as its neutral operator¹
-[Tag] Planned¹                              (rani)
+[Tag] Planned¹                              (secondary colour; the marker is rani)
 [UIL] A record of performance
 [BodyS] Every receivable that settles adds to a priced loss history
 [UIL] A clean payment path

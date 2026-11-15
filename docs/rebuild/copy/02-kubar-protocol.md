@@ -28,7 +28,7 @@ Extracted from Figma, Kubar Protocol · 1440 (frame 167:6), 13 Nov 2026, in read
 
 Beside it, the money timeline (drawn to scale on a day axis; Figma component "Money timeline", 123:1184):
 [Tag] When the money moves · your side
-[Label] Kubar holds none                (rani)
+[Label] Kubar holds none                (secondary colour; rule 11.4)
 [Tag] Received
 [Tag] Paid out
 [BodyS] $225,000 · face value, from the buyer, into your collection account

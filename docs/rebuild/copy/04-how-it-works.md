@@ -25,7 +25,7 @@ Desktop: the story panel (left) beside the lanes (right), as on Home but with th
 [Tag] Data path · Kubar
 [Body] Payment matched; closure tracked
 [Tag] Money path
-[Label] Kubar holds none            (rani)
+[Label] Kubar holds none            (secondary colour; rule 11.4)
 [Body] The buyer pays $225,000 to the financier; the financier pays the exporter the balance, less its discount and charges
 [UI] Skip the story                 (anchor past the rail)
 Legend: [Tag] Data path: documents and records · Money path: only between banks
@@ -105,7 +105,7 @@ A ruled register (component "If a buyer doesn’t pay", 133:2422), no boxes or a
 05 | The insurer | Pays claims on the covered share | No dispute
 06 | The exporter | Answers only for its own side of the trade: disputes, returns, set-off, fraud and its warranties | A dispute
 (number [Label], party [Tag], step [BodyS], branch [Label] in rani, right-aligned)
-[Label] Kubar holds none of the risk     (a plain sentence under the register, rani; no chip)
+[Label] Kubar holds none of the risk     (a plain sentence under the register, ink; no chip)
 [BodyS] This is how a programme runs with cover in the financier’s name. Where a programme starts on exporters’ own policies, the terms are set out before any receivable is sold.
 
 ## Who does what

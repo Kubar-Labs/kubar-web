@@ -20,7 +20,7 @@ Extracted from Figma, System and legal page (frames 176:6, 176:347, 176:546, 176
 ## Privacy notice  ·  /legal/privacy
 Layout: title and date; contents in the left three columns, sticky on desktop and under the date on mobile; numbered H4 headings matching the contents; Sans/Body text at 628 wide; lists as dash paragraphs; no rules between sections.
 [Display] Privacy notice
-[Fine] Last updated: [date]                  ← OPEN: set on publication
+[Fine] Last updated: 15 November 2026       (set 15 Nov)
 [Tag] Contents
 1. Who we are · 2. What we collect · 3. Cookies · 4. Why we use it · 5. Who we share it with · 6. How long we keep it · 7. How we protect it · 8. Your rights · 9. Grievance Officer · 10. Children · 11. Changes
 
@@ -51,7 +51,7 @@ We don’t sell personal data, and we don’t use it for advertising.
 – Authorities, where the law requires it.
 
 [H4] 6. How long we keep it
-We keep enquiries for [24 months] after our last exchange, unless a business relationship follows or the law requires us to keep them longer.      ← OPEN: retention period to confirm
+We keep enquiries for 24 months after our last exchange, unless a business relationship follows or the law requires us to keep them longer.      (retention period confirmed 15 Nov)
 
 [H4] 7. How we protect it
 We follow reasonable security practices: access only for staff who need it, encrypted connections, and providers that follow recognised security standards.
@@ -71,7 +71,7 @@ We post any change here, with the date it takes effect.
 ## Terms of use  ·  /legal/terms
 Same layout as the privacy notice.
 [Display] Terms of use
-[Fine] Last updated: [date]                  ← OPEN: set on publication
+[Fine] Last updated: 15 November 2026       (set 15 Nov)
 [Tag] Contents
 1. About these terms · 2. What the site is · 3. Kubar’s role · 4. Plans, status and examples · 5. Other people’s names and marks · 6. Our content · 7. Using the site · 8. No warranty · 9. Liability · 10. Privacy · 11. Changes · 12. Law and courts · 13. Contact
 

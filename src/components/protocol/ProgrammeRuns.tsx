@@ -143,7 +143,7 @@ export function ProgrammeRuns({
                   className="loop-card raise-card flex flex-col gap-2 border border-rule bg-raised px-[18px] pt-3.5 pb-4 shadow-elevation-2 outline-offset-2"
                   style={{ ["--card-delay" as string]: `${Math.round((DRAW_MS * i) / each.steps.length)}ms` }}
                 >
-                  <span className="t-code text-accent">{step.no}</span>
+                  <span className="t-code text-ink-muted">{step.no}</span>
                   <span className="t-body-sm text-ink">{step.text}</span>
                   {step.no === noteAfter ? <span className="t-body-sm text-ink-muted">{note}</span> : null}
                 </div>

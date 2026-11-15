@@ -125,7 +125,7 @@ export function PeopleCards({
               target="_blank"
               rel="noopener noreferrer"
               aria-label={linkLabel(person.name)}
-              className="t-ui-sm group mt-1 inline-flex min-h-6 items-center gap-1 text-ink"
+              className="tap-area t-ui-sm group mt-1 inline-flex min-h-6 items-center gap-1 text-ink"
             >
               <span className="underline decoration-1 [text-underline-position:from-font] group-hover:decoration-2">{linkedin}</span>
               <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" strokeWidth={1.2} strokeLinecap="square" aria-hidden="true" className="shrink-0">

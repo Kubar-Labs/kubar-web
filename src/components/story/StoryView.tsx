@@ -192,7 +192,7 @@ export function StoryView({
           <div className="flex flex-col lg:col-start-1 lg:row-start-1">
             {idRow("mb-4 hidden border-b border-rule-strong pb-2.5 lg:block")}
             {/* Home's link has no arrow (section 13 B3); How it works keeps the frame's. */}
-            <TextLink href={`#${skipTo}`} kind={long ? "anchor" : "plain"} className="mt-1 mb-4 self-start lg:mt-0 lg:mb-5">
+            <TextLink href={`#${skipTo}`} kind={long ? "anchor" : "plain"} className="tap-area mt-1 mb-4 self-start lg:mt-0 lg:mb-5">
               {t("skip")}
             </TextLink>
 
@@ -247,7 +247,7 @@ export function StoryView({
                           <p className={cn("t-fine flex flex-wrap items-center gap-x-2 transition-colors duration-(--duration-disclose)", tone)}>
                             <PathGlyph kind="money" />
                             {t("moneyPath")}
-                            <span className="text-accent">{t("holdsNone")}</span>
+                            <span className="text-ink-muted">{t("holdsNone")}</span>
                           </p>
                           <p className={cn("t-body-sm transition-colors duration-(--duration-disclose)", tone)}>{step.money}</p>
                         </div>

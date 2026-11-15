@@ -37,7 +37,7 @@ export function MoneyTimeline({ copy, className }: { copy: TimelineCopy; classNa
       {/* Desktop: the drawing at its column's width. */}
       <div role="img" aria-label={copy.alt} className="relative hidden h-[594px] w-full lg:block">
         <p className="t-fine absolute top-0 left-0 text-ink-muted">{copy.title}</p>
-        <p className="t-fine absolute -top-1 right-0 text-accent">{copy.holdsNone}</p>
+        <p className="t-fine absolute -top-1 right-0 text-ink-muted">{copy.holdsNone}</p>
         {[AT.ship, AT.buy, AT.due].map((x) => (
           <span key={x} className={cn(guide, "top-[61.5px] h-[424.75px]")} style={{ left: pct(x) }} />
         ))}
@@ -85,7 +85,7 @@ export function MoneyTimeline({ copy, className }: { copy: TimelineCopy; classNa
       {/* Tablets and phones (Figma 123:1157): the small drawing, then the words as a list. */}
       <div className="max-w-[350px] lg:hidden">
         <p className="t-fine text-ink-muted">{copy.title}</p>
-        <p className="t-fine pt-1 text-accent">{copy.holdsNone}</p>
+        <p className="t-fine pt-1 text-ink-muted">{copy.holdsNone}</p>
         <div aria-hidden="true" className="relative mt-[33.5px] h-[278px]">
           {[20, 50, 300].map((x) => (
             <span key={x} className={cn(guide, "top-0 h-[254px]")} style={{ left: pct(x / 350) }} />
