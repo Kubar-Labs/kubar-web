@@ -52,7 +52,7 @@ export default function KubarProtocol() {
         sub={t("hero.sub")}
         button={{ label: t("hero.button"), href: CONTACT }}
         link={{ label: t("hero.link"), href: "/how-it-works" }}
-        aside={<LimitDrawing className="block h-auto w-full overflow-visible" />}
+        aside={<LimitDrawing className="block h-auto w-full" />}
         asidePlacement="beside"
       />
       <div className="page-container">

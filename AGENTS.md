@@ -32,7 +32,8 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 ## The rebuild
 
-- `docs/rebuild/HANDOFF.md` is the brief; `docs/rebuild/copy/` holds the signed-off words. Use them exactly.
+- `docs/rebuild/SPEC.md` is the spec of the site as built and released; `docs/rebuild/copy/` holds the signed-off words. Use them exactly. The original brief and the redraw notes are in `docs/rebuild/archive/`; code comments that cite `HANDOFF` or `REDRAW-2026-11-14.md` sections point there.
+- Checks: `npm run check:safari` (WebKit in podman), `npm run check:lighthouse`, `npm run check:js` (scripts in `scripts/checks/`; SPEC section 15).
 
 ## Styling / UI Stack
 

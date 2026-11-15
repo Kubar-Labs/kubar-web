@@ -1994,3 +1994,36 @@ test.describe("Abbreviations (HANDOFF section 8)", () => {
     await expect(page.locator('abbr[data-abbr="RBI"]')).toHaveCount(1);
   });
 });
+
+test.describe("Ground shadows", () => {
+  // A drawing's ground shadow is a blurred ellipse that reaches past the svg's own box, and an
+  // svg clips to that box unless it is overflow-visible: the shadow then ends in a hard line.
+  for (const path of publicRoutes) {
+    test(`${path}: no blurred ground shadow is clipped by its svg or a clipping ancestor`, async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      for (const size of [{ width: 1440, height: 900 }, { width: 390, height: 844 }]) {
+        await page.setViewportSize(size);
+        await page.goto(path);
+        const clipped = await page.evaluate(() => {
+          const found: string[] = [];
+          for (const shadow of document.querySelectorAll<SVGEllipseElement>(".iso-ground")) {
+            const box = shadow.getBoundingClientRect();
+            if (box.width === 0) continue; // a drawing this width doesn't show
+            // The blur's radius is in the drawing's own units; two radii is where it has faded out.
+            const reach = 2 * parseFloat(getComputedStyle(shadow).filter.replace(/[^\d.]/g, "") || "0") * (box.width / (2 * shadow.rx.baseVal.value));
+            for (let el = shadow.parentElement; el && el !== document.body; el = el.parentElement) {
+              const style = getComputedStyle(el);
+              if (style.overflowX === "visible" && style.overflowY === "visible") continue;
+              const frame = el.getBoundingClientRect();
+              if (box.bottom + reach > frame.bottom + 1 || box.left - reach < frame.left - 1 || box.right + reach > frame.right + 1) {
+                found.push(`${el.tagName.toLowerCase()}.${String(el.getAttribute("class")).slice(0, 60)}`);
+              }
+            }
+          }
+          return found;
+        });
+        expect(clipped, `${path} at ${size.width}`).toEqual([]);
+      }
+    });
+  }
+});

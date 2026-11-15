@@ -1,5 +1,7 @@
 # Handover for the next session (15 Nov 2026)
 
+> 16 Nov 2026: written before the release. The site is live from `main`; the spec is `SPEC.md` (the two files this note cites are in `archive/`); the check scripts are back, in `scripts/checks/`, with `npm run check:safari`, `check:lighthouse` and `check:js` (SPEC.md, section 15). The notes on this machine and on flaky checks still hold.
+
 State: branch `rebuild-2026`, steps 1 to 8 built, last code commit `92e17bf`. 74 unit and 159 e2e tests pass. Nothing is deployed; `main` and Cloudflare are untouched. Spec: `REDRAW-2026-11-14.md` (sections 1 to 17), copy in `copy/`, budget in `HANDOFF.md` section 11. No further build step is authorised; wait for Vaibhav.
 
 ## Commands

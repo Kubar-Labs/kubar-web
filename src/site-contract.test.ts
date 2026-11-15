@@ -254,9 +254,9 @@ describe("copy matches docs/rebuild/copy word for word", () => {
   });
 });
 
-describe("metadata (HANDOFF section 5)", () => {
-  it("matches every page's title and description to the handoff table", () => {
-    const table = read("docs/rebuild/HANDOFF.md")
+describe("metadata (SPEC section 4)", () => {
+  it("matches every page's title and description to the spec's table", () => {
+    const table = read("docs/rebuild/SPEC.md")
       .split("\n")
       .filter((line) => /^\| .+ \| \/\S* \| /.test(line))
       .map((line) => line.split("|").map((cell) => cell.trim()))
@@ -274,7 +274,7 @@ describe("metadata (HANDOFF section 5)", () => {
     };
     for (const [, , route, title, description] of table) {
       expect(metas[route].title, route).toBe(title);
-      // The handoff table types a straight apostrophe; the site sets a typographic one.
+      // The spec's table types a straight apostrophe; the site sets a typographic one.
       expect(metas[route].description.replace(/’/g, "'"), route).toBe(description);
     }
   });

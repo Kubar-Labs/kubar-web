@@ -20,7 +20,10 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "check:safari": "bash scripts/checks/safari.sh",
+    "check:lighthouse": "bash scripts/checks/lighthouse.sh",
+    "check:js": "bash scripts/checks/js-budget.sh"
   },
   "dependencies": {
     "clsx": "^2.1.1",

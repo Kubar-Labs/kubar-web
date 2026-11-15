@@ -1,4 +1,5 @@
 import { GroundShadow, IsoSheetShape } from "@/components/drawings/iso";
+import { cn } from "@/lib/utils";
 
 /*
  * Limit and receivables · isometric (Figma 250:1744 at 1440, 257:2383 at
@@ -53,7 +54,7 @@ export function LimitDrawing({
   const edge = "limit-edge";
 
   return (
-    <svg aria-hidden="true" viewBox={full ? "0 0 500 440" : "13 25 474 415"} width={full ? 500 : 474} height={full ? 440 : 415} className={className}>
+    <svg aria-hidden="true" viewBox={full ? "0 0 500 440" : "13 25 474 415"} width={full ? 500 : 474} height={full ? 440 : 415} className={cn("overflow-visible", className)}>
       <GroundShadow cx={250} cy={400} rx={180} ry={45} />
       {/* The floor and the back of the box. */}
       <path d={`${line(base.top, base.right, base.front, base.left)} Z`} className="fill-inset" />
