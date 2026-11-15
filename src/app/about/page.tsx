@@ -57,7 +57,10 @@ export default function About() {
           foundations={t.raw("order.slabs") as Foundation[]}
           footnote={(suffix) => ({ target: "fn-1", refId: `fnref-1-${suffix}` })}
         />
-        <TextLink href="/how-it-works" kind="arrow">{t("order.link")}</TextLink>
+        <div className="flex flex-col items-start gap-4">
+          <p className="t-body max-w-(--measure) text-ink-muted">{t("order.note")}</p>
+          <TextLink href="/how-it-works" kind="arrow">{t("order.link")}</TextLink>
+        </div>
       </Section>
 
       <Section id="team" labelledBy="team-heading" className="flex flex-col gap-10 lg:gap-16">

@@ -7,6 +7,10 @@ Extracted from Figma, NavDhan SDK · 1440 (frame 170:6), 13 Nov 2026, in reading
 [Display] Trade finance inside the software your exporters already use.
 [BodyL] Embed NavDhan SDK and your exporters can check eligibility, apply and be paid for their export receivables without leaving your platform. Financiers buy; Kubar runs the programme; you keep the relationship.
 [UI] Talk about an integration                     (filled button → /contact?intent=platform)
+(16 Nov: directly under the hero, a strip on the inset ground, "Where this sits": the five foundations drawn small with the common standard in petrol, the sentence and the link, which goes to /#one-receivable.)
+[Fine] Where this sits
+[Body] Part of the institutional exchange Kubar is building. NavDhan SDK brings receivables in to the common standard, from the platforms exporters already use.
+[UI] Follow one receivable through all five        (→ /#one-receivable)
 
 (Build step 6, REDRAW-2026-11-14.md section 12 item 3: the hero carries "What you embed" (see that section below): the H3 and the six capabilities in the left column under the button, beside the sketch. Picking a row outlines its part of the sketch; "Eligibility check" is picked from the start.)
 The embed sketch (component "Embed sketch", 140:2523): a schematic, not a screenshot. From 1000 to 1199 the sketch sits beside the list; from 768 to 999 the sketch comes first, then the six rows. On phones (below 768) there is no full sketch: the six rows are an accordion, and an open row shows its own piece of the sketch under its sentence.
@@ -60,6 +64,8 @@ Events for your product | Status updates you can show your users
 
 ## From your side
 [H2] How it runs on your platform.
+(16 Nov: the page's pinned journey; this link sits above the lanes and goes to the next section.)
+[UI] Skip the five steps
 Desktop: a five-step register beside three lanes (Your platform, Kubar Protocol filled, The financier; component "Platform lanes", 138:2455). At 768 and 390: the register only.
 (After step 3, REDRAW-2026-11-14.md section 10: the column heads "Step" and "What happens" are cut; they name nothing.)
 [Code] 01  [Body] Your exporter books and documents a shipment in your platform, as it does today.

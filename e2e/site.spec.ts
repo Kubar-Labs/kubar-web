@@ -209,7 +209,7 @@ test.describe("primitives and registers (build step 2), on Home", () => {
     await page.goto("/");
     await expect(page.getByRole("button", { name: "Illustrative" })).toHaveCount(0);
     await expect(
-      page.getByText("An example: a $225,000 rice invoice to a buyer in the UAE, due 75 days after shipment.", { exact: true }),
+      page.getByText("An example: a $225,000 rice invoice to a buyer in Singapore, due 75 days after shipment.", { exact: true }),
     ).toBeVisible();
     await expect(page.locator(".iso-record ol").first()).toHaveAccessibleDescription(
       "An example record of one export receivable, with six documents filed.",
@@ -374,7 +374,7 @@ test.describe("Home, complete (build step 3)", () => {
     ]) {
       await expect(page.getByRole("heading", { level: 2, name, exact: true })).toHaveCount(1);
     }
-    await expect(page.getByText("Kubar is in the data path of every step and in the money path of none.")).toBeVisible();
+    await expect(page.getByText("Every receivable that settles adds to a priced loss history, and that history is what brings in the next financier.")).toBeVisible();
     await expectNoAxeViolations(page);
   });
 
@@ -659,8 +659,8 @@ test.describe("Kubar Protocol (redraw step 4)", () => {
     await expect(page.getByRole("link", { name: "partnerships@kubar.tech" })).toHaveAttribute("href", "mailto:partnerships@kubar.tech");
     await expect(page.locator("#fn-1")).toHaveCount(1);
     await expect(page.getByText("Planned", { exact: true })).toHaveCount(1);
-    // Ten questions, the two halves of "How a programme runs" and the five parties of "Who holds what".
-    await expect(page.getByRole("heading", { level: 3 })).toHaveCount(17);
+    // Eleven questions, the two halves of "How a programme runs" and the five parties of "Who holds what".
+    await expect(page.getByRole("heading", { level: 3 })).toHaveCount(18);
   });
 
   test("redraw: the limit drawing, the sheet marked An example, the loop, the holders and the corridor", async ({ page }) => {
@@ -846,7 +846,7 @@ test.describe("Kubar Protocol (redraw step 4)", () => {
     await page.goto("/products/kubar-protocol");
     const questions = page.locator("section", { has: page.locator("#questions-heading") });
     const buttons = questions.getByRole("button");
-    await expect(buttons).toHaveCount(10);
+    await expect(buttons).toHaveCount(11);
     await expect(buttons.first()).toHaveAttribute("aria-expanded", "true");
     await expect(buttons.nth(1)).toHaveAttribute("aria-expanded", "false");
     await expect(questions.locator("p:visible")).toHaveCount(1);
@@ -857,7 +857,7 @@ test.describe("Kubar Protocol (redraw step 4)", () => {
     expect((await buttons.nth(1).boundingBox())!.height).toBeGreaterThanOrEqual(44);
     await page.setViewportSize({ width: 768, height: 1024 });
     await expect(questions.getByRole("button")).toHaveCount(0);
-    await expect(questions.locator("p:visible")).toHaveCount(10);
+    await expect(questions.locator("p:visible")).toHaveCount(11);
   });
 
   test("tablets and phones keep the small money timeline and the evidence drawing", async ({ page }) => {
@@ -2059,6 +2059,33 @@ test.describe("Drawings that move as the page loads", () => {
       await expect
         .poll(() => page.evaluate((moving) => [...document.querySelectorAll(moving)].every((el) => getComputedStyle(el).opacity === "1"), moving))
         .toBe(true);
+    });
+  }
+});
+
+test.describe("Lane heads", () => {
+  // "Buyer, Singapore" takes two lines where its lane is narrow; the word is never cut and
+  // the type never shrunk (10 px on phones, 13 px on tablets, 15 px on laptops).
+  for (const [width, height, size] of [[360, 800, "10px"], [375, 667, "10px"], [390, 844, "10px"], [430, 932, "10px"], [768, 1024, "13px"], [1200, 800, "15px"], [1440, 900, "15px"]] as const) {
+    test(`every party's name fits its box at ${width}`, async ({ page }) => {
+      await page.setViewportSize({ width, height });
+      await page.goto("/");
+      await storyLive(page);
+      const heads = await page.evaluate(() =>
+        [...document.querySelectorAll<HTMLElement>(".story-on .lanes > span.border")].map((box) => {
+          const range = document.createRange();
+          range.selectNodeContents(box);
+          const text = [...range.getClientRects()].filter((r) => r.width > 0 && r.height < 30);
+          const frame = box.getBoundingClientRect();
+          return {
+            name: box.textContent,
+            size: getComputedStyle(box).fontSize,
+            fits: text.every((r) => r.left >= frame.left + 0.5 && r.right <= frame.right - 0.5 && r.top >= frame.top && r.bottom <= frame.bottom),
+          };
+        }),
+      );
+      expect(heads.map((h) => h.name)).toEqual(["Exporter", "Kubar", "Insurer", "Buyer, Singapore", "Financier", "Exporter’s bank"]);
+      for (const head of heads) expect(head, head.name ?? "").toMatchObject({ size, fits: true });
     });
   }
 });

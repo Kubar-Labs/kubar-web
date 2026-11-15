@@ -50,7 +50,7 @@
   },
   "home": {
     "display": "Building the institutional exchange<marker></marker> for <nb>cross-border</nb> trade finance.",
-    "subline": "Starting with the asset: export receivables an international financier can buy again and again, insured in its own name.",
+    "subline": "Indian export receivables, originated, insured and documented so an international financier can buy them again and again.",
     "routes": [
       {
         "label": "For financial institutions",
@@ -63,7 +63,8 @@
     ],
     "followAnchor": "Follow one receivable",
     "oneReceivable": {
-      "heading": "Follow one receivable from shipment to settlement."
+      "heading": "Follow one receivable from shipment to settlement.",
+      "lead": "Kubar is in the data path of every step and in the money path of none."
     },
     "standing": {
       "heading": "Standing and memberships."
@@ -90,7 +91,7 @@
       "estimateLink": "How we estimate this"
     },
     "band": {
-      "line": "Kubar is in the data path of every step and in the money path of none.",
+      "line": "Every receivable that settles adds to a priced loss history, and that history is what brings in the next financier.",
       "link": "See how it works"
     },
     "foundations": {
@@ -291,14 +292,15 @@
     "footnoteMarker": "Footnote {n}",
     "backToText": "Back to text",
     "sending": "Sending…",
-    "onThisPage": "On this page"
+    "onThisPage": "On this page",
+    "whereThisSits": "Where this sits"
   },
   "footnotes": {
     "status": "Kubar’s own ITFS registration is targeted for 2027; until then Kubar acts as the financier’s origination and servicing agent."
   },
   "record": {
     "title": "Record RCV-0001",
-    "summary": "An example: a $225,000 rice invoice to a buyer in the UAE, due 75 days after shipment.",
+    "summary": "An example: a $225,000 rice invoice to a buyer in Singapore, due 75 days after shipment.",
     "description": "An example record of one export receivable, with six documents filed.",
     "columns": {
       "no": "No.",
@@ -549,7 +551,7 @@
       "Exporter",
       "Kubar",
       "Insurer",
-      "Buyer, UAE",
+      "Buyer, Singapore",
       "Financier",
       "Exporter’s bank"
     ],
@@ -593,7 +595,7 @@
         ],
         [
           "Buyer",
-          "An importer in the UAE, on an approved insurance limit"
+          "An importer in Singapore, on an approved insurance limit"
         ],
         [
           "Terms",
@@ -791,7 +793,7 @@
       "heading": "The money moves only between banks.",
       "parties": [
         "Kubar",
-        "Buyer, UAE",
+        "Buyer, Singapore",
         "Financier",
         "Exporter’s bank"
       ],
@@ -821,7 +823,13 @@
         "from": "From",
         "to": "To"
       },
-      "alt": "Three payments move between the buyer, the financier and the exporter’s bank. None touches Kubar."
+      "alt": "Three payments move between the buyer, the financier and the exporter’s bank. None touches Kubar.",
+      "controls": [
+        "Purchase price",
+        "Face value",
+        "Deferred purchase price",
+        "All three"
+      ]
     },
     "lossHistory": {
       "heading": "Every receivable that settles adds to a priced loss history.",
@@ -869,6 +877,16 @@
           "Origination, the evidence package, servicing and reporting",
           "Money or credit risk"
         ]
+      ],
+      "things": [
+        "The receivable",
+        "The collection account",
+        "The insurance policy",
+        "The buyer’s credit risk",
+        "Disputes, returns, set-off and fraud",
+        "The relationship with the exporter",
+        "Origination, the evidence package, servicing and reporting",
+        "Recourse to the exporter for the buyer’s credit"
       ]
     },
     "questions": {
@@ -877,6 +895,10 @@
         {
           "q": "What am I buying?",
           "a": "An export receivable: the amount an overseas buyer owes an Indian exporter under a shipped invoice. You buy it outright, inside your programme limit, without recourse for the buyer’s credit."
+        },
+        {
+          "q": "Why isn’t the exporter’s own bank financing this?",
+          "a": "An exporter’s bank finances the exporter: its limit is sized on turnover, and it stops there. A shipment past the limit has no bank product, however strong the buyer. You look at it the other way round: the buyer’s credit, on a limit the insurer approves, with the cover in your name. The exporter keeps its bank and its limit."
         },
         {
           "q": "Who carries the buyer’s credit, and who carries disputes?",
@@ -914,7 +936,8 @@
           "q": "Can individuals invest?",
           "a": "No. Only institutional financiers buy the receivables. There is no retail access, and nothing on this site is an offer to the public."
         }
-      ]
+      ],
+      "showAll": "Show all 11 questions"
     },
     "fit": {
       "heading": "Where each institution fits.",
@@ -946,7 +969,7 @@
       ]
     },
     "programme1": {
-      "heading": "Programme 1: rice to buyers in the UAE and the Gulf.",
+      "heading": "Programme 1: rice to buyers in the UAE and Singapore.",
       "rows": [
         [
           "Exporters",
@@ -954,7 +977,7 @@
         ],
         [
           "Buyers",
-          "Importers in the UAE and the wider Gulf, on approved insurance limits"
+          "Importers in the UAE, Singapore and the wider Gulf, on approved insurance limits"
         ],
         [
           "Terms",
@@ -1041,7 +1064,11 @@
         "id": "venue-heading",
         "label": "The venue"
       }
-    ]
+    ],
+    "sits": {
+      "line": "Part of the institutional exchange Kubar is building. Kubar Protocol gives export receivables their standing buyers.",
+      "link": "Follow one receivable through all five"
+    }
   },
   "navdhanSdk": {
     "meta": {
@@ -1147,7 +1174,8 @@
         "evidence": "The evidence package",
         "status": "Each step as it happens"
       },
-      "link": "See how it works"
+      "link": "See how it works",
+      "skip": "Skip the five steps"
     },
     "rules": {
       "heading": "Rules the SDK follows.",
@@ -1173,6 +1201,10 @@
       "heading": "Tell us about your platform and your exporters.",
       "body": "We’ll take you through what an integration involves.",
       "button": "Talk about an integration"
+    },
+    "sits": {
+      "line": "Part of the institutional exchange Kubar is building. NavDhan SDK brings receivables in to the common standard, from the platforms exporters already use.",
+      "link": "Follow one receivable through all five"
     }
   },
   "howItWorks": {
@@ -1182,7 +1214,7 @@
     },
     "hero": {
       "headline": "From the port to the record.",
-      "sub": "One illustrative receivable, followed step by step: who does what, the documents behind it and where the money moves. A $225k rice invoice to a buyer in the UAE, due 75 days after shipment.",
+      "sub": "One illustrative receivable, followed step by step: who does what, the documents behind it and where the money moves. A $225k rice invoice to a buyer in Singapore, due 75 days after shipment.",
       "institutions": "For financial institutions",
       "platforms": "For trade platforms"
     },
@@ -1310,7 +1342,7 @@
       "heading": "Where the money moves.",
       "parties": [
         "Kubar",
-        "Buyer, UAE",
+        "Buyer, Singapore",
         "Financier",
         "Exporter’s bank"
       ],
@@ -1340,7 +1372,13 @@
         "from": "From",
         "to": "To"
       },
-      "alt": "Three payments move between the buyer, the financier and the exporter’s bank. None touches Kubar."
+      "alt": "Three payments move between the buyer, the financier and the exporter’s bank. None touches Kubar.",
+      "controls": [
+        "Purchase price",
+        "Face value",
+        "Deferred purchase price",
+        "All three"
+      ]
     },
     "unpaid": {
       "heading": "If a buyer doesn’t pay.",
@@ -1528,7 +1566,8 @@
           "ITFS",
           "An International Trade Finance Service platform at GIFT City, on which several financiers can finance trade. Kubar’s own ITFS registration is targeted for 2027; until then Kubar acts as the financier’s origination and servicing agent."
         ]
-      ]
+      ],
+      "showAll": "Show all 19 terms"
     },
     "next": {
       "label": "Next step",
@@ -1603,7 +1642,8 @@
           "line": "The programme rules and the evidence package"
         }
       ],
-      "link": "Follow one receivable through all five"
+      "link": "Follow one receivable through all five",
+      "note": "India is where we start: Indian exports, financed from GIFT City. The same five foundations are built for trade across Asia’s other emerging markets."
     },
     "team": {
       "heading": "The team.",

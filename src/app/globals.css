@@ -1062,6 +1062,13 @@
     position: relative;
     height: calc(var(--party-h) + 8 * var(--row-h));
   }
+  /* Narrow phones: the party boxes sit closer, so "Singapore" fits its box on
+     one line at 10 px from 360 up. The type is never shrunk for it. */
+  @media (max-width: 429.98px) {
+    .lanes {
+      --box-inset: 1px;
+    }
+  }
   @media (min-width: 1200px) {
     .lanes {
       --party-h: 64px;

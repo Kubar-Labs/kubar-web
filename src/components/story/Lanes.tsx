@@ -143,7 +143,7 @@ export function Lanes({
         <span
           key={party}
           className={cn(
-            "absolute top-0 flex flex-col items-center justify-center gap-1 border border-rule-strong px-0.5 text-center",
+            "absolute top-0 flex flex-col items-center justify-center gap-1 border border-rule-strong px-0 text-center min-[430px]:px-0.5",
             "text-[10px] leading-3 md:t-fine md:leading-4 lg:t-ui",
             c === 1 ? "bg-action text-on-action" : "bg-raised text-ink",
           )}

@@ -5,11 +5,13 @@ Extracted from Figma, Home · 1440 (frame 160:6), 13 Nov 2026, in reading order.
 ## Hero
 (15 Nov, REDRAW-2026-11-14.md section 13 B: the two figure captions in The gap are Sans/Body; "Drawn to scale…" is Sans/Fine, not mono; "Skip the story" has no arrow.)
 [Display] Building the institutional exchange¹ for cross-border trade finance.
+(16 Nov: the hero has a subline directly under the headline at every width; it replaces "Starting with the asset…". Figma 340:3704 at 1440, 166:3367 at 768, 162:1313 at 390. Below the laptop width the order is headline, subline, picture, routes. No other hero has a subline.)
+[BodyL] Indian export receivables, originated, insured and documented so an international financier can buy them again and again.
 [UIL] For financial institutions            → /products/kubar-protocol
 [UIL] For trade platforms                   → /products/navdhan-sdk
 (15 Nov, REDRAW-2026-11-14.md section 10: no Illustrative tag; the record's line says "An example" in words. Its accessible description: "An example record of one export receivable, with six documents filed.")
 [Tag] Record RCV-0001
-[Record] An example: a $225,000 rice invoice to a buyer in the UAE, due 75 days after shipment.
+[Record] An example: a $225,000 rice invoice to a buyer in Singapore, due 75 days after shipment.
 (14 Nov: the record becomes the isometric stack of six sheets with a row tied to each, 06 on top, so its column heads "No.", "Document", "Source" and "Status" are not shown.)
 [Code] 01
 [UI] Commercial invoice
@@ -60,6 +62,8 @@ Extracted from Figma, Home · 1440 (frame 160:6), 13 Nov 2026, in reading order.
 
 ## One receivable  (the pinned story; see ../HANDOFF.md, Motion)
 [H2] Follow one receivable from shipment to settlement.
+(16 Nov: the section's lead, beside the heading; it was the band's line.)
+[BodyL] Kubar is in the data path of every step and in the money path of none.
 (14 Nov, option B: only the lanes drawing is pinned; each state is a card that scrolls past it, so the panel's "State" label goes and each card carries its own counter, "05 of 08". REDRAW-2026-11-14.md, section 3a.)
 (After step 3, REDRAW-2026-11-14.md section 10: "Illustrative" is cut from the story; each card's state word loses its number; the "Party ·" line and the story's own "See how it works" link are cut, since the band right after it has the same link.)
 [Tag] Record RCV-0001
@@ -76,7 +80,7 @@ Extracted from Figma, Home · 1440 (frame 160:6), 13 Nov 2026, in reading order.
 [UI] Exporter
 [UI] Kubar                                  (the one filled column: petrol ground, white mark and name)
 [UI] Insurer
-[UI] Buyer, UAE
+[UI] Buyer, Singapore                       (16 Nov: the example's buyer is in Singapore. Where a lane head is too narrow for one line it takes two, "Buyer," over "Singapore"; the type is never shrunk and the word never cut)
 [UI] Financier
 [UI] Exporter’s bank
 [Code] 01 … 08                              (state rows)
@@ -90,7 +94,8 @@ Extracted from Figma, Home · 1440 (frame 160:6), 13 Nov 2026, in reading order.
 The 1440 frame shows the story at state 05. The text for all eight states is the ledger used at 768 and 390 (and with reduced motion), listed under "Only at 768 and 390" below; the story panel steps through the same eight.
 
 ## Band · closing line  (petrol ground)
-[Line] Kubar is in the data path of every step and in the money path of none.
+(16 Nov: a new line; the old one is the story section's lead. The link stays.)
+[Line] Every receivable that settles adds to a priced loss history, and that history is what brings in the next financier.
 [UIL] See how it works                      → /how-it-works
 
 ## Foundations first
@@ -188,7 +193,7 @@ The 1440 frame shows the story at state 05. The text for all eight states is the
 ## Only at 768 and 390
 
 Hero, under the display:
-[BodyL] Starting with the asset: export receivables an international financier can buy again and again, insured in its own name.
+(16 Nov: the subline is the same at every width now; see the Hero section above. "Starting with the asset…" stays only as the page's meta description.)
 [UI] Follow one receivable                  (anchor to the ledger)
 
 The eight-state ledger (replaces the lanes and story panel at 768 and 390, and everywhere when reduced motion is on). Each state: number, name, what happens, party, data path. Money path cells follow the lanes.

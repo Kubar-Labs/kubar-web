@@ -19,6 +19,8 @@ Foundations stack, built from the bottom up:
 [UIL] A clean payment path                    [BodyS] Payment matching, with the money moving only between banks
 [UIL] Standing buyers                         [BodyS] Programmes: a financier underwrites once and buys every receivable that fits
 [UIL] A common standard for what qualifies    [BodyS] The programme rules and the evidence package
+(16 Nov: a sentence above the link.)
+[Body] India is where we start: Indian exports, financed from GIFT City. The same five foundations are built for trade across Asia’s other emerging markets.
 [UI] Follow one receivable through all five   → /how-it-works
 (No In build / In preparation labels on the other four rows: removed.)
 

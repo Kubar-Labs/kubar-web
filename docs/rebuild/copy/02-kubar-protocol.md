@@ -5,6 +5,10 @@ Extracted from Figma, Kubar Protocol · 1440 (frame 167:6), 13 Nov 2026, in read
 ## Hero
 (15 Nov, REDRAW-2026-11-14.md section 12 item 5: under the hero, an "On this page" row: the label "On this page", then each section's name below as an anchor link: What you buy · How a programme runs · The evidence package · Insurance · The payment path · The loss history · Who holds what · Questions · Where you fit · Programme 1 · The venue. The same list opens from a fixed "On this page" button once the row has scrolled away.)
 (14 Nov: the kicker line above the headline is removed. REDRAW-2026-11-14.md, section 3.)
+(16 Nov: directly under the hero, a strip on the inset ground, "Where this sits": the five foundations drawn small with Standing buyers in petrol, the sentence and the link, which goes to /#one-receivable.)
+[Fine] Where this sits
+[Body] Part of the institutional exchange Kubar is building. Kubar Protocol gives export receivables their standing buyers.
+[UI] Follow one receivable through all five          (→ /#one-receivable)
 [Display] Underwrite once. Buy every receivable that fits.
 [BodyL] Kubar runs the programme around your limit: origination, the evidence package, the data your insurer needs and the matching of every payment. You buy each receivable without recourse for the buyer’s credit, insured in your own name.
 [UI] Start a programme conversation                  (filled button → /contact?intent=institution)
@@ -17,7 +21,7 @@ Extracted from Figma, Kubar Protocol · 1440 (frame 167:6), 13 Nov 2026, in read
 [Fine] An example                (15 Nov: plain words in muted Sans/Fine where the Illustrative tag was, at the right of the sheet's top row; not a button)
 [Tag] Face value                 [BodyS] $225,000
 [Tag] Goods                      [BodyS] Rice, shipped from India
-[Tag] Buyer                      [BodyS] An importer in the UAE, on an approved insurance limit
+[Tag] Buyer                      [BodyS] An importer in Singapore, on an approved insurance limit
 [Tag] Terms                      [BodyS] Open account, due 75 days after shipment
 [Tag] Purchase price             [BodyS] 90% of face, paid at purchase to the exporter’s own bank
 [Tag] Deferred purchase price    [BodyS] The balance, less your discount and charges, paid when the buyer pays
@@ -109,12 +113,17 @@ Purchase and settlement | You and the exporter’s bank | Payment references; th
 [H2] The money moves only between banks.
 Drawing (component "Money path", 120:1167; shared with How it works): four parties, Kubar filled and off to the side, solid money arrows only between the three banks' columns.
 [UI] Kubar
-[UI] Buyer, UAE
+[UI] Buyer, Singapore
 [UI] Financier
 [UI] Exporter’s bank
 [BodyS] Purchase price, at purchase (90% of face)
 [BodyS] Face value, on the due date
 [BodyS] Deferred purchase price: the balance, less discount and charges
+(16 Nov: four controls under the drawing, each of the first three with its payment's number, 1 to 3, in mono; they replay one payment or all three.)
+[UI] Purchase price
+[UI] Face value
+[UI] Deferred purchase price
+[UI] All three
 [Tag] Kubar holds none                             (under Kubar, on its grey chip; was "No account, no payment, no release")
 Below 1200, the three payments as rows, each with its from and to (Figma 120:1141), then Kubar with the chip:
 [Fine] Financier → Exporter’s bank
@@ -138,12 +147,24 @@ The exporter | Disputes, returns, set-off and fraud on its own trades | The rece
 The exporter’s bank | Its relationship with the exporter | The receivables sold
 Kubar | Origination, the evidence package, servicing and reporting | Money or credit risk
 (first column [UI], the others [BodyS])
+(16 Nov: the eight things that can be held, cut from the rows' own words, as chips beside the five parties:)
+[UI] The receivable
+[UI] The collection account
+[UI] The insurance policy
+[UI] The buyer’s credit risk
+[UI] Disputes, returns, set-off and fraud
+[UI] The relationship with the exporter
+[UI] Origination, the evidence package, servicing and reporting
+[UI] Recourse to the exporter for the buyer’s credit
 
 ## Questions  (disclosure list: question opens its answer in place)
 (15 Nov, section 13 B8: below 768 the ten questions are an accordion with the first one open; from 768 up they stay open.)
+(16 Nov: eleven questions, with a new second one. The first four show; the control below opens the other seven in place.)
 [H2] Questions a credit committee asks.
 [UIL] What am I buying?
 [Body] An export receivable: the amount an overseas buyer owes an Indian exporter under a shipped invoice. You buy it outright, inside your programme limit, without recourse for the buyer’s credit.
+[UIL] Why isn’t the exporter’s own bank financing this?
+[Body] An exporter’s bank finances the exporter: its limit is sized on turnover, and it stops there. A shipment past the limit has no bank product, however strong the buyer. You look at it the other way round: the buyer’s credit, on a limit the insurer approves, with the cover in your name. The exporter keeps its bank and its limit.
 [UIL] Who carries the buyer’s credit, and who carries disputes?
 [Body] You carry the buyer’s credit, insured in your name. The exporter carries disputes, returns, set-off and fraud, and answers for its own warranties.
 [UIL] Is the cover in my name?
@@ -162,6 +183,7 @@ Kubar | Origination, the evidence package, servicing and reporting | Money or cr
 [Body] By a fee from you and a fee from the exporter, for running the programme. Kubar earns nothing from holding money or credit risk.
 [UIL] Can individuals invest?
 [Body] No. Only institutional financiers buy the receivables. There is no retail access, and nothing on this site is an offer to the public.
+[UI] Show all 11 questions
 
 ## Where you fit
 [H2] Where each institution fits.
@@ -174,10 +196,11 @@ Funds | Later, buying receivables from financiers
 (first column [UI], the other [BodyS])
 
 ## Programme 1
-[H2] Programme 1: rice to buyers in the UAE and the Gulf.
+(16 Nov: the programme names both countries; the worked example names one, Singapore.)
+[H2] Programme 1: rice to buyers in the UAE and Singapore.
 (Step 4: the register becomes the corridor, REDRAW-2026-11-14.md, Kubar Protocol, so its column heads "Field" and "Entry" are not shown. The Status row was removed earlier.)
 Exporters | Indian rice exporters
-Buyers | Importers in the UAE and the wider Gulf, on approved insurance limits
+Buyers | Importers in the UAE, Singapore and the wider Gulf, on approved insurance limits
 Terms | Open account
 Financier | A bank’s unit at GIFT City. In discussions with IBUs
 Cover | Credit insurance on the buyers, in the financier’s name

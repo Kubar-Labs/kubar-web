@@ -7,7 +7,7 @@ Extracted from Figma, How it works · 1440 (frame 172:6), 13 Nov 2026, in readin
 (14 Nov: the kicker line above the headline is removed. REDRAW-2026-11-14.md, section 3.)
 (Build step 5: the words sit beside "Eight states · isometric steps" (258:1829), eight blocks numbered 01 to 08, 08 in petrol; the numbers are part of the drawing.)
 [Display] From the port to the record.
-[BodyL] One illustrative receivable, followed step by step: who does what, the documents behind it and where the money moves. A $225k rice invoice to a buyer in the UAE, due 75 days after shipment.
+[BodyL] One illustrative receivable, followed step by step: who does what, the documents behind it and where the money moves. A $225k rice invoice to a buyer in Singapore, due 75 days after shipment.
 (After step 3, REDRAW-2026-11-14.md section 10: "Illustrative" is cut in all three places on this page, since the lead already says "illustrative".)
 [UIL] For financial institutions     → /products/kubar-protocol
 [UIL] For trade platforms            → /products/navdhan-sdk
@@ -81,10 +81,15 @@ The record they lock into:
 ## The money path
 [H2] Where the money moves.
 Same drawing as Kubar Protocol (component "Money path", 120:1167):
-[UI] Kubar · Buyer, UAE · Financier · Exporter’s bank
+[UI] Kubar · Buyer, Singapore · Financier · Exporter’s bank
 [BodyS] Purchase price, at purchase (90% of face)
 [BodyS] Face value, on the due date
 [BodyS] Deferred purchase price: the balance, less discount and charges
+(16 Nov: four controls under the drawing, as on Kubar Protocol.)
+[UI] Purchase price
+[UI] Face value
+[UI] Deferred purchase price
+[UI] All three
 [Tag] Kubar holds none                 (was "No account, no payment, no release")
 Below 1200, the three payments as rows, each with its from and to (Figma 120:1141), then Kubar with the chip:
 [Fine] Financier → Exporter’s bank
@@ -148,6 +153,8 @@ GIFT City | India’s international financial services centre, in Gujarat.
 IFSC Banking Unit (IBU) | A bank’s unit in GIFT City, working in foreign currency.
 ITFS | An International Trade Finance Service platform at GIFT City, on which several financiers can finance trade. Kubar’s own ITFS registration is targeted for 2027; until then Kubar acts as the financier’s origination and servicing agent.
 (term [UI], meaning [BodyS])
+(16 Nov: the first six rows show; the control below opens the rest in place.)
+[UI] Show all 19 terms
 
 ## Next step  (two routes, no heading)
 [Tag] For financial institutions
