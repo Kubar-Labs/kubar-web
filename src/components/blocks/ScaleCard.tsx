@@ -46,7 +46,7 @@ export function ScaleCard({
   return (
     <PlayOnce
       className={cn(
-        "grid gap-7 border border-rule bg-raised p-5 shadow-elevation-2 md:gap-7 md:p-8 lg:grid-cols-[minmax(0,1fr)_400px] lg:gap-x-16 lg:gap-y-10 lg:px-12 lg:pt-10 lg:pb-12",
+        "grid gap-7 border border-rule bg-raised p-5 shadow-elevation-2 md:gap-7 md:p-8 lg:grid-cols-[minmax(0,1fr)_300px] lg:gap-x-8 lg:gap-y-10 xl:grid-cols-[minmax(0,1fr)_400px] xl:gap-x-16 lg:px-12 lg:pt-10 lg:pb-12",
         className,
       )}
     >

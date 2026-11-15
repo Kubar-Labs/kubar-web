@@ -67,7 +67,7 @@ No italics anywhere. Mono capitals only for State (status words in the record an
 
 `--section-space` is the padding above and below every section after option B; sections are joined by one hairline (`--rule-hairline` in `--color-rule-strong`). In Figma the variable `layout/section-space` still holds the old 128/96/72, which now applies only to the band; tokens.css splits them into two names.
 
-Breakpoints are not in Figma (the frames are 1440, 768 and 390). Proposed: mobile below 768, tablet 768 to 1199 (the mobile structure at eight columns), desktop from 1200 (twelve columns, content up to 1280, centred). Check the layouts at 1200, 1280 and 1440, and at 360 and 414 on the small side.
+Breakpoints are not in Figma (the frames are 1440, 768 and 390): mobile below 768, tablet 768 to 1023 (the mobile structure at eight columns), laptop and desktop from 1024 (twelve columns, content up to 1280, centred). Since 16 Nov 2026 the laptop layout starts at 1024, not 1200, so every iPad in landscape gets it; `--page-margin` runs from 40 at 1024 to 80 at 1200, and `Mono/Figure large` from 77 to 96 over the same span. Check at the sizes in SPEC.md, section 15.
 
 ## Motion
 

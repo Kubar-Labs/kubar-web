@@ -13,7 +13,7 @@ import { TextLink } from "@/components/ui/TextLink";
 
 /*
  * NavDhan SDK (Figma 170:6 at 1440; the 768 and 390 frames are not updated,
- * so below 1200 the page follows the existing rules). No "Where it stands",
+ * so below 1024 the page follows the existing rules). No "Where it stands",
  * no status words, no Illustrative tag. The hero carries "What you embed"
  * beside the sketch; the two audiences are one two-column block; the rules
  * have no numbers; "Behind it" is the isometric layers.
@@ -38,8 +38,8 @@ export default function NavdhanSdk() {
         below={<EmbedPicker heading={t("does.heading")} rows={t.raw("does.rows") as string[][]} copy={t.raw("sketch") as SketchCopy} />}
       />
 
-      {/* The two audiences as one two-column block from 1200 up (Figma 296:9538; section 13 C1). */}
-      <Section className="grid gap-(--section-space) lg:grid-cols-2 lg:gap-20">
+      {/* The two audiences as one two-column block from 1024 up (Figma 296:9538; section 13 C1). */}
+      <Section className="grid gap-(--section-space) lg:grid-cols-2 lg:gap-12 xl:gap-20">
         {(["exporters", "platform"] as const).map((key) => (
           <div key={key} className="flex flex-col gap-5 lg:gap-6">
             <h2 className="t-h2 text-ink">{t(`${key}.heading`)}</h2>
@@ -51,8 +51,9 @@ export default function NavdhanSdk() {
       <Section labelledBy="runs-heading" className="flex flex-col gap-10 lg:gap-16">
         <SectionHead id="runs-heading" heading={t("runs.heading")} layout="wide" />
         <div className="flex flex-col items-start gap-10">
-          {/* The drawing keeps its 1062 composition and is fitted to its column on narrower laptops (rule 11.1). */}
-          <FitStage width={1062} height={528} className="w-full">
+          {/* The drawing keeps its 1062 composition and is fitted to its column on narrower laptops
+              (rule 11.1): 0.89 at 1024, where its 13 px labels hold 12 px (fit-keep). */}
+          <FitStage width={1062} height={528} estimate={0.88} className="w-full">
             <PlatformLanes
               steps={t.raw("runs.steps") as string[]}
               lanes={t.raw("runs.lanes") as string[]}
@@ -63,7 +64,7 @@ export default function NavdhanSdk() {
         </div>
       </Section>
 
-      <Section labelledBy="rules-heading" className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-20">
+      <Section labelledBy="rules-heading" className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-12 xl:gap-20">
         <SectionHead id="rules-heading" heading={t("rules.heading")} layout="stacked" />
         {/* Not a sequence, so no numbers (REDRAW rule 7). */}
         <NumberedRows numbered={false} items={t.raw("rules.items") as string[]} className="min-w-0 flex-1" />

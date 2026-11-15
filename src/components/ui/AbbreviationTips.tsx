@@ -74,7 +74,7 @@ export function AbbreviationTips({ expansions }: { expansions: Record<string, st
   useEffect(() => {
     const root = document.getElementById("main-content");
     if (!root) return;
-    const desktop = window.matchMedia("(min-width: 1200px)");
+    const desktop = window.matchMedia("(min-width: 1024px)");
     let frame = 0;
     const run = () => {
       unmark(root);

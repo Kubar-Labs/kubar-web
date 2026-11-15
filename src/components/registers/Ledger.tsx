@@ -68,11 +68,12 @@ export function Ledger({ current = "05", footnote, states: ownStates, className 
     <table role="table" className={cn("w-full table-fixed border-collapse text-left max-lg:block", className)}>
       <colgroup>
         <col className="w-[4.375%]" />
-        <col className="w-[15.3%]" />
+        {/* From 1024 to 1199 the state column takes a little from the last, so "Acknowledged" clears the sentence beside it. */}
+        <col className="w-[15.3%] lg:max-xl:w-[17.5%]" />
         <col />
         <col className="w-[11.72%]" />
         <col className="w-[20.47%]" />
-        <col className="w-[21.1%]" />
+        <col className="w-[21.1%] lg:max-xl:w-[18.9%]" />
       </colgroup>
       <thead role="rowgroup" className="max-lg:sr-only">
         <tr role="row" className="border-b-2 border-rule-strong">

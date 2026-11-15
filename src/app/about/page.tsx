@@ -16,7 +16,7 @@ import { TextLink } from "@/components/ui/TextLink";
 
 /*
  * About (Figma 173:6 at 1440; the 768 and 390 frames are not updated, so
- * below 1200 the page follows the existing rules). The team lives here
+ * below 1024 the page follows the existing rules). The team lives here
  * (#team). The "Where we are" section is removed and is not built.
  * "What we're building" is the isometric foundations from Home with
  * About's own sentences; "Why GIFT City" has the three-zones drawing beside
@@ -88,7 +88,7 @@ export default function About() {
 
       <Section labelledBy="standing-heading" className="flex flex-col gap-10 lg:gap-16">
         {/* As on Home: four statements beside the heading, no lead and no kind labels (section 10). */}
-        <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-20">
+        <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-12 xl:gap-20">
           <SectionHead id="standing-heading" heading={t("standing.heading")} layout="stacked" />
           <Standing className="min-w-0 flex-1" />
         </div>
@@ -101,7 +101,7 @@ export default function About() {
         <SectionHead
           id="gift-heading"
           layout="stacked"
-          className="lg:w-[clamp(340px,calc(100%-760px),400px)]"
+          className="lg:w-[clamp(340px,calc(100%-760px),400px)] xl:w-[clamp(340px,calc(100%-760px),400px)]"
           heading={t("gift.heading")}
           lead={t.rich("gift.lead", { marker: () => <FootnoteMarker n={1} target="fn-1" refId="fnref-1-gift" /> })}
         />

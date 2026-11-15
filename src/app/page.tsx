@@ -33,7 +33,7 @@ export default function Home() {
 
   return (
     <>
-      {/* Hero. Below 1200 (phones, tablets, an iPad in landscape; Figma
+      {/* Hero. Below 1200 (phones and tablets; from 1024 to 1199 it is re-flowed in step 3; Figma
           162:1311 at 390, 166:3365 at 768) the record sits directly after
           the display, and the page order is the screen order: display,
           record, subline, routes, anchor, 24 px apart. From 1200 up, one
@@ -42,17 +42,17 @@ export default function Home() {
           48 px apart; 36 px between the columns); the subline and the anchor
           hidden. */}
       <section>
-        <div className="page-container flex flex-col gap-6 pt-8 pb-12 lg:grid lg:grid-cols-[578px_minmax(0,1fr)] lg:grid-rows-[auto_1fr] lg:items-start lg:gap-x-9 lg:gap-y-12 lg:pt-16 lg:pb-[72px]">
-          <h1 className="t-display text-ink lg:col-start-1 lg:row-start-1">
+        <div className="page-container flex flex-col gap-6 pt-8 pb-12 xl:grid xl:grid-cols-[578px_minmax(0,1fr)] xl:grid-rows-[auto_1fr] xl:items-start xl:gap-x-9 xl:gap-y-12 xl:pt-16 xl:pb-[72px]">
+          <h1 className="t-display text-ink xl:col-start-1 xl:row-start-1">
             {t.rich("display", {
               marker: () => <FootnoteMarker n={1} target={FN_STATUS} refId="fnref-1" />,
               nb: (chunks) => <span className="whitespace-nowrap">{chunks}</span>,
             })}
           </h1>
-          <Record className="min-w-0 lg:col-start-2 lg:row-span-2 lg:row-start-1" />
-          <p className="t-body-lg text-ink-muted lg:hidden">{t("subline")}</p>
-          <RouteRows routes={routes} className="lg:col-start-1 lg:row-start-2" />
-          <TextLink href="#one-receivable" kind="anchor" className="self-start lg:hidden">
+          <Record className="min-w-0 xl:col-start-2 xl:row-span-2 xl:row-start-1" />
+          <p className="t-body-lg text-ink-muted xl:hidden">{t("subline")}</p>
+          <RouteRows routes={routes} className="xl:col-start-1 xl:row-start-2" />
+          <TextLink href="#one-receivable" kind="anchor" className="self-start xl:hidden">
             {t("followAnchor")}
           </TextLink>
         </div>
@@ -115,7 +115,7 @@ export default function Home() {
       </Section>
 
       <Section labelledBy="standing-heading" className="flex flex-col gap-10 lg:gap-16">
-        <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-20">
+        <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-12 xl:gap-20">
           <SectionHead id="standing-heading" heading={t("standing.heading")} layout="stacked" />
           <Standing className="min-w-0 flex-1" />
         </div>
@@ -133,7 +133,7 @@ export default function Home() {
         </TextLink>
       </Section>
 
-      <Section labelledBy="contact-heading" className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-20">
+      <Section labelledBy="contact-heading" className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-12 xl:gap-20">
         <SectionHead id="contact-heading" heading={t("contact.heading")} layout="stacked" />
         <RouteCards className="min-w-0 flex-1" routes={t.raw("contact.rows") as HomeRoute[]} />
       </Section>

@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
  * "Receivables bought" on the sheets inside. No motion.
  *
  * The labels are a real list; the art is aria-hidden. Desktop sets them
- * beside the box on leaders; below 1200 the box scales to its column and
+ * beside the box on leaders; below 1024 the box scales to its column and
  * the labels sit under it in the same order.
  */
 export function BuyerLimit({ labels, className }: { labels: [string, string, string]; className?: string }) {

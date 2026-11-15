@@ -118,16 +118,40 @@ Raised surfaces are white with a 1 px `rule/default` border.
 ## 7 · Layout and page anatomy
 
 - **Grid:** 12 columns at desktop, 8 at tablet, 4 on phones; margins 80/40/20; gutters 24/24/16; content up to 1280 px, centred. Running text stays within `--measure` (640).
-- **Breakpoints:** phone below 768; tablet 768 to 1199; desktop from 1200 (`--breakpoint-lg`). The 1200 value also lives in media queries in `globals.css` and `tokens.css` and in script constants that mirror them.
-- **Tablet** is the phone structure at eight columns with tablet type sizes, full width, with running text kept to `--measure`. An iPad narrower than 1200 shows the 768 layout. Exceptions are named in section 8 (the SDK hero from 1000; the two-column blocks from 768).
-- **Laptops get the desktop composition** (rule 11.1).
-- **The header** is fixed on scroll on every page, with its bottom rule. Below 1200 the links collapse into a "Menu" button (64 × 44) that opens a full-screen sheet of ruled rows with "Talk to us" (48 px) at the foot. No LinkedIn link in the header or the sheet. The Products menu opens on click only.
+- **Breakpoints:** phone below 768; tablet 768 to 1023; laptop and desktop from 1024 (`--breakpoint-lg`), so every iPad in landscape gets the laptop layout (16 Nov 2026; it was 1200 at the release). The value also lives in media queries in `globals.css` and `tokens.css` and in script constants that mirror them (`Header.tsx`, `AbbreviationTips.tsx`, `StoryView.tsx`). `--breakpoint-xl` is 1200, where the content reaches 1040 px.
+- **Page margin at laptop width** runs from 40 px at 1024 to 80 px at 1200, so the content runs from 944 to 1040 px without a jump.
+- **Tablet** is the phone structure at eight columns with tablet type sizes, full width, with running text kept to `--measure`. An upright iPad shows the 768 layout. Exceptions are named in section 8 (the SDK hero from 1000; the two-column blocks from 768).
+- **Laptops get the desktop composition** (rule 11.1). Section 7a says how each section behaves from 1024 to 1199.
+- **The header** is fixed on scroll on every page, with its bottom rule. It shows the full nav from 1024. Below 1024 the links collapse into a "Menu" button (64 × 44) that opens a full-screen sheet of ruled rows with "Talk to us" (48 px) at the foot. No LinkedIn link in the header or the sheet. The Products menu opens on click only.
 - **Sections** are separated by `--section-space` (72/56/48) and no rule. The band keeps the larger `--band-space`.
-- **A section head** at desktop is the heading (400 wide) with its lead beside it (680). Several sections put their whole body beside the head instead (400 + 800): Home "The gap", "Standing", "Contact"; Kubar Protocol "The payment path", "The venue"; NavDhan SDK "Rules"; About "Why GIFT City". Small sizes stack.
+- **A section head** at desktop is the heading (400 wide; 320 with a 48 px gap from 1024 to 1199) with its lead beside it (680). Several sections put their whole body beside the head instead (400 + 800): Home "The gap", "Standing", "Contact"; Kubar Protocol "The payment path", "The venue"; NavDhan SDK "Rules"; About "Why GIFT City". Small sizes stack.
 - **Tables.** Every register that is still a table is a real `<table>` with header cells; on phones a table becomes stacked rows, each row a block with its first cell as the heading. Where a drawing replaced a visible table, the table stays in the page for screen readers unless the drawing's own list serves everyone (section 8 says which).
 - **"On this page"** (Kubar Protocol and How it works): a ruled row under the hero, "On this page" in muted Sans/Fine, then each section's name as an anchor link, wrapping. Once the row has scrolled away a small fixed "On this page" button shows at the bottom right; it opens the same list in a sheet, marks the section the reader is in, and closes on Escape, a pick or a click outside. It steps aside while a link, a button, a field or the footer is under it. It doesn't change the header's height or the pinned journey's measurements. Its names are the words a visitor sees (rule 11.9).
 - **Footnote ¹** (the ITFS registration line) shows once on each page that discusses the venue, and every marker ¹ on that page links to it (rule 11.11).
 - **Anchor targets** have `scroll-margin-top` equal to the header's height.
+
+## 7a · From 1024 to 1199 (16 Nov 2026)
+
+The rules for this band: a drawing may scale down to 80% and no lower; no label in a drawing under 12 px (mono tags are 11 px by token at every width; the rule governs scaling); no sentence under 15 px; no row leaves more than a third of the content width empty; an iPad is a touch screen at laptop width, so whatever answers a hover answers a tap. Scaling a drawing scales its type, so most sections fit their geometry and keep their type; only a drawing whose words survive it is scaled.
+
+| Section | From 1024 to 1199 |
+|---|---|
+| Home · hero | Re-flowed: headline and subline across the top, routes left, record right. |
+| Home · the gap | Laptop layout; the large figure runs from 77 px at 1024 to 96 px at 1200 and the second column is 300. |
+| Home · story | Laptop layout: cards beside the pinned lanes. |
+| Foundations drawing (Home, About) | Laptop layout at full size; the panel's padding is 24 and the leaders 40 shorter, so each sentence takes two lines. |
+| Kubar Protocol · What you buy | Re-flowed, up to 1279: the sheet with the tablets' small timeline and its list beside it. The day-axis timeline shows from 1280. |
+| Kubar Protocol · How a programme runs | Re-flowed, up to 1279: "Set up once" in two columns of three across the top, the loop under it at its full 760, centred. Side by side from 1280. |
+| Kubar Protocol · Cover in your name | Laptop layout; the box moves left so its labels stay inside the content. |
+| Kubar Protocol · The loss history | Re-flowed: the heading across the top, the drawing and its labels under it at full size, centred. |
+| NavDhan SDK · hero | The sketch keeps its 519 px from 1024; the list takes the rest. |
+| NavDhan SDK · How it runs | Laptop layout, fitted (0.89 at 1024); its 13 px labels hold 12 px (`fit-keep`). |
+| How it works · story | Side by side with 360 px cards. The pinned column holds the stack and its eight rows, names on two lines where needed; the financier's line and the relying lines follow the cards, as on tablets. Needs about 540 px of height. |
+| How it works · If a buyer doesn’t pay | Laptop layout; the three boxes share the width (275 at 1024, 300 from 1200). |
+| How it works · signs map | Laptop layout, columns share the width; the key sits under the map. |
+| Registers (the ledger) | The state column takes a little from the last. |
+| Contact | The form is 560; each address sits under its label. |
+| Everything else | Laptop layout, unchanged. |
 
 ## 8 · The site, page by page
 
@@ -159,7 +183,7 @@ The technology programmes are not on Home; they are on About only.
 | The evidence package | The ten elements show once, as a list of buttons: each row shows the element and its source with a small plus at its right; a click, a tap or Enter/Space opens its "Checked against" line under it, one at a time (`aria-expanded`). At desktop dashed stubs join the elements to one spine and one arrow into the record. There is no separate table. |
 | Cover in your name `167:319` | Under the lead, the hero's limit box at 0.8 scale, still, with three labels (`289:2664`): "An approved buyer limit", "Headroom" (a bracket on the right post) and "Receivables bought". From 1440 it sits in the lead's column; narrower laptops move it left so its labels fit. |
 | The payment path | `Money path` (`120:1167`): four parties, Kubar filled and off to the side with "Kubar holds none" on its chip, solid money arrows only between the three banks' columns; the lanes follow their column. Below 1200 the three payments are rows, each with its from and to, then Kubar with the chip. |
-| The loss history `167:387` | `288:2663` beside the heading: four stacked settled sheets with RCV-0003 hovering above on two dashed drop lines; labels "Settled" and "The loss history" (with "Recorded by buyer, exporter and commodity" under it); two dashed arrows out to "It lets an insurer price the pool" and "It brings in the next financier". The lead is not shown; it is the drawing's description for screen readers. Laptops narrow the heading's column to 340. |
+| The loss history `167:387` | `288:2663` beside the heading: four stacked settled sheets with RCV-0003 hovering above on two dashed drop lines; labels "Settled" and "The loss history" (with "Recorded by buyer, exporter and commodity" under it); two dashed arrows out to "It lets an insurer price the pool" and "It brings in the next financier". The lead is not shown; it is the drawing's description for screen readers. Laptops from 1200 narrow the heading's column to 340. |
 | Who holds what `167:393` | "You, the financier" as one raised petrol card (420); the other four as plain blocks in a two-by-two. Filled dot for "Holds", hollow rani dot for "Doesn’t hold". |
 | Questions | Ten questions. From 768 up they are all open; below 768 they are an accordion with the first one open. |
 | Where each institution fits | A two-column register, Institution and Role. |
@@ -245,14 +269,14 @@ All isometric drawings use one projection. A flat rectangle becomes a sheet with
 
 ## 11 · Standing rules from the reviews
 
-1. **Laptops get the desktop composition.** From 1200 up a page keeps its 1440 composition: drawings take their column's width instead of a fixed one, or are fitted to it (`src/components/drawings/FitStage.tsx`), so nothing stacks into the tablet layout. The one exception is the money timeline beside the receivable sheet between 1200 and 1279.
+1. **Laptops get the desktop composition.** From 1024 up a page keeps its 1440 composition: drawings take their column's width instead of a fixed one, or are fitted to it (`src/components/drawings/FitStage.tsx`), so nothing stacks into the tablet layout. Section 7a lists what is re-flowed below 1200, and the two re-flows that run up to 1279.
 2. **Tablets and phones keep their drawings.** Where the 768 and 390 frames draw something, it is built as drawn.
 3. **References stay whole.** An identifier such as RCV-0003 never breaks at its hyphen; a list of them breaks only between them.
 4. **Rani is kept for footnote markers, the current state and errors.** It also marks the one element a drawing is about: the current sheet, the current state, the SDK tile on the layers. Labels are Sans/Fine in the secondary colour at every width. Nothing else gets it; in particular "Kubar holds none", "Planned" and step numbers are in the secondary colour. *Addition, approved by Vaibhav on 16 Nov 2026 for the build after the release:* in a pick, rani may outline what the picked item does not hold, at most two at once.
 5. **Home's JavaScript budget is measured without prefetches:** the scripts its own HTML names, compressed and with headers, at 390 and at 1440. Next's prefetches of linked routes are reported separately.
 6. **Type floor.** Any sentence is at least 15 px (Sans/Body small). 13 px is for short labels, footnotes and the footer's fine print.
 7. **Tap areas.** Every standalone text link has a tap area at least 44 px tall on touch screens, with no change to how it looks.
-8. **A hover that shows information has a keyboard and a tap equivalent; a hover that only highlights needs a tap equivalent, not a tab stop.** The record's rows stay in the tab order (they show what each document proves); highlight-only items take `tabindex="-1"`. Do not write `:has(…:hover)` rules: Safari does not restyle them on hover reliably. A script marks the picked item instead (`PickStage`, `data-picked`), and answers hover only for a mouse.
+8. **A hover that shows information has a keyboard and a tap equivalent; a hover that only highlights needs a tap equivalent, not a tab stop.** The record's rows stay in the tab order (they show what each document proves); highlight-only items take `tabindex="-1"`, so a tap focuses them at any width (an iPad is a touch screen at laptop width; About's team cards colour their portrait this way). Do not write `:has(…:hover)` rules: Safari does not restyle them on hover reliably. A script marks the picked item instead (`PickStage`, `data-picked`), and answers hover only for a mouse.
 9. **"On this page" names** are the words a visitor sees, never an internal section name.
 10. **No "Illustrative" tag anywhere.** The example is marked in plain words: Home's record line starts "An example:", the receivable sheet carries "An example", and How it works' lead says "One illustrative receivable". The timeline's caption keeps "The purchase date is illustrative".
 11. **Footnote ¹ once per page** that discusses the venue; every marker ¹ on the page links to it. On Home it is under the foundations; on About under the hero.
@@ -330,6 +354,7 @@ The three `check:` scripts live in `scripts/checks/`.
 
 - **`check:safari`** makes a `LOCAL_PREVIEW=1` build in `.next-preview` (no `upgrade-insecure-requests`, so WebKit can load the site over plain http; `.next` is left alone), serves it on 3302 and runs `pass.mjs` in Playwright's own image under podman. Playwright's WebKit build does not start on Fedora, and nothing is installed with `dnf`. The image tag is taken from the installed `@playwright/test`; the repo is mounted with `:Z` for SELinux; the container uses `--network=host`. `ENGINE=chromium` runs the same pass in Chromium. The pass checks, for every route at every size: no script error; no sideways scroll at the top, on the way down and at the bottom; each pinned journey holds from state 3 to state 6 or shows its register; no ground shadow is clipped; every pick in its table answers a tap on touch sizes and a hover or click on the others. It prints one line per size and `ALL CLEAR`. Add a row to its table for every new pick.
 - **`check:lighthouse`** runs Lighthouse 13.6.0, mobile, performance only, in the same image, with a full Chrome on a virtual display (headless Chrome on this machine does not tick animation frames and reports `NO_FCP`). `RUNS=5` for five runs a route; the default is three. It fails if a route's median is over LCP 2.0 s or CLS 0.05.
+- **`scripts/checks/capture.mjs <base> <dir>`** takes a full-page picture and measurements of every route at every size; `--compare <before> <after>` lists what changed.
 - **`scripts/checks/heights.mjs <base>`** gives each page's total height at 390×844 against main (the live site); every report carries it. `scripts/checks/shot.mjs` takes a report's pictures.
 - **`check:js`** loads each route in Chromium at 390 and 1440 and applies rule 11.5. It fails if Home is over 170 KB. `e2e/acceptance.spec.ts` applies the same rule.
 

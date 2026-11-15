@@ -47,7 +47,7 @@ export function RouteCards({ routes, className }: { routes: HomeRoute[]; classNa
         {rows.map((route) => (
           <li key={route.href} className="flex items-center justify-between gap-4 border-t border-rule pt-4">
             <span className="t-ui text-ink">{route.who}</span>
-            <TextLink href={route.href} kind="arrow">
+            <TextLink href={route.href} kind="arrow" className="shrink-0 whitespace-nowrap">
               {route.step}
             </TextLink>
           </li>

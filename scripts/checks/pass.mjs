@@ -39,10 +39,14 @@ if (runSizes.length === 0) {
  *   expanded  aria-expanded="true" on the item
  *   pressed   aria-pressed="true" on the item
  *   marked    the item matches :hover or :focus (a highlight done in CSS)
+ *   colour    the item (a portrait) is no longer greyscale
+ *   open      the item carries data-open (an abbreviation's tip)
  * An item that isn't shown at a size is skipped there. Add a row for every
  * new pick.
  */
 const picks = [
+  { route: "/", name: "header menu", item: 'header button[aria-expanded="false"]', expect: "expanded", click: true },
+  { route: "/about", name: "abbreviation tip", item: "main abbr[data-abbr]", expect: "open" },
   { route: "/", name: "record row", item: ".iso-record li[tabindex]", expect: "marked" },
   { route: "/", name: "party map", item: ".party-map [data-party]", expect: "picked" },
   { route: "/", name: "foundations", item: "ol > li[data-level][tabindex]", expect: "marked", sideBySide: true },
@@ -54,6 +58,7 @@ const picks = [
   { route: "/how-it-works", name: "evidence stack", item: ".story-stack li[data-doc]", expect: "picked" },
   { route: "/how-it-works", name: "signs map", item: ".signs-map [data-party]", expect: "picked" },
   { route: "/about", name: "foundations", item: "ol > li[data-level][tabindex]", expect: "marked", sideBySide: true },
+  { route: "/about", name: "team portrait", item: "#team li[tabindex] img", expect: "colour" },
 ];
 
 const failures = [];
@@ -164,6 +169,7 @@ async function checkShadows(page, size, route) {
 async function checkPicks(page, size, route) {
   let done = 0;
   for (const pick of picks.filter((p) => p.route === route)) {
+    if (pick.expect === "open") await page.waitForSelector(pick.item, { state: "attached", timeout: 5000 }).catch(() => {});
     // Handles, not locators: a picked item may stop matching its own selector (aria-pressed="false").
     let item = null;
     for (const handle of await page.locator(pick.item).elementHandles()) {
@@ -193,6 +199,8 @@ async function checkPicks(page, size, route) {
       expanded: (el) => el.getAttribute("aria-expanded") === "true",
       pressed: (el) => el.getAttribute("aria-pressed") === "true",
       marked: (el) => el.matches(":hover, :focus, :focus-within"),
+      colour: (el) => !getComputedStyle(el).filter.includes("grayscale(1)"),
+      open: (el) => el.hasAttribute("data-open"),
     }[pick.expect];
     const ok = await item
       .evaluate(
@@ -208,7 +216,8 @@ async function checkPicks(page, size, route) {
       .catch(() => false);
     if (!ok) fail(size, route, `${pick.name}: a ${size.touch ? "tap" : pick.click ? "click" : "hover"} did not leave it ${pick.expect}`);
     done++;
-    // Clear the pick before the next one.
+    // Clear the pick before the next one, and close whatever it opened (a menu, the sheet).
+    await page.keyboard.press("Escape");
     await page.mouse.move(1, 1);
   }
   return done;

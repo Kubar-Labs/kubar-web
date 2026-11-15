@@ -36,7 +36,9 @@ export type LedgerState = {
   money: string | null;
 };
 
-const DESKTOP = "(min-width: 1200px)";
+const DESKTOP = "(min-width: 1024px)";
+/** Where the content reaches 1040 px: How it works pins the relying lines with its stack from here. */
+const WIDE = "(min-width: 1200px)";
 
 /** The 22 px line before "Data path" and "Money path" on a card. */
 function PathGlyph({ kind }: { kind: "data" | "money" }) {
@@ -106,7 +108,9 @@ export function StoryView({
       // The lanes need their smallest rows; the evidence stack its smallest height (globals.css, .story-stack).
       const ok = window.matchMedia(DESKTOP).matches
         ? long
-          ? svh - headerHeight() - 256 >= 250
+          ? window.matchMedia(WIDE).matches
+            ? svh - headerHeight() - 256 >= 250
+            : svh - headerHeight() - 110 >= 346
           : (svh - headerHeight() - 64 - 48) / 8 >= 44
         : long && !window.matchMedia("(min-width: 768px)").matches
           ? // On a phone the pinned stack and its list would take over half of a short screen.
@@ -177,7 +181,7 @@ export function StoryView({
       <div data-no-abbr data-story-state={state} className="story-on">
         {/* The drawing and the cards share a box that ends with the last card,
             so the drawing stops being pinned as the last card leaves. */}
-        <div className="lg:grid lg:grid-cols-[411px_minmax(0,1fr)] lg:items-start lg:gap-x-6">
+        <div className={cn("lg:grid lg:items-start lg:gap-x-6", long ? "lg:grid-cols-[360px_minmax(0,1fr)] xl:grid-cols-[411px_minmax(0,1fr)]" : "lg:grid-cols-[411px_minmax(0,1fr)]")}>
           {/* The pinned drawing. Phones and tablets pin the record's id row with it, on a
               ground that reaches the screen's edges and fades out over its last 24 px,
               so the cards pass under it (story-pin, globals.css). */}
@@ -261,7 +265,7 @@ export function StoryView({
         </div>
 
         {closing ? <p className="t-body-sm pt-2 text-ink lg:hidden">{closing}</p> : null}
-        {after ? <div className="pt-6 lg:ml-[435px] lg:pt-2">{after}</div> : null}
+        {after ? <div className={cn("pt-6 lg:pt-2", long ? "lg:ml-[384px] xl:ml-[435px]" : "lg:ml-[435px]")}>{after}</div> : null}
       </div>
 
       {/* The ledger: shown instead with reduced motion or on a very short screen. */}

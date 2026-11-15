@@ -114,7 +114,9 @@ export function PeopleCards({
   return (
     <ul className={cn("grid max-w-[302px] grid-cols-1 gap-x-6 gap-y-12 md:max-w-[628px] md:grid-cols-2 lg:max-w-[954px] lg:grid-cols-3", className)}>
       {people.map((person) => (
-        <li key={person.id} className="group/card flex flex-col">
+        // Not a tab stop: a tap focuses the card, which is what brings its portrait into colour on a
+        // touch screen at any width (hover never fires there). The LinkedIn link is the card's stop.
+        <li key={person.id} tabIndex={-1} className="group/card flex flex-col outline-offset-4">
           <Portrait id={person.id} alt="" sizes="302px" colour="group-hover/card:grayscale-0 group-focus-within/card:grayscale-0" />
           <div className="flex flex-col items-start gap-1.5 pt-4">
             <h3 className="t-ui text-ink">{person.name}</h3>

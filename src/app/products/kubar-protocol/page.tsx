@@ -61,16 +61,17 @@ export default function KubarProtocol() {
 
       <Section labelledBy="buy-heading" className="flex flex-col gap-10 lg:gap-16">
         <SectionHead id="buy-heading" heading={t("whatYouBuy.heading")} layout="wide" />
-        <div className="flex flex-col gap-12 min-[1280px]:flex-row min-[1280px]:items-start min-[1280px]:gap-6">
+        <div className="flex flex-col gap-12 lg:flex-row lg:items-start lg:gap-9 min-[1280px]:gap-6">
           <ReceivableSheet
             className="lg:w-[519px] lg:shrink-0"
             title={t("whatYouBuy.title")}
             example={t("whatYouBuy.example")}
             rows={t.raw("whatYouBuy.rows") as string[][]}
           />
-          {/* Side by side from 1280 up, the timeline taking the rest of the row (737 at 1440, about 580 at 1280);
-              between 1200 and 1279 it sits under the sheet at the full content width. */}
-          <MoneyTimeline copy={t.raw("timeline") as TimelineCopy} className="min-w-0 min-[1280px]:max-w-[737px] min-[1280px]:flex-1" />
+          {/* Side by side from 1024 up. From 1280 the day-axis timeline takes the rest of the row (737 at
+              1440, about 580 at 1280); from 1024 to 1279 the row holds the tablets' small timeline and its
+              list instead, so the sheet never sits alone in a half-empty row. */}
+          <MoneyTimeline copy={t.raw("timeline") as TimelineCopy} className="min-w-0 lg:flex-1 min-[1280px]:max-w-[737px]" />
         </div>
       </Section>
 
@@ -112,10 +113,10 @@ export default function KubarProtocol() {
       <Section labelledBy="insurance-heading" className="flex flex-col gap-10 lg:gap-16">
         <SectionHead id="insurance-heading" heading={t("insurance.heading")} lead={t("insurance.lead")} />
         {/* Under the lead, in the lead's column; narrower laptops move it left so its labels fit. */}
-        <BuyerLimit className="lg:ml-[clamp(300px,calc(100%-800px),480px)]" labels={t.raw("insurance.labels") as [string, string, string]} />
+        <BuyerLimit className="lg:ml-[min(300px,calc(100%-660px))] xl:ml-[clamp(300px,calc(100%-800px),480px)]" labels={t.raw("insurance.labels") as [string, string, string]} />
       </Section>
 
-      <Section labelledBy="payment-heading" className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-20">
+      <Section labelledBy="payment-heading" className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-12 xl:gap-20">
         <SectionHead id="payment-heading" heading={t("payment.heading")} layout="stacked" />
         <MoneyPath
           className="min-w-0 flex-1"
@@ -130,10 +131,12 @@ export default function KubarProtocol() {
       </Section>
 
       {/* The drawing's labels carry the lead, which stays as its description for screen readers. */}
-      <Section labelledBy="loss-heading" className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-10 min-[1366px]:gap-20">
-        {/* Laptops narrow the heading's column a little, so the drawing's labels keep their lines. */}
-        <SectionHead id="loss-heading" heading={t("lossHistory.heading")} layout="stacked" className="lg:w-[clamp(340px,calc(100%-800px),400px)]" />
-        <LossHistory className="min-w-0 flex-1" copy={t.raw("lossHistory.drawing") as LossHistoryCopy} description={t("lossHistory.lead")} />
+      <Section labelledBy="loss-heading" className="flex flex-col gap-10 xl:flex-row xl:items-start xl:gap-10 min-[1366px]:gap-20">
+        {/* Laptops narrow the heading's column a little, so the drawing's labels keep their lines. From
+            1024 to 1199 the heading runs across the top and the drawing sits under it at full size,
+            centred with its labels: beside a heading they would collide. */}
+        <SectionHead id="loss-heading" heading={t("lossHistory.heading")} layout="stacked" className="lg:w-auto lg:max-w-[800px] xl:w-[clamp(340px,calc(100%-800px),400px)] xl:max-w-none" />
+        <LossHistory className="min-w-0 flex-1 lg:mx-auto lg:w-[780px] lg:flex-none xl:mx-0 xl:w-auto xl:flex-1" copy={t.raw("lossHistory.drawing") as LossHistoryCopy} description={t("lossHistory.lead")} />
       </Section>
 
       <Section id="who-holds-what" labelledBy="holds-heading" className="flex flex-col gap-10 lg:gap-16">
@@ -166,7 +169,7 @@ export default function KubarProtocol() {
         <Corridor rows={t.raw("programme1.rows") as [string, string][]} />
       </Section>
 
-      <Section labelledBy="venue-heading" className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-20">
+      <Section labelledBy="venue-heading" className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-12 xl:gap-20">
         <SectionHead id="venue-heading" heading={t("venue.heading")} layout="stacked" />
         <div className="flex min-w-0 flex-1 flex-col gap-12">
           <VenueRegister

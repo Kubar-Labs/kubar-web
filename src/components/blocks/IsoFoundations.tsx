@@ -85,7 +85,7 @@ export function IsoFoundations({
   const levelOf = (i: number) => levels - 1 - i;
 
   return (
-    <div className={cn("bg-inset px-5 pt-5 pb-8 md:px-8 md:pt-8 md:pb-10 lg:px-12 lg:pt-10 lg:pb-12", className)}>
+    <div className={cn("bg-inset px-5 pt-5 pb-8 md:px-8 md:pt-8 md:pb-10 lg:px-6 lg:pt-10 lg:pb-12 xl:px-12", className)}>
       <PlayOnce className="iso-foundations relative">
         <svg
           aria-hidden="true"
@@ -109,7 +109,8 @@ export function IsoFoundations({
                 return (
                   <g key={f.name}>
                     <path d={shape.outline} mask={`url(#${maskId})`} className="iso-venue" />
-                    <line x1={shape.leaderX} x2={584} y1={shape.leaderY} y2={shape.leaderY} className="iso-leader-line is-dashed hidden lg:inline" />
+                    <line x1={shape.leaderX} x2={544} y1={shape.leaderY} y2={shape.leaderY} className="iso-leader-line is-dashed hidden lg:inline xl:hidden" />
+                    <line x1={shape.leaderX} x2={584} y1={shape.leaderY} y2={shape.leaderY} className="iso-leader-line is-dashed hidden xl:inline" />
                   </g>
                 );
               }
@@ -120,13 +121,16 @@ export function IsoFoundations({
                     <polygon points={shape.right} className="fill-[var(--petrol-50)]" />
                     <polygon points={shape.top} className="iso-top" />
                   </g>
-                  <line x1={shape.leaderX} x2={584} y1={shape.leaderY} y2={shape.leaderY} className="iso-leader-line hidden lg:inline" />
+                  <line x1={shape.leaderX} x2={544} y1={shape.leaderY} y2={shape.leaderY} className="iso-leader-line hidden lg:inline xl:hidden" />
+                  <line x1={shape.leaderX} x2={584} y1={shape.leaderY} y2={shape.leaderY} className="iso-leader-line hidden xl:inline" />
                 </g>
               );
             })}
         </svg>
 
-        <ol className="mt-6 lg:absolute lg:inset-y-0 lg:right-[-24px] lg:left-[600px] lg:mt-0">
+        {/* From 1024 to 1199 the panel's padding is 24 and the leaders are 40 shorter, so each
+            sentence keeps to two lines beside the drawing at its full size. */}
+        <ol className="mt-6 lg:absolute lg:inset-y-0 lg:right-0 lg:left-[560px] lg:mt-0 xl:right-[-24px] xl:left-[600px]">
           {foundations.map((f, i) => {
             const shape = faces(levelOf(i));
             return (
@@ -148,7 +152,7 @@ export function IsoFoundations({
                     width={WIDTH}
                     height={HEIGHT}
                     style={{ top: `${14 - shape.leaderY}px` }}
-                    className="pointer-events-none absolute left-[-600px] hidden overflow-visible lg:block"
+                    className="pointer-events-none absolute left-[-560px] hidden overflow-visible lg:block xl:left-[-600px]"
                   >
                     <polygon points={shape.top} data-level={levelOf(i)} className="iso-top-edge" />
                   </svg>

@@ -22,7 +22,7 @@ async function scrollToState(page: Page, n: number) {
     // The cards' own slots (How it works has a second list in the pinned stack).
     const slot = story.querySelectorAll(".story-card")[n - 1].parentElement!;
     const header = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--header-height"));
-    const pin = matchMedia("(min-width: 1200px)").matches ? 0 : story.querySelector<HTMLElement>(".story-pin")!.offsetHeight;
+    const pin = matchMedia("(min-width: 1024px)").matches ? 0 : story.querySelector<HTMLElement>(".story-pin")!.offsetHeight;
     const line = header + pin + 0.45 * (innerHeight - header - pin);
     window.scrollTo({ top: slot.getBoundingClientRect().top + scrollY - line + 20, behavior: "instant" });
   }, n);
@@ -698,21 +698,33 @@ test.describe("Kubar Protocol (redraw step 4)", () => {
     await expect(page.locator("section", { has: page.getByRole("heading", { name: "The venue comes last." }) }).locator(".t-code")).toHaveCount(0);
   });
 
-  test("laptops keep the 1440 composition from 1200 up", async ({ page }) => {
+  test("laptops keep the 1440 composition from 1280 up; from 1024 to 1279 two sections are re-flowed", async ({ page }) => {
     const box = async (selector: string) => (await page.locator(selector).first().boundingBox())!;
-    for (const width of [1200, 1280, 1366, 1440]) {
+    for (const width of [1024, 1180, 1200, 1279, 1280, 1366, 1440]) {
       await page.setViewportSize({ width, height: 900 });
       await page.goto("/products/kubar-protocol");
-      // What you buy: the timeline beside the sheet from 1280, under it at full width below that.
+      // What you buy: the day-axis timeline beside the sheet from 1280; below that the tablets'
+      // small timeline and its list sit beside the sheet, so the sheet is never alone in its row.
       const sheet = await box("dl:has(> dt:text-is('Face value'))");
-      const timeline = await box("[role='img'][aria-label^='A timeline']");
-      if (width >= 1280) expect(timeline.x, `${width}: timeline beside the sheet`).toBeGreaterThan(sheet.x + sheet.width);
-      else expect(timeline.y, `${width}: timeline under the sheet`).toBeGreaterThan(sheet.y + sheet.height);
-      // How a programme runs: the loop beside the set-up list, its cards inside the page.
+      const timeline = page.locator("[role='img'][aria-label^='A timeline']");
+      const small = page.locator("section[aria-labelledby='buy-heading'] dl").last();
+      if (width >= 1280) {
+        expect((await timeline.boundingBox())!.x, `${width}: timeline beside the sheet`).toBeGreaterThan(sheet.x + sheet.width);
+      } else {
+        await expect(timeline, `${width}: no day-axis timeline`).toBeHidden();
+        const list = (await small.boundingBox())!;
+        expect(list.x, `${width}: small timeline beside the sheet`).toBeGreaterThan(sheet.x + sheet.width);
+        expect(list.x + list.width, `${width}: small timeline inside the page`).toBeLessThanOrEqual(width);
+      }
+      // How a programme runs: the loop beside the set-up list from 1280; below that the list runs
+      // across the top in two columns and the loop sits under it at its full 760, so no sentence shrinks.
       const setUp = await box(".programme-loop >> xpath=ancestor::div[contains(@class,'fit-stage')]/preceding-sibling::div[1]");
       const loop = await box(".programme-loop");
-      expect(loop.x, `${width}: loop beside the list`).toBeGreaterThan(setUp.x + setUp.width - 1);
+      if (width >= 1280) expect(loop.x, `${width}: loop beside the list`).toBeGreaterThan(setUp.x + setUp.width - 1);
+      else expect(loop.y, `${width}: loop under the list`).toBeGreaterThan(setUp.y + setUp.height - 1);
+      expect(Math.round(loop.width), `${width}: loop at full size`).toBe(760);
       expect(loop.x + loop.width, `${width}: loop inside the page`).toBeLessThanOrEqual(width);
+      await expect(page.locator(".programme-loop .loop-card .t-body-sm").first()).toHaveCSS("font-size", "15px");
       // The payment lanes beside the heading.
       const heading = await box("#payment-heading");
       const lanes = await box("[role='img'][aria-label^='Three payments']");
@@ -958,13 +970,19 @@ test.describe("NavDhan SDK (build step 6)", () => {
     const art = (await sketch.boundingBox())!;
     expect(art.x).toBeGreaterThan(list.x + list.width);
     await expectNoAxeViolations(page);
-    // 1000 to 1199: the sketch beside the list, the list about 45% wide. Below 1000: the accordion, no full sketch.
+    // From 1024 the sketch keeps its 519 px and the list takes the rest (about 40% at 1024).
+    // 1000 to 1023: the list about 45% wide. Below 1000: the accordion, no full sketch.
     await page.setViewportSize({ width: 1024, height: 900 });
     const l2 = (await hero.locator("ul").first().boundingBox())!;
     const a2 = (await sketch.boundingBox())!;
     expect(a2.x).toBeGreaterThan(l2.x + l2.width - 1);
-    expect(l2.width / 944).toBeGreaterThan(0.4);
+    expect(Math.round(a2.width)).toBe(519);
+    expect(l2.width / 944).toBeGreaterThan(0.38);
     expect(l2.width / 944).toBeLessThan(0.5);
+    await page.setViewportSize({ width: 1010, height: 900 });
+    const l3 = (await hero.locator("ul").first().boundingBox())!;
+    expect(l3.width / 930).toBeGreaterThan(0.4);
+    expect(l3.width / 930).toBeLessThan(0.5);
     for (const width of [999, 820, 768]) {
       await page.setViewportSize({ width, height: 1180 });
       await expect(sketch, `${width}`).toBeHidden();
@@ -2086,6 +2104,64 @@ test.describe("Lane heads", () => {
       );
       expect(heads.map((h) => h.name)).toEqual(["Exporter", "Kubar", "Insurer", "Buyer, Singapore", "Financier", "Exporter’s bank"]);
       for (const head of heads) expect(head, head.name ?? "").toMatchObject({ size, fits: true });
+    });
+  }
+});
+
+test.describe("The laptop layout starts at 1024 (SPEC section 7)", () => {
+  test("the header shows the full nav from 1024 and Menu below it", async ({ page }) => {
+    await page.setViewportSize({ width: 1024, height: 768 });
+    await page.goto("/");
+    const header = page.locator("header");
+    for (const name of ["How it works", "About", "Contact"]) await expect(header.getByRole("link", { name, exact: true })).toBeVisible();
+    await expect(header.getByRole("button", { name: "Products" })).toBeVisible();
+    await expect(header.getByRole("button", { name: "Menu" })).toBeHidden();
+    // One line: every item sits on the same row.
+    const tops = await header.locator("nav a:visible, nav button:visible").evaluateAll((els) => els.map((el) => Math.round(el.getBoundingClientRect().top + el.getBoundingClientRect().height / 2)));
+    expect(new Set(tops).size).toBe(1);
+    await page.setViewportSize({ width: 1023, height: 768 });
+    await expect(header.getByRole("button", { name: "Menu" })).toBeVisible();
+    await expect(header.getByRole("link", { name: "About", exact: true })).toBeHidden();
+  });
+
+  test("the page margin runs from 40 at 1024 to 80 at 1200, and tablets keep 40", async ({ page }) => {
+    const margin = () => page.evaluate(() => Math.round(document.querySelector("main .page-container")!.getBoundingClientRect().left + parseFloat(getComputedStyle(document.querySelector("main .page-container")!).paddingLeft)));
+    for (const [width, expected] of [[820, 40], [1023, 40], [1024, 40], [1112, 60], [1200, 80], [1440, 80]] as const) {
+      await page.setViewportSize({ width, height: 800 });
+      await page.goto("/about");
+      expect(await margin(), `${width}`).toBe(expected);
+    }
+  });
+
+  for (const path of publicRoutes) {
+    test(`${path}: from 1024 to 1199 nothing scrolls sideways, no sentence is under 15 px and no fitted label under 12`, async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      for (const [width, height] of [[1024, 768], [1080, 810], [1133, 744], [1180, 820], [1194, 834]] as const) {
+        await page.setViewportSize({ width, height });
+        await page.goto(path);
+        // FitStage measures its column after hydration.
+        await page.waitForFunction(() => [...document.querySelectorAll<HTMLElement>(".fit-stage")].every((el) => el.style.getPropertyValue("--fit") !== "" || el.clientWidth === 0));
+        expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth), `${path} at ${width}`).toBe(0);
+        const small = await page.evaluate(() => {
+          const found: string[] = [];
+          for (const stage of document.querySelectorAll<HTMLElement>(".fit-stage")) {
+            const fit = parseFloat(getComputedStyle(stage).getPropertyValue("--fit")) || 1;
+            if (fit < 0.8) found.push(`a drawing is scaled to ${fit.toFixed(2)}`);
+            const walker = document.createTreeWalker(stage, NodeFilter.SHOW_TEXT);
+            for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+              const text = node.nodeValue!.trim();
+              const el = node.parentElement!;
+              if (text.length < 2 || el.getClientRects().length === 0 || el.closest(".sr-only")) continue;
+              const size = parseFloat(getComputedStyle(el).fontSize) * fit;
+              // A sentence: seven words or more. Mono tags are 11 px by token and are not scaled text.
+              const floor = text.split(/\s+/).length >= 7 ? 14.95 : el.matches(".t-tag") ? 0 : 11.95;
+              if (size < floor) found.push(`${size.toFixed(1)} px: ${text.slice(0, 40)}`);
+            }
+          }
+          return found;
+        });
+        expect(small, `${path} at ${width}`).toEqual([]);
+      }
     });
   }
 });

@@ -24,7 +24,7 @@ import { TextLink } from "@/components/ui/TextLink";
  * steps; the rail as the pinned story at every width (section 3a), told on
  * the evidence stack, whose documents land state by state (section 13 A);
  * "If a buyer doesn't pay" as a flow with a fork; the signs map. No Illustrative tag (15 Nov): the lead says
- * "illustrative" in words. From 1200 up the page keeps its 1440
+ * "illustrative" in words. From 1024 up the page keeps its 1440
  * composition, the drawings taking their column's width (section 11).
  */
 
@@ -113,7 +113,7 @@ export default function HowItWorks() {
       <Section labelledBy="who-heading" className="flex flex-col gap-10 lg:gap-16">
         <SectionHead id="who-heading" heading={t("who.heading")} layout="wide" />
         <div className="flex flex-col items-start gap-8 lg:gap-16">
-          {/* From 1200 up the map shows; the register stays as a table for screen readers at every
+          {/* From 1024 up the map shows; the register stays as a table for screen readers at every
               width, and is what tablets and phones show. */}
           <SignsMap className="hidden w-full lg:block" rows={t.raw("who.rows") as string[][]} copy={t.raw("who.map") as SignsMapCopy} />
           <Register

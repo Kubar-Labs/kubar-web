@@ -20,8 +20,8 @@ import { cx as cn } from "@/lib/cx";
  * the keyboard. The sketch is one image for assistive technology (its
  * `alt`); the rows carry the words. No Illustrative tag (15 Nov).
  *
- * From 1000 to 1199 the sketch sits beside the list (the list about 45%
- * wide).
+ * From 1000 to 1023 the sketch sits beside the list (the list about 45%
+ * wide); from 1024 the sketch keeps its 519 px and the list takes the rest.
  *
  * Below 1000 there is no full sketch (reviews of 1ce9d8b and 685bd15), so
  * the picked part is never off-screen: the six rows are an accordion. Tapping a row opens it to show that row's own piece of

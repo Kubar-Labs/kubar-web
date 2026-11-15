@@ -17,7 +17,7 @@ type ArrowKind = "money" | "data";
  *
  * Desktop lays the cards on a grid whose gaps are tracks of their own (88 px
  * across, 96 px down, as in the frame), so each arrow sits in its gap and
- * stays between its cards at any width from 1200 up.
+ * stays between its cards at any width from 1024 up.
  *
  * Below desktop the cards are one column in the order Buyers, Financiers,
  * Exporters, Trade platforms, Kubar, Credit insurers, joined by the same two

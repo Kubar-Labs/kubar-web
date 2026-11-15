@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 
 /*
  * Signs · map (Figma 287:2806 in How it works · 1440, section 172:541):
- * "Each party signs for its own part" as a map, from 1200 up. Seven cards in
+ * "Each party signs for its own part" as a map, from 1024 up. Seven cards in
  * three columns: Insurer and Financier; Trade platform, Kubar (petrol) and
  * Exporter; Exporter's bank and Buyer under Kubar and Exporter. Each card
  * has the party's name and its "Does" sentence from the register. Five
@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils";
  *
  * At 1440 the cards are 304 × 204 with 184 between columns and 100 between
  * rows. On narrower laptops the columns share the width (160 between them)
- * and a row grows with its longest card, so the composition holds from 1200.
+ * and a row grows with its longest card, so the composition holds from 1024 (cards about 208 wide there).
  * Each line hangs off a card's edge, so it follows the cards.
  *
  * Aria-hidden: the register stays in the page as a table for screen readers
@@ -118,7 +118,9 @@ export function SignsMap({ rows, copy, className }: { rows: string[][]; copy: Si
             </div>
           );
         })}
-        <div className="col-start-1 row-start-3 flex flex-col gap-1.5 self-end">
+        {/* From 1024 to 1199 the first column and its gap are narrower than the key, so the key sits
+            under the map, 32 px below the last row. */}
+        <div className="col-span-3 row-start-4 -mt-[68px] flex flex-col gap-1.5 xl:col-span-1 xl:col-start-1 xl:row-start-3 xl:mt-0 xl:self-end">
           {copy.key.map((line) => (
             <p key={line} className="t-body-sm whitespace-nowrap text-ink-muted">
               {line}

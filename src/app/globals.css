@@ -16,7 +16,10 @@
   --drop-shadow-*: initial;
   --breakpoint-*: initial;
   --breakpoint-md: 768px;
-  --breakpoint-lg: 1200px;
+  /* The laptop layout starts at 1024, so every iPad in landscape gets it (SPEC section 7).
+     xl is where the content reaches 1040 px and a 1440 composition holds unchanged. */
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1200px;
 }
 
 @theme inline reference {
@@ -284,7 +287,7 @@
     --font-mono: var(--font-geist-mono), ui-monospace, monospace;
     --header-height: 65px;
   }
-  @media (min-width: 1200px) {
+  @media (min-width: 1024px) {
     :root {
       --header-height: 81px;
     }
@@ -330,7 +333,7 @@
 
   /* Tablet: running text keeps to the measure (REDRAW-2026-11-14.md, 9.10).
      At desktop each block sets its own width; on phones the column is narrower. */
-  @media (min-width: 768px) and (max-width: 1199.98px) {
+  @media (min-width: 768px) and (max-width: 1023.98px) {
     main p,
     main dd,
     main li.t-body {
@@ -399,7 +402,7 @@
      as extra cells), so at desktop, where registers are real table rows, the
      ground's margin extension and the marker hang off the first cell. Below
      desktop the rows are blocks or grids and keep them on the row itself. */
-  @media (min-width: 1200px) {
+  @media (min-width: 1024px) {
     tr.is-current::before,
     tr.is-current::after {
       content: none;
@@ -597,7 +600,7 @@
     opacity: 0;
     transition: opacity var(--duration-hover) var(--ease-standard);
   }
-  @media (min-width: 1200px) {
+  @media (min-width: 1024px) {
     .iso-foundations li:is(:hover, :focus) .iso-top-edge {
       opacity: 1;
     }
@@ -785,7 +788,7 @@
       opacity var(--duration-write) var(--ease-standard) calc(3 * 80ms + var(--duration-write)),
       transform var(--duration-write) var(--ease-standard) calc(3 * 80ms + var(--duration-write));
   }
-  @media (min-width: 1200px) {
+  @media (min-width: 1024px) {
     .iso-layers li:is(:hover, :focus) .iso-top-edge {
       opacity: 1;
     }
@@ -932,10 +935,17 @@
     }
   }
 
-  /* A fixed-size desktop drawing fitted to its column (FitStage): from 1200
+  /* If a buyer doesn't pay (UnpaidFlow): three boxes and two 60 px arrows in a
+     row. A box is 300 wide where that fits and shares the width below that. */
+  .unpaid-flow {
+    container-type: inline-size;
+    --flow-box: min(300px, calc((100cqw - 120px) / 3));
+  }
+
+  /* A fixed-size desktop drawing fitted to its column (FitStage): from 1024
      up it keeps its composition and scales down only when the column is
-     narrower. The script measures --fit; 1200 to 1279 start from an estimate. */
-  @media (min-width: 1200px) {
+     narrower. The script measures --fit; until then a stage may give an estimate. */
+  @media (min-width: 1024px) {
     .fit-stage {
       --fit: 1;
       height: calc(var(--stage-h) * var(--fit));
@@ -946,10 +956,10 @@
       transform: scale(var(--fit));
       transform-origin: top left;
     }
-  }
-  @media (min-width: 1200px) and (max-width: 1279.98px) {
-    .fit-stage {
-      --fit: 0.91;
+    /* A 13 px label in a fitted drawing never reads smaller than 12 px. */
+    .fit-stage .fit-keep {
+      /* Over the label's own text utility, which sits in a later layer. */
+      font-size: max(13px, calc(12px / var(--fit))) !important;
     }
   }
 
@@ -1002,7 +1012,7 @@
     offset-rotate: 0deg;
     offset-distance: 72%;
   }
-  @media (min-width: 1200px) {
+  @media (min-width: 1024px) {
     [data-phase="armed"] .loop-line {
       stroke-dashoffset: 1;
     }
@@ -1069,7 +1079,7 @@
       --box-inset: 1px;
     }
   }
-  @media (min-width: 1200px) {
+  @media (min-width: 1024px) {
     .lanes {
       --party-h: 64px;
       --box-h: 56px;
@@ -1084,7 +1094,7 @@
   }
   /* Below desktop the pin's ground fades out over 24 px under the drawing,
      so the cards aren't sliced as they pass under it. */
-  @media (width < 1200px) {
+  @media (width < 1024px) {
     .story-pin::after {
       content: "";
       position: absolute;
@@ -1215,7 +1225,7 @@
       top: 50%;
     }
   }
-  @media (min-width: 1200px) {
+  @media (min-width: 1024px) {
     .story-stack {
       --stack-h: clamp(250px, 100svh - var(--header-height) - 256px, 526px);
     }
@@ -1229,7 +1239,14 @@
       max-width: calc(100cqw - 100% - 23px);
     }
   }
-  /* Tablets: the rows share the height evenly, so a name on two lines keeps its distance. */
+  /* 1024 to 1199: the stack sits beside 360 px cards without the relying lines, so it may be
+     taller for its screen but no wider than leaves its rows 250 px. */
+  @media (min-width: 1024px) and (max-width: 1199.98px) {
+    .story-stack {
+      --stack-h: clamp(346px, 100svh - var(--header-height) - 110px, 418px);
+    }
+  }
+  /* Tablets and narrow laptops: the rows share the height evenly, so a name on two lines keeps its distance. */
   @media (min-width: 768px) and (max-width: 1199.98px) {
     .story-stack .stack-rows {
       justify-content: space-between;

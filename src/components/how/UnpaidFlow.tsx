@@ -11,8 +11,9 @@ import { cn } from "@/lib/utils";
  * in a column and the two branches side by side; phones stack everything,
  * each branch under its label, with a short arrow between steps.
  *
- * The boxes are 300 wide from 1200 up: the row of three needs 1020, which a
- * 1200 laptop's 1040 holds, so laptops keep the 1440 composition; step 06
+ * The boxes are 300 wide where the row of three (1020) fits, from 1200 up;
+ * from 1024 to 1199 they share the width (275 at 1024; --flow-box,
+ * globals.css), so laptops keep the 1440 composition; step 06
  * keeps to the right edge and the fork's bar follows it.
  *
  * Rule 11.4: rani is kept for footnote markers, the current state and
@@ -43,7 +44,7 @@ function Box({ step, className, style }: { step: UnpaidStep; className?: string;
     <div
       style={style}
       className={cn(
-        "flex flex-col gap-1.5 border border-rule bg-raised px-[19px] pt-[15px] pb-[17px] lg:w-[300px] lg:shrink-0 lg:gap-2 lg:px-5 lg:pt-4 lg:pb-[18px]",
+        "flex flex-col gap-1.5 border border-rule bg-raised px-[19px] pt-[15px] pb-[17px] lg:w-(--flow-box) lg:shrink-0 lg:gap-2 lg:px-5 lg:pt-4 lg:pb-[18px]",
         className,
       )}
     >
@@ -109,12 +110,12 @@ export function UnpaidFlow({ steps, none, className }: { steps: UnpaidStep[]; no
       {/* The fork, desktop only: a stem down from step 03's middle (870 = 2 × 360 + 150), a bar from the
           first branch's middle to the second's, and an arrow down to each. */}
       <div aria-hidden="true" className="relative hidden h-[108px] lg:block">
-        <span className="fork-stem absolute top-1.5 left-[869.25px] h-[38px] border-l-[1.5px] border-ink" style={beat(forkAt)} />
-        <span className="fork-bar absolute top-[43.25px] right-[149.25px] left-[149.25px] border-t-[1.5px] border-ink" style={beat(barAt)} />
-        <svg width={10} height={56} viewBox="0 0 10 56" className="absolute top-11 left-[145px] overflow-visible">
+        <span className="fork-stem absolute top-1.5 left-[calc(2.5*var(--flow-box)+119.25px)] h-[38px] border-l-[1.5px] border-ink" style={beat(forkAt)} />
+        <span className="fork-bar absolute top-[43.25px] right-[calc(var(--flow-box)/2-0.75px)] left-[calc(var(--flow-box)/2-0.75px)] border-t-[1.5px] border-ink" style={beat(barAt)} />
+        <svg width={10} height={56} viewBox="0 0 10 56" className="absolute top-11 left-[calc(var(--flow-box)/2-5px)] overflow-visible">
           <Arrow id="unpaid-branch-1" kind="flow" {...BRANCH} delay={branchArrowsAt} />
         </svg>
-        <svg width={10} height={56} viewBox="0 0 10 56" className="absolute top-11 right-[145px] overflow-visible">
+        <svg width={10} height={56} viewBox="0 0 10 56" className="absolute top-11 right-[calc(var(--flow-box)/2-5px)] overflow-visible">
           <Arrow id="unpaid-branch-2" kind="flow" {...BRANCH} delay={branchArrowsAt} />
         </svg>
       </div>
@@ -126,7 +127,7 @@ export function UnpaidFlow({ steps, none, className }: { steps: UnpaidStep[]; no
             <p
               className={cn(
                 "t-ui pb-2.5 text-ink-muted lg:absolute lg:-top-[52px] lg:pb-0",
-                b === 0 ? "lg:left-[164px]" : "lg:right-[164px] lg:text-right",
+                b === 0 ? "lg:left-[calc(var(--flow-box)/2+14px)]" : "lg:right-[calc(var(--flow-box)/2+14px)] lg:text-right",
               )}
             >
               {branch.label}

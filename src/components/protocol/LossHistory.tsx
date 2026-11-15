@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils";
  * The labels carry the section's lead, so the lead isn't shown: it is the
  * drawing's description for screen readers (`description`). The labels are
  * a real list; the art is aria-hidden. Desktop sets the labels beside the
- * drawing on leaders; below 1200 the drawing scales to its column and the
+ * drawing on leaders; below 1024 the drawing scales to its column and the
  * labels sit under it as a list in the same order.
  *
  * Motion (section 12), once, when in view: RCV-0003 comes down to its drawn
