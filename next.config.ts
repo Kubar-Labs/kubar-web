@@ -11,12 +11,13 @@ const isDevelopment = process.env.NODE_ENV === "development";
 const upgradeInsecure = !isDevelopment && process.env.LOCAL_PREVIEW !== "1";
 const contentSecurityPolicy = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${isDevelopment ? " 'unsafe-eval'" : ""}`,
+  // Cloudflare Web Analytics: the beacon script and where it reports to.
+  `script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com${isDevelopment ? " 'unsafe-eval'" : ""}`,
   "script-src-attr 'none'",
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob:",
   "font-src 'self' data:",
-  `connect-src 'self'${isDevelopment ? " ws: http://localhost:4747" : ""}`,
+  `connect-src 'self' https://cloudflareinsights.com${isDevelopment ? " ws: http://localhost:4747" : ""}`,
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",

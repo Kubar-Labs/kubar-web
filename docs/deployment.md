@@ -143,13 +143,12 @@ known-good commit, install with `npm ci --ignore-scripts`, run
 queue during rollback; retained messages can be replayed after the consumer is
 healthy.
 
-## Contact form routing (rebuild, step 5)
+## Contact form routing
 
-The site routes institution, platform and investor messages to `partnerships@kubar.tech` and exporter, press and other messages to `outreach@kubar.tech`. The email Worker's `send_email` binding still allows only `outreach@kubar.tech` as a destination, so today a message routed to partnerships@ fails at the binding and the Worker sends the same email to the fallback, `outreach@kubar.tech` (logged as `contact_email_sent_to_fallback`). Nothing is lost and nothing waits.
+The site routes institution, platform and investor messages to `partnerships@kubar.tech` and exporter, press and other messages to `outreach@kubar.tech`. Both are allowed destinations of the email Worker's `send_email` binding.
 
-To switch the routing on in production:
+The account is on Workers Free, so the binding can send only to destination addresses verified under Email Routing, Destination addresses, in the Cloudflare dashboard. `outreach@kubar.tech` was verified on 15 November 2026. An unverified address fails with `E_RECIPIENT_PLAN_RESTRICTED`; a message for partnerships@ that fails is sent to outreach@ instead and logged as `contact_email_sent_to_fallback`, so nothing is lost. Delivery failures log the binding's error code and message, with addresses masked.
 
-1. In the Cloudflare dashboard, verify `partnerships@kubar.tech` as an Email Routing destination address.
-2. Add it to `allowed_destination_addresses` in `workers/contact-email/wrangler.jsonc` and deploy the consumer.
+## Web Analytics
 
-Neither step has been done; both are for Vaibhav to decide.
+The content security policy allows Cloudflare Web Analytics: the beacon script from `static.cloudflareinsights.com` and its reports to `cloudflareinsights.com`.
