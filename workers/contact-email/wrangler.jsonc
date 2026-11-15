@@ -24,7 +24,7 @@
       "name": "EMAIL",
       "remote": true,
       "allowed_sender_addresses": ["website@mail.kubar.tech"],
-      "allowed_destination_addresses": ["outreach@kubar.tech"]
+      "allowed_destination_addresses": ["outreach@kubar.tech", "partnerships@kubar.tech"]
     }
   ]
 }

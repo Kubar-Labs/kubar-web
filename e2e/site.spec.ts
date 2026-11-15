@@ -1393,6 +1393,14 @@ test.describe("rule 11.4: rani only for footnote markers, the current state, err
   });
 });
 
+test("the content security policy allows Cloudflare Web Analytics and nothing else from outside", async ({ request }) => {
+  const policy = (await request.get("/")).headers()["content-security-policy"];
+  const directive = (name: string) => policy.split("; ").find((part) => part.startsWith(`${name} `))!;
+  expect(directive("script-src")).toBe("script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com");
+  expect(directive("connect-src")).toBe("connect-src 'self' https://cloudflareinsights.com");
+  expect(policy.match(/https?:\/\/[^\s;]+/g)).toEqual(["https://static.cloudflareinsights.com", "https://cloudflareinsights.com"]);
+});
+
 test("legal pages carry their date and the retention period, with no placeholder left (15 Nov)", async ({ page }) => {
   for (const path of ["/legal/privacy", "/legal/terms"]) {
     await page.goto(path);
