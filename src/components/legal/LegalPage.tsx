@@ -6,7 +6,8 @@ import { WithEmails } from "@/components/ui/WithEmails";
  * title and date; the contents in the left three columns (sticky at desktop,
  * under the date below it); numbered headings matching the contents; the
  * text in Sans/Body at 628 wide; lists as dash paragraphs; no rules between
- * sections.
+ * sections. On touch screens each contents link is 44 px tall (they sit in
+ * a list, so they take the room themselves instead of an overlapping area).
  */
 export type LegalCopy = {
   title: string;
@@ -65,7 +66,7 @@ export function LegalPage({ copy }: { copy: LegalCopy }) {
           <ol className="flex flex-col gap-1">
             {copy.sections.map((section) => (
               <li key={section.n}>
-                <a href={`#section-${section.n}`} className="t-body-sm inline-flex min-h-6 items-center text-ink underline decoration-1 underline-offset-[0.2em] hover:decoration-2">
+                <a href={`#section-${section.n}`} className="t-body-sm inline-flex min-h-6 items-center text-ink underline decoration-1 underline-offset-[0.2em] hover:decoration-2 [@media(pointer:coarse)]:min-h-11">
                   {section.n}. {section.title}
                 </a>
               </li>

@@ -11,8 +11,10 @@ import { IsoSheetShape } from "@/components/drawings/iso";
  *
  * The words are real text; the art is aria-hidden. From 768 up the drawing
  * takes its column's width and the words sit on it at the frame's
- * proportions. On phones the platforms are too small to carry them, so the
- * three zones and then the three arrows are listed under the drawing.
+ * proportions. On phones (below 768) the zones stack down the page: each
+ * row is a platform about 120 px wide with its title and line beside it,
+ * and between the rows the arrows run vertically with their labels beside
+ * them (review of 685bd15).
  */
 export type ZonesCopy = {
   zones: { title: string; line: string }[];
@@ -45,38 +47,84 @@ function platform(cx: number) {
 }
 const pct = (x: number) => `${((x / W) * 100).toFixed(2)}%`;
 
-function Glyph({ kind }: { kind: "data" | "money" }) {
+/** One platform on its own, for the stacked layout on phones (drawn at about 120 px wide). */
+function Platform({ gift }: { gift: boolean }) {
+  const p = platform(113);
   return (
     <svg
       aria-hidden="true"
-      width={22}
-      height={10}
-      viewBox="0 0 22 10"
+      viewBox="0 70 226 190"
+      className="block h-auto w-[120px] shrink-0 overflow-visible"
+    >
+      <g className="iso-block">
+        <polygon
+          points={p.left}
+          className="fill-[var(--petrol-100)] stroke-rule"
+        />
+        <polygon
+          points={p.right}
+          className="fill-[var(--petrol-50)] stroke-rule"
+        />
+        <polygon
+          points={p.top}
+          className={
+            gift ? "fill-[var(--petrol-900)]" : "fill-raised stroke-rule"
+          }
+        />
+      </g>
+      {gift ? (
+        <IsoSheetShape x={113} y={124} w={71.4} h={71.4} elevation={1}>
+          <rect x={5.5} y={7} width={26} height={2.2} className="fill-ink" />
+          <rect
+            x={5.5}
+            y={18.9}
+            width={50.4}
+            height={1.3}
+            className="fill-rule"
+          />
+          <rect
+            x={5.5}
+            y={23.1}
+            width={40.3}
+            height={1.3}
+            className="fill-rule"
+          />
+          <rect
+            x={51.7}
+            y={51.7}
+            width={13.4}
+            height={13.4}
+            className="fill-inset"
+          />
+        </IsoSheetShape>
+      ) : null}
+    </svg>
+  );
+}
+
+/** A vertical arrow between two stacked zones: dashed for data, solid for money. */
+function Vertical({ kind, up }: { kind: "data" | "money"; up: boolean }) {
+  const ink = kind === "data" ? "ink-muted" : "ink";
+  return (
+    <svg
+      aria-hidden="true"
+      width={10}
+      height={32}
+      viewBox="0 0 10 32"
       className="shrink-0 overflow-visible"
     >
-      {kind === "data" ? (
-        <line
-          x1={0}
-          x2={15}
-          y1={5}
-          y2={5}
-          className="stroke-ink-muted"
-          strokeWidth={1.5}
-          strokeDasharray="5 3"
-        />
-      ) : (
-        <line
-          x1={0}
-          x2={15}
-          y1={5}
-          y2={5}
-          className="stroke-ink"
-          strokeWidth={2}
-        />
-      )}
+      <line
+        x1={5}
+        x2={5}
+        y1={up ? 7 : 0}
+        y2={up ? 32 : 25}
+        className={kind === "data" ? "stroke-ink-muted" : "stroke-ink"}
+        strokeWidth={kind === "data" ? 1.5 : 2}
+        strokeDasharray={kind === "data" ? "5 3" : undefined}
+      />
       <polygon
-        points="22,5 15,0.8 15,9.2"
-        className={kind === "data" ? "fill-ink-muted" : "fill-ink"}
+        points={up ? "5,0 0.8,7 9.2,7" : "5,32 0.8,25 9.2,25"}
+        className={ink === "ink" ? "fill-ink" : "fill-ink-muted"}
       />
     </svg>
   );
@@ -93,7 +141,7 @@ export function ThreeZones({
   return (
     <div className={className}>
       {/* The drawing and its arrow labels share one box, so the labels keep their places on it. */}
-      <div className="relative">
+      <div className="relative hidden md:block">
         <svg
           aria-hidden="true"
           viewBox={`0 0 ${W} ${H}`}
@@ -220,28 +268,40 @@ export function ThreeZones({
         ))}
       </ul>
 
-      {/* Phones: the zones, then the arrows, as lists under the drawing. */}
-      <div className="mt-6 flex flex-col gap-5 md:hidden">
-        <ul className="flex flex-col gap-3">
-          {copy.zones.map((zone) => (
-            <li key={zone.title} className="flex flex-col gap-0.5">
-              <span className="t-ui-lg text-ink">{zone.title}</span>
-              <span className="t-body-sm text-ink-muted">{zone.line}</span>
-            </li>
-          ))}
-        </ul>
-        <ul className="flex flex-col gap-1.5">
-          {([receivable, purchase, payment] as const).map((label, i) => (
-            <li
-              key={label}
-              className="t-fine flex items-center gap-3 text-ink-muted"
-            >
-              <Glyph kind={i === 0 ? "data" : "money"} />
-              {label}
-            </li>
-          ))}
-        </ul>
-      </div>
+      {/* Phones: the zones stacked down the page, each platform with its words beside it; between
+          them the arrows run vertically with their labels beside them. */}
+      <ol className="flex flex-col md:hidden">
+        {copy.zones.map((zone, i) => (
+          <li key={zone.title} className="flex flex-col">
+            {i > 0 ? (
+              <ul className="flex flex-col gap-2 py-3 pl-[55px]">
+                {(i === 1
+                  ? ([
+                      [receivable, "data", false],
+                      [purchase, "money", true],
+                    ] as const)
+                  : ([[payment, "money", true]] as const)
+                ).map(([label, kind, up]) => (
+                  <li
+                    key={label}
+                    className="t-fine flex items-center gap-3 text-ink-muted"
+                  >
+                    <Vertical kind={kind} up={up} />
+                    {label}
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+            <div className="flex items-center gap-4">
+              <Platform gift={i === 1} />
+              <div className="flex min-w-0 flex-col gap-0.5">
+                <span className="t-ui-lg text-ink">{zone.title}</span>
+                <span className="t-body-sm text-ink-muted">{zone.line}</span>
+              </div>
+            </div>
+          </li>
+        ))}
+      </ol>
     </div>
   );
 }

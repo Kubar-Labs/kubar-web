@@ -42,7 +42,7 @@ export function SystemPage({ kind, headingId }: SystemPageProps) {
                 })}
           </p>
           {kind === "notFound" ? (
-            <ul className="flex flex-col gap-3 lg:flex-row lg:flex-wrap lg:gap-x-8">
+            <ul className="flex flex-col gap-5 lg:flex-row lg:flex-wrap lg:gap-x-8 lg:gap-y-5">
               {routes.map((route) => (
                 <li key={route.href} className="flex">
                   <TextLink href={route.href} kind="arrow">

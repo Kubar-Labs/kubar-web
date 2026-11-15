@@ -29,6 +29,11 @@ async function scrollToState(page: Page, n: number) {
 }
 
 async function expectNoAxeViolations(page: Page) {
+  // Measure only once nothing is moving: a drawing that is still fading in reads as low contrast.
+  // (A fixed wait isn't enough: headless frames only advance when something asks for one.)
+  await expect
+    .poll(() => page.evaluate(() => document.getAnimations().filter((a) => a.playState === "running" && (a.effect?.getComputedTiming().iterations ?? 1) !== Infinity).length), { timeout: 10_000 })
+    .toBe(0);
   const results = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
     .analyze();
@@ -953,17 +958,18 @@ test.describe("NavDhan SDK (build step 6)", () => {
     const art = (await sketch.boundingBox())!;
     expect(art.x).toBeGreaterThan(list.x + list.width);
     await expectNoAxeViolations(page);
-    // 1000 to 1199: the sketch beside the list, the list about 45% wide. 768 to 999: the sketch, then the rows.
+    // 1000 to 1199: the sketch beside the list, the list about 45% wide. Below 1000: the accordion, no full sketch.
     await page.setViewportSize({ width: 1024, height: 900 });
     const l2 = (await hero.locator("ul").first().boundingBox())!;
     const a2 = (await sketch.boundingBox())!;
     expect(a2.x).toBeGreaterThan(l2.x + l2.width - 1);
     expect(l2.width / 944).toBeGreaterThan(0.4);
     expect(l2.width / 944).toBeLessThan(0.5);
-    await page.setViewportSize({ width: 820, height: 1180 });
-    const l3 = (await hero.locator("ul").first().boundingBox())!;
-    const a3 = (await sketch.boundingBox())!;
-    expect(l3.y).toBeGreaterThan(a3.y + a3.height);
+    for (const width of [999, 820, 768]) {
+      await page.setViewportSize({ width, height: 1180 });
+      await expect(sketch, `${width}`).toBeHidden();
+      await expect(hero.getByRole("button", { expanded: true }), `${width}`).toHaveCount(1);
+    }
     // Phones: no full sketch; the rows are an accordion, each opening its own piece of the sketch.
     const phone = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
     const tab = await phone.newPage();
@@ -1000,7 +1006,7 @@ test.describe("NavDhan SDK (build step 6)", () => {
     // A row closed on a phone, then a wider screen: Eligibility check is picked again.
     await phoneHero.getByRole("button", { expanded: true }).tap();
     await expect(phoneHero.getByRole("button", { expanded: true })).toHaveCount(0);
-    await tab.setViewportSize({ width: 844, height: 390 });
+    await tab.setViewportSize({ width: 1024, height: 768 });
     await expect(phoneHero.getByRole("button", { name: /^Eligibility check/, pressed: true })).toBeVisible();
     await expect(phoneHero.getByRole("img").locator(".outline-2:visible")).toContainText("Buyer country");
     await phone.close();
@@ -1473,10 +1479,17 @@ test.describe("About (build step 4)", () => {
       expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth), `${width}`).toBe(0);
       await expect(gift.getByText("Payment on the due date", { exact: true }).locator("visible=true"), `${width}`).toHaveCount(1);
     }
-    // Phones: the zones and the arrows are listed under the drawing.
-    const phoneArt = (await art.boundingBox())!;
-    const zone = (await gift.getByText("Onshore India", { exact: true }).locator("visible=true").boundingBox())!;
-    expect(zone.y).toBeGreaterThan(phoneArt.y + phoneArt.height);
+    // Phones: the zones stack down the page, each platform with its words beside it; the arrows
+    // run between the rows with their labels, in the order receivable, purchase price, payment.
+    const rows = gift.locator("ol > li");
+    await expect(rows).toHaveCount(3);
+    const y = async (text: string) => (await gift.getByText(text, { exact: true }).locator("visible=true").boundingBox())!.y;
+    const order = await Promise.all(["Onshore India", "The receivable", "Purchase price", "GIFT City", "Payment on the due date", "Abroad"].map(y));
+    expect([...order].sort((p, q) => p - q)).toEqual(order);
+    const platformBox = (await rows.first().locator("svg").first().boundingBox())!;
+    const title = (await gift.getByText("Onshore India", { exact: true }).locator("visible=true").boundingBox())!;
+    expect(Math.round(platformBox.width)).toBe(120);
+    expect(title.x).toBeGreaterThan(platformBox.x + platformBox.width);
   });
 
   test("portraits load through the image optimiser at the size the layout needs", async ({ page }) => {

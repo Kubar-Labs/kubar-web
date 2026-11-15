@@ -16,16 +16,15 @@ import { cx as cn } from "@/lib/cx";
  * onboarding" shows three filled marks, and "Events for your product" shows
  * a small "Purchased" status beside "Invoice" in the Shipment list.
  *
- * From 768 up each row is a button (aria-pressed), so the pick works from
+ * From 1000 up each row is a button (aria-pressed), so the pick works from
  * the keyboard. The sketch is one image for assistive technology (its
  * `alt`); the rows carry the words. No Illustrative tag (15 Nov).
  *
  * From 1000 to 1199 the sketch sits beside the list (the list about 45%
- * wide); from 768 to 999 it doesn't fit, so the sketch comes first and the
- * rows follow.
+ * wide).
  *
- * Phones (below 768) have no full sketch (review of 1ce9d8b): the six rows
- * are an accordion. Tapping a row opens it to show that row's own piece of
+ * Below 1000 there is no full sketch (reviews of 1ce9d8b and 685bd15), so
+ * the picked part is never off-screen: the six rows are an accordion. Tapping a row opens it to show that row's own piece of
  * the sketch under its sentence, at the row's width: its block, the
  * Shipment list, the three marks, or "Invoice" with its "Purchased" status.
  * "Eligibility check" is open from the start; one row is open at a time;
@@ -201,7 +200,7 @@ export function EmbedPicker({
   const base = useId();
   // Phones: the open row, or none.
   const open = (key: Key) => picked === key;
-  // From 768 up one row is always picked: a row closed on a phone falls back to the first pick.
+  // From 1000 up one row is always picked: a row closed on a phone falls back to the first pick.
   const on = (key: Key) => (picked ?? "eligibility") === key;
 
   return (
@@ -211,7 +210,7 @@ export function EmbedPicker({
         className,
       )}
     >
-      <div className="order-2 min-w-0 min-[1000px]:order-none min-[1000px]:w-[45%] lg:w-[640px] lg:shrink">
+      <div className="min-w-0 min-[1000px]:w-[45%] lg:w-[640px] lg:shrink">
         <h2 className="t-h3 pb-4 text-ink">{heading}</h2>
         <ul>
           {rows.map(([name, sees], i) => {
@@ -231,10 +230,10 @@ export function EmbedPicker({
                 key={name}
                 className={cn(
                   "border-t border-rule",
-                  on(key) && "md:border-t-transparent",
+                  on(key) && "min-[1000px]:border-t-transparent",
                 )}
               >
-                {/* Phones: an accordion row that opens its own piece of the sketch. */}
+                {/* Below 1000: an accordion row that opens its own piece of the sketch. */}
                 <button
                   type="button"
                   aria-expanded={open(key)}
@@ -243,7 +242,7 @@ export function EmbedPicker({
                   className={cn(
                     "w-full flex-col gap-0.5 border-l-2 py-[11px] pl-4 text-left outline-offset-2",
                     open(key) ? "border-ink" : "border-transparent",
-                    "flex md:hidden",
+                    "flex min-[1000px]:hidden",
                   )}
                 >
                   {words}
@@ -251,13 +250,13 @@ export function EmbedPicker({
                 <div
                   id={`${base}-${key}`}
                   hidden={!open(key)}
-                  className="md:hidden"
+                  className="min-[1000px]:hidden"
                 >
                   <div className="mb-4 ml-4 flex flex-col gap-2 border border-rule-strong bg-raised p-4">
                     <Piece k={key} copy={copy} />
                   </div>
                 </div>
-                {/* From 768 up: a row that marks its part of the sketch. */}
+                {/* From 1000 up: a row that marks its part of the sketch. */}
                 <button
                   type="button"
                   aria-pressed={on(key)}
@@ -266,7 +265,7 @@ export function EmbedPicker({
                   onPointerEnter={(event) => {
                     if (event.pointerType === "mouse") setPicked(key);
                   }}
-                  className={cn(row, "hidden md:flex")}
+                  className={cn(row, "hidden min-[1000px]:flex")}
                 >
                   {words}
                 </button>
@@ -279,7 +278,7 @@ export function EmbedPicker({
       <div
         role="img"
         aria-label={copy.alt}
-        className="order-1 hidden w-full flex-col border border-rule-strong bg-raised md:flex min-[1000px]:order-none min-[1000px]:min-w-0 min-[1000px]:flex-1 lg:w-[519px] lg:flex-none lg:shrink-0"
+        className="hidden min-w-0 flex-1 flex-col border border-rule-strong bg-raised min-[1000px]:flex lg:w-[519px] lg:flex-none lg:shrink-0"
       >
         <div className="border-b border-rule px-4 py-3">
           <p className="t-fine text-ink-muted">{copy.platform}</p>
