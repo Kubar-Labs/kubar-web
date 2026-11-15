@@ -100,6 +100,24 @@ export function ContactForm({ copy }: { copy: ContactFormCopy }) {
     if (isIntent(preset)) setValues((current) => ({ ...current, intent: preset }));
   }
 
+  // Choosing a route on this page pre-fills "I'm writing as" and moves focus to the form (REDRAW
+  // section 13 C2). Arriving from another page with ?intent= leaves focus alone.
+  // It listens for the choice itself, not for ?intent= changing, so choosing the same route twice,
+  // or the route already in the address, still fills the field and moves focus.
+  useEffect(() => {
+    const onClick = (event: MouseEvent) => {
+      const link = (event.target as Element).closest?.<HTMLAnchorElement>('a[href*="intent="][href$="#form"]');
+      if (!link) return;
+      const chosen = new URL(link.href).searchParams.get("intent");
+      if (!isIntent(chosen)) return;
+      setValues((current) => ({ ...current, intent: chosen }));
+      // After the router has moved the page to the form.
+      window.setTimeout(() => document.getElementById("contact-intent")?.focus(), 50);
+    };
+    document.addEventListener("click", onClick);
+    return () => document.removeEventListener("click", onClick);
+  }, []);
+
   useEffect(() => {
     if (status === "sent") sentRef.current?.focus();
   }, [status]);

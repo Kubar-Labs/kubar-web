@@ -3,7 +3,8 @@ import { useTranslations } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import { createPageMetadata } from "@/app/page-metadata";
 import { Band } from "@/components/blocks/Band";
-import { FoundationsStack, type Slab } from "@/components/blocks/Foundations";
+import { ThreeZones, type ZonesCopy } from "@/components/about/ThreeZones";
+import { IsoFoundations, type Foundation } from "@/components/blocks/IsoFoundations";
 import { PageHero } from "@/components/blocks/PageHero";
 import { PeopleCards, type FullPerson } from "@/components/blocks/People";
 import { Section, SectionHead } from "@/components/blocks/Section";
@@ -14,14 +15,21 @@ import { Footnote, FootnoteMarker } from "@/components/ui/Footnote";
 import { TextLink } from "@/components/ui/TextLink";
 
 /*
- * About (Figma 173:6 at 1440). The team lives here (#team). The "Where we
- * are" section is removed and is not built. Footnote ¹ (the status line)
- * sits under the hero and again beside Why GIFT City, as in the design.
+ * About (Figma 173:6 at 1440; the 768 and 390 frames are not updated, so
+ * below 1200 the page follows the existing rules). The team lives here
+ * (#team). The "Where we are" section is removed and is not built.
+ * "What we're building" is the isometric foundations from Home with
+ * About's own sentences; "Why GIFT City" has the three-zones drawing beside
+ * it. Footnote ¹ (the status line) shows once, under the hero; every other
+ * marker links to it (REDRAW-2026-11-14.md, sections 5, 10 and 12).
  */
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("about.meta");
   return createPageMetadata({ title: t("title"), description: t("description"), path: "/about" });
 }
+
+// The company register's column heads named nothing and are cut (section 10); the table keeps them for screen readers.
+const COMPANY_HEADS = ["Field", "Entry"];
 
 export default function About() {
   const t = useTranslations("about");
@@ -41,11 +49,12 @@ export default function About() {
 
       <Section labelledBy="order-heading" className="flex flex-col items-start gap-10 lg:gap-16">
         <SectionHead id="order-heading" heading={t("order.heading")} layout="wide" />
-        <FoundationsStack
-          statusOnly
-          className="w-full lg:w-[543px]"
-          label={t("order.label")}
-          slabs={t.raw("order.slabs") as Slab[]}
+        {/* No H3 over the blocks (section 10); the venue carries "Planned" as its state word. */}
+        <IsoFoundations
+          id="about-foundations"
+          plannedStyle="state"
+          className="w-full"
+          foundations={t.raw("order.slabs") as Foundation[]}
           footnote={(suffix) => ({ target: "fn-1", refId: `fnref-1-${suffix}` })}
         />
         <TextLink href="/how-it-works" kind="arrow">{t("order.link")}</TextLink>
@@ -75,21 +84,25 @@ export default function About() {
       </Section>
 
       <Section labelledBy="standing-heading" className="flex flex-col gap-10 lg:gap-16">
-        <SectionHead id="standing-heading" heading={t("standing.heading")} lead={t("standing.lead")} />
-        <Standing className="lg:max-w-[845px]" />
+        {/* As on Home: four statements beside the heading, no lead and no kind labels (section 10). */}
+        <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-20">
+          <SectionHead id="standing-heading" heading={t("standing.heading")} layout="stacked" />
+          <Standing className="min-w-0 flex-1" />
+        </div>
         <FinanceProgrammes />
         <TechnologyProgrammes />
       </Section>
 
-      <Section labelledBy="gift-heading" className="flex flex-col gap-10">
+      {/* Why GIFT City: the words beside the three zones. Its marker links to the footnote under the hero. */}
+      <Section labelledBy="gift-heading" className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-10 min-[1366px]:gap-20">
         <SectionHead
           id="gift-heading"
+          layout="stacked"
+          className="lg:w-[clamp(340px,calc(100%-760px),400px)]"
           heading={t("gift.heading")}
-          lead={t.rich("gift.lead", { marker: () => <FootnoteMarker n={1} target="fn-1-gift" refId="fnref-1-gift" /> })}
+          lead={t.rich("gift.lead", { marker: () => <FootnoteMarker n={1} target="fn-1" refId="fnref-1-gift" /> })}
         />
-        <Footnote n={1} id="fn-1-gift" backTo="fnref-1-gift" className="lg:ml-[480px] lg:max-w-[628px]">
-          {footnotes("status")}
-        </Footnote>
+        <ThreeZones className="min-w-0 flex-1 lg:pt-2" copy={t.raw("gift.zones") as ZonesCopy} />
       </Section>
 
       <Band ground="paper" line={t("band.line")} />
@@ -99,7 +112,8 @@ export default function About() {
         <Register
           className="lg:max-w-[845px]"
           first="label"
-          columns={t.raw("company.columns") as string[]}
+          hideHeads
+          columns={COMPANY_HEADS}
           widths={[217, 628]}
           rows={t.raw("company.rows") as string[][]}
         />

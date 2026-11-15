@@ -1579,7 +1579,6 @@
     },
     "order": {
       "heading": "What we’re building.",
-      "label": "Five foundations, built from the bottom up",
       "slabs": [
         {
           "name": "The venue",
@@ -1682,22 +1681,38 @@
       }
     },
     "standing": {
-      "heading": "Standing and memberships.",
-      "lead": "Kubar acts as the financier’s origination and servicing agent. It never holds the money or the credit risk."
+      "heading": "Standing and memberships."
     },
     "gift": {
       "heading": "Why GIFT City.",
-      "lead": "GIFT City is India’s international financial services centre. Banks’ units there work in foreign currency and can buy export receivables under their own licences and credit policies, which is how Programme 1 runs. It is also home to the framework for trade-finance platforms (ITFS) under which Kubar’s own venue is planned<marker></marker>. Kubar works from an office in GIFT City."
+      "lead": "GIFT City is India’s international financial services centre. Banks’ units there work in foreign currency and can buy export receivables under their own licences and credit policies, which is how Programme 1 runs. It is also home to the framework for trade-finance platforms (ITFS) under which Kubar’s own venue is planned<marker></marker>. Kubar works from an office in GIFT City.",
+      "zones": {
+        "zones": [
+          {
+            "title": "Onshore India",
+            "line": "The exporter and its own bank"
+          },
+          {
+            "title": "GIFT City",
+            "line": "A bank’s unit buys the receivable, in foreign currency"
+          },
+          {
+            "title": "Abroad",
+            "line": "The buyer pays the financier’s account"
+          }
+        ],
+        "arrows": [
+          "The receivable",
+          "Purchase price",
+          "Payment on the due date"
+        ]
+      }
     },
     "band": {
       "line": "Kubar connects Indian trade flows to global institutional capital through GIFT City."
     },
     "company": {
       "heading": "The company.",
-      "columns": [
-        "Field",
-        "Entry"
-      ],
       "rows": [
         [
           "Brand",
@@ -1763,39 +1778,33 @@
     "routes": {
       "columns": {
         "who": "If you are",
-        "step": "Next step",
-        "goesTo": "Goes to"
+        "step": "Next step"
       },
       "rows": [
         {
           "who": "A bank, finance company, insurer or fund",
           "step": "Start a programme conversation",
-          "href": "/contact?intent=institution#form",
-          "goesTo": "partnerships@kubar.tech"
+          "href": "/contact?intent=institution#form"
         },
         {
           "who": "A trade platform or marketplace",
           "step": "Talk about an integration",
-          "href": "/contact?intent=platform#form",
-          "goesTo": "partnerships@kubar.tech"
+          "href": "/contact?intent=platform#form"
         },
         {
           "who": "An exporter",
           "step": "Ask about Programme 1",
-          "href": "/contact?intent=exporter#form",
-          "goesTo": "outreach@kubar.tech"
+          "href": "/contact?intent=exporter#form"
         },
         {
           "who": "An investor",
           "step": "Email us",
-          "href": "mailto:partnerships@kubar.tech",
-          "goesTo": "partnerships@kubar.tech"
+          "href": "mailto:partnerships@kubar.tech"
         },
         {
           "who": "Press, or anything else",
           "step": "Write to us",
-          "href": "/contact?intent=other#form",
-          "goesTo": "outreach@kubar.tech"
+          "href": "/contact?intent=other#form"
         }
       ]
     },
@@ -1854,7 +1863,6 @@
       }
     },
     "direct": {
-      "label": "Direct",
       "columns": [
         "For",
         "Write to"

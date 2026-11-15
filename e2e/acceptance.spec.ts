@@ -202,15 +202,18 @@ test.describe("performance budget (HANDOFF section 11)", () => {
         const r = seen.get(event.requestId);
         if (r) r.bytes = event.encodedDataLength;
       });
-      // The page's own script, without prefetches: Next also fetches the routes linked from
-      // what's on screen (and their page chunks), which this page doesn't run. Bytes on the wire,
-      // headers included. Measured at 390 and at 1440, where different links are on screen.
-      const own = path === "/" ? "/app/page-" : `/app${path}/page-`;
+      // The page's own script, without prefetches: the scripts its own HTML names. Next also
+      // fetches the routes linked from what's on screen, their page chunks and the shared chunks
+      // those pull in, which this page doesn't run; none of those are in its HTML. (Telling them
+      // apart by URL or header missed the shared chunks, which carry no prefetch header and aren't
+      // under /app/.) Bytes on the wire, headers included. Measured at 390 and at 1440, where
+      // different links are on screen.
+      const html = await (await page.request.get(path)).text();
+      const inHtml = (url: string) => html.includes(new URL(url).pathname);
       const ownScripts = () =>
-        [...seen.values()]
-          .filter((r) => r.type === "Script" && !r.prefetch && (!/\/app\/.*page-/.test(r.url) || r.url.includes(own)))
-          .reduce((sum, r) => sum + r.bytes, 0);
-      const prefetched = () => [...seen.values()].filter((r) => r.prefetch || (r.type === "Script" && /\/app\/.*page-/.test(r.url) && !r.url.includes(own))).reduce((sum, r) => sum + r.bytes, 0);
+        [...seen.values()].filter((r) => r.type === "Script" && !r.prefetch && inHtml(r.url)).reduce((sum, r) => sum + r.bytes, 0);
+      const prefetched = () =>
+        [...seen.values()].filter((r) => r.prefetch || (r.type === "Script" && !inHtml(r.url))).reduce((sum, r) => sum + r.bytes, 0);
       await page.setViewportSize({ width: 1440, height: 900 });
       await page.goto(path, { waitUntil: "networkidle" });
       const wide = ownScripts();

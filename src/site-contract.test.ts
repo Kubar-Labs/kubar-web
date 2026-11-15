@@ -225,7 +225,8 @@ describe("copy matches docs/rebuild/copy word for word", () => {
     expect(Object.keys(form.intents)).toEqual(["institution", "platform", "exporter", "investor", "press", "other"]);
     expect(form.messageHelp).not.toHaveProperty("other");
     for (const row of messages.contact.routes.rows) {
-      expect(copy).toContain(`${row.who} | ${row.step} | ${row.goesTo}`);
+      expect(copy).toContain(`${row.who} | ${row.step}\n`);
+      expect(row).not.toHaveProperty("goesTo");
     }
     for (const row of messages.contact.direct.rows) expect(copy).toContain(row.join(" | "));
     expect(JSON.stringify(messages.contact)).not.toMatch(/24 hours|phone/i);

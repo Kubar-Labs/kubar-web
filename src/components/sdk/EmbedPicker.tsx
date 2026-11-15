@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import { cx as cn } from "@/lib/cx";
 
 /*
@@ -16,12 +16,20 @@ import { cx as cn } from "@/lib/cx";
  * onboarding" shows three filled marks, and "Events for your product" shows
  * a small "Purchased" status beside "Invoice" in the Shipment list.
  *
- * Each row is a button (aria-pressed), so the pick works from the
- * keyboard. The sketch is one image for assistive technology (its `alt`);
- * the rows carry the words. No Illustrative tag (15 Nov).
+ * From 768 up each row is a button (aria-pressed), so the pick works from
+ * the keyboard. The sketch is one image for assistive technology (its
+ * `alt`); the rows carry the words. No Illustrative tag (15 Nov).
  *
- * Below 1200: the sketch, then the six rows stacked; the sketch's Shipment
- * list sits above its SDK panel, so every row still has its part to mark.
+ * From 1000 to 1199 the sketch sits beside the list (the list about 45%
+ * wide); from 768 to 999 it doesn't fit, so the sketch comes first and the
+ * rows follow.
+ *
+ * Phones (below 768) have no full sketch (review of 1ce9d8b): the six rows
+ * are an accordion. Tapping a row opens it to show that row's own piece of
+ * the sketch under its sentence, at the row's width: its block, the
+ * Shipment list, the three marks, or "Invoice" with its "Purchased" status.
+ * "Eligibility check" is open from the start; one row is open at a time;
+ * the rows are buttons with aria-expanded.
  */
 export type SketchCopy = {
   platform: string;
@@ -67,6 +75,115 @@ function Square({ kind }: { kind: "done" | "current" | "open" }) {
 
 const outline = "outline-2 outline-offset-[6px] outline-ink outline-solid";
 
+/** One piece of the sketch: what a capability shows, in the sketch and on its own in the phone accordion. */
+function Piece({
+  k,
+  copy,
+  events = false,
+}: {
+  k: Key;
+  copy: SketchCopy;
+  events?: boolean;
+}) {
+  switch (k) {
+    case "onboarding":
+      return (
+        <ul className="flex flex-col gap-2">
+          {copy.onboarding.map((mark) => (
+            <li
+              key={mark}
+              className="t-body-sm flex items-center gap-2 text-ink"
+            >
+              <Square kind="done" />
+              {mark}
+            </li>
+          ))}
+        </ul>
+      );
+    case "shipment":
+      return (
+        <>
+          <p className="t-fine pb-2 text-ink-muted">{copy.shipment}</p>
+          {copy.records.map((record, r) => (
+            <p
+              key={record}
+              className={cn(
+                "t-body-sm flex items-center justify-between gap-2 border-b border-rule py-2 text-ink",
+                r === 1 && events && outline,
+              )}
+            >
+              {record}
+              {r === 1 ? (
+                <span
+                  className={cn("t-state text-accent", !events && "hidden")}
+                >
+                  {copy.purchased}
+                </span>
+              ) : null}
+            </p>
+          ))}
+        </>
+      );
+    case "eligibility":
+      return (
+        <>
+          <p className="t-ui-sm text-ink">{copy.eligibility}</p>
+          <ul className="flex flex-wrap gap-x-4 gap-y-2">
+            {copy.rules.map((rule) => (
+              <li
+                key={rule}
+                className="t-body-sm flex items-center gap-2 text-ink"
+              >
+                <Square kind="done" />
+                {rule}
+              </li>
+            ))}
+          </ul>
+        </>
+      );
+    case "offer":
+      return (
+        <>
+          <p className="t-ui-sm text-ink">{copy.offer}</p>
+          {copy.prices.map((price) => (
+            <p
+              key={price}
+              className="t-body-sm flex items-center justify-between gap-3 text-ink"
+            >
+              {price}
+              <span className="h-5 w-14 shrink-0 border border-dashed border-rule-strong" />
+            </p>
+          ))}
+        </>
+      );
+    case "application":
+      return (
+        <>
+          <p className="t-ui-sm text-ink">{copy.application}</p>
+          <ul className="flex flex-col gap-2">
+            {copy.states.map((state, i) => (
+              <li
+                key={state}
+                className="t-body-sm flex items-center gap-2 text-ink"
+              >
+                <Square kind={i < 2 ? "done" : i === 2 ? "current" : "open"} />
+                {state}
+              </li>
+            ))}
+          </ul>
+        </>
+      );
+    case "events":
+      // "Invoice" with its status, as it shows in the Shipment list.
+      return (
+        <p className="t-body-sm flex items-center justify-between gap-2 border-b border-rule py-2 text-ink">
+          {copy.records[1]}
+          <span className="t-state text-accent">{copy.purchased}</span>
+        </p>
+      );
+  }
+}
+
 export function EmbedPicker({
   heading,
   rows,
@@ -79,29 +196,68 @@ export function EmbedPicker({
   copy: SketchCopy;
   className?: string;
 }) {
-  const [picked, setPicked] = useState<Key>("eligibility");
-  const on = (key: Key) => picked === key;
+  // null only on phones, where tapping the open row closes it.
+  const [picked, setPicked] = useState<Key | null>("eligibility");
+  const base = useId();
+  // Phones: the open row, or none.
+  const open = (key: Key) => picked === key;
+  // From 768 up one row is always picked: a row closed on a phone falls back to the first pick.
+  const on = (key: Key) => (picked ?? "eligibility") === key;
 
   return (
     <div
       className={cn(
-        "flex flex-col gap-10 lg:flex-row lg:items-start lg:justify-between lg:gap-12",
+        "flex flex-col gap-10 min-[1000px]:flex-row min-[1000px]:items-start min-[1000px]:justify-between min-[1000px]:gap-8 lg:gap-12",
         className,
       )}
     >
-      <div className="order-2 min-w-0 lg:order-none lg:w-[640px] lg:shrink">
+      <div className="order-2 min-w-0 min-[1000px]:order-none min-[1000px]:w-[45%] lg:w-[640px] lg:shrink">
         <h2 className="t-h3 pb-4 text-ink">{heading}</h2>
         <ul>
           {rows.map(([name, sees], i) => {
             const key = KEYS[i];
+            const words = (
+              <>
+                <span className="t-ui-lg text-ink">{name}</span>
+                <span className="t-body-sm text-ink-muted">{sees}</span>
+              </>
+            );
+            const row = cn(
+              "w-full flex-col gap-0.5 border-l-2 py-[11px] pl-4 text-left outline-offset-2",
+              on(key) ? "border-ink" : "border-transparent",
+            );
             return (
               <li
                 key={name}
                 className={cn(
                   "border-t border-rule",
-                  on(key) && "border-t-transparent",
+                  on(key) && "md:border-t-transparent",
                 )}
               >
+                {/* Phones: an accordion row that opens its own piece of the sketch. */}
+                <button
+                  type="button"
+                  aria-expanded={open(key)}
+                  aria-controls={`${base}-${key}`}
+                  onClick={() => setPicked(open(key) ? null : key)}
+                  className={cn(
+                    "w-full flex-col gap-0.5 border-l-2 py-[11px] pl-4 text-left outline-offset-2",
+                    open(key) ? "border-ink" : "border-transparent",
+                    "flex md:hidden",
+                  )}
+                >
+                  {words}
+                </button>
+                <div
+                  id={`${base}-${key}`}
+                  hidden={!open(key)}
+                  className="md:hidden"
+                >
+                  <div className="mb-4 ml-4 flex flex-col gap-2 border border-rule-strong bg-raised p-4">
+                    <Piece k={key} copy={copy} />
+                  </div>
+                </div>
+                {/* From 768 up: a row that marks its part of the sketch. */}
                 <button
                   type="button"
                   aria-pressed={on(key)}
@@ -110,13 +266,9 @@ export function EmbedPicker({
                   onPointerEnter={(event) => {
                     if (event.pointerType === "mouse") setPicked(key);
                   }}
-                  className={cn(
-                    "flex w-full flex-col gap-0.5 border-l-2 py-[11px] pl-4 text-left outline-offset-2",
-                    on(key) ? "border-ink" : "border-transparent",
-                  )}
+                  className={cn(row, "hidden md:flex")}
                 >
-                  <span className="t-ui-lg text-ink">{name}</span>
-                  <span className="t-body-sm text-ink-muted">{sees}</span>
+                  {words}
                 </button>
               </li>
             );
@@ -127,64 +279,33 @@ export function EmbedPicker({
       <div
         role="img"
         aria-label={copy.alt}
-        className="order-1 flex w-full flex-col border border-rule-strong bg-raised lg:order-none lg:w-[519px] lg:shrink-0"
+        className="order-1 hidden w-full flex-col border border-rule-strong bg-raised md:flex min-[1000px]:order-none min-[1000px]:min-w-0 min-[1000px]:flex-1 lg:w-[519px] lg:flex-none lg:shrink-0"
       >
         <div className="border-b border-rule px-4 py-3">
           <p className="t-fine text-ink-muted">{copy.platform}</p>
         </div>
-        <div className="flex flex-col lg:flex-row lg:items-stretch">
-          <div className="flex shrink-0 flex-col border-b border-rule p-4 lg:w-[170px] lg:border-r lg:border-b-0">
+        <div className="flex items-stretch">
+          <div className="flex w-[170px] shrink-0 flex-col border-r border-rule p-4">
             <div className={cn("flex flex-col", on("shipment") && outline)}>
-              <p className="t-fine pb-2 text-ink-muted">{copy.shipment}</p>
-              {copy.records.map((record, r) => (
-                <p
-                  key={record}
-                  className={cn(
-                    "t-body-sm flex items-center justify-between gap-2 border-b border-rule py-2 text-ink",
-                    r === 1 && on("events") && outline,
-                  )}
-                >
-                  {record}
-                  {r === 1 ? (
-                    <span
-                      className={cn(
-                        "t-state text-accent",
-                        !on("events") && "hidden",
-                      )}
-                    >
-                      {copy.purchased}
-                    </span>
-                  ) : null}
-                </p>
-              ))}
+              <Piece k="shipment" copy={copy} events={on("events")} />
             </div>
           </div>
           <div className="min-w-0 flex-1 p-4">
             <div className="flex flex-col gap-3 border border-rule-strong bg-page p-4">
               <p className="t-fine text-ink">{copy.sdk}</p>
-
-              {/* The panel's two contents share one grid cell, so the sketch keeps its height when they swap
-                  and the rows beside or under it never move. */}
+              {/* The panel's two contents share one grid cell, so the sketch keeps its height when they
+                  swap and the rows beside or under it never move. */}
               <div className="grid">
                 {/* While "Consented onboarding" is picked: its three marks, in place of the panel's content. */}
-                <ul
+                <div
                   className={cn(
-                    "col-start-1 row-start-1 flex flex-col gap-2 self-start",
+                    "col-start-1 row-start-1 self-start",
                     outline,
                     !on("onboarding") && "invisible",
                   )}
                 >
-                  {copy.onboarding.map((mark) => (
-                    <li
-                      key={mark}
-                      className="t-body-sm flex items-center gap-2 text-ink"
-                    >
-                      <Square kind="done" />
-                      {mark}
-                    </li>
-                  ))}
-                </ul>
-
+                  <Piece k="onboarding" copy={copy} />
+                </div>
                 <div
                   className={cn(
                     "col-start-1 row-start-1 flex flex-col gap-3",
@@ -197,18 +318,7 @@ export function EmbedPicker({
                       on("eligibility") && outline,
                     )}
                   >
-                    <p className="t-ui-sm text-ink">{copy.eligibility}</p>
-                    <ul className="flex flex-wrap gap-x-4 gap-y-2">
-                      {copy.rules.map((rule) => (
-                        <li
-                          key={rule}
-                          className="t-body-sm flex items-center gap-2 text-ink"
-                        >
-                          <Square kind="done" />
-                          {rule}
-                        </li>
-                      ))}
-                    </ul>
+                    <Piece k="eligibility" copy={copy} />
                   </div>
                   <div className="border-t border-rule pt-3">
                     <div
@@ -217,16 +327,7 @@ export function EmbedPicker({
                         on("offer") && outline,
                       )}
                     >
-                      <p className="t-ui-sm text-ink">{copy.offer}</p>
-                      {copy.prices.map((price) => (
-                        <p
-                          key={price}
-                          className="t-body-sm flex items-center justify-between gap-3 text-ink"
-                        >
-                          {price}
-                          <span className="h-5 w-14 shrink-0 border border-dashed border-rule-strong" />
-                        </p>
-                      ))}
+                      <Piece k="offer" copy={copy} />
                     </div>
                   </div>
                   <div className="border-t border-rule pt-3">
@@ -236,22 +337,7 @@ export function EmbedPicker({
                         on("application") && outline,
                       )}
                     >
-                      <p className="t-ui-sm text-ink">{copy.application}</p>
-                      <ul className="flex flex-col gap-2">
-                        {copy.states.map((state, i) => (
-                          <li
-                            key={state}
-                            className="t-body-sm flex items-center gap-2 text-ink"
-                          >
-                            <Square
-                              kind={
-                                i < 2 ? "done" : i === 2 ? "current" : "open"
-                              }
-                            />
-                            {state}
-                          </li>
-                        ))}
-                      </ul>
+                      <Piece k="application" copy={copy} />
                     </div>
                   </div>
                 </div>

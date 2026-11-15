@@ -5,13 +5,14 @@ Extracted from Figma, Contact · 1440 (frame 174:6), 13 Nov 2026. Bracketed tags
 ## Hero and routes
 [Display] Talk to us.
 [BodyL] Tell us who you are and what you’d like to discuss, and your message reaches the right people.
-[Tag] If you are | [Tag] Next step | [Tag] Goes to
-A bank, finance company, insurer or fund | Start a programme conversation | partnerships@kubar.tech
-A trade platform or marketplace | Talk about an integration | partnerships@kubar.tech
-An exporter | Ask about Programme 1 | outreach@kubar.tech
-An investor | Email us | partnerships@kubar.tech
-Press, or anything else | Write to us | outreach@kubar.tech
-(first column [UI], next step [UI] link, goes to [BodyS]. Each "next step" goes to the form with "I’m writing as" preset: /contact?intent=institution, platform, exporter, other; "Email us" is mailto:partnerships@kubar.tech. At 768 and 390 the rows stack without column heads.)
+(Build step 7, REDRAW-2026-11-14.md section 13 C2: the "Goes to" column is cut. Choosing a route that leads to the form pre-fills "I’m writing as" and moves focus to the form.)
+[Tag] If you are | [Tag] Next step
+A bank, finance company, insurer or fund | Start a programme conversation
+A trade platform or marketplace | Talk about an integration
+An exporter | Ask about Programme 1
+An investor | Email us
+Press, or anything else | Write to us
+(first column [UI], next step [UI] link. Each "next step" goes to the form with "I’m writing as" preset: /contact?intent=institution, platform, exporter, other; "Email us" is mailto:partnerships@kubar.tech. At 768 and 390 the rows stack without column heads.)
 
 ## The form  (component set: Text field 151:73, Message field 151:154, Select 152:119, Error summary 152:157, Form message 152:197)
 Field contract, from copy deck 4.7 (Notion), which this frame follows:
@@ -65,7 +66,7 @@ The 1440 frame shows the form filled in as an example (Arjun Mehta, arjun.mehta@
 States to build from the Forms board (Figma 153:53): rest, hover, focus, filled, error (field message under the field, and an error summary at the top of the form that takes focus and links to each field), sending, sent (form message replaces the form), and failed (form message above the button with outreach@kubar.tech as the fallback).
 
 ## Direct
-[Label] Direct                           (a label, no heading; no section number)
+(Build step 7, section 13 C2: the separate Direct section and its label "Direct" are gone. The addresses below sit beside the form from 1200 up, and under it below that.)
 [Tag] For | [Tag] Write to
 Partnerships and investors | partnerships@kubar.tech
 Everything else, including press | outreach@kubar.tech

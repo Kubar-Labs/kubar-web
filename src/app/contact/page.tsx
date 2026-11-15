@@ -10,9 +10,10 @@ import { Register } from "@/components/registers/Register";
 import { WithEmails } from "@/components/ui/WithEmails";
 
 /*
- * Contact (Figma 174:6 at 1440, 174:616 at 768, 174:291 at 390): the routes
- * (each goes to the form with "I'm writing as" chosen), the form, and the
- * direct addresses.
+ * Contact (Figma 174:6 at 1440; the 768 and 390 frames are not updated):
+ * the routes, with no "Goes to" column (choosing one that leads to the
+ * form pre-fills "I'm writing as" and moves focus to the form), then the
+ * form with the direct addresses beside it.
  */
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("contact.meta");
@@ -31,26 +32,26 @@ export default function Contact() {
             <p className="t-body-lg text-ink-muted lg:max-w-[628px]">{t("hero.sub")}</p>
           </div>
           <ContactRoutes
-            columns={t.raw("routes.columns") as { who: string; step: string; goesTo: string }}
+            columns={t.raw("routes.columns") as { who: string; step: string }}
             rows={t.raw("routes.rows") as ContactRoute[]}
           />
         </div>
       </section>
 
-      <Section id="form">
-        {/* useSearchParams (the ?intent= preset) needs a Suspense boundary on a static page. */}
-        <Suspense>
-          <ContactForm copy={t.raw("form") as ContactFormCopy} />
-        </Suspense>
-      </Section>
-
-      <Section labelledBy="direct-heading" className="flex flex-col gap-10 lg:gap-16">
-        <h2 id="direct-heading" className="t-fine text-ink-muted">{t("direct.label")}</h2>
+      {/* The form, with the direct addresses beside it from 1200 up and under it below that
+          (Figma 296:12889; REDRAW section 13 C2). No separate Direct section or label. */}
+      <Section id="form" className="flex flex-col gap-(--section-space) lg:flex-row lg:items-start lg:gap-20">
+        <div className="min-w-0 lg:w-[628px] lg:shrink">
+          {/* useSearchParams (the ?intent= preset) needs a Suspense boundary on a static page. */}
+          <Suspense>
+            <ContactForm copy={t.raw("form") as ContactFormCopy} />
+          </Suspense>
+        </div>
         <Register
-          className="lg:max-w-[845px]"
+          className="min-w-0 lg:flex-1"
           first="label"
           columns={t.raw("direct.columns") as string[]}
-          widths={[217, 628]}
+          widths={[217, 355]}
           rows={(t.raw("direct.rows") as string[][]).map(([label, entry]) => [label, <WithEmails key={label} text={entry} />])}
         />
       </Section>

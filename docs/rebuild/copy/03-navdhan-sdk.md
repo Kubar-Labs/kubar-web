@@ -9,7 +9,7 @@ Extracted from Figma, NavDhan SDK · 1440 (frame 170:6), 13 Nov 2026, in reading
 [UI] Talk about an integration                     (filled button → /contact?intent=platform)
 
 (Build step 6, REDRAW-2026-11-14.md section 12 item 3: the hero carries "What you embed" (see that section below): the H3 and the six capabilities in the left column under the button, beside the sketch. Picking a row outlines its part of the sketch; "Eligibility check" is picked from the start.)
-The embed sketch (component "Embed sketch", 140:2523): a schematic, not a screenshot. Below 1200 the sketch comes first, with its Shipment list above the SDK panel, then the six rows.
+The embed sketch (component "Embed sketch", 140:2523): a schematic, not a screenshot. From 1000 to 1199 the sketch sits beside the list; from 768 to 999 the sketch comes first, then the six rows. On phones (below 768) there is no full sketch: the six rows are an accordion, and an open row shows its own piece of the sketch under its sentence.
 [Tag] Your platform
 (15 Nov, REDRAW-2026-11-14.md section 10: no Illustrative tag on the sketch.)
 [Tag] Shipment

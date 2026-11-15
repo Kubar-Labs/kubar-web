@@ -402,7 +402,12 @@ test.describe("Home, complete (build step 3)", () => {
     await scrollToState(page, 1);
     await page.getByRole("link", { name: "Skip the story" }).click();
     await expect(page).toHaveURL(/#closing-line$/);
-    await page.waitForTimeout(500); // let the cards' 200 ms change finish before measuring contrast
+    // Wait for the state itself before measuring contrast: every written lane row fully faded in
+    // (a fixed wait isn't enough, since headless frames only advance when something asks for one).
+    await expect
+      .poll(() => page.evaluate(() => [...document.querySelectorAll(".story-on .lane-row")].every((row) => ["0", "1"].includes(getComputedStyle(row).opacity))))
+      .toBe(true);
+    await page.waitForTimeout(250);
     await expectNoAxeViolations(page);
   });
 
@@ -911,7 +916,7 @@ test.describe("NavDhan SDK (build step 6)", () => {
     const rows = hero.getByRole("button", { pressed: undefined }).filter({ hasNot: page.locator("svg") });
     const row = (name: string) => hero.getByRole("button", { name: new RegExp(`^${name}`) });
     const sketch = hero.getByRole("img");
-    await expect(hero.locator("ul > li > button")).toHaveCount(6);
+    await expect(hero.locator("ul > li > button:visible")).toHaveCount(6);
     expect(await rows.count()).toBeGreaterThanOrEqual(6);
     // Eligibility check is picked from the start.
     await expect(row("Eligibility check")).toHaveAttribute("aria-pressed", "true");
@@ -948,20 +953,56 @@ test.describe("NavDhan SDK (build step 6)", () => {
     const art = (await sketch.boundingBox())!;
     expect(art.x).toBeGreaterThan(list.x + list.width);
     await expectNoAxeViolations(page);
-    // Below 1200: the sketch, then the rows; a tap still picks.
+    // 1000 to 1199: the sketch beside the list, the list about 45% wide. 768 to 999: the sketch, then the rows.
+    await page.setViewportSize({ width: 1024, height: 900 });
+    const l2 = (await hero.locator("ul").first().boundingBox())!;
+    const a2 = (await sketch.boundingBox())!;
+    expect(a2.x).toBeGreaterThan(l2.x + l2.width - 1);
+    expect(l2.width / 944).toBeGreaterThan(0.4);
+    expect(l2.width / 944).toBeLessThan(0.5);
+    await page.setViewportSize({ width: 820, height: 1180 });
+    const l3 = (await hero.locator("ul").first().boundingBox())!;
+    const a3 = (await sketch.boundingBox())!;
+    expect(l3.y).toBeGreaterThan(a3.y + a3.height);
+    // Phones: no full sketch; the rows are an accordion, each opening its own piece of the sketch.
     const phone = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
     const tab = await phone.newPage();
     await tab.goto("/products/navdhan-sdk");
     const phoneHero = tab.locator("main section").first();
-    const phoneArt = (await phoneHero.getByRole("img").boundingBox())!;
-    const first = phoneHero.locator("ul > li > button").first();
-    expect((await first.boundingBox())!.y).toBeGreaterThan(phoneArt.y + phoneArt.height);
-    const tapped = phoneHero.getByRole("button", { name: /^Shipment and document capture/ });
-    await tapped.scrollIntoViewIfNeeded();
-    await tapped.tap();
-    await expect(tapped).toHaveAttribute("aria-pressed", "true");
-    await expect(phoneHero.getByRole("img").locator(".outline-2:visible")).toContainText("Booking");
+    await expect(phoneHero.getByRole("img")).toBeHidden();
+    const accordion = phoneHero.locator("ul > li > button:visible");
+    await expect(accordion).toHaveCount(6);
+    const open = (name: string) => phoneHero.getByRole("button", { name: new RegExp(`^${name}`), expanded: true });
+    await expect(phoneHero.getByRole("button", { expanded: true })).toHaveCount(1);
+    await expect(open("Eligibility check")).toBeVisible();
+    const piece = (name: string) => phoneHero.locator("li", { has: tab.getByRole("button", { name: new RegExp(`^${name}`) }) }).locator("div[id]:visible");
+    await expect(piece("Eligibility check")).toContainText("Buyer country");
+    const pieces: [string, string][] = [
+      ["Consented onboarding", "Identity checkBusiness checkConsent recorded"],
+      ["Shipment and document capture", "Bill of lading"],
+      ["Indicative offer", "All-in price"],
+      ["Application and status", "Settlement"],
+      ["Events for your product", "InvoicePurchased"],
+    ];
+    for (const [name, text] of pieces) {
+      const button = phoneHero.locator("ul > li > button:visible", { hasText: name });
+      await button.scrollIntoViewIfNeeded();
+      await button.tap();
+      await expect(button).toHaveAttribute("aria-expanded", "true");
+      await expect(phoneHero.getByRole("button", { expanded: true })).toHaveCount(1);
+      await expect(piece(name)).toContainText(text);
+      const box = (await piece(name).boundingBox())!;
+      const rowBox = (await button.boundingBox())!;
+      expect(box.y).toBeGreaterThanOrEqual(rowBox.y + rowBox.height - 1);
+      expect(box.x + box.width).toBeLessThanOrEqual(390 - 20 + 1);
+    }
     expect(await tab.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
+    // A row closed on a phone, then a wider screen: Eligibility check is picked again.
+    await phoneHero.getByRole("button", { expanded: true }).tap();
+    await expect(phoneHero.getByRole("button", { expanded: true })).toHaveCount(0);
+    await tab.setViewportSize({ width: 844, height: 390 });
+    await expect(phoneHero.getByRole("button", { name: /^Eligibility check/, pressed: true })).toBeVisible();
+    await expect(phoneHero.getByRole("img").locator(".outline-2:visible")).toContainText("Buyer country");
     await phone.close();
   });
 
@@ -1384,7 +1425,7 @@ test.describe("On this page index (section 12, item 5)", () => {
 });
 
 test.describe("About (build step 4)", () => {
-  test("carries its metadata, the team anchor, both status footnotes and no removed section", async ({ page }) => {
+  test("carries its metadata, the team anchor, one status footnote and no removed section", async ({ page }) => {
     await page.goto("/about");
     await expect(page).toHaveTitle("About · Kubar Labs");
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("Foundations first.");
@@ -1392,11 +1433,50 @@ test.describe("About (build step 4)", () => {
     await expect(page.locator("#team ul").first().locator("li")).toHaveCount(6);
     await expect(page.getByRole("link", { name: "Rayansh Srivastava on LinkedIn (opens in a new tab)" })).toHaveAttribute("target", "_blank");
     await expect(page.locator("#fn-1")).toHaveCount(1);
-    await expect(page.locator("#fn-1-gift")).toHaveCount(1);
+    // Footnote 1 shows once; the marker in Why GIFT City links to it.
+    await expect(page.locator("#fn-1-gift")).toHaveCount(0);
+    await expect(page.locator("#fnref-1-gift")).toHaveAttribute("href", "#fn-1");
     await expect(page.getByText("Planned", { exact: true })).toHaveCount(1);
     await expect(page.getByText("Where we are")).toHaveCount(0);
     await expect(page.getByRole("link", { name: "Email us (partnerships@kubar.tech)" })).toHaveAttribute("href", "mailto:partnerships@kubar.tech");
     await expect(page.getByRole("link", { name: "Follow one receivable through all five" })).toHaveAttribute("href", "/how-it-works");
+  });
+
+  test("build step 7: the foundations are drawn, the cuts are in, and Why GIFT City has its three zones", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/about");
+    await expect(page.getByText("Five foundations, built from the bottom up")).toHaveCount(0);
+    await expect(page.getByText(/^Kubar acts as the financier’s origination and servicing agent\. It never holds/)).toHaveCount(0);
+    // The company register's heads are read, not shown.
+    for (const gone of ["Field", "Entry"]) {
+      await expect(page.getByRole("columnheader", { name: gone, exact: true }).locator("xpath=ancestor::thead"), gone).toHaveClass(/sr-only/);
+    }
+    const blocks = page.locator(".iso-foundations");
+    await expect(blocks.locator("svg").first()).toHaveAttribute("aria-hidden", "true");
+    await expect(blocks.locator("ol > li")).toHaveCount(5);
+    await expect(blocks.locator("ol > li").first()).toContainText("The venue");
+    await expect(blocks.locator("ol > li").first()).toContainText("Planned");
+    // Standing as on Home: the statements beside the heading.
+    const heading = (await page.locator("#standing-heading").boundingBox())!;
+    const statement = (await page.getByText(/^Priority entry to the IFSCA FinTech Innovation Sandbox/).boundingBox())!;
+    expect(statement.x).toBeGreaterThan(heading.x + heading.width);
+    // Why GIFT City: the drawing beside the words, three zones and three arrows as real text.
+    const gift = page.locator("section", { has: page.locator("#gift-heading") });
+    const art = gift.locator("svg[aria-hidden='true']").first();
+    const words = (await gift.getByText(/^GIFT City is India’s international financial services centre/).boundingBox())!;
+    expect((await art.boundingBox())!.x).toBeGreaterThan(words.x + words.width);
+    for (const text of ["Onshore India", "The exporter and its own bank", "GIFT City", "A bank’s unit buys the receivable, in foreign currency", "Abroad", "The buyer pays the financier’s account", "The receivable", "Purchase price", "Payment on the due date"]) {
+      await expect(gift.getByText(text, { exact: true }).locator("visible=true"), text).toHaveCount(1);
+    }
+    for (const width of [1200, 1280, 1366, 768, 390, 375]) {
+      await page.setViewportSize({ width, height: 900 });
+      expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth), `${width}`).toBe(0);
+      await expect(gift.getByText("Payment on the due date", { exact: true }).locator("visible=true"), `${width}`).toHaveCount(1);
+    }
+    // Phones: the zones and the arrows are listed under the drawing.
+    const phoneArt = (await art.boundingBox())!;
+    const zone = (await gift.getByText("Onshore India", { exact: true }).locator("visible=true").boundingBox())!;
+    expect(zone.y).toBeGreaterThan(phoneArt.y + phoneArt.height);
   });
 
   test("portraits load through the image optimiser at the size the layout needs", async ({ page }) => {
@@ -1451,6 +1531,60 @@ test.describe("Contact (build step 5)", () => {
       await expect(page.getByLabel(label)).not.toHaveAttribute("placeholder", /.+/);
     }
     await expect(page.getByText("0 of 2,000")).toBeVisible();
+  });
+
+  test("build step 7: two-column routes, a route pre-fills and focuses the form, the addresses sit beside it", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/contact");
+    const routes = page.getByRole("table").filter({ has: page.getByRole("columnheader", { name: "Next step" }) });
+    await expect(routes.getByRole("columnheader")).toHaveText(["If you are", "Next step"]);
+    await expect(page.getByText("Goes to")).toHaveCount(0);
+    await expect(page.getByText("Direct", { exact: true })).toHaveCount(0);
+    // The addresses beside the form.
+    const select = page.getByLabel("I’m writing as");
+    const direct = page.getByRole("table").filter({ has: page.getByRole("columnheader", { name: "Write to" }) });
+    const form = (await select.boundingBox())!;
+    const table = (await direct.boundingBox())!;
+    expect(table.x).toBeGreaterThan(form.x + form.width);
+    expect(Math.abs(table.y - form.y)).toBeLessThan(40);
+    await expect(direct.getByRole("row")).toHaveCount(5);
+    // Choosing a route pre-fills "I'm writing as" and moves focus to it.
+    await expect(select).toHaveValue("");
+    await page.getByRole("link", { name: "Talk about an integration" }).click();
+    await expect(page).toHaveURL(/intent=platform#form$/);
+    await expect(select).toHaveValue("platform");
+    await expect(select).toBeFocused();
+    await expect(select).toBeInViewport();
+    await page.getByRole("link", { name: "Ask about Programme 1" }).click();
+    await expect(select).toHaveValue("exporter");
+    await expect(select).toBeFocused();
+    // The same route again, after the field was changed by hand: filled and focused again.
+    await select.selectOption("press");
+    await page.getByRole("link", { name: "Ask about Programme 1" }).click();
+    await expect(select).toHaveValue("exporter");
+    await expect(select).toBeFocused();
+    // Arriving from another page with ?intent= pre-fills it and leaves focus alone; choosing
+    // the route already in the address still moves focus.
+    await page.goto("/contact?intent=institution");
+    await expect(select).toHaveValue("institution");
+    await expect(select).not.toBeFocused();
+    await page.getByRole("link", { name: "Start a programme conversation" }).click();
+    await expect(select).toBeFocused();
+    // Below 1200 the addresses come under the form; nothing scrolls sideways.
+    for (const width of [1200, 1280, 1366]) {
+      await page.setViewportSize({ width, height: 900 });
+      const f = (await select.boundingBox())!;
+      const t = (await direct.boundingBox())!;
+      expect(t.x, `${width}`).toBeGreaterThan(f.x + f.width);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth), `${width}`).toBe(0);
+    }
+    for (const width of [768, 390, 375]) {
+      await page.setViewportSize({ width, height: 900 });
+      const button = (await page.getByRole("button", { name: "Send message" }).boundingBox())!;
+      expect((await direct.boundingBox())!.y, `${width}`).toBeGreaterThan(button.y + button.height);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth), `${width}`).toBe(0);
+    }
+    await expectNoAxeViolations(page);
   });
 
   test("each ?intent= value preselects its option and sets the message help", async ({ page }) => {

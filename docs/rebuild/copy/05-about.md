@@ -11,7 +11,8 @@ Extracted from Figma, About · 1440 (frame 173:6), 13 Nov 2026, in reading order
 
 ## In order
 [H2] What we’re building.
-Foundations stack, ruled rows, built from the bottom up (component "Foundations stack", 121:1424, About variant):
+(Build step 7, REDRAW-2026-11-14.md section 5: drawn as the isometric foundations from Home, with About's own sentences below and "Planned" as the venue's state word.)
+Foundations stack, built from the bottom up:
 (After step 3, REDRAW-2026-11-14.md section 10: the H3 "Five foundations, built from the bottom up" is cut.)
 [UIL] The venue                               [BodyS] An ITFS for institutional financiers only, with Kubar as its neutral operator¹      [State] Planned (muted; the venue keeps its status word)
 [UIL] A record of performance                 [BodyS] The loss history, receivable by receivable
@@ -70,6 +71,13 @@ Programme marks (logo and name, no kind labels from 14 Nov): GIFT IFIH Young Bui
 [H2] Why GIFT City.
 [BodyL] GIFT City is India’s international financial services centre. Banks’ units there work in foreign currency and can buy export receivables under their own licences and credit policies, which is how Programme 1 runs. It is also home to the framework for trade-finance platforms (ITFS) under which Kubar’s own venue is planned¹. Kubar works from an office in GIFT City.
 (After step 3, REDRAW-2026-11-14.md section 10: the second status footnote is cut: footnote ¹ shows once per page, and this marker links to the one under the hero.)
+(Build step 7, section 12 item 4: beside the text, three isometric platforms, each with a title and a line, and three labelled arrows. New strings, Vaibhav, 15 Nov:)
+[UIL] Onshore India                [BodyS] The exporter and its own bank
+[UIL] GIFT City                    [BodyS] A bank’s unit buys the receivable, in foreign currency
+[UIL] Abroad                       [BodyS] The buyer pays the financier’s account
+[Fine] The receivable
+[Fine] Purchase price
+[Fine] Payment on the due date
 
 ## Band · India-rooted line  (petrol ground)
 [Line] Kubar connects Indian trade flows to global institutional capital through GIFT City.

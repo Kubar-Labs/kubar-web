@@ -5,8 +5,8 @@ import { cn } from "@/lib/utils";
  * Contact routes (Figma C2 76:858, Page=Home): who should write and the next
  * step for them, each a link (to the form with its intent chosen, or to
  * partnerships@ for investors). A register in two equal columns; below
- * desktop each route stacks. On Contact (Page=Contact) a third column says
- * where the message goes.
+ * desktop each route stacks. (Contact's third column, "Goes to", was cut:
+ * REDRAW-2026-11-14.md, section 13 C2.)
  */
 export type ContactRoute = { who: string; step: string; href: string; goesTo?: string };
 
