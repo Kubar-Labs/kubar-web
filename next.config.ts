@@ -4,6 +4,11 @@ import type { NextConfig } from "next";
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
 const isDevelopment = process.env.NODE_ENV === "development";
+// LOCAL_PREVIEW=1 at build time: a production build to open over plain http on
+// this machine or the local network (WebKit checks, a phone on the same Wi-Fi).
+// Safari would otherwise upgrade every script and stylesheet to https and the
+// page would load unstyled. Never set it for a deploy.
+const upgradeInsecure = !isDevelopment && process.env.LOCAL_PREVIEW !== "1";
 const contentSecurityPolicy = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline'${isDevelopment ? " 'unsafe-eval'" : ""}`,
@@ -16,7 +21,7 @@ const contentSecurityPolicy = [
   "base-uri 'self'",
   "form-action 'self'",
   "frame-ancestors 'none'",
-  ...(!isDevelopment ? ["upgrade-insecure-requests"] : []),
+  ...(upgradeInsecure ? ["upgrade-insecure-requests"] : []),
 ].join("; ");
 
 const nextConfig: NextConfig = {
@@ -34,9 +39,14 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
+      // Old routes (HANDOFF section 5). Permanent.
+      { source: "/products/navdhan", destination: "/products/navdhan-sdk", permanent: true },
+      { source: "/for-platforms", destination: "/products/navdhan-sdk", permanent: true },
+      { source: "/team", destination: "/about#team", permanent: true },
+      { source: "/privacy", destination: "/legal/privacy", permanent: true },
       {
         source: "/opengraph-image",
-        destination: "/media/kubar-labs-og-b2add55b.png",
+        destination: "/media/kubar-labs-social-bd9a99c9.png",
         permanent: true,
       },
       {
@@ -74,15 +84,6 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        source: "/:asset(icon\\.png|logo\\.png|nd_logo\\.png)",
-        headers: [
-          {
-            key: "Cache-Control",
-            value: "public, max-age=86400, stale-while-revalidate=604800",
-          },
-        ],
-      },
-      {
         source: "/media/:path*",
         headers: [
           {
@@ -92,7 +93,7 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        source: "/:directory(logos|team|advisors|bft_logos)/:path*",
+        source: "/:directory(people|programmes)/:path*",
         headers: [
           {
             key: "Cache-Control",

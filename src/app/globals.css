@@ -1,591 +1,1313 @@
 @import "tailwindcss";
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
+@import "./tokens.css";
 
-@custom-variant dark (&:is(.dark *));
-
-@theme inline {
-    /* ShadCN → Tailwind color mappings */
-    --color-background: var(--background);
-    --color-foreground: var(--foreground);
-    --font-sans: var(--font-plus-jakarta);
-    --font-mono: var(--font-geist-mono);
-    --font-heading: var(--font-plus-jakarta);
-    --color-sidebar-ring: var(--sidebar-ring);
-    --color-sidebar-border: var(--sidebar-border);
-    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-    --color-sidebar-accent: var(--sidebar-accent);
-    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-    --color-sidebar-primary: var(--sidebar-primary);
-    --color-sidebar-foreground: var(--sidebar-foreground);
-    --color-sidebar: var(--sidebar);
-    --color-chart-5: var(--chart-5);
-    --color-chart-4: var(--chart-4);
-    --color-chart-3: var(--chart-3);
-    --color-chart-2: var(--chart-2);
-    --color-chart-1: var(--chart-1);
-    --color-ring: var(--ring);
-    --color-input: var(--input);
-    --color-border: var(--border);
-    --color-destructive: var(--destructive);
-    --color-accent-foreground: var(--accent-foreground);
-    --color-accent: var(--accent);
-    --color-muted-foreground: var(--muted-foreground);
-    --color-muted: var(--muted);
-    --color-secondary-foreground: var(--secondary-foreground);
-    --color-secondary: var(--secondary);
-    --color-primary-foreground: var(--primary-foreground);
-    --color-primary: var(--primary);
-    --color-popover-foreground: var(--popover-foreground);
-    --color-popover: var(--popover);
-    --color-card-foreground: var(--card-foreground);
-    --color-card: var(--card);
-    --radius-sm: calc(var(--radius) * 0.6);
-    --radius-md: calc(var(--radius) * 0.8);
-    --radius-lg: var(--radius);
-    --radius-xl: calc(var(--radius) * 1.4);
-    --radius-2xl: calc(var(--radius) * 1.8);
-    --radius-3xl: calc(var(--radius) * 2.2);
-    --radius-4xl: calc(var(--radius) * 2.6);
-
-    /* Kubar Labs brand colors */
-    --color-gold: var(--kubar-gold);
-    --color-gold-light: var(--kubar-gold-light);
-    --color-gold-dim: var(--kubar-gold-dim);
-    --color-surface: var(--kubar-surface);
-
-    /* Custom animation definitions */
-    --animate-float: float 6s ease-in-out infinite;
-    --animate-float-slow: float 9s ease-in-out infinite;
-    --animate-float-fast: float 4.5s ease-in-out infinite;
-    --animate-pulse-glow: pulse-glow 3s ease-in-out infinite;
-    --animate-shimmer: shimmer 3s linear infinite;
-    --animate-orb: orb-drift 16s ease-in-out infinite;
-    --animate-orb-alt: orb-drift-alt 20s ease-in-out infinite;
-    --animate-spin-slow: spin 24s linear infinite;
-    --animate-dash-flow: dash-flow 2s linear infinite;
-
-    @keyframes float {
-        0%,
-        100% {
-            transform: translateY(0px);
-        }
-        50% {
-            transform: translateY(-14px);
-        }
-    }
-
-    @keyframes pulse-glow {
-        0%,
-        100% {
-            opacity: 0.12;
-            transform: scale(1);
-        }
-        50% {
-            opacity: 0.22;
-            transform: scale(1.06);
-        }
-    }
-
-    @keyframes shimmer {
-        0% {
-            background-position: -200% center;
-        }
-        100% {
-            background-position: 200% center;
-        }
-    }
-
-    @keyframes orb-drift {
-        0%,
-        100% {
-            transform: translate(0px, 0px) scale(1);
-            opacity: 0.18;
-        }
-        33% {
-            transform: translate(35px, -35px) scale(1.07);
-            opacity: 0.24;
-        }
-        66% {
-            transform: translate(-20px, 22px) scale(0.95);
-            opacity: 0.13;
-        }
-    }
-
-    @keyframes orb-drift-alt {
-        0%,
-        100% {
-            transform: translate(0px, 0px) scale(1);
-            opacity: 0.1;
-        }
-        40% {
-            transform: translate(-28px, 28px) scale(1.05);
-            opacity: 0.18;
-        }
-        70% {
-            transform: translate(20px, -15px) scale(0.97);
-            opacity: 0.08;
-        }
-    }
-
-    @keyframes dash-flow {
-        from {
-            stroke-dashoffset: 20;
-        }
-        to {
-            stroke-dashoffset: 0;
-        }
-    }
-
-    @keyframes gradient-shift {
-        0%,
-        100% {
-            background-position: 0% 50%;
-        }
-        50% {
-            background-position: 100% 50%;
-        }
-    }
-
-    @keyframes count-up {
-        from {
-            opacity: 0;
-            transform: translateY(8px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    @keyframes marquee-left {
-        from {
-            transform: translateX(0%);
-        }
-        to {
-            transform: translateX(-50%);
-        }
-    }
-
-    @keyframes ecosystem-partner-loop {
-        from {
-            transform: translateX(calc(100vw + 12rem));
-        }
-        to {
-            transform: translateX(
-                calc(100vw + 12rem - max(144rem, 100vw + 24rem))
-            );
-        }
-    }
+/*
+ * Tailwind reads the design tokens by name. "reference" stops Tailwind from
+ * re-declaring the variables, so the Petrol mode ([data-ground="petrol"]) can
+ * swap them; "inline" makes each utility point straight at the token.
+ * The default palette, radii, shadows and breakpoints are cleared so only
+ * the system's values exist.
+ */
+@theme {
+  --color-*: initial;
+  --radius-*: initial;
+  --shadow-*: initial;
+  --inset-shadow-*: initial;
+  --drop-shadow-*: initial;
+  --breakpoint-*: initial;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1200px;
 }
 
-@media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-        scroll-behavior: auto !important;
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
+@theme inline reference {
+  --color-page: var(--color-page);
+  --color-inset: var(--color-inset);
+  --color-raised: var(--color-raised);
+  --color-accent-soft: var(--color-accent-soft);
+  --color-ink: var(--color-ink);
+  --color-ink-muted: var(--color-ink-muted);
+  --color-on-action: var(--color-on-action);
+  --color-accent: var(--color-accent);
+  --color-rule: var(--color-rule);
+  --color-rule-strong: var(--color-rule-strong);
+  --color-rule-control: var(--color-rule-control);
+  --color-action: var(--color-action);
+  --color-action-hover: var(--color-action-hover);
+  --color-action-pressed: var(--color-action-pressed);
+  --color-action-soft: var(--color-action-soft);
+  --color-focus: var(--color-focus);
+  --color-faint: var(--color-faint);
+  --color-mark: var(--color-mark);
+  --color-partner-mark: var(--color-partner-mark);
+  --color-transparent: transparent;
+  --color-current: currentColor;
+
+  --font-serif: var(--font-serif);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+
+  --ease-standard: var(--ease-standard);
+  --ease-exit: var(--ease-exit);
+
+  /* The three elevations (REDRAW-2026-11-14.md, section 2): shadow-elevation-1 … 3. */
+  --shadow-elevation-1: var(--elevation-1);
+  --shadow-elevation-2: var(--elevation-2);
+  --shadow-elevation-3: var(--elevation-3);
+}
+
+/* Text styles: one utility per Figma text style (docs/rebuild/tokens/README.md). */
+@utility t-display {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: var(--text-display);
+  line-height: var(--text-display--line-height);
+  letter-spacing: -0.02em;
+}
+@utility t-h2 {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: var(--text-h2);
+  line-height: var(--text-h2--line-height);
+  letter-spacing: -0.01em;
+}
+@utility t-h3 {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: var(--text-h3);
+  line-height: var(--text-h3--line-height);
+  letter-spacing: -0.005em;
+}
+@utility t-h4 {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: var(--text-h4);
+  line-height: var(--text-h4--line-height);
+}
+@utility t-line {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: var(--text-line);
+  line-height: var(--text-line--line-height);
+  letter-spacing: -0.01em;
+}
+@utility t-lead {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--text-lead);
+  line-height: var(--text-lead--line-height);
+  /* No word left alone on a last line (leads and running text). */
+  text-wrap: pretty;
+}
+@utility t-figure {
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: var(--text-figure);
+  line-height: var(--text-figure--line-height);
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+/* Mono/Figure large: desktop only, used once (Home, "About $80bn"). */
+@utility t-figure-lg {
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: var(--text-figure-lg);
+  line-height: var(--text-figure-lg--line-height);
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+@utility t-record {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: var(--text-record);
+  line-height: var(--text-record--line-height);
+  /* No word left alone on a last line (leads and running text). */
+  text-wrap: pretty;
+}
+@utility t-body-lg {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--text-body-lg);
+  line-height: var(--text-body-lg--line-height);
+  /* No word left alone on a last line (leads and running text). */
+  text-wrap: pretty;
+}
+@utility t-body {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--text-body);
+  line-height: var(--text-body--line-height);
+  /* No word left alone on a last line (leads and running text). */
+  text-wrap: pretty;
+}
+@utility t-body-sm {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--text-body-sm);
+  line-height: var(--text-body-sm--line-height);
+  /* No word left alone on a last line (leads and running text). */
+  text-wrap: pretty;
+}
+@utility t-fine {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--text-fine);
+  line-height: var(--text-fine--line-height);
+}
+@utility t-ui-lg {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: var(--text-ui-lg);
+  line-height: var(--text-ui-lg--line-height);
+}
+@utility t-ui {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: var(--text-ui);
+  line-height: var(--text-ui--line-height);
+}
+@utility t-ui-sm {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: var(--text-ui-sm);
+  line-height: var(--text-ui-sm--line-height);
+}
+@utility t-label {
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: var(--text-label);
+  line-height: var(--text-label--line-height);
+}
+@utility t-tag {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: var(--text-tag);
+  line-height: var(--text-tag--line-height);
+}
+@utility t-code {
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: var(--text-code);
+  line-height: var(--text-code--line-height);
+  letter-spacing: 0.02em;
+}
+@utility t-state {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: var(--text-label);
+  line-height: var(--text-label--line-height);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Layout: the page container and the 12 / 8 / 4 column grid. */
+@utility page-container {
+  width: 100%;
+  max-width: calc(1280px + 2 * var(--page-margin));
+  margin-inline: auto;
+  padding-inline: var(--page-margin);
+}
+@utility page-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
+  column-gap: var(--grid-gutter);
+}
+/* A card that is a link (contact routes, map parties; REDRAW-2026-11-14.md,
+   section 7): at rest --elevation-2 (or --lift-rest); on hover, focus or tap
+   it rises to --elevation-3 and 2 px up over --duration-hover. The deeper
+   shadow sits on a pseudo-element and fades in, so only opacity and
+   transform move. Reduced motion: it doesn't move; its border darkens. */
+@utility lift-card {
+  position: relative;
+  box-shadow: var(--lift-rest, var(--elevation-2));
+  transition: translate var(--duration-hover) var(--ease-standard);
+  &::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    box-shadow: var(--elevation-3);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--duration-hover) var(--ease-standard);
+  }
+  &:is(:hover, :focus-within) {
+    translate: 0 -2px;
+  }
+  &:is(:hover, :focus-within)::before {
+    opacity: 1;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    &:is(:hover, :focus-within) {
+      translate: none;
+      border-color: var(--color-rule-strong);
     }
+  }
+}
+/* A standalone text link's tap area on touch screens: at least 44 px tall,
+   centred on the link, with no change to how it looks. */
+@utility tap-area {
+  @media (pointer: coarse) {
+    position: relative;
+    &::after {
+      content: "";
+      position: absolute;
+      inset-inline: 0;
+      top: 50%;
+      height: 44px;
+      transform: translateY(-50%);
+    }
+  }
+}
+@utility measure {
+  max-width: var(--measure);
 }
 
-/* ─── Kubar Labs Dark Theme (always-on) ─── */
-:root {
-    /* Base surfaces */
-    --background: #04040c;
-    --foreground: #f0f0f0;
-
-    /* Card / popup surfaces */
-    --card: #0a0a18;
-    --card-foreground: #f0f0f0;
-    --popover: #0d0d1e;
-    --popover-foreground: #f0f0f0;
-
-    /* Brand primary: warm amber-gold */
-    --primary: #d4920c;
-    --primary-foreground: #080602;
-
-    /* Secondaries */
-    --secondary: #111122;
-    --secondary-foreground: #c0c0cc;
-    --muted: #0c0c1a;
-    --muted-foreground: #7a7a90;
-    --accent: #14142a;
-    --accent-foreground: #f0f0f0;
-
-    /* Semantic */
-    --destructive: #ef4444;
-    --destructive-foreground: #f0f0f0;
-
-    /* Borders & interactions */
-    --border: rgba(255, 255, 255, 0.07);
-    --input: rgba(255, 255, 255, 0.09);
-    --ring: rgba(212, 146, 12, 0.45);
-
-    /* Border radius scale */
-    --radius: 0.75rem;
-
-    /* Charts (can be customised later) */
-    --chart-1: #d4920c;
-    --chart-2: #3b82f6;
-    --chart-3: #10b981;
-    --chart-4: #8b5cf6;
-    --chart-5: #f43f5e;
-
-    /* Sidebar */
-    --sidebar: #080814;
-    --sidebar-foreground: #d0d0dc;
-    --sidebar-primary: #d4920c;
-    --sidebar-primary-foreground: #080602;
-    --sidebar-accent: #14142a;
-    --sidebar-accent-foreground: #f0f0f0;
-    --sidebar-border: rgba(255, 255, 255, 0.06);
-    --sidebar-ring: rgba(212, 146, 12, 0.4);
-
-    /* ── Kubar Labs Brand Tokens ── */
-    --kubar-gold: #d4920c;
-    --kubar-gold-light: #f0b429;
-    --kubar-gold-dim: #9b6a08;
-    --kubar-gold-pale: rgba(212, 146, 12, 0.08);
-    --kubar-gold-glow: rgba(212, 146, 12, 0.14);
-    --kubar-gold-border: rgba(212, 146, 12, 0.22);
-    --kubar-surface: #0a0a18;
-    --kubar-surface-raised: #0e0e20;
-    --kubar-surface-hover: rgba(255, 255, 255, 0.035);
-    --kubar-border: rgba(255, 255, 255, 0.07);
-    --kubar-border-strong: rgba(255, 255, 255, 0.12);
+/* Links: ink, underlined 1 px at rest, 2 px on hover, no colour change. */
+@utility link-ink {
+  color: var(--color-ink);
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+  transition: text-decoration-thickness var(--duration-hover) var(--ease-standard);
+  /* An inline link's target is at least 24 px tall (WCAG 2.5.8); block
+     padding on an inline box doesn't move the lines. */
+  padding-block: 4px;
+  &:hover {
+    text-decoration-thickness: 2px;
+  }
 }
 
-/* Keep .dark in sync for any component that applies .dark class */
-.dark {
-    --background: #04040c;
-    --foreground: #f0f0f0;
-    --card: #0a0a18;
-    --card-foreground: #f0f0f0;
-    --popover: #0d0d1e;
-    --popover-foreground: #f0f0f0;
-    --primary: #d4920c;
-    --primary-foreground: #080602;
-    --secondary: #111122;
-    --secondary-foreground: #c0c0cc;
-    --muted: #0c0c1a;
-    --muted-foreground: #7a7a90;
-    --accent: #14142a;
-    --accent-foreground: #f0f0f0;
-    --destructive: #ef4444;
-    --border: rgba(255, 255, 255, 0.07);
-    --input: rgba(255, 255, 255, 0.09);
-    --ring: rgba(212, 146, 12, 0.45);
-    --sidebar: #080814;
-    --sidebar-foreground: #d0d0dc;
-    --sidebar-primary: #d4920c;
-    --sidebar-primary-foreground: #080602;
-    --sidebar-accent: #14142a;
-    --sidebar-accent-foreground: #f0f0f0;
-    --sidebar-border: rgba(255, 255, 255, 0.06);
-    --sidebar-ring: rgba(212, 146, 12, 0.4);
-}
-
-/* ─── Base Layer ─── */
 @layer base {
-    * {
-        @apply border-border outline-ring/50;
-        box-sizing: border-box;
+  :root {
+    /* next/font supplies the hashed family and a metric-matched fallback. */
+    --font-serif: var(--font-newsreader), Georgia, serif;
+    --font-sans: var(--font-schibsted), system-ui, sans-serif;
+    --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+    --header-height: 65px;
+  }
+  @media (min-width: 1200px) {
+    :root {
+      --header-height: 81px;
     }
+  }
 
+  html {
+    scroll-padding-top: var(--header-height);
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  @media (prefers-reduced-motion: no-preference) {
     html {
-        color-scheme: dark;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-        text-rendering: optimizeLegibility;
-        font-feature-settings: "cv02", "cv03", "cv04", "cv11";
-        scroll-behavior: auto; /* Lenis handles this */
+      scroll-behavior: smooth;
     }
+  }
 
-    body {
-        @apply bg-background text-foreground;
-        min-height: 100dvh;
-        overflow-x: hidden;
+  body {
+    min-height: 100dvh;
+    background-color: var(--color-page);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-synthesis: none;
+  }
+
+  /* No italics anywhere (HANDOFF section 4). */
+  em,
+  i,
+  cite,
+  address,
+  dfn,
+  var {
+    font-style: normal;
+  }
+
+  :focus-visible {
+    outline: var(--focus-width) solid var(--color-focus);
+    outline-offset: var(--focus-offset);
+  }
+
+  /* Tablet: running text keeps to the measure (REDRAW-2026-11-14.md, 9.10).
+     At desktop each block sets its own width; on phones the column is narrower. */
+  @media (min-width: 768px) and (max-width: 1199.98px) {
+    main p,
+    main dd,
+    main li.t-body {
+      max-width: var(--measure);
     }
+  }
 
-    .skip-link {
-        position: fixed;
-        top: 0.75rem;
-        left: 0.75rem;
-        z-index: 10000;
-        transform: translateY(-200%);
-        border: 2px solid #f0b429;
-        border-radius: 0.5rem;
-        background: #0a0a18;
-        color: #f0f0f0;
-        padding: 0.75rem 1rem;
-        font-weight: 700;
-        transition: transform 0.15s ease;
-    }
+  [data-ground="petrol"] {
+    background-color: var(--color-page);
+    color: var(--color-ink);
+  }
 
-    .skip-link:focus {
-        transform: translateY(0);
-    }
-
-    #main-content {
-        scroll-margin-top: 4.5rem;
-    }
-
-    /* Premium scrollbar */
-    ::-webkit-scrollbar {
-        width: 5px;
-        height: 5px;
-    }
-
-    ::-webkit-scrollbar-track {
-        background: #030309;
-    }
-
-    ::-webkit-scrollbar-thumb {
-        background: rgba(212, 146, 12, 0.28);
-        border-radius: 3px;
-        transition: background 0.2s;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-        background: rgba(212, 146, 12, 0.52);
-    }
-
-    ::-webkit-scrollbar-corner {
-        background: transparent;
-    }
-
-    /* Brand selection */
-    ::selection {
-        background-color: rgba(212, 146, 12, 0.22);
-        color: #f0f0f0;
-    }
-
-    /* Focus ring */
-    :focus-visible {
-        outline: 2px solid rgba(212, 146, 12, 0.5);
-        outline-offset: 2px;
-    }
-
+  ::selection {
+    background-color: var(--color-inset);
+    color: var(--color-ink);
+  }
 }
 
-/* ─── Utility Classes ─── */
-@layer utilities {
-    /* Gradient text — gold */
-    .gradient-text-gold {
-        background: linear-gradient(
-            135deg,
-            #f5bc35 0%,
-            #d4920c 55%,
-            #b87b0a 100%
-        );
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+/* The mobile and tablet menu sheet: a full-screen modal dialog that fades in
+   over --duration-disclose. The page behind doesn't scroll while it is open. */
+@layer components {
+  .menu-sheet {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100dvh;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    overflow-y: auto;
+    background-color: var(--color-page);
+    color: var(--color-ink);
+    opacity: 0;
+    transition:
+      opacity var(--duration-disclose) var(--ease-exit),
+      overlay var(--duration-disclose) allow-discrete,
+      display var(--duration-disclose) allow-discrete;
+  }
+  .menu-sheet[open] {
+    opacity: 1;
+    transition-timing-function: var(--ease-standard);
+  }
+  @starting-style {
+    .menu-sheet[open] {
+      opacity: 0;
     }
+  }
+  .menu-sheet::backdrop {
+    background: transparent;
+  }
+  html:has(.menu-sheet[open]) {
+    overflow: hidden;
+  }
 
-    /* Animated gradient text */
-    .gradient-text-animated {
-        background: linear-gradient(
-            90deg,
-            #f5bc35 0%,
-            #d4920c 30%,
-            #f5bc35 60%,
-            #d4920c 100%
-        );
-        background-size: 200% auto;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        animation: shimmer 3s linear infinite;
+  /* The current row of a register (record, ledger): the inset ground, which
+     reaches 16 px into the margin, and the 6 px rani marker whose foot is cut
+     at the Kubar mark's angle (33°: 3.9 px over 6 px). Works on <tr> and on
+     block rows. */
+  .is-current {
+    position: relative;
+    background-color: var(--color-accent-soft);
+  }
+  /* A table row can't carry positioned pseudo-elements (Chrome lays them out
+     as extra cells), so at desktop, where registers are real table rows, the
+     ground's margin extension and the marker hang off the first cell. Below
+     desktop the rows are blocks or grids and keep them on the row itself. */
+  @media (min-width: 1200px) {
+    tr.is-current::before,
+    tr.is-current::after {
+      content: none;
     }
+    tr.is-current > :first-child {
+      position: relative;
+    }
+    tr.is-current > :first-child::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: -16px;
+      width: 16px;
+      background-color: var(--color-accent-soft);
+    }
+    tr.is-current > :first-child::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: -16px;
+      width: 6px;
+      background-color: var(--color-accent);
+      clip-path: polygon(0 0, 100% 0, 100% calc(100% - 3.9px), 0 100%);
+    }
+  }
+  .is-current::before,
+  .footnote:target::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 -16px;
+    width: 16px;
+    background-color: var(--color-accent-soft);
+  }
+  .is-current::after,
+  .footnote:target::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -16px;
+    width: 6px;
+    background-color: var(--color-accent);
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 3.9px), 0 100%);
+  }
 
-    /* Glassmorphism card */
-    .glass-card {
-        background: rgba(9, 9, 22, 0.78);
-        backdrop-filter: blur(22px) saturate(1.4);
-        -webkit-backdrop-filter: blur(22px) saturate(1.4);
-        border: 1px solid rgba(255, 255, 255, 0.085);
-        border-radius: 16px;
-        box-shadow:
-            0 4px 24px rgba(0, 0, 0, 0.35),
-            0 1px 0 rgba(255, 255, 255, 0.055) inset;
+  /* A footnote reached from its marker takes the current-row treatment, then
+     lets it go after 2 s over --duration-disclose. */
+  .footnote {
+    isolation: isolate;
+  }
+  .footnote:target::before {
+    inset: 0 0 0 -16px;
+    width: auto;
+    z-index: -1;
+  }
+  .footnote:target::before,
+  .footnote:target::after {
+    animation: footnote-mark calc(2000ms + var(--duration-disclose)) linear forwards;
+  }
+  @keyframes footnote-mark {
+    0%,
+    90% {
+      opacity: 1;
     }
+    100% {
+      opacity: 0;
+    }
+  }
 
-    /* Glassmorphism card — gold accent border */
-    .glass-card-gold {
-        background: rgba(7, 7, 19, 0.88);
-        backdrop-filter: blur(28px) saturate(1.5);
-        -webkit-backdrop-filter: blur(28px) saturate(1.5);
-        border: 1px solid rgba(212, 146, 12, 0.22);
-        border-radius: 18px;
-        box-shadow:
-            0 8px 40px rgba(0, 0, 0, 0.45),
-            0 0 60px rgba(212, 146, 12, 0.06),
-            0 1px 0 rgba(255, 255, 255, 0.055) inset;
-    }
+  /* Abbreviation (Figma 95:438): the first use on a page. It keeps the text's
+     style with a dotted underline in muted ink; the tooltip opens below. */
+  /* A footnote marker is one small figure: its target reaches 24 px with
+     padding that the negative margin takes back out of the line. */
+  .footnote-marker {
+    padding: 6px 10px;
+    margin-inline: -10px;
+  }
 
-    /* Gradient border via pseudo-element */
-    .gradient-border {
-        position: relative;
-    }
+  .abbr {
+    padding-block: 4px;
+    position: relative;
+    cursor: help;
+    text-decoration: underline dotted 1px var(--color-ink-muted);
+    text-underline-offset: 0.2em;
+  }
+  .abbr-tip {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    z-index: 20;
+    width: max-content;
+    max-width: min(280px, calc(100vw - 32px));
+    padding: 8px 12px;
+    border: 1px solid var(--color-rule-control);
+    background-color: var(--color-raised);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-weight: 400;
+    font-size: var(--text-fine);
+    line-height: var(--text-fine--line-height);
+    letter-spacing: 0;
+    text-transform: none;
+    text-align: left;
+    white-space: normal;
+    cursor: auto;
+    animation: story-fade var(--duration-disclose) var(--ease-standard);
+  }
+  .abbr[data-open] > .abbr-tip {
+    display: block;
+  }
 
-    .gradient-border::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        border-radius: inherit;
-        padding: 1px;
-        background: linear-gradient(
-            135deg,
-            rgba(212, 146, 12, 0.55),
-            rgba(212, 146, 12, 0.12) 50%,
-            transparent
-        );
-        -webkit-mask:
-            linear-gradient(#fff 0 0) content-box,
-            linear-gradient(#fff 0 0);
-        -webkit-mask-composite: xor;
-        mask-composite: exclude;
-        pointer-events: none;
+  /* Isometric drawings (REDRAW-2026-11-14.md, sections 4 and 7). The
+     elevations as filters, so they follow the projected shape. */
+  .iso-sheet-rest {
+    filter: drop-shadow(0 1px 2px rgb(2 39 50 / 0.08)) drop-shadow(0 6px 16px rgb(2 39 50 / 0.08)); /* --elevation-1 */
+  }
+  .iso-sheet {
+    filter: drop-shadow(0 2px 4px rgb(2 39 50 / 0.08)) drop-shadow(0 14px 36px rgb(2 39 50 / 0.12)); /* --elevation-2 */
+  }
+  .iso-sheet-current,
+  .iso-lift-shadow {
+    filter: drop-shadow(0 4px 8px rgb(2 39 50 / 0.08)) drop-shadow(0 24px 56px rgb(2 39 50 / 0.16)); /* --elevation-3 */
+  }
+  .iso-lift-shadow {
+    opacity: 0;
+    transition: opacity var(--duration-disclose) var(--ease-standard);
+  }
+  .is-lifted .iso-lift-shadow {
+    opacity: 1;
+  }
+  .iso-ground {
+    fill: rgb(2 39 50 / 0.2);
+    filter: blur(14px);
+  }
+  .iso-text-code {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    letter-spacing: 0.02em;
+  }
+  .iso-text-state {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    font-size: 13px;
+    letter-spacing: 0.06em;
+  }
+  .iso-lift {
+    transition: transform var(--duration-disclose) var(--ease-standard);
+  }
+  .iso-lift.is-lifted {
+    transform: translateY(-14px);
+  }
+  .iso-leader {
+    position: absolute;
+    top: 11px;
+    left: -24px;
+    width: 16px;
+    border-top: 1px solid var(--color-rule);
+  }
+  .iso-leader.is-current {
+    border-color: var(--color-accent);
+  }
+  .iso-record {
+    --iso-record-gap: 74px;
+  }
+  @media (min-width: 768px) {
+    .iso-record {
+      --iso-record-gap: 50px;
     }
+  }
+  @media (min-width: 1200px) {
+    .iso-record {
+      --iso-record-gap: 78px;
+    }
+  }
+  /* Blocks (foundations, layers, steps): a resting shadow under each, in
+     screen space; the top face takes accent-soft when its label is picked. */
+  .iso-block {
+    filter: drop-shadow(0 2px 4px rgb(2 39 50 / 0.08)) drop-shadow(0 14px 36px rgb(2 39 50 / 0.12)); /* --elevation-2 */
+  }
+  /* The top face stays white; the picked block's top edges turn rani at
+     2 px, as the hero marks its current sheet. Desktop only: below it the
+     labels sit under the drawing (REDRAW section 10). */
+  .iso-top {
+    fill: var(--color-raised);
+  }
+  .iso-top-edge {
+    fill: none;
+    stroke: var(--color-accent);
+    stroke-width: 2;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+    opacity: 0;
+    transition: opacity var(--duration-hover) var(--ease-standard);
+  }
+  @media (min-width: 1200px) {
+    .iso-foundations li:is(:hover, :focus) .iso-top-edge {
+      opacity: 1;
+    }
+  }
+  /* The scale card's bar grows from the left; the sliver and caption follow. */
+  [data-phase="armed"] .scale-bar {
+    transform: scaleX(0);
+  }
+  [data-phase="playing"] .scale-bar {
+    transition: transform var(--duration-scene) var(--ease-standard);
+  }
+  [data-phase="armed"] .scale-sliver {
+    opacity: 0;
+  }
+  [data-phase="playing"] .scale-sliver {
+    transition: opacity var(--duration-disclose) var(--ease-standard) calc(var(--duration-scene) + 200ms);
+  }
+  /* Visible strokes stay 1 px, with 6/5 dashes, however small the drawing
+     renders (it is about half size at 390). The reveal mask keeps scaling. */
+  .iso-leader-line,
+  .iso-venue {
+    vector-effect: non-scaling-stroke;
+  }
+  .iso-leader-line {
+    stroke: var(--color-rule);
+    stroke-width: 1;
+  }
+  .iso-leader-line.is-dashed,
+  .iso-venue {
+    stroke: var(--color-ink);
+    stroke-dasharray: 6 5;
+  }
+  .iso-venue {
+    fill: none;
+    stroke-width: 1;
+  }
+  /* The solid copy that reveals a dashed outline as it draws. */
+  .iso-outline-mask {
+    fill: none;
+    stroke: white;
+    stroke-width: 6;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+  }
+  [data-phase="armed"] .iso-rise {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  [data-phase="playing"] .iso-rise {
+    transition:
+      opacity var(--duration-write) var(--ease-standard),
+      transform var(--duration-write) var(--ease-standard);
+    transition-delay: calc(var(--level) * 80ms);
+  }
+  [data-phase="armed"] .iso-outline-mask {
+    stroke-dashoffset: 1;
+  }
+  [data-phase="playing"] .iso-outline-mask {
+    transition: stroke-dashoffset 480ms var(--ease-standard) calc(3 * 80ms + var(--duration-write));
+  }
 
-    /* Gold glow shadow */
-    .glow-gold {
-        box-shadow:
-            0 0 40px rgba(212, 146, 12, 0.18),
-            0 0 80px rgba(212, 146, 12, 0.08);
+  /* Arrivals on page load: a sheet drops in from 24 px above; a row fades in. */
+  .iso-drop {
+    animation: iso-drop var(--duration-write) var(--ease-standard) both;
+  }
+  .iso-fade {
+    animation: iso-fade var(--duration-disclose) var(--ease-standard) both;
+  }
+  @keyframes iso-drop {
+    from {
+      opacity: 0;
+      transform: translateY(-24px);
     }
+  }
+  @keyframes iso-fade {
+    from {
+      opacity: 0;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .iso-drop,
+    .iso-fade,
+    .limit-settle {
+      animation: none;
+    }
+    .iso-lift,
+    .iso-lift-shadow {
+      transition: none;
+    }
+    .iso-lift.is-lifted {
+      transform: none;
+    }
+    .is-lifted .iso-lift-shadow {
+      opacity: 0;
+    }
+    /* The lift becomes a colour change: unlayered, at the end of this file. */
+  }
 
-    .glow-gold-sm {
-        box-shadow: 0 4px 20px rgba(212, 146, 12, 0.22);
-    }
+  /* Lines that draw (Arrow.tsx; sections 7 and 9.4). With no script, reduced
+     motion or the drawing already in view: drawn. Armed: the lines are
+     undrawn and the heads hidden. Playing: each line draws over
+     --duration-write after its --draw-delay, and its head appears as the
+     line arrives. A solid line draws with its own dashoffset (pathLength 1);
+     a dashed one is revealed through a mask whose solid copy draws. */
+  .draw-solid,
+  .draw-mask {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+  }
+  .draw-mask {
+    fill: none;
+    stroke: white;
+    stroke-width: 6;
+  }
+  [data-phase="armed"] :is(.draw-solid, .draw-mask) {
+    stroke-dashoffset: 1;
+  }
+  [data-phase="armed"] .draw-head {
+    opacity: 0;
+  }
+  [data-phase="playing"] :is(.draw-solid, .draw-mask) {
+    transition: stroke-dashoffset var(--duration-write) var(--ease-standard) var(--draw-delay, 0ms);
+  }
+  [data-phase="playing"] .draw-head {
+    transition: opacity var(--duration-hover) var(--ease-standard) calc(var(--draw-delay, 0ms) + var(--duration-write));
+  }
 
-    /* Noise texture overlay */
-    .noise-overlay {
-        position: relative;
-    }
+  /* The who-takes-part map: a card under the pointer or focus, or the last
+     one tapped, dims the arrows that don't touch it to 30%. PickStage sets
+     data-picked to the card's party (a `:has(…:hover)` rule isn't restyled
+     reliably in Safari). */
+  .party-map .draw-arrow {
+    transition: opacity var(--duration-hover) var(--ease-standard);
+  }
+  .party-map[data-picked="financiers"] .draw-arrow:not([data-touches~="financiers"]),
+  .party-map[data-picked="insurers"] .draw-arrow:not([data-touches~="insurers"]),
+  .party-map[data-picked="platforms"] .draw-arrow:not([data-touches~="platforms"]),
+  .party-map[data-picked="exporters"] .draw-arrow:not([data-touches~="exporters"]),
+  .party-map[data-picked="buyers"] .draw-arrow:not([data-touches~="buyers"]),
+  .party-map[data-picked="kubar"] .draw-arrow:not([data-touches~="kubar"]) {
+    opacity: 0.3;
+  }
 
-    .noise-overlay::after {
-        content: "";
-        position: absolute;
-        inset: 0;
-        border-radius: inherit;
-        opacity: 0.025;
-        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-        pointer-events: none;
+  /* Kubar Protocol hero: the programme limit as a dashed box (LimitDrawing).
+     On page load RCV-0003 starts 40 px higher and settles above the box. */
+  .limit-edge {
+    fill: none;
+    stroke: var(--color-ink);
+    stroke-width: 1;
+    stroke-dasharray: 4 4;
+    vector-effect: non-scaling-stroke;
+  }
+  .limit-settle {
+    animation: limit-settle var(--duration-scene) var(--ease-standard) both;
+  }
+  @keyframes limit-settle {
+    from {
+      transform: translateY(-40px);
     }
+  }
 
-    /* Subtle dot-grid background pattern */
-    .dot-grid {
-        background-image: radial-gradient(
-            circle,
-            rgba(255, 255, 255, 0.055) 1px,
-            transparent 1px
-        );
-        background-size: 40px 40px;
-    }
+  /* Kubar Protocol's loss history: when it comes into view, RCV-0003 comes
+     down to its drawn place above the stack over the scene duration. */
+  [data-phase="armed"] .loss-settle {
+    transform: translateY(-40px);
+  }
+  [data-phase="playing"] .loss-settle {
+    transition: transform var(--duration-scene) var(--ease-standard);
+  }
 
-    /* Hex grid pattern */
-    .hex-grid {
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='48' viewBox='0 0 56 48'%3E%3Cpath d='M0 24L14 0h28L56 24L42 48H14Z' fill='none' stroke='rgba(255,255,255,0.04)' stroke-width='0.8'/%3E%3C/svg%3E");
-        background-size: 56px 48px;
+  /* NavDhan SDK's layers (IsoLayers): when in view, the layers settle from
+     20 px apart to their drawn spacing, bottom first; the SDK tile lands last. */
+  [data-phase="armed"] .layer-settle {
+    transform: translateY(var(--from));
+  }
+  [data-phase="playing"] .layer-settle {
+    transition: transform var(--duration-write) var(--ease-standard) calc(var(--n) * 80ms);
+  }
+  [data-phase="armed"] .layer-tile {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  [data-phase="playing"] .layer-tile {
+    transition:
+      opacity var(--duration-write) var(--ease-standard) calc(3 * 80ms + var(--duration-write)),
+      transform var(--duration-write) var(--ease-standard) calc(3 * 80ms + var(--duration-write));
+  }
+  @media (min-width: 1200px) {
+    .iso-layers li:is(:hover, :focus) .iso-top-edge {
+      opacity: 1;
     }
+  }
 
-    /* Pill badge */
-    .pill-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.375rem 0.875rem;
-        border-radius: 9999px;
-        border: 1px solid rgba(212, 146, 12, 0.25);
-        background: rgba(212, 146, 12, 0.07);
-        font-size: 0.8125rem;
-        font-weight: 500;
-        color: #f0b429;
-        letter-spacing: 0.015em;
-        white-space: nowrap;
+  /* How it works hero (IsoSteps): on page load the blocks rise in order, 01
+     to 08, 60 ms apart; 08's petrol top fades in over its white one last. */
+  .steps-rise {
+    animation: steps-rise var(--duration-write) var(--ease-standard) both;
+    animation-delay: calc(var(--i) * 60ms);
+  }
+  .steps-petrol {
+    animation: iso-fade var(--duration-disclose) var(--ease-standard) both;
+    animation-delay: calc(7 * 60ms + var(--duration-write));
+  }
+  /* Below the fold on load (phones): hold, then play when in view. */
+  [data-phase="armed"] :is(.steps-rise, .steps-petrol) {
+    animation: none;
+    opacity: 0;
+  }
+  @keyframes steps-rise {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
     }
+  }
+  /* The numbers on the steps: 13 px at full size, about 11 px at 0.625 (the
+     390 frame), in the drawing's own units: 25.3 - 12.3 × (width / 560). */
+  .iso-steps .iso-text-code {
+    font-size: clamp(13px, 25.3px - 2.196cqw, 17.6px);
+  }
 
-    /* Number display */
-    .stat-value {
-        font-variant-numeric: tabular-nums;
-        font-feature-settings: "tnum";
-    }
+  /* Drawings that play when they come into view (PlayOnce): a sheet drops in
+     from 24 px above, 80 ms after the one before it (--i); a row fades in as
+     its sheet lands. As the Home hero stack, but on entering view. */
+  [data-phase="armed"] .phase-drop {
+    opacity: 0;
+    transform: translateY(-24px);
+  }
+  [data-phase="playing"] .phase-drop {
+    transition:
+      opacity var(--duration-write) var(--ease-standard),
+      transform var(--duration-write) var(--ease-standard);
+    transition-delay: calc(var(--i) * 80ms);
+  }
+  [data-phase="armed"] .phase-fade {
+    opacity: 0;
+  }
+  [data-phase="playing"] .phase-fade {
+    transition: opacity var(--duration-disclose) var(--ease-standard);
+    transition-delay: calc(var(--i) * 80ms + var(--duration-write));
+  }
 
-    /* Flowing dashed line (SVG stroke) */
-    .line-flow {
-        stroke-dasharray: 4 6;
-        animation: dash-flow 2s linear infinite;
-    }
+  /* The evidence stack (IsoEvidence): hover, focus or a tap on a row lifts
+     its sheet 14 px and fades in its --elevation-3 shadow, as on Home.
+     PickStage sets data-picked to the row's document. */
+  .iso-evidence[data-picked="01"] .iso-lift[data-doc="01"],
+  .iso-evidence[data-picked="02"] .iso-lift[data-doc="02"],
+  .iso-evidence[data-picked="03"] .iso-lift[data-doc="03"],
+  .iso-evidence[data-picked="04"] .iso-lift[data-doc="04"],
+  .iso-evidence[data-picked="05"] .iso-lift[data-doc="05"],
+  .iso-evidence[data-picked="06"] .iso-lift[data-doc="06"],
+  .iso-evidence[data-picked="07"] .iso-lift[data-doc="07"],
+  .iso-evidence[data-picked="08"] .iso-lift[data-doc="08"] {
+    transform: translateY(-14px);
+  }
+  .iso-evidence[data-picked="01"] .iso-lift[data-doc="01"] .iso-lift-shadow,
+  .iso-evidence[data-picked="02"] .iso-lift[data-doc="02"] .iso-lift-shadow,
+  .iso-evidence[data-picked="03"] .iso-lift[data-doc="03"] .iso-lift-shadow,
+  .iso-evidence[data-picked="04"] .iso-lift[data-doc="04"] .iso-lift-shadow,
+  .iso-evidence[data-picked="05"] .iso-lift[data-doc="05"] .iso-lift-shadow,
+  .iso-evidence[data-picked="06"] .iso-lift[data-doc="06"] .iso-lift-shadow,
+  .iso-evidence[data-picked="07"] .iso-lift[data-doc="07"] .iso-lift-shadow,
+  .iso-evidence[data-picked="08"] .iso-lift[data-doc="08"] .iso-lift-shadow {
+    opacity: 1;
+  }
 
-    /* Balanced text wrap */
-    .text-balance {
-        text-wrap: balance;
+  /* Each party signs for its own part (SignsMap): a picked card keeps its
+     lines and labels; the others dim to 30%, as on Home's party map. */
+  .signs-map {
+    --gap: 160px;
+  }
+  @media (min-width: 1280px) {
+    .signs-map {
+      --gap: 184px;
     }
+  }
+  .signs-map .sign-line {
+    transition: opacity var(--duration-hover) var(--ease-standard);
+  }
+  .signs-map[data-picked="financier"] .sign-line:not([data-touches~="financier"]),
+  .signs-map[data-picked="insurer"] .sign-line:not([data-touches~="insurer"]),
+  .signs-map[data-picked="exporter"] .sign-line:not([data-touches~="exporter"]),
+  .signs-map[data-picked="bank"] .sign-line:not([data-touches~="bank"]),
+  .signs-map[data-picked="buyer"] .sign-line:not([data-touches~="buyer"]),
+  .signs-map[data-picked="platform"] .sign-line:not([data-touches~="platform"]),
+  .signs-map[data-picked="kubar"] .sign-line:not([data-touches~="kubar"]) {
+    opacity: 0.3;
+  }
 
-    .text-pretty {
-        text-wrap: pretty;
+  /* If a buyer doesn't pay (UnpaidFlow): each beat fades in at its --beat;
+     the fork's stem draws down and its bar out from the stem (transform). */
+  [data-phase="armed"] .flow-beat {
+    opacity: 0;
+  }
+  [data-phase="playing"] .flow-beat {
+    transition: opacity var(--duration-write) var(--ease-standard) var(--beat, 0ms);
+  }
+  .fork-stem {
+    transform-origin: top;
+  }
+  .fork-bar {
+    transform-origin: 720px 0; /* the stem, 870 - 150 */
+  }
+  [data-phase="armed"] .fork-stem {
+    transform: scaleY(0);
+  }
+  [data-phase="armed"] .fork-bar {
+    transform: scaleX(0);
+  }
+  [data-phase="playing"] :is(.fork-stem, .fork-bar) {
+    transition: transform var(--duration-write) var(--ease-standard) var(--beat, 0ms);
+  }
+  /* Print: drawings that wait to come into view are printed in their end state. */
+  @media print {
+    .phase-drop,
+    .phase-fade,
+    .flow-beat,
+    .steps-rise,
+    .steps-petrol,
+    .fork-stem,
+    .fork-bar {
+      opacity: 1 !important;
+      transform: none !important;
+      animation: none !important;
     }
+  }
+  /* Reduced motion, after the rules above: the steps stand still (the
+     evidence lift becomes a colour change at the end of the file). */
+  @media (prefers-reduced-motion: reduce) {
+    .steps-rise,
+    .steps-petrol {
+      animation: none;
+    }
+  }
 
-    .marquee-track {
-        animation: marquee-left 28s linear infinite;
-        will-change: transform;
+  /* A fixed-size desktop drawing fitted to its column (FitStage): from 1200
+     up it keeps its composition and scales down only when the column is
+     narrower. The script measures --fit; 1200 to 1279 start from an estimate. */
+  @media (min-width: 1200px) {
+    .fit-stage {
+      --fit: 1;
+      height: calc(var(--stage-h) * var(--fit));
     }
+    .fit-stage-inner {
+      width: var(--stage-w);
+      height: var(--stage-h);
+      transform: scale(var(--fit));
+      transform-origin: top left;
+    }
+  }
+  @media (min-width: 1200px) and (max-width: 1279.98px) {
+    .fit-stage {
+      --fit: 0.91;
+    }
+  }
 
-    .marquee-track:hover {
-        animation-play-state: paused;
+  /* How a programme runs (ProgrammeRuns). The set-up dots rest at
+     --elevation-1. A loop card raises to --elevation-3 on hover, focus or
+     tap: the deeper shadow fades in on a pseudo-element. */
+  .setup-dot {
+    filter: drop-shadow(0 1px 2px rgb(2 39 50 / 0.08)) drop-shadow(0 6px 16px rgb(2 39 50 / 0.08)); /* --elevation-1 */
+  }
+  .raise-card {
+    position: relative;
+  }
+  .raise-card::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    box-shadow: var(--elevation-3);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--duration-hover) var(--ease-standard);
+  }
+  .raise-card:is(:hover, :focus)::before {
+    opacity: 1;
+  }
+  .programme-loop[data-picked="01"] .loop-card[data-step="01"]::before,
+  .programme-loop[data-picked="02"] .loop-card[data-step="02"]::before,
+  .programme-loop[data-picked="03"] .loop-card[data-step="03"]::before,
+  .programme-loop[data-picked="04"] .loop-card[data-step="04"]::before,
+  .programme-loop[data-picked="05"] .loop-card[data-step="05"]::before {
+    opacity: 1;
+  }
+  /* The loop at desktop: the ellipse draws clockwise from 01 over 900 ms; each
+     arrowhead and card appears as the line reaches it; then one small sheet
+     travels the loop and stops by 05. Drawn as it ends without script, with
+     reduced motion or when already in view. */
+  .loop-line {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+  }
+  .loop-sheet {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 16px;
+    height: 20px;
+    border: 1px solid var(--color-rule-strong);
+    border-bottom: 2px solid var(--color-accent);
+    background-color: var(--color-raised);
+    box-shadow: var(--elevation-1);
+    offset-rotate: 0deg;
+    offset-distance: 72%;
+  }
+  @media (min-width: 1200px) {
+    [data-phase="armed"] .loop-line {
+      stroke-dashoffset: 1;
     }
+    [data-phase="armed"] :is(.loop-head, .loop-card) {
+      opacity: 0;
+    }
+    [data-phase="armed"] .loop-sheet {
+      offset-distance: 0%;
+      opacity: 0;
+    }
+    [data-phase="playing"] .loop-line {
+      transition: stroke-dashoffset 900ms linear;
+    }
+    [data-phase="playing"] .loop-head {
+      transition: opacity var(--duration-hover) var(--ease-standard) var(--draw-delay, 0ms);
+    }
+    [data-phase="playing"] .loop-card {
+      transition: opacity var(--duration-disclose) var(--ease-standard) var(--card-delay, 0ms);
+    }
+    [data-phase="playing"] .loop-sheet {
+      transition:
+        opacity var(--duration-hover) var(--ease-standard) 900ms,
+        offset-distance 1800ms var(--ease-standard) 900ms;
+    }
+    /* The stepper: a picked card (click, tap or focus) calls the sheet to it
+       and is raised. The sheet rests just before each card on the ellipse. */
+    .programme-loop[data-picked] .loop-sheet {
+      opacity: 1;
+      transition: offset-distance var(--duration-scene) var(--ease-standard);
+    }
+    .programme-loop[data-picked="01"] .loop-sheet { offset-distance: 92%; }
+    .programme-loop[data-picked="02"] .loop-sheet { offset-distance: 12%; }
+    .programme-loop[data-picked="03"] .loop-sheet { offset-distance: 32%; }
+    .programme-loop[data-picked="04"] .loop-sheet { offset-distance: 52%; }
+    .programme-loop[data-picked="05"] .loop-sheet { offset-distance: 72%; }
+    .programme-loop[data-picked] :is(.loop-head, .loop-card) {
+      opacity: 1;
+    }
+    .programme-loop[data-picked] .loop-line {
+      stroke-dashoffset: 0;
+    }
+  }
 
-    .ecosystem-marquee {
-        position: relative;
-        height: 2.5rem;
-        overflow: hidden;
+  /* The pinned story, option B (StoryView.tsx, Lanes.tsx; REDRAW section
+     3a). The lanes drawing is sized here: rows from the viewport in svh,
+     columns from the drawing's own width. Phones and tablets: party boxes
+     40 px high, rows of 22 to 40 px, the drawing at most 45% of 100svh.
+     Desktop: party boxes 56 px, rows of 44 to 74 px, the drawing filling the
+     height under the header less 48 px. */
+  .lanes {
+    --party-h: 50px;
+    --box-h: 40px;
+    --box-inset: 2px;
+    --gutter: 0px;
+    --row-h: clamp(22px, (45svh - 40px - 24px) / 8, 40px);
+    --dy: 6px;
+    position: relative;
+    height: calc(var(--party-h) + 8 * var(--row-h));
+  }
+  @media (min-width: 1200px) {
+    .lanes {
+      --party-h: 64px;
+      --box-h: 56px;
+      --box-inset: 4px;
+      --gutter: 36px;
+      --row-h: clamp(44px, (100svh - var(--header-height) - 64px - 48px) / 8, 74px);
+      --dy: 7px;
     }
-
-    .ecosystem-marquee__item {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 12rem;
-        height: 2.5rem;
-        animation: ecosystem-partner-loop 36s linear infinite;
-        will-change: transform;
+  }
+  .lane-current {
+    transition: transform var(--duration-write) var(--ease-standard);
+  }
+  /* Below desktop the pin's ground fades out over 24 px under the drawing,
+     so the cards aren't sliced as they pass under it. */
+  @media (width < 1200px) {
+    .story-pin::after {
+      content: "";
+      position: absolute;
+      inset-inline: 0;
+      top: 100%;
+      height: 24px;
+      background: linear-gradient(var(--color-page), transparent);
+      pointer-events: none;
     }
-
-    .ecosystem-marquee:hover .ecosystem-marquee__item,
-    .ecosystem-marquee:focus .ecosystem-marquee__item {
-        animation-play-state: paused;
+  }
+  /* A card is raised while its state is current: --elevation-2 on a
+     pseudo-element that fades, so only opacity moves (200 ms). */
+  .story-card {
+    position: relative;
+  }
+  .story-card::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    box-shadow: var(--elevation-2);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--duration-disclose) var(--ease-standard);
+  }
+  .story-card[data-current]::before {
+    opacity: 1;
+  }
+  /* A lanes row writes in over --duration-write: its words fade and its
+     lines draw from their origin. */
+  .lane-row {
+    opacity: 0;
+    transition: opacity var(--duration-write) var(--ease-standard);
+  }
+  .lane-row svg {
+    clip-path: inset(0 100% 0 0);
+    transition: clip-path var(--duration-write) var(--ease-standard);
+  }
+  /* Which rows are written and which number is current follow the story's
+     data-story-state (StoryView sets it; the drawing is server-rendered).
+     Row 01 is written from the start. */
+  .lane-row[data-row="1"],
+  :is([data-story-state="2"],[data-story-state="3"],[data-story-state="4"],[data-story-state="5"],[data-story-state="6"],[data-story-state="7"],[data-story-state="8"]) .lane-row[data-row="2"],
+  :is([data-story-state="3"],[data-story-state="4"],[data-story-state="5"],[data-story-state="6"],[data-story-state="7"],[data-story-state="8"]) .lane-row[data-row="3"],
+  :is([data-story-state="4"],[data-story-state="5"],[data-story-state="6"],[data-story-state="7"],[data-story-state="8"]) .lane-row[data-row="4"],
+  :is([data-story-state="5"],[data-story-state="6"],[data-story-state="7"],[data-story-state="8"]) .lane-row[data-row="5"],
+  :is([data-story-state="6"],[data-story-state="7"],[data-story-state="8"]) .lane-row[data-row="6"],
+  :is([data-story-state="7"],[data-story-state="8"]) .lane-row[data-row="7"],
+  :is([data-story-state="8"]) .lane-row[data-row="8"] {
+    opacity: 1;
+  }
+  .lane-row[data-row="1"] svg,
+  :is([data-story-state="2"],[data-story-state="3"],[data-story-state="4"],[data-story-state="5"],[data-story-state="6"],[data-story-state="7"],[data-story-state="8"]) .lane-row[data-row="2"] svg,
+  :is([data-story-state="3"],[data-story-state="4"],[data-story-state="5"],[data-story-state="6"],[data-story-state="7"],[data-story-state="8"]) .lane-row[data-row="3"] svg,
+  :is([data-story-state="4"],[data-story-state="5"],[data-story-state="6"],[data-story-state="7"],[data-story-state="8"]) .lane-row[data-row="4"] svg,
+  :is([data-story-state="5"],[data-story-state="6"],[data-story-state="7"],[data-story-state="8"]) .lane-row[data-row="5"] svg,
+  :is([data-story-state="6"],[data-story-state="7"],[data-story-state="8"]) .lane-row[data-row="6"] svg,
+  :is([data-story-state="7"],[data-story-state="8"]) .lane-row[data-row="7"] svg,
+  :is([data-story-state="8"]) .lane-row[data-row="8"] svg {
+    clip-path: inset(0 0 0 0);
+  }
+  .lane-no {
+    color: var(--color-ink-muted);
+    transition: color var(--duration-write) var(--ease-standard);
+  }
+  :is([data-story-state="2"],[data-story-state="3"],[data-story-state="4"],[data-story-state="5"],[data-story-state="6"],[data-story-state="7"],[data-story-state="8"]) .lane-no[data-row="1"],
+  :is([data-story-state="3"],[data-story-state="4"],[data-story-state="5"],[data-story-state="6"],[data-story-state="7"],[data-story-state="8"]) .lane-no[data-row="2"],
+  :is([data-story-state="4"],[data-story-state="5"],[data-story-state="6"],[data-story-state="7"],[data-story-state="8"]) .lane-no[data-row="3"],
+  :is([data-story-state="5"],[data-story-state="6"],[data-story-state="7"],[data-story-state="8"]) .lane-no[data-row="4"],
+  :is([data-story-state="6"],[data-story-state="7"],[data-story-state="8"]) .lane-no[data-row="5"],
+  :is([data-story-state="7"],[data-story-state="8"]) .lane-no[data-row="6"],
+  :is([data-story-state="8"]) .lane-no[data-row="7"] {
+    color: var(--color-ink);
+  }
+  [data-story-state="1"] .lane-no[data-row="1"],
+  [data-story-state="2"] .lane-no[data-row="2"],
+  [data-story-state="3"] .lane-no[data-row="3"],
+  [data-story-state="4"] .lane-no[data-row="4"],
+  [data-story-state="5"] .lane-no[data-row="5"],
+  [data-story-state="6"] .lane-no[data-row="6"],
+  [data-story-state="7"] .lane-no[data-row="7"],
+  [data-story-state="8"] .lane-no[data-row="8"] {
+    color: var(--color-accent);
+  }
+  [data-story-state="2"] .lane-current {
+    transform: translateY(calc(1 * var(--row-h)));
+  }
+  [data-story-state="3"] .lane-current {
+    transform: translateY(calc(2 * var(--row-h)));
+  }
+  [data-story-state="4"] .lane-current {
+    transform: translateY(calc(3 * var(--row-h)));
+  }
+  [data-story-state="5"] .lane-current {
+    transform: translateY(calc(4 * var(--row-h)));
+  }
+  [data-story-state="6"] .lane-current {
+    transform: translateY(calc(5 * var(--row-h)));
+  }
+  [data-story-state="7"] .lane-current {
+    transform: translateY(calc(6 * var(--row-h)));
+  }
+  [data-story-state="8"] .lane-current {
+    transform: translateY(calc(7 * var(--row-h)));
+  }
+  /* How it works tells the story on its evidence stack (StoryStack; REDRAW
+     section 13 A). The stack's height is what the screen leaves, its width
+     follows, and the rows sit beside it at the same proportions. Desktop:
+     the height under the header less the record row and the relying lines
+     pinned under it. Tablets: at most 45% of 100svh. Phones: a small stack
+     beside the rows. */
+  @media (min-width: 768px) {
+    .story-stack {
+      --stack-h: clamp(240px, 45svh - 48px, 467px);
     }
-
-    .marquee-item-text {
-        background: linear-gradient(
-            90deg,
-            rgba(255, 255, 255, 0.72) 0%,
-            rgba(255, 255, 255, 0.98) 38%,
-            rgba(212, 146, 12, 0.95) 100%
-        );
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+    .story-stack .stack-box {
+      position: relative;
+      height: var(--stack-h);
+      width: calc(var(--stack-h) * 336 / 467);
     }
+    .story-stack .stack-rows {
+      top: 26.55%;
+      left: calc(100% + 20px);
+      height: 58.24%;
+      width: max-content;
+      max-width: calc(100cqw - 100% - 20px);
+    }
+    .story-stack .iso-leader {
+      top: 50%;
+    }
+  }
+  @media (min-width: 1200px) {
+    .story-stack {
+      --stack-h: clamp(250px, 100svh - var(--header-height) - 256px, 526px);
+    }
+    .story-stack .stack-box {
+      width: calc(var(--stack-h) * 360 / 526);
+    }
+    .story-stack .stack-rows {
+      top: 27%;
+      left: calc(100% + 23px);
+      height: 57.8%;
+      max-width: calc(100cqw - 100% - 23px);
+    }
+  }
+  /* Tablets: the rows share the height evenly, so a name on two lines keeps its distance. */
+  @media (min-width: 768px) and (max-width: 1199.98px) {
+    .story-stack .stack-rows {
+      justify-content: space-between;
+    }
+  }
+  @media (max-width: 767.98px) {
+    .story-stack .stack-rows {
+      gap: clamp(2px, (45svh - 226px) / 7, 8px);
+    }
+  }
+  /* What a state brings stays hidden until its card passes, then stays.
+     A sheet lands from 24 px above; words fade in. */
+  .story-on [data-from] {
+    opacity: 0;
+    transition: opacity var(--duration-write) var(--ease-standard);
+    transition-delay: calc(var(--j, 0) * 80ms);
+  }
+  .story-on .stack-land[data-from] {
+    transform: translateY(-24px);
+    transition:
+      opacity var(--duration-write) var(--ease-standard),
+      transform var(--duration-write) var(--ease-standard);
+    transition-delay: calc(var(--j, 0) * 80ms);
+  }
+  [data-story-state="1"] :is([data-from="1"]),
+  [data-story-state="2"] :is([data-from="1"], [data-from="2"]),
+  [data-story-state="3"] :is([data-from="1"], [data-from="2"], [data-from="3"]),
+  [data-story-state="4"] :is([data-from="1"], [data-from="2"], [data-from="3"], [data-from="4"]),
+  [data-story-state="5"] :is([data-from="1"], [data-from="2"], [data-from="3"], [data-from="4"], [data-from="5"]),
+  [data-story-state="6"] :is([data-from="1"], [data-from="2"], [data-from="3"], [data-from="4"], [data-from="5"], [data-from="6"]),
+  [data-story-state="7"] :is([data-from="1"], [data-from="2"], [data-from="3"], [data-from="4"], [data-from="5"], [data-from="6"], [data-from="7"]),
+  [data-story-state="8"] :is([data-from="1"], [data-from="2"], [data-from="3"], [data-from="4"], [data-from="5"], [data-from="6"], [data-from="7"], [data-from="8"]) {
+    opacity: 1;
+    transform: none;
+  }
+  .story-fade {
+    animation: story-fade var(--duration-disclose) var(--ease-standard);
+  }
+  @keyframes story-fade {
+    from {
+      opacity: 0;
+    }
+  }
 }
 
+/* The pinned story or its ledger (StoryView.tsx). Unlayered, so it wins over
+   the layout utilities on the story. The ledger shows with reduced motion
+   (decided here, so it holds without script) or when even the smallest rows
+   don't fit the screen (data-story-fits, set by script). */
+.story-ledger {
+  display: none;
+}
+.story[data-story-fits="false"] .story-on {
+  display: none;
+}
+.story[data-story-fits="false"] .story-ledger {
+  display: block;
+}
 @media (prefers-reduced-motion: reduce) {
-    .ecosystem-marquee {
-        display: flex;
-        height: auto;
-        gap: 0;
-        overflow-x: auto;
-        padding-bottom: 0.5rem;
-    }
-
-    .ecosystem-marquee__item {
-        position: static;
-        flex: 0 0 12rem;
-        animation: none !important;
-        transform: none;
-    }
+  .story-on {
+    display: none;
+  }
+  .story-ledger {
+    display: block;
+  }
+  /* A sheet's lift becomes a colour change (section 7). Unlayered, so it wins
+     over the sheet's own fill utility. Home: the lifted sheet; How it works:
+     the sheet whose row is under the pointer or focus (--lift-fill). */
+  .is-lifted :is(.iso-sheet, .iso-sheet-current) > rect:first-child {
+    fill: var(--color-accent-soft);
+  }
+  .iso-evidence .iso-lift {
+    transform: none !important;
+  }
+  .iso-evidence .iso-lift-shadow {
+    opacity: 0 !important;
+  }
+  .iso-evidence[data-picked="01"] .iso-lift[data-doc="01"] :is(.iso-sheet, .iso-sheet-current) > rect:first-child,
+  .iso-evidence[data-picked="02"] .iso-lift[data-doc="02"] :is(.iso-sheet, .iso-sheet-current) > rect:first-child,
+  .iso-evidence[data-picked="03"] .iso-lift[data-doc="03"] :is(.iso-sheet, .iso-sheet-current) > rect:first-child,
+  .iso-evidence[data-picked="04"] .iso-lift[data-doc="04"] :is(.iso-sheet, .iso-sheet-current) > rect:first-child,
+  .iso-evidence[data-picked="05"] .iso-lift[data-doc="05"] :is(.iso-sheet, .iso-sheet-current) > rect:first-child,
+  .iso-evidence[data-picked="06"] .iso-lift[data-doc="06"] :is(.iso-sheet, .iso-sheet-current) > rect:first-child,
+  .iso-evidence[data-picked="07"] .iso-lift[data-doc="07"] :is(.iso-sheet, .iso-sheet-current) > rect:first-child,
+  .iso-evidence[data-picked="08"] .iso-lift[data-doc="08"] :is(.iso-sheet, .iso-sheet-current) > rect:first-child {
+    fill: var(--color-accent-soft);
+  }
 }

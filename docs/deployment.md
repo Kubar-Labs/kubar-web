@@ -41,21 +41,78 @@ npm run deploy:cf
 ```
 
 `deploy:cf` deploys the queue consumer before the web Worker so that accepted
-contact submissions always have an active consumer. After deployment, verify:
+contact submissions always have an active consumer. The new consumer accepts
+both message versions (1 and 2); the old consumer accepts only version 1, so
+never run the new web Worker against the old consumer.
+
+After deployment, verify:
 
 ```bash
 curl -I http://kubar.tech
+curl -I https://www.kubar.tech
 curl -I https://kubar.tech
 curl -I https://kubar.tech/opengraph-image
-curl -I https://kubar.tech/media/kubar-labs-og-b2add55b.png
+curl -I https://kubar.tech/media/kubar-labs-social-bd9a99c9.png
 ```
 
-Expected results are an HTTP-to-HTTPS redirect, the staged HSTS header on HTTPS,
-a permanent redirect from the legacy Open Graph URL, and an immutable PNG at
-the content-versioned URL. Submit one contact-form smoke test and verify the
-corresponding
-`contact_submission_queued` and `contact_email_sent` events. These structured
-events contain identifiers and delivery state, not form fields.
+Expected results are an HTTP-to-HTTPS redirect, a redirect from `www` to the
+apex, the staged HSTS header on HTTPS, a permanent redirect from the legacy
+Open Graph URL to the social image, and an immutable PNG at the
+content-versioned URL.
+
+The eight routes return 200, and any other path returns the 404 page with
+status 404:
+
+```bash
+for p in / /products/kubar-protocol /products/navdhan-sdk /how-it-works /about /contact /legal/privacy /legal/terms /no-such-page; do
+  curl -s -o /dev/null -w "$p %{http_code}\n" https://kubar.tech$p
+done
+```
+
+The four permanent redirects (308) from the old site's addresses:
+
+| From | To |
+|---|---|
+| `/products/navdhan` | `/products/navdhan-sdk` |
+| `/for-platforms` | `/products/navdhan-sdk` |
+| `/team` | `/about#team` |
+| `/privacy` | `/legal/privacy` |
+
+```bash
+for p in /products/navdhan /for-platforms /team /privacy; do
+  curl -s -o /dev/null -w "$p %{http_code} %{redirect_url}\n" https://kubar.tech$p
+done
+```
+
+Every HTML response carries `Content-Security-Policy`, `Referrer-Policy`,
+`X-Content-Type-Options`, `X-Frame-Options`, `Strict-Transport-Security`,
+`Cross-Origin-Opener-Policy` and `Permissions-Policy`.
+
+Submit one contact-form smoke test, marked as a test and written as "Something
+else" so that it goes to `outreach@kubar.tech`, and verify the corresponding
+`contact_submission_queued` and `contact_email_sent` events (a message routed
+to partnerships@ logs `contact_email_sent_to_fallback` instead; see below).
+These structured events contain identifiers and delivery state, not form
+fields.
+
+## Checking the Workers build locally
+
+`npm run preview:cf` serves the Workers build on `http://localhost:8787`, but
+`worker.mjs` redirects every plain-http request to https, so over http every
+request answers 308. Serve the same build over local https instead and address
+it as `kubar.tech` (the contact route accepts only that origin):
+
+```bash
+npm run build:cf
+npx opennextjs-cloudflare preview --local-protocol https
+curl -sk --connect-to kubar.tech:443:127.0.0.1:8787 -I https://kubar.tech/
+```
+
+In a browser test, start Chromium with
+`--host-resolver-rules="MAP kubar.tech:443 127.0.0.1:8787"` and ignore the
+self-signed certificate. All bindings are local: a posted form is queued
+locally and no email is sent. The `www` redirect cannot be checked this way
+(Wrangler rewrites the host to the first route); check it on the live site.
 
 ## HSTS rollout
 
@@ -85,3 +142,14 @@ known-good commit, install with `npm ci --ignore-scripts`, run
 `npm run release:check`, and deploy from that worktree. Do not delete either
 queue during rollback; retained messages can be replayed after the consumer is
 healthy.
+
+## Contact form routing (rebuild, step 5)
+
+The site routes institution, platform and investor messages to `partnerships@kubar.tech` and exporter, press and other messages to `outreach@kubar.tech`. The email Worker's `send_email` binding still allows only `outreach@kubar.tech` as a destination, so today a message routed to partnerships@ fails at the binding and the Worker sends the same email to the fallback, `outreach@kubar.tech` (logged as `contact_email_sent_to_fallback`). Nothing is lost and nothing waits.
+
+To switch the routing on in production:
+
+1. In the Cloudflare dashboard, verify `partnerships@kubar.tech` as an Email Routing destination address.
+2. Add it to `allowed_destination_addresses` in `workers/contact-email/wrangler.jsonc` and deploy the consumer.
+
+Neither step has been done; both are for Vaibhav to decide.

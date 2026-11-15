@@ -1,412 +1,60 @@
-"use client";
-
-import { useState, useCallback, useRef } from "react";
-import { m } from "framer-motion";
-import { Mail, ArrowRight } from "lucide-react";
-import Link from "next/link";
+import type { Metadata } from "next";
+import { Suspense } from "react";
 import { useTranslations } from "next-intl";
-import { Navbar } from "@/components/layout/Navbar";
-import { ContactSuccessModal } from "@/components/contact/ContactSuccessModal";
-import "./contact.css";
+import { getTranslations } from "next-intl/server";
+import { createPageMetadata } from "@/app/page-metadata";
+import { Section } from "@/components/blocks/Section";
+import { ContactForm, type ContactFormCopy } from "@/components/contact/ContactForm";
+import { ContactRoutes, type ContactRoute } from "@/components/registers/ContactRoutes";
+import { Register } from "@/components/registers/Register";
+import { WithEmails } from "@/components/ui/WithEmails";
 
-/* ─── Animation Variants ─────────────────────────────────── */
+/*
+ * Contact (Figma 174:6 at 1440; the 768 and 390 frames are not updated):
+ * the routes, with no "Goes to" column (choosing one that leads to the
+ * form pre-fills "I'm writing as" and moves focus to the form), then the
+ * form with the direct addresses beside it.
+ */
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("contact.meta");
+  return createPageMetadata({ title: t("title"), description: t("description"), path: "/contact" });
+}
 
-const fadeInUp = {
-  hidden: { opacity: 0, y: 32 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.8,
-      ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
-    },
-  },
-};
-
-const staggerContainer = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-      delayChildren: 0.2,
-    },
-  },
-};
-
-/* ─── Contact Form Component ────────────────────────────── */
-function ContactForm() {
+export default function Contact() {
   const t = useTranslations("contact");
-  const submitButtonRef = useRef<HTMLButtonElement>(null);
-  const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    phone: "",
-    companyName: "",
-    category: "",
-    website: "",
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<
-    "idle" | "success" | "error"
-  >("idle");
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [submittedName, setSubmittedName] = useState("");
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleCloseModal = useCallback(() => {
-    setShowSuccessModal(false);
-  }, []);
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setSubmitStatus("idle");
-
-    try {
-      const response = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-
-      const data = (await response.json()) as { error?: string };
-
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to send message");
-      }
-
-      // Store the name for the modal before clearing the form
-      setSubmittedName(formData.fullName.split(" ")[0]);
-      setSubmitStatus("success");
-      setShowSuccessModal(true);
-      setFormData({
-        fullName: "",
-        email: "",
-        phone: "",
-        companyName: "",
-        category: "",
-        website: "",
-      });
-    } catch {
-      setSubmitStatus("error");
-      setTimeout(() => setSubmitStatus("idle"), 5000);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   return (
     <>
-      <m.form
-        initial={{ opacity: 0, x: -24 }}
-        whileInView={{ opacity: 1, x: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
-        onSubmit={handleSubmit}
-        className="contact-form"
-      >
-        <input
-          type="text"
-          name="website"
-          value={formData.website}
-          onChange={handleChange}
-          tabIndex={-1}
-          autoComplete="off"
-          aria-hidden="true"
-          className="absolute h-px w-px overflow-hidden opacity-0"
+      <section>
+        <div className="page-container flex flex-col gap-10 pt-8 pb-12 lg:gap-16 lg:pt-16 lg:pb-[72px]">
+          <div className="flex flex-col gap-8">
+            <h1 className="t-display text-ink">{t("hero.headline")}</h1>
+            <p className="t-body-lg text-ink-muted lg:max-w-[628px]">{t("hero.sub")}</p>
+          </div>
+          <ContactRoutes
+            columns={t.raw("routes.columns") as { who: string; step: string }}
+            rows={t.raw("routes.rows") as ContactRoute[]}
+          />
+        </div>
+      </section>
+
+      {/* The form, with the direct addresses beside it from 1200 up and under it below that
+          (Figma 296:12889; REDRAW section 13 C2). No separate Direct section or label. */}
+      <Section id="form" className="flex flex-col gap-(--section-space) lg:flex-row lg:items-start lg:gap-20">
+        <div className="min-w-0 lg:w-[628px] lg:shrink">
+          {/* useSearchParams (the ?intent= preset) needs a Suspense boundary on a static page. */}
+          <Suspense>
+            <ContactForm copy={t.raw("form") as ContactFormCopy} />
+          </Suspense>
+        </div>
+        <Register
+          className="min-w-0 lg:flex-1"
+          first="label"
+          columns={t.raw("direct.columns") as string[]}
+          widths={[217, 355]}
+          rows={(t.raw("direct.rows") as string[][]).map(([label, entry]) => [label, <WithEmails key={label} text={entry} />])}
         />
-        {/* Full Name */}
-        <m.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="contact-form-group"
-        >
-          <label htmlFor="contact-full-name" className="contact-label">
-            {t("form.full_name_label")}
-          </label>
-          <input
-            type="text"
-            id="contact-full-name"
-            name="fullName"
-            value={formData.fullName}
-            onChange={handleChange}
-            placeholder={t("form.full_name_placeholder")}
-            className="contact-input"
-            required
-          />
-        </m.div>
-
-        {/* Email */}
-        <m.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="contact-form-group"
-        >
-          <label htmlFor="contact-email" className="contact-label">
-            {t("form.email_label")}
-          </label>
-          <input
-            type="email"
-            id="contact-email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            placeholder={t("form.email_placeholder")}
-            className="contact-input"
-            required
-          />
-        </m.div>
-
-        {/* Phone */}
-        <m.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.25 }}
-          className="contact-form-group"
-        >
-          <label htmlFor="contact-phone" className="contact-label">
-            {t("form.phone_label")}
-          </label>
-          <input
-            type="tel"
-            id="contact-phone"
-            name="phone"
-            value={formData.phone}
-            onChange={handleChange}
-            placeholder={t("form.phone_placeholder")}
-            className="contact-input"
-          />
-        </m.div>
-
-        {/* Company Name */}
-        <m.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.28 }}
-          className="contact-form-group"
-        >
-          <label htmlFor="contact-company" className="contact-label">
-            {t("form.company_name_label")}
-          </label>
-          <input
-            type="text"
-            id="contact-company"
-            name="companyName"
-            value={formData.companyName}
-            onChange={handleChange}
-            placeholder={t("form.company_name_placeholder")}
-            className="contact-input"
-            required
-          />
-        </m.div>
-
-        {/* Category */}
-        <m.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="contact-form-group"
-        >
-          <label htmlFor="contact-category" className="contact-label">
-            {t("form.category_label")}
-          </label>
-          <div className="contact-select-wrapper">
-            <select
-              id="contact-category"
-              name="category"
-              value={formData.category}
-              onChange={handleChange}
-              className="contact-input contact-select"
-              required
-            >
-              <option value="" disabled hidden>
-                {t("form.category_placeholder")}
-              </option>
-              <option value="bank">{t("form.category_options.bank")}</option>
-              <option value="fintech">{t("form.category_options.fintech")}</option>
-              <option value="nbfc">{t("form.category_options.nbfc")}</option>
-              <option value="b2b_marketplace">{t("form.category_options.b2b_marketplace")}</option>
-              <option value="b2b_platform">{t("form.category_options.b2b_platform")}</option>
-              <option value="erp">{t("form.category_options.erp")}</option>
-              <option value="other">{t("form.category_options.other")}</option>
-            </select>
-          </div>
-        </m.div>
-
-        {/* Error message (inline) */}
-        {submitStatus === "error" && (
-          <m.div
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            className="contact-status-error"
-            role="alert"
-            aria-live="assertive"
-          >
-            ✕ {t("form.error")}
-          </m.div>
-        )}
-
-        <p className="text-xs leading-relaxed text-white/50">
-          {t("form.privacy_notice")} {" "}
-          <Link
-            href="/privacy"
-            className="text-white/70 underline underline-offset-4 transition-colors hover:text-white"
-          >
-            {t("form.privacy_link")}
-          </Link>
-        </p>
-
-        {/* Submit button */}
-        <m.button
-          ref={submitButtonRef}
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.35 }}
-          whileHover={{ scale: 1.02, y: -2 }}
-          whileTap={{ scale: 0.98 }}
-          type="submit"
-          disabled={isSubmitting}
-          className="contact-submit-btn"
-        >
-          {isSubmitting ? t("form.submitting") : t("form.submit")}
-          {!isSubmitting && <ArrowRight aria-hidden="true" className="h-4 w-4" />}
-        </m.button>
-      </m.form>
-
-      {/* Success Modal */}
-      <ContactSuccessModal
-        isOpen={showSuccessModal}
-        onClose={handleCloseModal}
-        senderName={submittedName}
-        returnFocusRef={submitButtonRef}
-      />
+      </Section>
     </>
-  );
-}
-
-/* ─── Contact Info Component ────────────────────────────── */
-function ContactInfo() {
-  const t = useTranslations("contact");
-
-  const contactItems = [
-    {
-      label: t("contact_info.partner_label"),
-      email: t("contact_info.partner_email"),
-      delay: 0.1,
-    },
-    {
-      label: t("contact_info.support_label"),
-      email: t("contact_info.support_email"),
-      delay: 0.15,
-    },
-    {
-      label: t("contact_info.media_label"),
-      email: t("contact_info.media_email"),
-      delay: 0.2,
-    },
-  ];
-
-  return (
-    <m.div
-      initial={{ opacity: 0, x: 24 }}
-      whileInView={{ opacity: 1, x: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
-      className="contact-info-section"
-    >
-      <m.h2
-        initial={{ opacity: 0, y: -12 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.6 }}
-        className="contact-info-heading"
-      >
-        {t("contact_info.heading")}
-      </m.h2>
-
-      <div className="contact-info-list">
-        {contactItems.map((item) => (
-          <m.a
-            key={item.email}
-            href={`mailto:${item.email}`}
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: item.delay }}
-            whileHover={{ x: 4 }}
-            className="contact-info-item"
-          >
-            <Mail className="contact-info-icon" aria-hidden="true" />
-            <div className="contact-info-content">
-              <p className="contact-info-label">{item.label}</p>
-              <p className="contact-info-email">{item.email}</p>
-            </div>
-          </m.a>
-        ))}
-      </div>
-    </m.div>
-  );
-}
-
-/* ─── Main Page ──────────────────────────────────────────── */
-export default function ContactPage() {
-  const t = useTranslations("contact");
-
-  return (
-    <main className="contact-main">
-      <Navbar variant="approved" />
-
-      {/* Hero Section */}
-      <section className="contact-hero">
-        <div className="contact-container">
-          <m.div
-            variants={staggerContainer}
-            initial="hidden"
-            animate="visible"
-            className="contact-hero-content"
-          >
-            <m.h1
-              variants={fadeInUp}
-              className="contact-hero-title"
-            >
-              {t("main_heading")}
-            </m.h1>
-            <m.p
-              variants={fadeInUp}
-              className="contact-hero-description"
-            >
-              {t("main_description")}
-            </m.p>
-          </m.div>
-
-        </div>
-      </section>
-
-      {/* Form + Info Section */}
-      <section className="contact-content">
-        <div className="contact-container">
-          <div className="contact-grid">
-            <ContactForm />
-            <ContactInfo />
-          </div>
-        </div>
-      </section>
-    </main>
   );
 }

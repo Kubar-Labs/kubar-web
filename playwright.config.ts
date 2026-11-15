@@ -14,7 +14,13 @@ export default defineConfig({
   use: {
     baseURL,
     trace: "on-first-retry",
-    launchOptions: executablePath ? { executablePath } : undefined,
+    // Software rendering only: on some machines headless Chromium's GPU
+    // compositor stalls for ~30 s before its first frame, which times out
+    // every click, hover and screenshot. The tests never need the GPU.
+    launchOptions: {
+      ...(executablePath ? { executablePath } : {}),
+      args: ["--disable-gpu", "--disable-gpu-compositing", "--disable-software-rasterizer"],
+    },
   },
   projects: [
     {

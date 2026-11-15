@@ -1,785 +1,2110 @@
 {
   "site": {
     "name": "Kubar Labs",
-    "title": "Commerce to Capital | Kubar Labs",
-    "description": "Kubar Labs builds financial infrastructure through NavDhan for embedded business credit and Kubar Protocol for cross-border trade finance.",
-    "og_title": "Commerce to Capital | Kubar Labs",
-    "og_description": "Kubar Labs connects business activity and commerce workflows to regulated capital through NavDhan and Kubar Protocol.",
-    "twitter_description": "Financial infrastructure connecting commerce to regulated capital.",
-    "locale": "en_IN",
-    "author": "Kubar Labs"
+    "homeTitle": "Kubar Labs · Building the institutional exchange for cross-border trade finance",
+    "homeDescription": "Starting with the asset: export receivables an international financier can buy again and again, insured in its own name.",
+    "socialTitle": "Kubar Labs",
+    "socialImageAlt": "Kubar Labs: Building the institutional exchange for cross-border trade finance."
   },
-  "nav": {
-    "logo_alt": "Kubar Labs",
+  "skipLink": "Skip to content",
+  "header": {
+    "homeLabel": "Kubar Labs, home",
+    "primaryNav": "Main",
     "products": "Products",
-    "about": "About Us",
-    "contact": "Contact",
-    "team": "Our Team",
-    "cta": "Request Demo",
-    "main_nav_aria": "Main navigation",
-    "mobile_nav_aria": "Mobile navigation",
-    "open_menu_aria": "Open navigation menu",
-    "close_menu_aria": "Close menu",
-    "products_dropdown": {
-      "navdhan": {
-        "name": "NavDhan",
-        "description": "Embedded origination infrastructure for business lending",
-        "href": "/products/navdhan"
-      },
-      "bre": {
-        "name": "Business Rules Engine",
-        "description": "Lender-configurable eligibility and routing rules",
-        "status": "Planned"
-      },
-      "underwriting": {
-        "name": "Credit Intelligence",
-        "description": "Sector-specific pre-qualification signals",
-        "status": "Planned"
-      }
-    }
-  },
-  "hero": {
-    "aria_label": "Kubar Labs connects commerce to capital",
-    "title": {
-      "line1": "Connect commerce",
-      "line2": "to capital."
-    },
-    "subtitle": "We build financial infrastructure that connects business activity to regulated capital, through NavDhan for embedded business credit and Kubar Protocol for cross-border trade finance",
-    "cta_primary": "Explore products",
-    "cta_primary_aria": "Explore Kubar Labs products",
-    "cta_secondary": "Meet Kubar Labs",
-    "cta_secondary_aria": "Learn about Kubar Labs",
-    "scroll": "Scroll"
-  },
-  "home_current": {
-    "products": {
-      "title": "Two products.\nOne company.",
-      "description": "Domestic credit and cross-border trade finance, built around the context of how businesses work.",
-      "navdhan": {
-        "description": "Unified credit infrastructure for commerce-tech and B2B platforms, designed for the breadth of loan products a business may need.",
-        "status": "BUILT FOR EMBEDDED DISTRIBUTION",
-        "link": "Explore NavDhan"
-      },
-      "protocol": {
-        "description": "Cross-border trade-finance infrastructure, in development, connecting trade evidence, rights and financing context from order to settlement.",
-        "status": "DEMONSTRATED WORKFLOW · IN DEVELOPMENT",
-        "link": "Explore Kubar Protocol"
-      }
-    },
-    "thesis": {
-      "title": "Financial infrastructure\nfor the way\nbusinesses trade.",
-      "description": "Business activity carries the context that finance needs. Kubar Labs builds the connective infrastructure around it, while lenders, banks and document providers retain their responsibilities.",
-      "link": "About Kubar Labs",
-      "architecture_aria": "Kubar Labs parent company with sibling NavDhan and Kubar Protocol products",
-      "navdhan_label": "DOMESTIC BUSINESS CREDIT",
-      "navdhan_description": "Embedded business credit.",
-      "protocol_label": "CROSS-BORDER TRADE FINANCE",
-      "protocol_description": "Cross-border trade finance.",
-      "note": "Lending, document authority and money movement stay with the relevant institutions."
-    }
-  },
-  "cards": {
-    "loan_approval": {
-      "label": "Illustrative Application",
-      "amount": "₹8.5 lakh",
-      "processing_label": "Application status",
-      "processing_time": "Lender-ready",
-      "match_label": "Routing fit",
-      "match_value": "Illustrative"
-    },
-    "credit": {
-      "header": "Platform Signals",
-      "msme_name": "Illustrative Business",
-      "score_label": "Pre-qualification",
-      "score": "Eligible",
-      "change": "+ context",
-      "change_period": "from platform data",
-      "rate_label": "Final decision",
-      "rate": "By lender"
-    },
-    "nbfc": {
-      "status": "Illustrative lender options",
-      "lender_1_name": "Lender A",
-      "lender_1_amount": "Eligible",
-      "lender_2_name": "Lender B",
-      "lender_2_amount": "Review",
-      "more": "+ more based on policy"
-    }
-  },
-  "marquee": {
-    "aria_label": "Awards, programmes and recognitions",
-    "items": {
-      "finvision": "FinVision 2026 Award at NIBM, Pune",
-      "startup_mahakumbh": "Popular Choice Award at Startup MahaKumbh",
-      "f6s": "Recognised in F6S FinTech rankings",
-      "ifsca": "IFSCA Fintech Sandbox"
-    }
-  },
-  "problems": {
-    "aria_label": "B2B platform and lender origination problems",
-    "conclusion": "The constraint is not lender capacity. It is scalable, contextual origination.",
-    "marketplace": {
-      "title": "The B2B Platform Problem",
-      "subtitle": "Businesses transact on your platform, but financing remains disconnected from the workflow.",
-      "bullets": {
-        "1": "Businesses delay or abandon orders when working capital is unavailable at the point of need",
-        "2": "Financing-related GMV and retention opportunities leave the platform",
-        "3": "Building and maintaining multiple lender integrations is expensive and operationally complex"
-      }
-    },
-    "lender": {
-      "title": "The Lender Origination Problem",
-      "subtitle": "You have lending capacity, but fragmented B2B ecosystems are difficult to reach and integrate.",
-      "bullets": {
-        "1": "Intermediary-led sourcing is costly and difficult to scale consistently",
-        "2": "Unfiltered applications create low conversion and repeated manual work",
-        "3": "Limited platform context makes pre-qualification and product matching harder"
-      }
-    }
-  },
-  "product_showcase": {
-    "aria_label": "NavDhan product overview",
-    "eyebrow": "EMBEDDED ORIGINATION INFRASTRUCTURE",
-    "title": "NavDhan",
-    "subtitle": "A lender-neutral origination layer embedded inside fragmented B2B platforms. NavDhan captures borrower intent and permissioned operational signals, then creates and routes lender-ready applications into existing lender systems.",
-    "metrics": {
-      "approval_time": {
-        "value": "Lender-ready",
-        "label": "Structured applications for existing lender systems"
-      },
-      "cash_time": {
-        "value": "Contextual",
-        "label": "Permissioned platform and transaction signals"
-      },
-      "approval_rate": {
-        "value": "Multi-lender",
-        "label": "Rules-based routing across eligible products"
-      }
-    }
-  },
-  "visual_story": {
-    "aria_label": "Illustrative NavDhan origination journey",
-    "implementation_label": "NavDhan Workflow",
-    "implementation_phases": {
-      "1": "Credit Intent",
-      "2": "Data & Pre-Qualification",
-      "3": "Lender Routing",
-      "4": "Lender Decision & Disbursal"
-    },
-    "old_way_label": "Traditional Journey",
-    "old_way_steps": {
-      "1": "Agent or branch",
-      "2": "Repeated paperwork",
-      "3": "Manual follow-ups",
-      "4": "Delayed or lost opportunity"
-    },
-    "steps": {
-      "1": "Sheetal receives a ₹10 lakh bulk order through a B2B platform.",
-      "2": "She needs ₹4 lakh in working capital to fulfil it.",
-      "3": "NavDhan captures the credit request inside the platform workflow.",
-      "4": "With consent, NavDhan retrieves and structures relevant platform and financial data.",
-      "5": "Lender-configured rules and sector-specific signals pre-qualify the application.",
-      "6": "The lender-ready application is routed to eligible lenders.",
-      "7": "The selected regulated lender completes underwriting, pricing and disbursal.",
-      "8": "Sheetal fulfils the order without leaving the platform."
-    },
-    "timeline_titles": {
-      "1": "Order Received",
-      "2": "Capital Need Identified",
-      "3": "Credit Intent Captured",
-      "4": "Permissioned Data Structured",
-      "5": "Application Pre-Qualified",
-      "6": "Application Routed",
-      "7": "Lender Decision & Disbursal",
-      "8": "Order Fulfilled"
-    },
-    "visual_alts": {
-      "1": "Illustrative business order received inside a B2B platform",
-      "2": "Illustrative working-capital need identified",
-      "3": "NavDhan embedded credit request",
-      "4": "Permissioned data retrieval and application structuring",
-      "5": "Lender-configured pre-qualification",
-      "6": "Application routing to eligible lenders",
-      "7": "Regulated lender decision and disbursal",
-      "8": "Business fulfils the order"
-    },
-    "cta": {
-      "title": "Embed business credit with",
-      "subtitle": "NavDhan by Kubar Labs",
-      "button": "Request a Demo"
-    }
-  },
-  "two_outcomes": {
-    "aria_label": "Value for B2B platforms and financial institutions",
-    "title": "One Origination Layer. Two-Sided Value.",
-    "marketplaces": {
-      "tab": "For B2B Platforms",
-      "subtitle": "Offer contextual business financing without building lender integrations or internal credit operations. NavDhan charges the platform no integration or subscription fee.",
-      "cta": "Explore Platform Integration",
-      "cta_email": "partnerships@kubar.tech",
-      "features": {
-        "1": {
-          "title": "Higher GMV",
-          "description": "Businesses can fulfil orders that may otherwise be delayed or abandoned because of a working-capital gap."
-        },
-        "2": {
-          "title": "Business Retention",
-          "description": "Contextual financing gives businesses another reason to transact and remain active on the platform."
-        },
-        "3": {
-          "title": "Success-Based Revenue",
-          "description": "Eligible platform partners may receive a success-based revenue share on loans disbursed through their ecosystem."
-        },
-        "4": {
-          "title": "No Upfront Platform Fee",
-          "description": "NavDhan handles the origination workflow and lender integrations. Final credit decisions remain with regulated lenders."
-        }
-      }
-    },
-    "institutions": {
-      "tab": "For Financial Institutions",
-      "subtitle": "Reach high-intent businesses through structured, data-enriched applications embedded in third-party B2B workflows.",
-      "cta": "Request a Lender Demo",
-      "cta_email": "partnerships@kubar.tech",
-      "features": {
-        "1": {
-          "title": "Lender-Ready Applications",
-          "description": "Receive structured applications through existing LOS, CRM or internal lender workflows."
-        },
-        "2": {
-          "title": "Platform-Specific Intelligence",
-          "description": "Use permissioned operational signals to add context before the lender's final underwriting decision."
-        },
-        "3": {
-          "title": "Pre-Disbursement Orchestration",
-          "description": "Automate application collection, verification, pre-qualification and routing while retaining lender control over approval and pricing."
-        },
-        "4": {
-          "title": "Compliance-Aware Design",
-          "description": "Configure workflows around applicable digital-lending, consent and data-protection requirements."
-        }
-      }
-    }
-  },
-  "built_for_trust": {
-    "aria_label": "Responsible lending, data protection and institutional recognition",
-    "title": "Designed for Responsible Lending",
-    "subtitle": "Compliance and data protection are shared responsibilities, supported by configurable workflows and controls.",
-    "cards": {
-      "1": {
-        "title": "RBI Digital Lending Directions, 2025",
-        "tagline": "Designed for Lender-Configured Compliance",
-        "context": "NavDhan is designed to support regulated entities and lending service providers in configuring disclosures, consent, data use and offer presentation around applicable RBI digital-lending requirements. Each regulated lender remains responsible for its policies, approvals and compliance obligations."
-      },
-      "2": {
-        "title": "DPDP-Aligned Data Practices",
-        "tagline": "Purpose-Limited, Consent-Led Data Use",
-        "context": "NavDhan is designed around purpose-specific notices, consent, access controls and configurable retention practices. Compliance depends on the implementation and the respective roles of Kubar Labs, platform partners and lenders."
-      },
-      "3": {
-        "title": "Member of FACE",
-        "tagline": "Part of India's Responsible FinTech Ecosystem",
-        "context": "Kubar Labs is a member of FACE, the RBI-recognised Self-Regulatory Organisation in the FinTech Sector (SRO-FT), and participates in an ecosystem focused on responsible conduct and consumer protection."
-      },
-      "4": {
-        "title": "STPI FinGlobe Incubatee",
-        "tagline": "Supported by a MeitY-Backed FinTech Programme",
-        "context": "Kubar Labs is incubated at STPI FinGlobe, an initiative of Software Technology Parks of India focused on supporting FinTech innovation and market development."
-      },
-      "5": {
-        "title": "FinVision 2026 Award Recipient",
-        "tagline": "Recognised at NIBM, Pune",
-        "context": "Kubar Labs received a FinVision 2026 award at NIBM, Pune, an autonomous institute established by the Reserve Bank of India in consultation with the Government of India."
-      }
-    }
-  },
-  "built_by": {
-    "aria_label": "Kubar Labs products and roadmap",
-    "title_prefix": "Built by",
-    "title_suffix": "Kubar Labs",
-    "description": "Kubar Labs builds financial infrastructure for business credit. NavDhan is our embedded origination platform for domestic business lending, with planned extensions into secured credit and trade-finance workflows. Kubar Protocol is our longer-term R&D initiative for digital trade assets and cross-border settlement.",
-    "tagline": "New <bharat>Bharat</bharat>. New <methods>Credit Rails</methods>. New <money>Possibilities</money>.",
-    "products": {
-      "navdhan": {
-        "name": "NavDhan",
-        "description": "Embedded origination infrastructure for business lending",
-        "status": "LAUNCHING",
-        "status_type": "live"
-      },
-      "protocol": {
+    "menuProducts": {
+      "kubarProtocol": {
         "name": "Kubar Protocol",
-        "description": "Long-term R&D for digital trade assets and cross-border settlement",
-        "status": "LONG-TERM R&D",
-        "status_type": "upcoming"
+        "line": "For banks, finance companies, insurers and funds"
+      },
+      "navdhanSdk": {
+        "name": "NavDhan SDK",
+        "line": "For trade platforms and marketplaces"
       }
     },
-    "hiring_cta": "Want to help us build it? Get in touch",
-    "hiring_link": "→",
-    "hiring_email": "careers@kubar.tech"
-  },
-  "products": {
-    "section_label": "Products section",
-    "eyebrow": "What We Build",
-    "title": "One Origination Layer. Multiple Credit Products.",
-    "subtitle": "Kubar Labs builds the infrastructure that connects fragmented B2B workflows with existing lender systems.",
-    "embedded_credit": {
-      "title": "Embedded Origination Infrastructure",
-      "description": "A configurable SDK and API layer that embeds credit requests, data collection and lender routing inside third-party business workflows."
-    },
-    "unified_scoring": {
-      "title": "Credit Intelligence & Pre-Qualification",
-      "description": "Combine permissioned platform, banking, GST, bureau and verification signals to support lender-configured pre-qualification. Final underwriting remains with the regulated lender."
-    },
-    "nbfc_infrastructure": {
-      "title": "Lender Integration & Orchestration",
-      "description": "Route structured applications into existing LOS, LMS, CRM and internal lender systems without replacing the lender's core infrastructure."
-    }
-  },
-  "nbfcs": {
-    "section_label": "For financial institutions section",
-    "eyebrow": "For Financial Institutions",
-    "title": "Reach High-Intent Businesses. Originate with More Context.",
-    "subtitle": "NavDhan helps lenders access structured, contextual applications from fragmented B2B ecosystems.",
-    "benefit_1": {
-      "title": "Embedded Business Reach",
-      "description": "Access businesses inside the platforms where transactions and credit intent already occur."
-    },
-    "benefit_2": {
-      "title": "Data-Enriched Pre-Qualification",
-      "description": "Use permissioned operational and financial signals to support product matching and lender-configured eligibility checks."
-    },
-    "benefit_3": {
-      "title": "Structured Application Delivery",
-      "description": "Create and route lender-ready applications into existing systems. Underwriting, pricing, approval and servicing remain with the lender."
-    }
-  },
-  "msmes": {
-    "section_label": "For businesses section",
-    "eyebrow": "For Businesses",
-    "title": "Access Business Credit Where You Already Work.",
-    "subtitle": "Request financing inside the B2B platform you already use and share relevant information with eligible regulated lenders.",
-    "benefit_1": {
-      "title": "Credit at the Point of Business",
-      "description": "Start a financing request without leaving the platform where your order or transaction occurs."
-    },
-    "benefit_2": {
-      "title": "Comparable Lender Offers",
-      "description": "Where multiple offers are available, review key lender-provided terms before making a decision."
-    },
-    "benefit_3": {
-      "title": "Use Your Operating Context",
-      "description": "With consent, relevant platform and financial information can help create a more complete application."
-    }
+    "howItWorks": "How it works",
+    "about": "About",
+    "contact": "Contact",
+    "talkToUs": "Talk to us",
+    "menu": "Menu",
+    "close": "Close",
+    "sheetLabel": "Menu"
   },
   "footer": {
-    "main_cta_title": "Explore how NavDhan can support your lending or platform workflow.",
-    "email_link": "partnerships@kubar.tech",
-    "schedule_call": "Schedule a Call",
-    "schedule_link": "https://calendly.com/vaibhav-kubar/partnerships-kubar",
-    "links": {
-      "about": "About Kubar Labs",
-      "navdhan": "NavDhan",
-      "contact": "Contact",
-      "privacy": "Privacy Policy"
-    },
-    "copyright": "© 2026 Kubar Labs. All rights reserved."
+    "navLabel": "Footer",
+    "products": "Products",
+    "kubarProtocol": "Kubar Protocol",
+    "navdhanSdk": "NavDhan SDK",
+    "company": "Company",
+    "howItWorks": "How it works",
+    "about": "About",
+    "contact": "Contact",
+    "legal": "Legal",
+    "privacy": "Privacy notice",
+    "terms": "Terms of use",
+    "linkedin": "LinkedIn",
+    "linkedinLabel": "Kubar Labs on LinkedIn (opens in a new tab)",
+    "role": "Kubar acts as a financier’s origination and servicing agent. It doesn’t lend, hold client money or take credit risk. Its services are for institutions only, and nothing on this site is an offer to the public.",
+    "entity": "Kubar Labs is the brand of Kubar Protocol Private Limited, a company incorporated in India. CIN U70200WB2024PTC274850. Registered office: Paras Market, Station Road, Barakar, West Bengal 713324.",
+    "marks": "Programme names and logos belong to their owners. They show programmes Kubar or its founder takes part in, not partnerships.",
+    "copyright": "© {year} Kubar Protocol Private Limited"
   },
-  "contact": {
-    "page_title": "Contact Kubar Labs",
-    "page_description": "Speak with the NavDhan team about lender integration, platform distribution or investment.",
-    "main_heading": "Start a Conversation",
-    "main_description": "Talk to Kubar Labs about embedded business credit with NavDhan, cross-border trade finance with Kubar Protocol, or working with our team.",
-    "form": {
-      "full_name_label": "Full Name",
-      "full_name_placeholder": "John Doe",
-      "email_label": "Email Address",
-      "email_placeholder": "you@company.com",
-      "phone_label": "Phone Number (optional)",
-      "phone_placeholder": "+91 98765 43210",
-      "company_name_label": "Company Name",
-      "company_name_placeholder": "Enter Company Name",
-      "category_label": "Which category best describes your organisation?",
-      "category_placeholder": "Select category...",
-      "category_options": {
-        "bank": "Bank",
-        "fintech": "FinTech",
-        "nbfc": "NBFC",
-        "b2b_marketplace": "B2B Marketplace",
-        "b2b_platform": "B2B Platform",
-        "erp": "ERP or Enterprise Software",
-        "other": "Investor / Ecosystem Partner / Other"
+  "home": {
+    "display": "Building the institutional exchange<marker></marker> for <nb>cross-border</nb> trade finance.",
+    "subline": "Starting with the asset: export receivables an international financier can buy again and again, insured in its own name.",
+    "routes": [
+      {
+        "label": "For financial institutions",
+        "href": "/products/kubar-protocol"
       },
-      "submit": "Send Message",
-      "submitting": "Sending...",
-      "success": "Message sent! We'll be in touch within 24 hours.",
-      "error": "Something went wrong. Please try again.",
-      "privacy_notice": "By submitting this form, you agree that Kubar Labs may use your details to respond to your enquiry.",
-      "privacy_link": "Privacy Policy"
+      {
+        "label": "For trade platforms",
+        "href": "/products/navdhan-sdk"
+      }
+    ],
+    "followAnchor": "Follow one receivable",
+    "oneReceivable": {
+      "heading": "Follow one receivable from shipment to settlement."
     },
-    "contact_info": {
-      "heading": "Contact the right team",
-      "partner_label": "Partnership and investor enquiries",
-      "partner_email": "partnerships@kubar.tech",
-      "support_label": "Support",
-      "support_email": "support@kubar.tech",
-      "media_label": "Media",
-      "media_email": "press@kubar.tech"
+    "standing": {
+      "heading": "Standing and memberships."
+    },
+    "gap": {
+      "heading": "The missing piece isn’t capital.",
+      "lead": "Exporters’ paper doesn’t arrive originated, insured and documented in a form a financier can buy again and again. Kubar builds that layer.",
+      "figures": [
+        {
+          "figure": "About $80bn",
+          "caption": "a year of Indian SME and mid-market export receivables is financeable: Kubar’s estimate for FY 2025–26.",
+          "footnote": 2
+        },
+        {
+          "figure": "$126.92M",
+          "caption": "financed in total on GIFT City’s trade-finance platforms (ITFS): 2,857 transactions to June 2026.",
+          "footnote": 3
+        }
+      ],
+      "scaleNote": "Drawn to scale. $126.92M is about 0.16% of the bar above.",
+      "scaleAlt": "A bar for about $80bn a year above a hairline for $126.92M in total, drawn to the same scale.",
+      "footnote2": "Kubar’s estimate: India’s merchandise exports in FY 2025–26, $441.78bn (Ministry of Commerce and Industry), × 75% on open-account terms (Kubar’s planning assumption) × 48.55%, the share of MSME-related products in merchandise exports in 2024–25 (Ministry of MSME, in Parliament) × 50% financeable after screens for tenor, insurable buyers and related parties (Kubar’s planning assumption).",
+      "footnote3": "IFSCA Bulletin, April–June 2026: ITFS transactions in IFSC reached 2,857, with a total value of $126.92M, as of June 2026.",
+      "estimateLink": "How we estimate this"
+    },
+    "band": {
+      "line": "Kubar is in the data path of every step and in the money path of none.",
+      "link": "See how it works"
+    },
+    "foundations": {
+      "heading": "An exchange needs more than a venue.",
+      "lead": "India already runs specialised exchanges for businesses and financial institutions, not the public. At GIFT City, cross-border trade finance has the rules for such an exchange, but not yet the asset. So Kubar builds the foundations first and the venue last.",
+      "exchangeHead": "Exchange",
+      "exchanges": [
+        "TReDS",
+        "Indian Energy Exchange",
+        "GIFT City · ITFS"
+      ],
+      "rows": [
+        {
+          "cells": [
+            "Only banks and other financial institutions permitted by the RBI finance MSME invoices",
+            "Distribution companies, generators, traders and large consumers buy and sell electricity",
+            "Only institutional financiers would buy export receivables, on Kubar’s planned venue"
+          ],
+          "footnoteOnLast": true
+        },
+        {
+          "label": "Today",
+          "cells": [
+            "Running",
+            "Running",
+            "The rules exist; the asset doesn’t yet"
+          ],
+          "accentLast": true
+        }
+      ],
+      "slabs": [
+        {
+          "name": "The venue, last",
+          "line": "An ITFS for institutional financiers only, with Kubar as its neutral operator",
+          "where": "Planned",
+          "planned": true
+        },
+        {
+          "name": "A record of performance",
+          "line": "Every receivable that settles adds to a priced loss history"
+        },
+        {
+          "name": "A clean payment path",
+          "line": "The buyer pays the financier’s account; the exporter’s bank closes the shipping bill"
+        },
+        {
+          "name": "Standing buyers",
+          "line": "A financier underwrites a programme once and buys every receivable that fits inside its limit"
+        },
+        {
+          "name": "A common standard for what qualifies",
+          "line": "Every receivable has a shipping bill, an invoice that names the financier’s account, a buyer on an approved insurance limit and the buyer’s acknowledgement"
+        }
+      ]
+    },
+    "whoTakesPart": {
+      "heading": "Who takes part.",
+      "lead": "Only institutional financiers buy the receivables. There is no retail access.",
+      "legend": {
+        "money": "Money path: only between banks",
+        "data": "Data path: documents and records"
+      },
+      "rows": [
+        {
+          "party": "Financiers",
+          "role": "Set a programme limit once, then buy every receivable that fits, insured in their own name",
+          "link": {
+            "label": "For financial institutions",
+            "href": "/products/kubar-protocol"
+          }
+        },
+        {
+          "party": "Credit insurers",
+          "role": "Cover approved buyers in the financier’s name, with the evidence behind each receivable",
+          "link": {
+            "label": "For financial institutions",
+            "href": "/products/kubar-protocol"
+          }
+        },
+        {
+          "party": "Trade platforms",
+          "role": "Bring their exporters and shipment data through NavDhan SDK",
+          "link": {
+            "label": "For trade platforms",
+            "href": "/products/navdhan-sdk"
+          }
+        },
+        {
+          "party": "Exporters",
+          "role": "Ship, invoice and keep their own banks",
+          "link": {
+            "label": "How it works",
+            "href": "/how-it-works"
+          }
+        },
+        {
+          "party": "Buyers",
+          "role": "Pay the financier’s account, on the terms they already have",
+          "link": null
+        },
+        {
+          "party": "Kubar",
+          "role": "Runs the programme: origination, the evidence package, servicing and reporting. No money and no credit risk",
+          "link": {
+            "label": "About",
+            "href": "/about"
+          }
+        }
+      ]
+    },
+    "people": {
+      "heading": "The people building it.",
+      "link": "Meet the team and advisers",
+      "linkedinLabel": "{name} on LinkedIn (opens in a new tab)",
+      "people": [
+        {
+          "id": "vaibhav-sharma",
+          "name": "Vaibhav Sharma",
+          "role": "Founder and CEO",
+          "linkedin": "https://www.linkedin.com/in/fenestbuc/"
+        },
+        {
+          "id": "rayansh-srivastava",
+          "name": "Rayansh Srivastava",
+          "role": "Co-founder and CTO",
+          "linkedin": "https://www.linkedin.com/in/rayansh-srivastava-419951219/"
+        },
+        {
+          "id": "keshav-dudani",
+          "name": "Keshav Dudani",
+          "role": "Founding Engineer",
+          "linkedin": "https://www.linkedin.com/in/keshav-dudani-617295251/"
+        },
+        {
+          "id": "manchit-sanan",
+          "name": "Manchit Sanan",
+          "role": "Compliance Lead",
+          "linkedin": "https://www.linkedin.com/in/manchit-sanan-6b9705158/"
+        },
+        {
+          "id": "divyesh-reddy",
+          "name": "Divyesh Reddy",
+          "role": "Partnerships Lead",
+          "linkedin": "https://www.linkedin.com/in/divyesh-reddy/"
+        },
+        {
+          "id": "kavish-mahajan",
+          "name": "Kavish Mahajan",
+          "role": "Creative Director",
+          "linkedin": "https://www.linkedin.com/in/koverner/"
+        }
+      ]
+    },
+    "contact": {
+      "heading": "Start the right conversation.",
+      "rows": [
+        {
+          "who": "A bank, finance company, insurer or fund",
+          "step": "Start a programme conversation",
+          "href": "/contact?intent=institution"
+        },
+        {
+          "who": "A trade platform or marketplace",
+          "step": "Talk about an integration",
+          "href": "/contact?intent=platform"
+        },
+        {
+          "who": "An investor",
+          "step": "Email us",
+          "href": "mailto:partnerships@kubar.tech"
+        },
+        {
+          "who": "Press, or anything else",
+          "step": "Write to us",
+          "href": "/contact?intent=other"
+        }
+      ]
+    }
+  },
+  "system": {
+    "notFound": {
+      "title": "No record at this address · Kubar Labs",
+      "display": "No record at this address.",
+      "line": "The page may have moved when we rebuilt the site.",
+      "home": "Home",
+      "kubarProtocol": "Kubar Protocol",
+      "navdhanSdk": "NavDhan SDK",
+      "howItWorks": "How it works",
+      "contact": "Contact"
+    },
+    "error": {
+      "title": "Something went wrong on our side · Kubar Labs",
+      "display": "Something went wrong on our side.",
+      "line": "Please try again in a moment. If it keeps happening, email <email>outreach@kubar.tech</email>."
     }
   },
   "common": {
-    "learn_more": "Learn more",
-    "get_started": "Get Started",
-    "read_more": "Read more",
-    "view_all": "View all",
-    "back": "Back",
-    "close": "Close",
-    "loading": "Loading...",
-    "error_generic": "Something went wrong. Please try again.",
-    "scroll_to_top": "Scroll to top"
+    "footnoteMarker": "Footnote {n}",
+    "backToText": "Back to text",
+    "sending": "Sending…",
+    "onThisPage": "On this page"
+  },
+  "footnotes": {
+    "status": "Kubar’s own ITFS registration is targeted for 2027; until then Kubar acts as the financier’s origination and servicing agent."
+  },
+  "record": {
+    "title": "Record RCV-0001",
+    "summary": "An example: a $225,000 rice invoice to a buyer in the UAE, due 75 days after shipment.",
+    "description": "An example record of one export receivable, with six documents filed.",
+    "columns": {
+      "no": "No.",
+      "document": "Document",
+      "source": "Source",
+      "status": "Status",
+      "proves": "Proves"
+    },
+    "documents": [
+      {
+        "no": "01",
+        "document": "Commercial invoice",
+        "source": "The exporter",
+        "status": "Filed",
+        "proves": "What was sold, to whom, for how much and when it’s due, with the instruction to pay the financier"
+      },
+      {
+        "no": "02",
+        "document": "Shipping bill",
+        "source": "Indian Customs",
+        "status": "Filed",
+        "proves": "The goods were cleared for export, as invoiced"
+      },
+      {
+        "no": "03",
+        "document": "Electronic bill of lading",
+        "source": "The carrier",
+        "status": "Filed",
+        "proves": "The goods were shipped on board"
+      },
+      {
+        "no": "04",
+        "document": "Credit-insurance cover",
+        "source": "The insurer, in the financier’s name",
+        "status": "Filed",
+        "proves": "The buyer’s credit is covered, in the financier’s name"
+      },
+      {
+        "no": "05",
+        "document": "Assignment notice, acknowledged",
+        "source": "The buyer",
+        "status": "Filed",
+        "proves": "The buyer will pay the financier’s account"
+      },
+      {
+        "no": "06",
+        "document": "Purchase confirmation",
+        "source": "The financier",
+        "status": "Filed",
+        "proves": "The financier bought the receivable, without recourse for the buyer’s credit"
+      }
+    ],
+    "provesLabel": "Proves"
+  },
+  "ledger": {
+    "columns": {
+      "no": "No.",
+      "state": "State",
+      "what": "What happens",
+      "party": "Party",
+      "dataPath": "Data path: Kubar",
+      "moneyPath": "Money path: Kubar holds none"
+    },
+    "dataPathLabel": "Data path: Kubar",
+    "moneyPathLabel": "Money path",
+    "planned": "Planned",
+    "states": [
+      {
+        "no": "01",
+        "state": "Shipped",
+        "what": "The exporter ships the rice and invoices the buyer, with the instruction to pay the financier’s account.",
+        "party": "Exporter",
+        "data": "Shipment and invoice data received",
+        "money": null
+      },
+      {
+        "no": "02",
+        "state": "Documented",
+        "what": "Shipping bill, invoice and bill of lading are checked against each other and filed in one evidence package.",
+        "party": "Kubar",
+        "data": "Evidence package assembled and checked",
+        "money": null
+      },
+      {
+        "no": "03",
+        "state": "Insured",
+        "what": "The buyer’s limit with the insurer is checked; the cover is in the financier’s name.",
+        "party": "Insurer",
+        "data": "Limit and headroom confirmed",
+        "money": null
+      },
+      {
+        "no": "04",
+        "state": "Acknowledged",
+        "what": "The buyer acknowledges that it will pay the financier.",
+        "party": "Buyer",
+        "data": "Acknowledgement filed",
+        "money": null
+      },
+      {
+        "no": "05",
+        "state": "Purchased",
+        "what": "The financier buys the receivable, without recourse for the buyer’s credit.",
+        "party": "Financier",
+        "data": "Package delivered; purchase recorded",
+        "money": "The financier pays 90% of face to the exporter’s own bank"
+      },
+      {
+        "no": "06",
+        "state": "Settled",
+        "what": "On the due date the buyer pays, and the exporter’s bank closes the shipping bill.",
+        "party": "Buyer, financier, exporter’s bank",
+        "data": "Payment matched; closure tracked",
+        "money": "The buyer pays the financier’s collection account; the financier pays the exporter the balance, less its discount and charges"
+      },
+      {
+        "no": "07",
+        "state": "Recorded",
+        "what": "The outcome joins the record of how the asset performs.",
+        "party": "Kubar",
+        "data": "Added to the loss history",
+        "money": null
+      },
+      {
+        "no": "08",
+        "state": "Transferred, later",
+        "what": "On the venue, a receivable can move to another institutional financier, with a registry entry.",
+        "party": null,
+        "data": null,
+        "money": null
+      }
+    ]
+  },
+  "standing": {
+    "rows": [
+      {
+        "entry": "Priority entry to the IFSCA FinTech Innovation Sandbox through GIFT IFIH"
+      },
+      {
+        "entry": "Member of FACE, an RBI-recognised self-regulatory organisation for fintech"
+      },
+      {
+        "entry": "FinVision Award for Most Innovative Startup in Fintech, FinTech Edge 2026, NIBM Pune"
+      },
+      {
+        "entry": "Winner, Popular Choice Award, Startup Mahakumbh 2025"
+      }
+    ]
+  },
+  "programmes": {
+    "finance": [
+      {
+        "id": "gift-ifih",
+        "name": "GIFT IFIH Young Builders Program"
+      },
+      {
+        "id": "bharatnetra",
+        "name": "BharatNetra Startup Accelerator (GFTN)"
+      },
+      {
+        "id": "stpi-finglobe",
+        "name": "STPI FinGlobe"
+      },
+      {
+        "id": "meity-startup-hub",
+        "name": "MeitY GENESIS Entrepreneur in Residence"
+      },
+      {
+        "id": "t-hub",
+        "name": "T-Hub, RubriX Cohort 5"
+      },
+      {
+        "id": "pusa-krishi",
+        "name": "Pusa Krishi Incubation Programme 2026–27"
+      }
+    ],
+    "technologyLabel": "Technology programmes, grants and credits",
+    "technology": [
+      {
+        "id": "google",
+        "name": "Google for Startups"
+      },
+      {
+        "id": "nvidia",
+        "name": "NVIDIA Inception"
+      },
+      {
+        "id": "perplexity",
+        "name": "Perplexity for Startups"
+      },
+      {
+        "id": "openai",
+        "name": "OpenAI for Startups"
+      },
+      {
+        "id": "microsoft",
+        "name": "Microsoft for Startups"
+      },
+      {
+        "id": "intel",
+        "name": "STPI-Intel PRAGATI Accelerator"
+      },
+      {
+        "id": "elevenlabs",
+        "name": "ElevenLabs Grants"
+      },
+      {
+        "id": "amplitude",
+        "name": "Amplitude for Startups"
+      },
+      {
+        "id": "polkadot-academy",
+        "name": "Polkadot Blockchain Academy"
+      },
+      {
+        "id": "uniswap",
+        "name": "Uniswap Hook Incubator"
+      },
+      {
+        "id": "sarvam",
+        "name": "Sarvam Startup Program"
+      },
+      {
+        "id": "cloudflare",
+        "name": "Cloudflare for Startups"
+      },
+      {
+        "id": "claude",
+        "name": "Claude for Startups"
+      },
+      {
+        "id": "mongodb",
+        "name": "MongoDB for Startups"
+      }
+    ]
+  },
+  "story": {
+    "record": "Record RCV-0001",
+    "stateLabel": "State",
+    "counter": "{n} of 08",
+    "party": "Party · {party}",
+    "planned": "Planned",
+    "dataPath": "Data path · Kubar",
+    "moneyPath": "Money path",
+    "holdsNone": "Kubar holds none",
+    "skip": "Skip the story",
+    "parties": [
+      "Exporter",
+      "Kubar",
+      "Insurer",
+      "Buyer, UAE",
+      "Financier",
+      "Exporter’s bank"
+    ],
+    "lanes": {
+      "s1": "Shipment, invoice",
+      "s2": "Evidence package checked",
+      "s3": "Limit and headroom",
+      "s4": "Acknowledgement",
+      "s5data": "Evidence package",
+      "s5money": "90% of face",
+      "s6": "Payment matched",
+      "s6face": "Face value",
+      "s6balance": "The balance",
+      "s7": "Added to the loss history",
+      "s8": "Registry entry, planned"
+    }
+  },
+  "kubarProtocol": {
+    "meta": {
+      "title": "Kubar Protocol · Kubar Labs",
+      "description": "Underwrite once, then buy every export receivable that fits: without recourse for the buyer’s credit, insured in your name, with the evidence behind each one."
+    },
+    "hero": {
+      "headline": "Underwrite once. Buy every receivable that fits.",
+      "sub": "Kubar runs the programme around your limit: origination, the evidence package, the data your insurer needs and the matching of every payment. You buy each receivable without recourse for the buyer’s credit, insured in your own name.",
+      "button": "Start a programme conversation",
+      "link": "See how it works"
+    },
+    "whatYouBuy": {
+      "heading": "What you buy.",
+      "title": "Receivable RCV-0001",
+      "example": "An example",
+      "rows": [
+        [
+          "Face value",
+          "$225,000"
+        ],
+        [
+          "Goods",
+          "Rice, shipped from India"
+        ],
+        [
+          "Buyer",
+          "An importer in the UAE, on an approved insurance limit"
+        ],
+        [
+          "Terms",
+          "Open account, due 75 days after shipment"
+        ],
+        [
+          "Purchase price",
+          "90% of face, paid at purchase to the exporter’s own bank"
+        ],
+        [
+          "Deferred purchase price",
+          "The balance, less your discount and charges, paid when the buyer pays"
+        ],
+        [
+          "Recourse",
+          "None for the buyer’s credit; the exporter answers for disputes, returns, set-off and fraud"
+        ],
+        [
+          "Cover",
+          "Credit insurance on the buyer, in your name"
+        ],
+        [
+          "Payment",
+          "The buyer pays your collection account"
+        ],
+        [
+          "Evidence",
+          "One package, with your own read access"
+        ]
+      ]
+    },
+    "timeline": {
+      "title": "When the money moves · your side",
+      "holdsNone": "Kubar holds none",
+      "received": "Received",
+      "paidOut": "Paid out",
+      "receivedText": "$225,000 · face value, from the buyer, into your collection account",
+      "paidText": "$202,500 · the purchase price, 90% of face, to the exporter’s bank",
+      "meanwhile": "Meanwhile you carry the buyer’s credit, insured in your name",
+      "deferred": "The deferred purchase price: the balance (10% of face), less your discount and charges, to the exporter. Its amount depends on pricing, so it has no figure.",
+      "shipment": "Shipment · day 0",
+      "purchase": "Purchase",
+      "due": "Due date · day 75",
+      "note": "Days after shipment. The purchase date is illustrative: it follows the documents, the insurer’s limit check and the buyer’s acknowledgement.",
+      "dayZero": "Day 0",
+      "dayDue": "Day 75",
+      "stacked": {
+        "paid": "Paid out · at purchase",
+        "meanwhile": "Meanwhile",
+        "received": "Received · day 75",
+        "later": "Paid out · later"
+      },
+      "alt": "A timeline of the financier’s payments against days after shipment: $202,500 paid out at purchase, $225,000 received on day 75, and the deferred purchase price paid out after it."
+    },
+    "programme": {
+      "heading": "How a programme runs.",
+      "setUp": "Set up once",
+      "setUpSteps": [
+        {
+          "no": "01",
+          "text": "Kubar proposes the pool and its rules"
+        },
+        {
+          "no": "02",
+          "text": "You agree the terms and set a programme limit"
+        },
+        {
+          "no": "03",
+          "text": "The insurer approves limits on the buyers, in your name"
+        },
+        {
+          "no": "04",
+          "text": "You appoint Kubar as your origination and servicing agent"
+        },
+        {
+          "no": "05",
+          "text": "Exporters join: identity checks, their bank’s no-objection, a notice on their invoices"
+        },
+        {
+          "no": "06",
+          "text": "Buyers are told to pay your account, and acknowledge it"
+        }
+      ],
+      "link": "See every step in detail",
+      "each": "Then, for every receivable",
+      "eachSteps": [
+        {
+          "no": "01",
+          "text": "The exporter, or its platform, submits the shipment"
+        },
+        {
+          "no": "02",
+          "text": "Kubar checks it against the programme’s rules and assembles the evidence package"
+        },
+        {
+          "no": "03",
+          "text": "You accept it under your limit"
+        },
+        {
+          "no": "04",
+          "text": "You pay the purchase price; the buyer pays you on the due date; you pay the exporter the balance"
+        },
+        {
+          "no": "05",
+          "text": "The outcome enters the loss history"
+        }
+      ],
+      "note": "The credit decision is yours; Kubar can’t override it.",
+      "noteAfter": "03",
+      "refs": "RCV-0001 · RCV-0002 · RCV-0003 · …",
+      "refsLine": "Every receivable that fits, inside your limit"
+    },
+    "evidence": {
+      "heading": "Every element traces to a system the exporter doesn’t control.",
+      "lead": "Financiers have lost money on paper they couldn’t verify. So each receivable comes with one record: you buy on it, the insurer prices on it, and the exporter’s bank closes the shipping bill against it.",
+      "from": "From {source}",
+      "record": "Record RCV-0001",
+      "readers": [
+        "You buy on it",
+        "The insurer prices on it",
+        "The exporter’s bank closes the shipping bill against it"
+      ],
+      "columns": [
+        "Element",
+        "From",
+        "Checked against"
+      ],
+      "rows": [
+        [
+          "Identity of the exporter and the buyer",
+          "Government registries; screening",
+          "Kubar’s checks, kept on file"
+        ],
+        [
+          "Commercial invoice, with the instruction to pay you",
+          "The exporter",
+          "The shipping bill; the e-invoice reference where one applies"
+        ],
+        [
+          "Shipping bill",
+          "Indian Customs",
+          "The invoice: goods, quantity, value and buyer"
+        ],
+        [
+          "Bill of lading, electronic where the carrier issues one",
+          "The carrier",
+          "The shipped-on-board date and vessel"
+        ],
+        [
+          "Inspection report, where the programme requires one",
+          "The inspection agency",
+          "The report’s reference"
+        ],
+        [
+          "Insurance limit",
+          "The insurer",
+          "Headroom on the buyer’s limit"
+        ],
+        [
+          "Buyer’s acknowledgement",
+          "The buyer",
+          "Signatory, date and channel"
+        ],
+        [
+          "No-objection",
+          "The exporter’s bank",
+          "The bank’s letter"
+        ],
+        [
+          "Programme checks",
+          "Kubar",
+          "Eligibility, concentration, sanctions and related-party results"
+        ],
+        [
+          "Purchase and settlement",
+          "You and the exporter’s bank",
+          "Payment references; the closure of the shipping bill"
+        ]
+      ],
+      "after": [
+        "Each element carries its source, its time and who signed it, and any change after signing shows. You and the insurer each get your own read access.",
+        "The record is built on Corda, a permissioned ledger: one shared record of each receivable, who holds which rights after the purchase, and its payment and loss history."
+      ]
+    },
+    "insurance": {
+      "heading": "Cover in your name.",
+      "lead": "The credit-insurance policy is yours: you are the insured, on buyer limits the insurer approves. Kubar insures nothing. It gives the insurer what it needs to set and keep those limits: the pool, each receivable as it’s bought and how each one paid. No receivable is bought without headroom on an approved limit.",
+      "labels": [
+        "An approved buyer limit",
+        "Headroom",
+        "Receivables bought"
+      ]
+    },
+    "payment": {
+      "heading": "The money moves only between banks.",
+      "parties": [
+        "Kubar",
+        "Buyer, UAE",
+        "Financier",
+        "Exporter’s bank"
+      ],
+      "payments": [
+        "Purchase price, at purchase (90% of face)",
+        "Face value, on the due date",
+        "Deferred purchase price: the balance, less discount and charges"
+      ],
+      "routes": [
+        [
+          "Financier",
+          "Exporter’s bank"
+        ],
+        [
+          "Buyer",
+          "Financier’s collection account"
+        ],
+        [
+          "Financier",
+          "Exporter’s bank"
+        ]
+      ],
+      "kubarNote": "Kubar holds none",
+      "under": "Every payment carries the receivable’s reference, and Kubar matches each one to its receivable.",
+      "columns": {
+        "payment": "Payment",
+        "from": "From",
+        "to": "To"
+      },
+      "alt": "Three payments move between the buyer, the financier and the exporter’s bank. None touches Kubar."
+    },
+    "lossHistory": {
+      "heading": "Every receivable that settles adds to a priced loss history.",
+      "lead": "Recorded by buyer, exporter and commodity, it lets an insurer price the pool, and it brings in the next financier.",
+      "drawing": {
+        "settled": "Settled",
+        "history": "The loss history",
+        "recorded": "Recorded by buyer, exporter and commodity",
+        "outcomes": [
+          "It lets an insurer price the pool",
+          "It brings in the next financier"
+        ]
+      }
+    },
+    "holds": {
+      "heading": "You hold the receivable, the policy and the account.",
+      "columns": [
+        "Party",
+        "Holds",
+        "Doesn’t hold"
+      ],
+      "rows": [
+        [
+          "You, the financier",
+          "The receivable, the collection account, the insurance policy and the buyer’s credit risk",
+          "Recourse to the exporter for the buyer’s credit"
+        ],
+        [
+          "The insurer",
+          "The buyer’s credit risk on the covered share",
+          "Dispute or fraud risk"
+        ],
+        [
+          "The exporter",
+          "Disputes, returns, set-off and fraud on its own trades",
+          "The receivable, once sold"
+        ],
+        [
+          "The exporter’s bank",
+          "Its relationship with the exporter",
+          "The receivables sold"
+        ],
+        [
+          "Kubar",
+          "Origination, the evidence package, servicing and reporting",
+          "Money or credit risk"
+        ]
+      ]
+    },
+    "questions": {
+      "heading": "Questions a credit committee asks.",
+      "items": [
+        {
+          "q": "What am I buying?",
+          "a": "An export receivable: the amount an overseas buyer owes an Indian exporter under a shipped invoice. You buy it outright, inside your programme limit, without recourse for the buyer’s credit."
+        },
+        {
+          "q": "Who carries the buyer’s credit, and who carries disputes?",
+          "a": "You carry the buyer’s credit, insured in your name. The exporter carries disputes, returns, set-off and fraud, and answers for its own warranties."
+        },
+        {
+          "q": "Is the cover in my name?",
+          "a": "Yes. In a programme the credit-insurance policy is in your name, on buyer limits the insurer approves. Until that policy is signed, a programme can start on exporters’ own policies with claims assigned to you; we say which applies before you buy anything."
+        },
+        {
+          "q": "Who holds the money?",
+          "a": "You do. The buyer pays your collection account, and you pay the exporter’s account at its own bank. Kubar never holds an account, receives a payment or releases funds."
+        },
+        {
+          "q": "How do I know the shipment and the invoice are real?",
+          "a": "Each element of the evidence package comes from a system the exporter doesn’t control: Indian Customs for the shipping bill, the carrier for the bill of lading, the insurer for the limit, the buyer for its acknowledgement and the exporter’s bank for its no-objection. Kubar checks them against each other before anything is offered to you."
+        },
+        {
+          "q": "Who is Kubar, and under what mandate does it act?",
+          "a": "Kubar Labs is the brand of Kubar Protocol Private Limited, founded in India in 2024. Under a written mandate from you, Kubar designs the pool and its rules, checks and documents each receivable, services it and reports. The purchase runs on your licence and your credit policies; Kubar never makes the credit decision, holds money or carries credit risk. Kubar’s own ITFS registration is targeted for 2027; until then Kubar acts as the financier’s origination and servicing agent."
+        },
+        {
+          "q": "What happens if a buyer doesn’t pay?",
+          "a": "Kubar flags the late payment, checks with the exporter for any dispute and sends the notices your policy requires. As the insured, you lodge the claim under your policy, with the evidence package behind it. The exporter answers only for its own side of the trade: disputes, returns, set-off, fraud and its warranties."
+        },
+        {
+          "q": "What do I sign?",
+          "a": "Programme terms on your own paper (the rules, your limit, the caps and the reporting); a mandate appointing Kubar as your origination and servicing agent; the credit-insurance policy, between you and the insurer; and a receivables purchase agreement with each exporter in the programme."
+        },
+        {
+          "q": "How is Kubar paid?",
+          "a": "By a fee from you and a fee from the exporter, for running the programme. Kubar earns nothing from holding money or credit risk."
+        },
+        {
+          "q": "Can individuals invest?",
+          "a": "No. Only institutional financiers buy the receivables. There is no retail access, and nothing on this site is an offer to the public."
+        }
+      ]
+    },
+    "fit": {
+      "heading": "Where each institution fits.",
+      "columns": [
+        "Institution",
+        "Role"
+      ],
+      "rows": [
+        [
+          "Banks’ units at GIFT City (IFSC Banking Units)",
+          "Programme financier: set a limit and buy every receivable that fits"
+        ],
+        [
+          "IFSC finance companies and factors",
+          "Programme financier; later, a lane for smaller receivables held on a finance company’s balance sheet"
+        ],
+        [
+          "Banks, factors and finance companies abroad",
+          "Bid for programmes on Kubar’s own venue once it is registered<marker></marker>, with no entity at GIFT City, if they meet its admission rules"
+        ],
+        [
+          "Credit insurers",
+          "Cover the buyers in the financier’s name, with the evidence behind every receivable and a loss history over time"
+        ],
+        [
+          "Funds",
+          "Later, buying receivables from financiers"
+        ]
+      ]
+    },
+    "programme1": {
+      "heading": "Programme 1: rice to buyers in the UAE and the Gulf.",
+      "rows": [
+        [
+          "Exporters",
+          "Indian rice exporters"
+        ],
+        [
+          "Buyers",
+          "Importers in the UAE and the wider Gulf, on approved insurance limits"
+        ],
+        [
+          "Terms",
+          "Open account"
+        ],
+        [
+          "Financier",
+          "A bank’s unit at GIFT City. In discussions with IBUs"
+        ],
+        [
+          "Cover",
+          "Credit insurance on the buyers, in the financier’s name"
+        ],
+        [
+          "Next",
+          "Chemicals and pharmaceutical formulations, then engineering goods and auto components"
+        ]
+      ]
+    },
+    "venue": {
+      "heading": "The venue comes last.",
+      "sentence": "Kubar’s own ITFS, once registered<marker></marker>, is meant to do three things the programmes can’t:",
+      "planned": "Planned",
+      "things": [
+        "Admit institutional financiers beyond banks’ units at GIFT City, including those with no presence there",
+        "Keep a registry so a receivable can change hands without a fresh assignment each time",
+        "Give insurers, rating agencies and funds a neutral operator’s record to rely on"
+      ],
+      "under": "Like the programmes, it is for institutional financiers only.",
+      "columns": {
+        "no": "No.",
+        "thing": "What it does"
+      }
+    },
+    "next": {
+      "heading": "Tell us what you finance today.",
+      "body": "We’ll take you through how a programme would run for you.",
+      "button": "Start a programme conversation",
+      "orEmail": "Or email",
+      "email": "partnerships@kubar.tech"
+    },
+    "index": [
+      {
+        "id": "buy-heading",
+        "label": "What you buy"
+      },
+      {
+        "id": "runs-heading",
+        "label": "How a programme runs"
+      },
+      {
+        "id": "evidence-heading",
+        "label": "The evidence package"
+      },
+      {
+        "id": "insurance-heading",
+        "label": "Insurance"
+      },
+      {
+        "id": "payment-heading",
+        "label": "The payment path"
+      },
+      {
+        "id": "loss-heading",
+        "label": "The loss history"
+      },
+      {
+        "id": "holds-heading",
+        "label": "Who holds what"
+      },
+      {
+        "id": "questions-heading",
+        "label": "Questions"
+      },
+      {
+        "id": "fit-heading",
+        "label": "Where you fit"
+      },
+      {
+        "id": "programme1-heading",
+        "label": "Programme 1"
+      },
+      {
+        "id": "venue-heading",
+        "label": "The venue"
+      }
+    ]
+  },
+  "navdhanSdk": {
+    "meta": {
+      "title": "NavDhan SDK · Kubar Labs",
+      "description": "Embed NavDhan SDK so your exporters can finance their export receivables inside your platform. Financiers buy; Kubar runs the programme."
+    },
+    "hero": {
+      "headline": "Trade finance inside the software your exporters already use.",
+      "sub": "Embed NavDhan SDK and your exporters can check eligibility, apply and be paid for their export receivables without leaving your platform. Financiers buy; Kubar runs the programme; you keep the relationship.",
+      "button": "Talk about an integration"
+    },
+    "sketch": {
+      "platform": "Your platform",
+      "shipment": "Shipment",
+      "records": [
+        "Booking",
+        "Invoice",
+        "Inspection report",
+        "Bill of lading"
+      ],
+      "sdk": "NavDhan SDK",
+      "eligibility": "Eligibility check",
+      "rules": [
+        "Buyer country",
+        "Terms",
+        "Size",
+        "Goods"
+      ],
+      "offer": "Indicative offer",
+      "prices": [
+        "All-in price",
+        "The exporter’s own alternative"
+      ],
+      "application": "Application and status",
+      "states": [
+        "Submission",
+        "Documents outstanding",
+        "Purchase",
+        "Settlement"
+      ],
+      "alt": "A schematic of your platform with the shipment’s own records and the NavDhan SDK panel inside it: an eligibility check, an indicative offer with no figures, and the application’s four states.",
+      "onboarding": [
+        "Identity check",
+        "Business check",
+        "Consent recorded"
+      ],
+      "purchased": "Purchased"
+    },
+    "exporters": {
+      "heading": "Dollar finance beyond their bank limit.",
+      "lead": "Your exporters can sell their export receivables to institutional financiers, beyond the limits their own banks set, without recourse for the buyer’s credit. They keep their own bank, and their buyers keep their terms."
+    },
+    "platform": {
+      "heading": "Finance in your product.",
+      "lead": "Your users are financed where they already book and document their shipments. You make no credit decisions and hold no money: financiers buy, insurers cover and Kubar runs the programme. Kubar is paid through the programme, not by the platform, and terms with each platform are agreed in writing."
+    },
+    "does": {
+      "heading": "What you embed.",
+      "rows": [
+        [
+          "Consented onboarding",
+          "Identity and business checks, with consent recorded for each data source"
+        ],
+        [
+          "Shipment and document capture",
+          "Booking, invoice, inspection report and bill of lading, taken from your own records"
+        ],
+        [
+          "Eligibility check",
+          "Whether a shipment fits a programme’s rules: buyer country, terms, size and goods"
+        ],
+        [
+          "Indicative offer",
+          "The all-in price, shown against the exporter’s own alternative"
+        ],
+        [
+          "Application and status",
+          "Submission, documents outstanding, purchase and settlement"
+        ],
+        [
+          "Events for your product",
+          "Status updates you can show your users"
+        ]
+      ]
+    },
+    "runs": {
+      "heading": "How it runs on your platform.",
+      "steps": [
+        "Your exporter books and documents a shipment in your platform, as it does today.",
+        "NavDhan SDK checks the shipment against the programme’s rules and shows an indicative offer.",
+        "With the exporter’s consent, the shipment data and documents go to Kubar Protocol, which assembles the evidence package.",
+        "A financier buys the receivable and pays the exporter’s own bank.",
+        "The buyer pays the financier on the due date. Your platform shows each step as it happens."
+      ],
+      "lanes": [
+        "Your platform",
+        "Kubar Protocol",
+        "The financier"
+      ],
+      "paths": {
+        "sdk": "NavDhan SDK",
+        "consent": "With the exporter’s consent",
+        "evidence": "The evidence package",
+        "status": "Each step as it happens"
+      },
+      "link": "See how it works"
+    },
+    "rules": {
+      "heading": "Rules the SDK follows.",
+      "items": [
+        "Kubar never makes the credit decision, holds the money or carries the credit risk.",
+        "Consent is collected and recorded for each data source, in line with the Digital Personal Data Protection Act, 2023 and its Rules.",
+        "Offers show the all-in price and the alternative it’s measured against, with no nudge towards any one financier.",
+        "Data your platform shares is used only for the exporter’s application and its servicing."
+      ]
+    },
+    "behind": {
+      "heading": "Your exporters see NavDhan. Kubar Protocol runs behind it.",
+      "lead": "The programme, the evidence package, insurance and payment matching run on Kubar Protocol, the infrastructure Kubar presents to banks, insurers and funds.",
+      "layers": {
+        "platform": "Your platform",
+        "sdk": "NavDhan SDK",
+        "protocol": "Kubar Protocol",
+        "base": "Banks, insurers and funds"
+      },
+      "link": "See Kubar Protocol"
+    },
+    "next": {
+      "heading": "Tell us about your platform and your exporters.",
+      "body": "We’ll take you through what an integration involves.",
+      "button": "Talk about an integration"
+    }
+  },
+  "howItWorks": {
+    "meta": {
+      "title": "How it works · Kubar Labs",
+      "description": "Follow one illustrative export receivable from shipment to settlement: who does what, the documents behind each step and where the money moves."
+    },
+    "hero": {
+      "headline": "From the port to the record.",
+      "sub": "One illustrative receivable, followed step by step: who does what, the documents behind it and where the money moves. A $225k rice invoice to a buyer in the UAE, due 75 days after shipment.",
+      "institutions": "For financial institutions",
+      "platforms": "For trade platforms"
+    },
+    "rail": {
+      "heading": "What happens to a receivable.",
+      "closing": "Kubar is in the data path of every step and in the money path of none.",
+      "states": [
+        {
+          "no": "01",
+          "state": "Shipped",
+          "what": "The exporter ships the rice and issues its invoice. The invoice carries the assignment notice: the instruction to pay the financier’s account.",
+          "party": "The exporter, and its trade platform if it uses one",
+          "data": "Shipment and invoice data received",
+          "money": null
+        },
+        {
+          "no": "02",
+          "state": "Documented",
+          "what": "Kubar checks the shipping bill against the invoice (goods, quantity, value and buyer), checks who the exporter and the buyer are, runs the programme’s rules and files everything in one evidence package. The exporter’s bank’s no-objection is on file.",
+          "party": "Kubar",
+          "data": "Evidence package assembled and checked",
+          "money": null
+        },
+        {
+          "no": "03",
+          "state": "Insured",
+          "what": "The buyer’s limit with the insurer is checked for headroom. The cover is in the financier’s name.",
+          "party": "The insurer",
+          "data": "Limit and headroom confirmed",
+          "money": null
+        },
+        {
+          "no": "04",
+          "state": "Acknowledged",
+          "what": "The buyer acknowledges the notice: it will pay the financier’s account.",
+          "party": "The buyer",
+          "data": "Acknowledgement filed",
+          "money": null
+        },
+        {
+          "no": "05",
+          "state": "Purchased",
+          "what": "The financier accepts the receivable under its programme limit, without recourse for the buyer’s credit, and pays the purchase price. The credit decision is the financier’s own.",
+          "party": "The financier",
+          "data": "Package delivered; purchase recorded",
+          "money": "The financier pays 90% of face to the exporter’s own bank"
+        },
+        {
+          "no": "06",
+          "state": "Settled",
+          "what": "On the due date the buyer pays the financier’s collection account, quoting the receivable’s reference. Kubar matches the payment. The financier pays the exporter the balance, less its discount and charges, and the exporter’s bank closes the shipping bill. Where the exporter qualifies, the government’s interest subvention on export factoring is filed on the financier’s data and paid to the exporter.",
+          "party": "The buyer, the financier and the exporter’s bank",
+          "data": "Payment matched; closure tracked",
+          "money": "The buyer pays $225,000 to the financier; the financier pays the exporter the balance, less its discount and charges"
+        },
+        {
+          "no": "07",
+          "state": "Recorded",
+          "what": "The outcome joins the loss history, by buyer, exporter and commodity.",
+          "party": "Kubar",
+          "data": "Added to the loss history",
+          "money": null
+        },
+        {
+          "no": "08",
+          "state": "Transferred, later",
+          "what": "Once the venue is registered, a receivable can move from one institutional financier to another, with a registry entry in place of a fresh assignment.",
+          "party": "Institutional financiers",
+          "data": null,
+          "money": null
+        }
+      ]
+    },
+    "evidence": {
+      "docLabel": "Doc {no}",
+      "documents": [
+        {
+          "no": "01",
+          "name": "Commercial invoice"
+        },
+        {
+          "no": "02",
+          "name": "Shipping bill"
+        },
+        {
+          "no": "03",
+          "name": "Bill of lading, electronic where issued"
+        },
+        {
+          "no": "04",
+          "name": "Inspection report, where the programme requires one"
+        },
+        {
+          "no": "05",
+          "name": "No-objection"
+        },
+        {
+          "no": "06",
+          "name": "Credit-insurance cover"
+        },
+        {
+          "no": "07",
+          "name": "Buyer’s acknowledgement"
+        },
+        {
+          "no": "08",
+          "name": "Purchase confirmation"
+        }
+      ],
+      "from": "From · The financier",
+      "proves": "The financier owns the receivable",
+      "record": "Record RCV-0001 · Evidence package",
+      "after": [
+        "Each element carries its source, its time and who signed it. Any change after signing shows.",
+        "The record is built on Corda, a permissioned ledger: one shared record of each receivable, who holds which rights after the purchase, and its payment and loss history."
+      ],
+      "relying": [
+        "The financier buys on it.",
+        "The insurer prices on it.",
+        "The exporter’s bank closes the shipping bill against it.",
+        "The government’s interest subvention is filed on it, where the exporter qualifies."
+      ]
+    },
+    "money": {
+      "heading": "Where the money moves.",
+      "parties": [
+        "Kubar",
+        "Buyer, UAE",
+        "Financier",
+        "Exporter’s bank"
+      ],
+      "payments": [
+        "Purchase price, at purchase (90% of face)",
+        "Face value, on the due date",
+        "Deferred purchase price: the balance, less discount and charges"
+      ],
+      "routes": [
+        [
+          "Financier",
+          "Exporter’s bank"
+        ],
+        [
+          "Buyer",
+          "Financier’s collection account"
+        ],
+        [
+          "Financier",
+          "Exporter’s bank"
+        ]
+      ],
+      "kubarNote": "Kubar holds none",
+      "under": "Every payment carries the receivable’s reference, and Kubar matches each one to its receivable.",
+      "columns": {
+        "payment": "Payment",
+        "from": "From",
+        "to": "To"
+      },
+      "alt": "Three payments move between the buyer, the financier and the exporter’s bank. None touches Kubar."
+    },
+    "unpaid": {
+      "heading": "If a buyer doesn’t pay.",
+      "rows": [
+        {
+          "no": "01",
+          "party": "Kubar",
+          "step": "Flags the late payment straight away",
+          "branch": null
+        },
+        {
+          "no": "02",
+          "party": "Kubar",
+          "step": "Checks with the exporter for any dispute",
+          "branch": null
+        },
+        {
+          "no": "03",
+          "party": "Kubar",
+          "step": "Sends the insurer the notices the policy requires",
+          "branch": null
+        },
+        {
+          "no": "04",
+          "party": "The financier, as the insured",
+          "step": "Lodges the claim with the evidence package behind it",
+          "branch": "No dispute"
+        },
+        {
+          "no": "05",
+          "party": "The insurer",
+          "step": "Pays claims on the covered share",
+          "branch": "No dispute"
+        },
+        {
+          "no": "06",
+          "party": "The exporter",
+          "step": "Answers only for its own side of the trade: disputes, returns, set-off, fraud and its warranties",
+          "branch": "A dispute"
+        }
+      ],
+      "none": "Kubar holds none of the risk",
+      "note": "This is how a programme runs with cover in the financier’s name. Where a programme starts on exporters’ own policies, the terms are set out before any receivable is sold."
+    },
+    "who": {
+      "heading": "Each party signs for its own part.",
+      "columns": [
+        "Party",
+        "Does",
+        "Signs"
+      ],
+      "rows": [
+        [
+          "Financier",
+          "Sets the programme limit, decides credit, buys each receivable, holds the policy and the collection account",
+          "Programme terms; the mandate to Kubar; a purchase agreement with each exporter; the insurance policy"
+        ],
+        [
+          "Insurer",
+          "Approves buyer limits; pays claims on the covered share",
+          "The policy, with the financier"
+        ],
+        [
+          "Exporter",
+          "Ships, invoices with the assignment notice, keeps its own bank",
+          "The purchase agreement; Kubar’s services agreement"
+        ],
+        [
+          "Exporter’s bank",
+          "Gives its no-objection; closes the shipping bill",
+          "Its no-objection"
+        ],
+        [
+          "Buyer",
+          "Acknowledges the notice; pays the financier’s account",
+          "Its acknowledgement"
+        ],
+        [
+          "Trade platform",
+          "Brings exporters and their shipment data through NavDhan SDK",
+          "Its agreement with Kubar"
+        ],
+        [
+          "Kubar",
+          "Designs the pool, checks and documents each receivable, matches payments, services and reports",
+          "The mandate from the financier"
+        ]
+      ],
+      "link": "Who holds what",
+      "map": {
+        "lines": {
+          "policy": "The policy",
+          "mandate": "The mandate",
+          "purchase": "Purchase agreement",
+          "platform": "Agreement with Kubar",
+          "services": "Services agreement"
+        },
+        "tags": {
+          "financier": "Programme terms",
+          "bank": "Its no-objection",
+          "buyer": "Its acknowledgement"
+        },
+        "key": [
+          "A line is an agreement between the two parties it joins.",
+          "A tag is a paper one party signs on its own."
+        ]
+      }
+    },
+    "terms": {
+      "heading": "The terms on this site.",
+      "rows": [
+        [
+          "Receivable",
+          "The amount an overseas buyer owes an exporter under a shipped invoice."
+        ],
+        [
+          "Financier",
+          "The institution that buys the receivable: for Programme 1, a bank’s unit at GIFT City; on Kubar’s own venue<marker></marker>, other institutional financiers, in GIFT City or abroad."
+        ],
+        [
+          "Institutional financier",
+          "A bank, finance company or other institution that finances trade. Only institutional financiers buy the receivables."
+        ],
+        [
+          "Programme",
+          "One underwriting for many receivables: the financier’s limit, the rules for what qualifies, the insurance, the mandate to Kubar and the payment path."
+        ],
+        [
+          "Programme limit",
+          "The amount a financier sets for a programme. Each receivable that fits is bought inside it, without a new credit decision."
+        ],
+        [
+          "Without recourse for the buyer’s credit",
+          "If the buyer doesn’t pay, the financier can’t turn to the exporter, except for disputes, returns, set-off, fraud or the exporter’s own breach."
+        ],
+        [
+          "Purchase price",
+          "What the financier pays at purchase: 90% of face in the illustration."
+        ],
+        [
+          "Deferred purchase price",
+          "The balance, less the financier’s discount and charges, paid when the buyer pays."
+        ],
+        [
+          "Assignment notice",
+          "The instruction on the invoice telling the buyer to pay the financier’s account."
+        ],
+        [
+          "Collection account",
+          "The financier’s own account, into which the buyer pays."
+        ],
+        [
+          "Evidence package",
+          "One record per receivable that the financier buys on, the insurer prices on and the exporter’s bank closes the shipping bill against."
+        ],
+        [
+          "Shipping bill",
+          "The customs document under which goods are cleared for export from India."
+        ],
+        [
+          "EDPMS",
+          "The RBI’s Export Data Processing and Monitoring System, in which the exporter’s bank records each shipping bill until the export proceeds arrive."
+        ],
+        [
+          "AD bank",
+          "Authorised Dealer bank: the exporter’s own bank for foreign exchange."
+        ],
+        [
+          "Credit insurance",
+          "Cover against a buyer’s failure to pay, on limits the insurer sets for each buyer."
+        ],
+        [
+          "Loss history",
+          "The record of how each receivable paid, by buyer, exporter and commodity."
+        ],
+        [
+          "GIFT City",
+          "India’s international financial services centre, in Gujarat."
+        ],
+        [
+          "IFSC Banking Unit (IBU)",
+          "A bank’s unit in GIFT City, working in foreign currency."
+        ],
+        [
+          "ITFS",
+          "An International Trade Finance Service platform at GIFT City, on which several financiers can finance trade. Kubar’s own ITFS registration is targeted for 2027; until then Kubar acts as the financier’s origination and servicing agent."
+        ]
+      ]
+    },
+    "next": {
+      "label": "Next step",
+      "routes": [
+        {
+          "tag": "For financial institutions",
+          "label": "Start a programme conversation",
+          "href": "/contact?intent=institution"
+        },
+        {
+          "tag": "For trade platforms",
+          "label": "Talk about an integration",
+          "href": "/contact?intent=platform"
+        }
+      ]
+    },
+    "index": [
+      {
+        "id": "rail-heading",
+        "label": "What happens to a receivable"
+      },
+      {
+        "id": "money-heading",
+        "label": "Where the money moves"
+      },
+      {
+        "id": "unpaid-heading",
+        "label": "If a buyer doesn’t pay"
+      },
+      {
+        "id": "who-heading",
+        "label": "Each party signs"
+      },
+      {
+        "id": "terms-heading",
+        "label": "The terms"
+      }
+    ]
   },
   "about": {
-    "page_title": "About Kubar Labs | Embedded Origination Infrastructure",
-    "page_description": "Building the lender-neutral origination layer for fragmented B2B ecosystems",
+    "meta": {
+      "title": "About · Kubar Labs",
+      "description": "Kubar Labs is building the institutional exchange for cross-border trade finance, foundations first. The team and our standing."
+    },
     "hero": {
-      "badge": "About Kubar Labs",
-      "title": "Kubar Labs",
-      "subtitle": "Building the origination layer between fragmented B2B platforms and lenders",
-      "intro": "Kubar Labs builds NavDhan, embedded origination infrastructure that converts borrower intent and permissioned platform signals into lender-ready applications for existing lender systems."
+      "headline": "Foundations first.",
+      "sub": "Kubar Labs is building the institutional exchange<marker></marker> for cross-border trade finance, from GIFT City. We started with the asset: export receivables an international financier can buy again and again, insured in its own name. A venue needs something financiers will bid on, so we build that first: receivables with cover, documents, a clean payment path and a history."
     },
-    "mission_vision": {
-      "mission_label": "Mission",
-      "mission_text": "Make business credit easier to originate by embedding lender-ready workflows inside the platforms businesses already use.",
-      "vision_label": "Vision",
-      "vision_text": "A business-credit ecosystem where viable enterprises can be understood through their operating context and connected to suitable regulated lenders."
-    },
-    "why_we_exist": {
-      "title": "Why we exist",
-      "p1": "Business-lending infrastructure has improved, but origination across fragmented B2B ecosystems remains difficult to scale.",
-      "p2": "Millions of small businesses transact through marketplaces, procurement systems, ERPs and sector-specific platforms, yet financing is often disconnected from those workflows and the operating context they contain.",
-      "p3": "Our research with businesses, platforms and lenders showed that the bottleneck is not only capital. It is the ability to capture intent, structure permissioned data and deliver lender-ready applications efficiently.",
-      "p4": "We started Kubar Labs to build that origination layer."
-    },
-    "how_we_work": {
-      "title": "How we work",
-      "subtitle": "We build origination infrastructure around three principles:",
-      "pillars": {
-        "1": {
-          "title": "Platform-Specific Intelligence",
-          "desc": "Generic applications miss the operating context available inside business platforms. NavDhan structures permissioned signals such as transaction patterns, inventory cycles, payment behaviour and sector-specific operating data for lender-configured pre-qualification."
+    "order": {
+      "heading": "What we’re building.",
+      "slabs": [
+        {
+          "name": "The venue",
+          "line": "An ITFS for institutional financiers only, with Kubar as its neutral operator",
+          "where": "Planned",
+          "planned": true
         },
-        "2": {
-          "title": "Embedded Origination",
-          "desc": "Credit requests begin inside B2B platforms, marketplaces, ERPs and enterprise workflows. NavDhan captures intent at the point of need and creates lender-ready applications without becoming a separate borrower-destination marketplace."
+        {
+          "name": "A record of performance",
+          "line": "The loss history, receivable by receivable"
         },
-        "3": {
-          "title": "Pre-Disbursement Orchestration",
-          "desc": "NavDhan coordinates application collection, data verification, pre-qualification and routing into existing lender systems. The regulated lender retains underwriting, pricing, approval, documentation, disbursal and servicing."
+        {
+          "name": "A clean payment path",
+          "line": "Payment matching, with the money moving only between banks"
+        },
+        {
+          "name": "Standing buyers",
+          "line": "Programmes: a financier underwrites once and buys every receivable that fits"
+        },
+        {
+          "name": "A common standard for what qualifies",
+          "line": "The programme rules and the evidence package"
         }
-      }
+      ],
+      "link": "Follow one receivable through all five"
     },
-    "horizons": {
-      "title": "One mission, two horizons",
-      "items": {
-        "1": {
-          "label": "Horizon 1",
-          "title": "NavDhan",
-          "desc": "NavDhan embeds inside fragmented B2B platforms, captures borrower intent and permissioned operational signals, and routes lender-ready applications into existing lender systems. Lenders pay transaction, origination and later recurring platform fees. Final credit decisions remain with regulated lenders."
+    "team": {
+      "heading": "The team.",
+      "people": [
+        {
+          "id": "vaibhav-sharma",
+          "name": "Vaibhav Sharma",
+          "role": "Founder and CEO",
+          "linkedin": "https://www.linkedin.com/in/fenestbuc/",
+          "line": "Leads product, institutional partnerships and regulatory work."
         },
-        "2": {
-          "label": "Horizon 2",
-          "title": "Kubar Protocol",
-          "desc": "Kubar Protocol is longer-term R&D focused on digital trade assets and cross-border settlement infrastructure. Nearer-term eBL and LC financing remain use cases of NavDhan's origination layer."
+        {
+          "id": "rayansh-srivastava",
+          "name": "Rayansh Srivastava",
+          "role": "Co-founder and CTO",
+          "linkedin": "https://www.linkedin.com/in/rayansh-srivastava-419951219/",
+          "line": "Runs Kubar’s technology, after five years building AI systems, including importer-side logistics at Everest and fraud detection at Oodles."
+        },
+        {
+          "id": "keshav-dudani",
+          "name": "Keshav Dudani",
+          "role": "Founding Engineer",
+          "linkedin": "https://www.linkedin.com/in/keshav-dudani-617295251/",
+          "line": "Builds the document intelligence behind the evidence package and leads exporter engagement, after building financial NLP systems for fund managers."
+        },
+        {
+          "id": "manchit-sanan",
+          "name": "Manchit Sanan",
+          "role": "Compliance Lead",
+          "linkedin": "https://www.linkedin.com/in/manchit-sanan-6b9705158/",
+          "line": "Leads compliance, with 17+ years building systems in regulated industries."
+        },
+        {
+          "id": "divyesh-reddy",
+          "name": "Divyesh Reddy",
+          "role": "Partnerships Lead",
+          "linkedin": "https://www.linkedin.com/in/divyesh-reddy/",
+          "line": "Runs partnerships with trade platforms and financiers, with a background in buyer-risk intelligence and MSME credit analytics."
+        },
+        {
+          "id": "kavish-mahajan",
+          "name": "Kavish Mahajan",
+          "role": "Creative Director",
+          "linkedin": "https://www.linkedin.com/in/koverner/",
+          "line": "Leads brand and product design, after founding and scaling a design agency."
         }
+      ],
+      "linkedin": "LinkedIn",
+      "linkedinLabel": "{name} on LinkedIn (opens in a new tab)",
+      "advisers": {
+        "heading": "Advisers",
+        "columns": [
+          "Adviser",
+          "Background"
+        ],
+        "rows": [
+          [
+            "Tushar Jaruhar",
+            "Former pricing actuary, Zurich Insurance. Advises on insurance pricing and risk."
+          ],
+          [
+            "Shridhar Sethuram",
+            "25+ years in private equity. Advises on capital markets."
+          ],
+          [
+            "Amit Sagar",
+            "Lead System Architect, Bank of England. Advises on settlement and system architecture."
+          ],
+          [
+            "Debayan Gupta",
+            "Associate Professor of Computer Science, Ashoka University. Advises on data security."
+          ]
+        ],
+        "note": "Advisers serve in a personal capacity."
       }
     },
-    "traction": {
-      "title": "The path so far",
-      "desc": "We have developed NavDhan through incubation programmes, grants, technical credits, product co-design and commercial discussions. Relationship labels below must distinguish recognitions, design partners, active integration discussions, pilot interest and ecosystem programmes.",
-      "recognitions_title": "Recognitions",
-      "recognitions": {
-        "1": "FinVision Award for Most Innovative Startup (RBI think-tank - NIBM, Pune)",
-        "2": "Startup Mahakumbh \"Popular Choice Award\"",
-        "3": "Top 25 in Google X Campus Fund",
-        "4": "Top 25 WTFund"
-      },
-      "partnerships_title": "Commercial and Ecosystem Status",
-      "partnerships": {
-        "1": "AgriGrader and CargoFirst: Phase 1 platform design partners for domestic financing; CargoFirst separately represents trade-finance pilot interest.",
-        "2": "betterfinance and Interestng: Phase 1 lending partners.",
-        "3": "Ninjacart and QuID Capital: active integration discussions for the Embedded Credit SDK.",
-        "4": "Clix Capital and Shriram Finance: pilot interest for the SDK phase.",
-        "5": "AgriNext, Credore, GFTN and EximPe: ecosystem relationships or pilot interest for agri-value-chain and trade-finance expansion."
+    "standing": {
+      "heading": "Standing and memberships."
+    },
+    "gift": {
+      "heading": "Why GIFT City.",
+      "lead": "GIFT City is India’s international financial services centre. Banks’ units there work in foreign currency and can buy export receivables under their own licences and credit policies, which is how Programme 1 runs. It is also home to the framework for trade-finance platforms (ITFS) under which Kubar’s own venue is planned<marker></marker>. Kubar works from an office in GIFT City.",
+      "zones": {
+        "zones": [
+          {
+            "title": "Onshore India",
+            "line": "The exporter and its own bank"
+          },
+          {
+            "title": "GIFT City",
+            "line": "A bank’s unit buys the receivable, in foreign currency"
+          },
+          {
+            "title": "Abroad",
+            "line": "The buyer pays the financier’s account"
+          }
+        ],
+        "arrows": [
+          "The receivable",
+          "Purchase price",
+          "Payment on the due date"
+        ]
       }
     },
-    "roadmap": {
-      "title": "Roadmap",
-      "p1": "Lenders have scaled decisioning and servicing infrastructure, but origination across fragmented B2B ecosystems remains manual and intermediary-led.",
-      "p2": "Phase 1 launches managed origination for unsecured business loans, allowing NavDhan to validate application quality, lender matching, operating costs and repayment-linked economics.",
-      "p3": "Phase 2 scales the Embedded Credit SDK across platform and lender integrations, adds recurring infrastructure revenue and supports secured business-credit use cases.",
-      "p4": "Phase 3 extends the origination layer into eBL and LC financing, while Kubar Protocol remains a separate longer-term R&D initiative for digital trade assets and cross-border settlement."
+    "band": {
+      "line": "Kubar connects Indian trade flows to global institutional capital through GIFT City."
     },
-    "work_with_us": {
-      "title": "Work with us",
-      "subtitle": "We work with lenders, B2B platforms, investors and ecosystem organisations building scalable business-credit distribution.",
-      "items": {
-        "1": {
-          "title": "Financial Institutions",
-          "desc": "Access lender-ready applications sourced inside fragmented B2B workflows, enriched with permissioned platform context and routed into existing lender systems.",
-          "button": "Request a Lender Demo"
+    "company": {
+      "heading": "The company.",
+      "rows": [
+        [
+          "Brand",
+          "Kubar Labs"
+        ],
+        [
+          "Legal entity",
+          "Kubar Protocol Private Limited, incorporated in India"
+        ],
+        [
+          "CIN",
+          "U70200WB2024PTC274850"
+        ],
+        [
+          "Founded",
+          "2024"
+        ],
+        [
+          "Registered office",
+          "Paras Market, Station Road, Barakar, West Bengal 713324"
+        ],
+        [
+          "Office",
+          "GIFT City, Gandhinagar"
+        ],
+        [
+          "Recognition",
+          "DPIIT-recognised startup"
+        ],
+        [
+          "Products",
+          "Kubar Protocol, for institutions · NavDhan SDK, for trade platforms"
+        ]
+      ]
+    },
+    "next": {
+      "heading": "Talk to us.",
+      "links": [
+        {
+          "label": "Start a programme conversation",
+          "href": "/contact?intent=institution"
         },
-        "2": {
-          "title": "B2B Platforms",
-          "desc": "Offer contextual financing without building multiple lender integrations or internal credit operations. NavDhan charges no integration or subscription fee to the platform.",
-          "button": "Explore Platform Integration"
+        {
+          "label": "Talk about an integration",
+          "href": "/contact?intent=platform"
         },
-        "3": {
-          "title": "Investors & Ecosystem Enablers",
-          "desc": "Review our roadmap from managed origination to the Embedded Credit SDK and selective regulated capital participation.",
-          "button": "Request the Investor Deck"
+        {
+          "label": "Email us (partnerships@kubar.tech)",
+          "href": "mailto:partnerships@kubar.tech"
         }
-      }
-    },
-    "team_section": {
-      "badge": "03",
-      "title": "Meet the Team",
-      "subtitle": "Builders across technology, credit workflows and B2B distribution",
-      "description": "The team combines product engineering, applied machine learning, API integration, compliance workflows, marketplace onboarding and go-to-market experience.",
-      "closing": "That combination supports NavDhan's platform-and-lender integration strategy."
-    },
-    "closing_section": {
-      "title": "The Future of Business Credit",
-      "message": "Business credit should be available inside the workflows where commercial intent and operating context already exist.",
-      "final": "NavDhan is building the origination layer that connects those workflows to regulated lenders.",
-      "brand": "Built by Kubar Labs."
-    },
-    "cta_section": {
-      "title": "Build the origination network with us",
-      "description": "Partner with NavDhan as a lender, B2B platform, investor or ecosystem enabler.",
-      "button": "Get in Touch",
-      "button_email": "partnerships@kubar.tech"
+      ]
     }
   },
-  "navdhan": {
-    "page_title": "NavDhan | Embedded Origination Infrastructure for Business Lending",
-    "page_description": "NavDhan embeds lender-ready credit journeys inside fragmented B2B platforms and routes structured applications into existing lender systems.",
+  "contact": {
+    "meta": {
+      "title": "Contact · Kubar Labs",
+      "description": "Talk to Kubar Labs about a programme, an integration or anything else. Tell us who you are and your message reaches the right people."
+    },
     "hero": {
-      "title": "The Origination Layer Between B2B Platforms and Lenders",
-      "description": "NavDhan captures borrower intent inside third-party business workflows, structures permissioned platform and financial data, and routes lender-ready applications into existing lender systems.",
-      "cta_primary": "Request a Lender Demo"
+      "headline": "Talk to us.",
+      "sub": "Tell us who you are and what you’d like to discuss, and your message reaches the right people."
     },
-    "problem_section": {
-      "eyebrow": "The Origination Gap",
-      "subtitle": "Lenders can process more applications than fragmented channels can originate.",
-      "problem_text": "Businesses often seek credit through manual, intermediary-led channels that are disconnected from the platforms where transactions and operating data already exist.",
-      "solution_text": "NavDhan embeds the credit request inside those platforms, structures permissioned data, pre-qualifies applications against lender-configured criteria and routes lender-ready files into existing lender systems."
-    },
-    "use_cases": {
-      "title": "Credit Products Supported by One Origination Layer",
-      "cases": {
-        "1": {
-          "title": "Unsecured Business Loans",
-          "description": "Capture working-capital demand inside B2B workflows and route structured applications to eligible lending partners."
+    "routes": {
+      "columns": {
+        "who": "If you are",
+        "step": "Next step"
+      },
+      "rows": [
+        {
+          "who": "A bank, finance company, insurer or fund",
+          "step": "Start a programme conversation",
+          "href": "/contact?intent=institution#form"
         },
-        "2": {
-          "title": "Secured Business Credit",
-          "description": "Extend the same origination workflow to machinery, inventory-backed and loan-against-property products as lender integrations expand."
+        {
+          "who": "A trade platform or marketplace",
+          "step": "Talk about an integration",
+          "href": "/contact?intent=platform#form"
         },
-        "3": {
-          "title": "Trade-Finance Origination",
-          "description": "Support eBL and LC financing workflows through export, import, logistics and trade platforms as the network expands."
+        {
+          "who": "An exporter",
+          "step": "Ask about Programme 1",
+          "href": "/contact?intent=exporter#form"
+        },
+        {
+          "who": "An investor",
+          "step": "Email us",
+          "href": "mailto:partnerships@kubar.tech"
+        },
+        {
+          "who": "Press, or anything else",
+          "step": "Write to us",
+          "href": "/contact?intent=other#form"
         }
+      ]
+    },
+    "form": {
+      "heading": "Send message",
+      "labels": {
+        "intent": "I’m writing as",
+        "name": "Full name",
+        "email": "Work email",
+        "organisation": "Organisation",
+        "role": "Your role",
+        "message": "What would you like to discuss?",
+        "website": "Leave this field empty"
+      },
+      "optional": "(optional)",
+      "emailHelp": "We’ll reply to this address.",
+      "intents": {
+        "institution": "A bank, finance company, insurer or fund",
+        "platform": "A trade platform or marketplace",
+        "exporter": "An exporter",
+        "investor": "An investor",
+        "press": "Press",
+        "other": "Something else"
+      },
+      "messageHelp": {
+        "institution": "For example: the trade you finance today, the limits you work with, or what your credit committee will ask.",
+        "platform": "For example: your platform, the exporters on it and what you’d like them to have.",
+        "exporter": "For example: what you export, where your buyers are and how much of your bank limit you use.",
+        "investor": "For example: your fund and what you’d like to know.",
+        "press": "For example: your publication, your deadline and your question."
+      },
+      "count": "{n} of 2,000",
+      "errors": {
+        "intentRequired": "Please choose who you’re writing as.",
+        "nameRequired": "Please enter your full name.",
+        "emailRequired": "Please enter your work email.",
+        "emailInvalid": "Please enter an email address in the form name@organisation.com.",
+        "organisationRequired": "Please enter your organisation.",
+        "messageRequired": "Please tell us what you’d like to discuss.",
+        "messageTooLong": "Please keep your message under 2,000 characters."
+      },
+      "summary": "Your message didn’t send. Please check these fields.",
+      "send": "Send message",
+      "sending": "Sending…",
+      "notice": "We use these details only to reply to you and to continue the conversation you start.",
+      "privacy": "Privacy notice",
+      "sent": {
+        "heading": "Message sent.",
+        "body": "Thank you, {firstName}. Your message is with the team, and we’ll reply from a kubar.tech address.",
+        "link": "Back to the home page"
+      },
+      "failed": {
+        "server": "Your message didn’t send. Please try again, or email <email>outreach@kubar.tech</email> directly.",
+        "rate": "We’ve had several messages from this connection in a short time. Please wait a few minutes and try again, or email <email>outreach@kubar.tech</email>.",
+        "offline": "You seem to be offline. Your message is still here; send it again when you’re connected."
       }
-    },
-    "why_works": {
-      "title": "Why NavDhan Works",
-      "tagline": "Traditional sourcing captures a lead. NavDhan captures intent, operating context and a structured application.",
-      "message": "NavDhan combines permissioned platform signals with lender-configured rules to improve application quality without replacing the lender's underwriting process.",
-      "features": {
-        "1": "Permissioned validation across platform, GST, banking, bureau and verification sources, where available",
-        "2": "Sector-specific operational signals for lender-configured pre-qualification",
-        "3": "Rules-based routing into existing LOS, LMS, CRM or internal lender portals",
-        "4": "Clear separation between NavDhan's origination role and the regulated lender's final credit decision"
-      }
-    },
-    "integrations": {
-      "title": "Integrates Between Business Workflows and Lender Systems",
-      "subtitle": "NavDhan is designed to sit between third-party origination surfaces and the systems lenders already operate.",
-      "marketplace_partners": {
-        "label": "Origination Surfaces",
-        "items": {
-          "1": "B2B marketplaces and procurement platforms",
-          "2": "Export, import and logistics platforms",
-          "3": "ERPs and enterprise service providers"
-        }
-      },
-      "lender_systems": {
-        "label": "Lender Systems",
-        "items": {
-          "1": "Loan Origination Systems and internal portals",
-          "2": "Loan Management Systems and core banking",
-          "3": "CRM, document and compliance workflows"
-        }
-      },
-      "data_infra": {
-        "label": "Permissioned Data & Verification",
-        "items": {
-          "1": "Platform and transaction data",
-          "2": "GST, e-invoice and Account Aggregator rails, where applicable",
-          "3": "Bureau, banking and verification providers configured by the lender"
-        }
-      }
-    },
-    "for_banks": {
-      "title": "NavDhan for Financial Institutions",
-      "subtitle": "Reach high-intent businesses inside third-party workflows and receive structured applications mapped to your product and eligibility criteria.",
-      "features": {
-        "1": "Embedded origination: Access credit demand inside fragmented B2B ecosystems",
-        "2": "Lender-ready applications: Receive structured files enriched with permissioned operating context",
-        "3": "Existing-system integration: Route applications into LOS, LMS, CRM or internal portals",
-        "4": "Contextual intelligence: Use platform-specific signals to support pre-qualification"
-      },
-      "tagline": "NavDhan expands the origination funnel; the regulated lender retains underwriting, pricing, approval and servicing.",
-      "cta": "Schedule a Lender Briefing",
-      "cta_email": "partnerships@kubar.tech"
-    },
-    "for_msmes": {
-      "title": "NavDhan for Businesses",
-      "subtitle": "Request financing inside the B2B platform you already use. NavDhan helps structure and route your application to eligible lenders; final offers and terms come from regulated lenders.",
-      "features": {
-        "1": "Contextual applications: Use relevant business and transaction information with your consent",
-        "2": "Less repeated paperwork: Reuse structured information where integrations and lender policies allow"
-      },
-      "cta_primary": "Join Our WhatsApp Community",
-      "cta_secondary": "Join the Waitlist"
-    }
-  },
-  "navdhan_current": {
-    "hero": {
-      "title": "Unified credit infrastructure for B2B commerce.",
-      "description": "One credit infrastructure layer for commerce-tech and B2B platforms, designed to connect businesses to the breadth of loan products they may need.",
-      "primary": "Discuss integration",
-      "secondary": "Visit navdhan.app",
-      "notice": "Temporary direct access. Embedded distribution comes first."
-    },
-    "integration": {
-      "eyebrow": "AN EMBEDDED INTEGRATION MODEL",
-      "platform_title": "Commerce-tech & B2B platforms",
-      "platform_lines": "Export/import platforms · B2B marketplaces|Procurement, ERP & vertical SaaS|Enterprise service providers",
-      "infrastructure": "UNIFIED CREDIT INFRASTRUCTURE",
-      "lender_title": "Lender integrations",
-      "lender_lines": "Core banking · Loan management|Loan origination · DSA portals · CRM",
-      "note": "Illustrative architecture. Connections and loan-product availability depend on lender and integration coverage."
-    },
-    "roles": {
-      "title": "One embedded journey.\nA clear role for everyone.",
-      "description": "The platform remains the place customers do business. The lender remains responsible for the lending decision. NavDhan connects the journey between them.",
-      "platform_tab": "For platforms",
-      "lender_tab": "For lenders",
-      "platform_title": "Keep the customer relationship.",
-      "platform_description": "Bring a connected credit journey into the platform your business customers already use. Share permitted business context, support an application and connect it to participating lenders.",
-      "platform_note": "Loan products and lender coverage vary by integration. Lending decisions remain with the lender.",
-      "lender_title": "Review a connected application.",
-      "lender_description": "Receive structured applications with permissioned business context. Use lender-defined requirements and your own credit process to assess the financing need.",
-      "lender_note": "Lenders retain eligibility, pricing, underwriting, documentation and disbursal. A signal from NavDhan is not a credit approval."
-    },
-    "responsibility": {
-      "title": "Infrastructure, not a lender.",
-      "summary": "Credit approval, pricing and disbursal remain with regulated lenders. Kubar does not lend or hold loan funds.",
-      "detail": "NavDhan connects permissioned business context and applications with participating lenders. Each lender retains eligibility assessment, underwriting, pricing, documentation and disbursal. Product availability depends on lender and integration coverage.",
-      "toggle": "Read how responsibilities are divided"
     },
     "direct": {
-      "description": "NavDhan is primarily designed to be embedded within commerce-tech and B2B platforms. For a limited period, businesses may also use navdhan.app directly to start an application.",
-      "link": "Visit navdhan.app"
+      "columns": [
+        "For",
+        "Write to"
+      ],
+      "rows": [
+        [
+          "Partnerships and investors",
+          "partnerships@kubar.tech"
+        ],
+        [
+          "Everything else, including press",
+          "outreach@kubar.tech"
+        ],
+        [
+          "Privacy requests and grievances",
+          "Keshav Dudani, Grievance Officer: keshav@kubar.tech"
+        ],
+        [
+          "Registered office",
+          "Paras Market, Station Road, Barakar, West Bengal 713324"
+        ]
+      ]
     }
   },
-  "protocol": {
-    "hero": {
-      "title": "Trade finance, from order to settlement.",
-      "description": "Cross-border trade-finance infrastructure, in development, that connects trade evidence, rights and financing context from order to settlement.",
-      "status": "DEMONSTRATED PROTOTYPE",
-      "primary": "Discuss a pilot",
-      "secondary": "Explore the workflow",
-      "diagram_eyebrow": "FROM TRADE EVIDENCE TO AN ACCEPTED RECEIVABLE",
-      "context_label": "PERMISSIONED BUSINESS CONTEXT",
-      "context_value": "Order · LC terms · shipment evidence",
-      "context_owner": "OWNER-CONTROLLED ACCESS",
-      "context_state": "AUDITABLE STATE",
-      "acceptance": "ISSUING-BANK ACCEPTANCE",
-      "claim_label": "DOCUMENTARY CLAIM",
-      "claim_value": "Not yet an accepted receivable",
-      "receivable_label": "ACCEPTED LC RECEIVABLE",
-      "receivable_value": "After authoritative issuing-bank acceptance",
-      "transition_note": "Issuing-bank acceptance is the decisive transition.",
-      "qualification": "Banks, lenders and external document providers retain their authority. This is an illustrative workflow, not a live transaction."
-    },
-    "progress": {
-      "title": "A demonstrated prototype.\nA product in development.",
-      "description": "We demonstrated the lifecycle with synthetic trade data and simulated institutional adapters. No external money moved and no live partner, bank, venue or regulator system was contacted.",
-      "note": "Development status: August 2026. Demonstration does not imply production availability.",
-      "demonstrated_label": "01 / DEMONSTRATED",
-      "demonstrated_title": "An end-to-end synthetic demonstration.",
-      "demonstrated_description": "Synthetic adapters connected order and LC context, document evidence, simulated bank acceptance, financing and simulated settlement.",
-      "development_label": "02 / IN DEVELOPMENT",
-      "development_title": "Pilot integrations and controls.",
-      "development_description": "Work continues on institution-facing integrations, permissioned access and operating controls. Availability remains subject to institutional readiness and applicable requirements."
-    },
-    "workflow": {
-      "title": "Follow the trade.\nKeep the authority clear.",
-      "description": "An example lifecycle for LC-backed export finance. Availability depends on the institutions, approvals and regulated venues involved.",
-      "badge": "KUBAR PROTOCOL · WORKFLOW",
-      "stages": {
-        "1": {
-          "title": "Begin with the trade commitment.",
-          "description": "Connect the order, counterparties and letter-of-credit context into a permissioned trade record."
+  "legal": {
+    "privacy": {
+      "meta": {
+        "title": "Privacy notice · Kubar Labs",
+        "description": "How Kubar Labs handles personal data collected through kubar.tech."
+      },
+      "title": "Privacy notice",
+      "lastUpdated": "Last updated: 15 November 2026",
+      "contents": "Contents",
+      "sections": [
+        {
+          "n": "1",
+          "title": "Who we are",
+          "blocks": [
+            "Kubar Labs is the brand of Kubar Protocol Private Limited, a company incorporated in India (CIN U70200WB2024PTC274850), with its registered office at Paras Market, Station Road, Barakar, West Bengal 713324 (“Kubar”, “we”). This notice explains how we handle personal data collected through kubar.tech. We decide why and how this data is used."
+          ]
         },
-        "2": {
-          "title": "Connect pre-shipment finance.",
-          "description": "A bank may provide packing credit in foreign currency (PCFC), subject to its assessment and requirements."
+        {
+          "n": "2",
+          "title": "What we collect",
+          "blocks": [
+            "– What you send through the contact form: your name, work email, organisation, role (if you give it), who you’re writing as and your message.",
+            "– What you send us by email.",
+            "– Technical data that our hosting provider handles to deliver and protect the site, such as your IP address, browser type and the pages you request. We use your IP address briefly to limit repeated form submissions, and we don’t store it with your message.",
+            "– Aggregate figures on how the site is used, from Cloudflare Web Analytics, which uses no cookies or local storage and doesn’t fingerprint visitors.",
+            "We don’t ask for sensitive personal data, such as passwords or financial, health or biometric information. Please don’t send it."
+          ]
         },
-        "3": {
-          "title": "Link shipment evidence.",
-          "description": "Bring shipment events and external electronic bill-of-lading references into the record without assuming control of those documents."
+        {
+          "n": "3",
+          "title": "Cookies",
+          "blocks": [
+            "The site sets no cookies for analytics or advertising. Our hosting provider may set a strictly necessary cookie to protect the site from automated traffic."
+          ]
         },
-        "4": {
-          "title": "Identify the accepted receivable.",
-          "description": "Documentary evidence alone is not an accepted receivable. Authoritative issuing-bank acceptance establishes the Accepted LC Receivable."
+        {
+          "n": "4",
+          "title": "Why we use it",
+          "blocks": [
+            "– To reply to your enquiry and to continue the conversation you start.",
+            "– To keep the site and the form secure and working.",
+            "– To understand, in aggregate, how the site is used.",
+            "We don’t sell personal data, and we don’t use it for advertising."
+          ]
         },
-        "5": {
-          "title": "Connect eligible financing.",
-          "description": "Carry the accepted receivable and its verified context into an eligible funding workflow through the relevant regulated venue."
+        {
+          "n": "5",
+          "title": "Who we share it with",
+          "blocks": [
+            "– Kubar staff who need it to reply to you.",
+            "– Service providers that process it for us: Cloudflare (hosting, security, form delivery and analytics) and Google (email). These providers may process data outside India.",
+            "– Authorities, where the law requires it."
+          ]
         },
-        "6": {
-          "title": "Settle through the bank.",
-          "description": "The bank executes the settlement waterfall: PCFC repayment and the exporter’s balance. Payment to the financier at maturity is a separate, later event."
+        {
+          "n": "6",
+          "title": "How long we keep it",
+          "blocks": [
+            "We keep enquiries for 24 months after our last exchange, unless a business relationship follows or the law requires us to keep them longer."
+          ]
+        },
+        {
+          "n": "7",
+          "title": "How we protect it",
+          "blocks": [
+            "We follow reasonable security practices: access only for staff who need it, encrypted connections, and providers that follow recognised security standards."
+          ]
+        },
+        {
+          "n": "8",
+          "title": "Your rights",
+          "blocks": [
+            "You can ask us to tell you what personal data we hold about you, to correct or update it, to delete it where we don’t need to keep it, and to stop using it by withdrawing your consent. You can nominate someone to act for you, and you can raise a grievance with our Grievance Officer. From 13 May 2027, when the remaining provisions of the Digital Personal Data Protection Act, 2023 and its Rules apply, you may also complain to the Data Protection Board of India if we haven’t resolved your grievance."
+          ]
+        },
+        {
+          "n": "9",
+          "title": "Grievance Officer",
+          "blocks": [
+            "Keshav Dudani, Grievance Officer, Kubar Protocol Private Limited, Paras Market, Station Road, Barakar, West Bengal 713324; keshav@kubar.tech. We reply within one month of receiving a grievance."
+          ]
+        },
+        {
+          "n": "10",
+          "title": "Children",
+          "blocks": [
+            "The site is for businesses and institutions, not for children, and we don’t knowingly collect children’s personal data."
+          ]
+        },
+        {
+          "n": "11",
+          "title": "Changes",
+          "blocks": [
+            "We post any change here, with the date it takes effect."
+          ]
         }
-      }
+      ]
     },
-    "authority": {
-      "toggle": "Read how responsibilities are divided",
-      "bank_title": "Banks control money movement.",
-      "bank_summary": "Credit approval and settlement stay with the relevant banks and regulated institutions. Kubar Protocol does not lend or hold financing proceeds.",
-      "bank_detail": "The bank executes the financing-proceeds waterfall: PCFC repayment and the exporter’s balance. The financier’s maturity payment is a separate, later event under the financing terms.",
-      "evidence_title": "Evidence has an authoritative owner.",
-      "evidence_summary": "External document providers retain document control. An accepted receivable requires authoritative issuing-bank acceptance, not just uploaded documents.",
-      "evidence_detail": "Protocol links references and permissioned context. It is not the default controller of the electronic bill of lading, and does not replace the issuing bank or document provider’s authority.",
-      "role_boundary": "Kubar Protocol does not become the lender, custodian, regulated venue or settlement bank."
+    "terms": {
+      "meta": {
+        "title": "Terms of use · Kubar Labs",
+        "description": "The terms on which kubar.tech is offered."
+      },
+      "title": "Terms of use",
+      "lastUpdated": "Last updated: 15 November 2026",
+      "contents": "Contents",
+      "sections": [
+        {
+          "n": "1",
+          "title": "About these terms",
+          "blocks": [
+            "kubar.tech is run by Kubar Protocol Private Limited, a company incorporated in India (CIN U70200WB2024PTC274850), with its registered office at Paras Market, Station Road, Barakar, West Bengal 713324 (“Kubar”). By using the site, you accept these terms."
+          ]
+        },
+        {
+          "n": "2",
+          "title": "What the site is",
+          "blocks": [
+            "The site gives information about Kubar Labs and its products, for institutions and businesses. It is not an offer, an invitation or a solicitation to buy, sell or finance any receivable, security or other financial product, and nothing on it is investment, financial, legal or tax advice. Kubar’s services are for institutions only; nothing on the site is an offer to the public."
+          ]
+        },
+        {
+          "n": "3",
+          "title": "Kubar’s role",
+          "blocks": [
+            "Kubar acts as a financier’s origination and servicing agent. It doesn’t lend, hold client money or take credit risk. Any programme is governed by its own signed documents, not by this site."
+          ]
+        },
+        {
+          "n": "4",
+          "title": "Plans and examples",
+          "blocks": [
+            "Statements about plans, such as Kubar’s own ITFS registration, targeted for 2027, are intentions, not promises, and depend on approvals and agreements outside Kubar’s control. The illustrative receivable is an example, not a real transaction."
+          ]
+        },
+        {
+          "n": "5",
+          "title": "Other people’s names and marks",
+          "blocks": [
+            "Programme names and logos belong to their owners. They show programmes Kubar or its founder takes part in, and they don’t imply a partnership or an endorsement. Links to other sites are for convenience; we aren’t responsible for their content."
+          ]
+        },
+        {
+          "n": "6",
+          "title": "Our content",
+          "blocks": [
+            "The site’s text and design, the Kubar mark and the names Kubar Labs, Kubar Protocol and NavDhan belong to Kubar Protocol Private Limited. You may view and share pages for your own reference; any other use needs our written permission."
+          ]
+        },
+        {
+          "n": "7",
+          "title": "Using the site",
+          "blocks": [
+            "Don’t use the site unlawfully, interfere with its security or operation, or send it malicious code or automated requests."
+          ]
+        },
+        {
+          "n": "8",
+          "title": "No warranty",
+          "blocks": [
+            "We work to keep the site accurate, but it is provided as it is, without warranties, to the extent the law allows."
+          ]
+        },
+        {
+          "n": "9",
+          "title": "Liability",
+          "blocks": [
+            "To the extent the law allows, Kubar isn’t liable for any loss arising from use of, or reliance on, the site."
+          ]
+        },
+        {
+          "n": "10",
+          "title": "Privacy",
+          "blocks": [
+            "The <link>privacy notice</link> explains how we handle personal data."
+          ]
+        },
+        {
+          "n": "11",
+          "title": "Changes",
+          "blocks": [
+            "We may update these terms. The version on this page applies from the date shown."
+          ]
+        },
+        {
+          "n": "12",
+          "title": "Law and courts",
+          "blocks": [
+            "These terms are governed by the laws of India. Any dispute arising from them or from the use of the site is resolved by arbitration seated in GIFT City, Gandhinagar, before a sole arbitrator under the Arbitration and Conciliation Act, 1996. Subject to that, the courts at Gandhinagar, Gujarat have exclusive jurisdiction."
+          ]
+        },
+        {
+          "n": "13",
+          "title": "Contact",
+          "blocks": [
+            "outreach@kubar.tech · Paras Market, Station Road, Barakar, West Bengal 713324"
+          ]
+        }
+      ]
     }
   },
-  "team": {
-    "page_title": "The Kubar Labs Team",
-    "page_description": "Meet the team building NavDhan's embedded origination infrastructure",
-    "hero_section": {
-      "title": "The Team",
-      "description": "Built across technology, credit, compliance, distribution and product."
-    },
-    "team_section": {
-      "title": "The Team",
-      "subtitle": "Building embedded origination infrastructure"
-    },
-    "advisors_section": {
-      "title": "Advisory Board",
-      "subtitle": "Supporting us across finance, technology and institutional strategy"
-    }
+  "abbreviations": {
+    "AD bank": "Authorised Dealer bank",
+    "DPIIT": "Department for Promotion of Industry and Internal Trade",
+    "EDPMS": "Export Data Processing and Monitoring System",
+    "FACE": "Fintech Association for Consumer Empowerment",
+    "GFTN": "Global Finance & Technology Network",
+    "GIFT City": "Gujarat International Finance Tec-City",
+    "GIFT IFIH": "GIFT International Fintech Innovation Hub",
+    "IBU": "IFSC Banking Unit, a bank’s unit at GIFT City",
+    "IFSC": "International Financial Services Centre",
+    "IFSCA": "International Financial Services Centres Authority",
+    "ITFS": "International Trade Finance Service platform",
+    "MeitY": "Ministry of Electronics and Information Technology",
+    "MSME": "micro, small and medium enterprises",
+    "NIBM": "National Institute of Bank Management",
+    "RBI": "Reserve Bank of India",
+    "SME": "small and medium-sized enterprises",
+    "STPI": "Software Technology Parks of India"
   }
 }
