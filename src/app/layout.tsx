@@ -73,8 +73,15 @@ export default async function RootLayout({
   }
 
   return (
-    <html lang="en" className={fontVariables}>
+    // The script below adds data-frames to <html>, so React must not report the difference.
+    <html lang="en" className={fontVariables} suppressHydrationWarning>
       <body>
+        {/* Movements that play as a page loads (the hero drawings; globals.css) start from a
+            hidden or displaced state, so they may only start where frames are being drawn. This
+            marks the document on its first frame, before anything is painted. In a background
+            tab or a hidden pane no frame comes, the mark is never set, and the drawings stay as
+            the server drew them: complete. */}
+        <script dangerouslySetInnerHTML={{ __html: "requestAnimationFrame(function(){document.documentElement.setAttribute('data-frames','')})" }} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

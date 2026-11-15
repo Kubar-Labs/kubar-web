@@ -660,10 +660,10 @@
   }
 
   /* Arrivals on page load: a sheet drops in from 24 px above; a row fades in. */
-  .iso-drop {
+  :where(html[data-frames]) .iso-drop {
     animation: iso-drop var(--duration-write) var(--ease-standard) both;
   }
-  .iso-fade {
+  :where(html[data-frames]) .iso-fade {
     animation: iso-fade var(--duration-disclose) var(--ease-standard) both;
   }
   @keyframes iso-drop {
@@ -750,7 +750,7 @@
     stroke-dasharray: 4 4;
     vector-effect: non-scaling-stroke;
   }
-  .limit-settle {
+  :where(html[data-frames]) .limit-settle {
     animation: limit-settle var(--duration-scene) var(--ease-standard) both;
   }
   @keyframes limit-settle {
@@ -793,11 +793,11 @@
 
   /* How it works hero (IsoSteps): on page load the blocks rise in order, 01
      to 08, 60 ms apart; 08's petrol top fades in over its white one last. */
-  .steps-rise {
+  :where(html[data-frames]) .steps-rise {
     animation: steps-rise var(--duration-write) var(--ease-standard) both;
     animation-delay: calc(var(--i) * 60ms);
   }
-  .steps-petrol {
+  :where(html[data-frames]) .steps-petrol {
     animation: iso-fade var(--duration-disclose) var(--ease-standard) both;
     animation-delay: calc(7 * 60ms + var(--duration-write));
   }

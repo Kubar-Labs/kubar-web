@@ -2027,3 +2027,38 @@ test.describe("Ground shadows", () => {
     });
   }
 });
+
+test.describe("Drawings that move as the page loads", () => {
+  // A background tab or a hidden pane draws no frames. The hero drawings must be complete
+  // there, not waiting at the start of a movement that never runs (How it works showed only
+  // its ground shadow). Frames are stopped here the way such a pane stops them.
+  const moving = ".steps-rise, .steps-petrol, .iso-drop, .iso-fade, .limit-settle";
+  for (const path of ["/", "/products/kubar-protocol", "/how-it-works"]) {
+    test(`${path}: complete where no frame is drawn`, async ({ page }) => {
+      await page.addInitScript(() => {
+        window.requestAnimationFrame = () => 0;
+      });
+      await page.goto(path);
+      await expect(page.locator("html")).not.toHaveAttribute("data-frames");
+      const waiting = await page.evaluate(
+        (moving) =>
+          [...document.querySelectorAll(moving)].filter((el) => {
+            const style = getComputedStyle(el);
+            return style.animationName !== "none" || style.opacity !== "1" || style.transform !== "none";
+          }).length,
+        moving,
+      );
+      expect(await page.locator(moving).count()).toBeGreaterThan(0);
+      expect(waiting).toBe(0);
+    });
+
+    test(`${path}: the movement still plays where frames are drawn, and ends complete`, async ({ page }) => {
+      await page.goto(path);
+      await expect(page.locator("html")).toHaveAttribute("data-frames", "");
+      expect(await page.evaluate((moving) => getComputedStyle(document.querySelector(moving)!).animationName, moving)).not.toBe("none");
+      await expect
+        .poll(() => page.evaluate((moving) => [...document.querySelectorAll(moving)].every((el) => getComputedStyle(el).opacity === "1"), moving))
+        .toBe(true);
+    });
+  }
+});

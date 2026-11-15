@@ -263,6 +263,7 @@ Motion shows a change of state and nothing else. The site has three kinds of int
 
 - Each drawing has one authored movement. It plays once, when 40% of the drawing is in view, and stays in its end state. A drawing already on screen when the page loads stays drawn.
 - The end state is what the server renders: with reduced motion or without script the reader sees the finished drawing, with every word. Nothing on a first screen starts hidden.
+- Movements that play as a page loads (the hero drawings) run only where frames are being drawn: an inline script marks `<html data-frames>` on the first frame, and their CSS waits for that mark. In a background tab or a hidden pane the mark never comes and the drawings stay complete. A browser test holds this.
 - No fade-up applied to sections in general. No parallax, looping, pulsing or spinning. No count-up numbers.
 - Animate `transform` and `opacity` only (and `stroke-dashoffset` for the lines named below).
 - No animation library: CSS transitions and keyframes on the tokens, CSS sticky and IntersectionObserver.
