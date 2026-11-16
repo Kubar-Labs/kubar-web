@@ -2349,3 +2349,163 @@ test.describe("Picks answer every time (repeated hover, and again after a reload
     });
   }
 });
+
+test.describe("Home's hero without script", () => {
+  for (const [width, height] of [[390, 844], [1180, 820], [1440, 900]] as const) {
+    test(`at ${width} the record is complete: eight rows, From and Proves for document 08, the link`, async ({ browser }) => {
+      const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width, height } });
+      const page = await context.newPage();
+      await page.goto("/");
+      const record = page.locator(".iso-record");
+      // Nothing waits on a movement: no mark for frames, so every sheet and row is in place.
+      await expect(page.locator("html")).not.toHaveAttribute("data-frames");
+      const rows = record.locator("ol li");
+      await expect(rows).toHaveCount(8);
+      for (const [i, name] of ["Purchase confirmation", "Buyer’s acknowledgement", "Credit-insurance cover", "No-objection", "Inspection report", "Bill of lading", "Shipping bill", "Commercial invoice"].entries()) {
+        await expect(rows.nth(i).getByText(name, { exact: true })).toBeVisible();
+        await expect(rows.nth(i)).toHaveCSS("opacity", "1");
+      }
+      const sheets = record.locator("svg.record-art .iso-drop");
+      await expect(sheets).toHaveCount(8);
+      for (const sheet of await sheets.all()) {
+        await expect(sheet).toHaveCSS("opacity", "1");
+        await expect(sheet).toHaveCSS("transform", "none");
+      }
+      await expect(record.locator("svg.record-art text", { hasText: "FILED" })).toBeVisible();
+      const shown = record.locator("dl");
+      await expect(shown.locator("dt")).toHaveText(["From", "Proves"]);
+      await expect(shown.locator("dd")).toHaveText(["The financier", "The financier bought the receivable, without recourse for the buyer’s credit"]);
+      const link = record.getByRole("link", { name: "See how it works" });
+      await expect(link).toBeVisible();
+      await expect(link).toHaveAttribute("href", "/how-it-works");
+      // The words around it are there too.
+      await expect(page.locator("main h1 + p")).toBeVisible();
+      await expect(page.getByRole("link", { name: "For financial institutions" }).first()).toBeVisible();
+      await page.screenshot({ path: `test-results/hero-no-script-${width}.png` });
+      await context.close();
+    });
+  }
+});
+
+test.describe("Where this sits (SPEC section 8)", () => {
+  const pages = [
+    { path: "/products/kubar-protocol", level: "Standing buyers", line: "Part of the institutional exchange Kubar is building. Kubar Protocol gives export receivables their standing buyers." },
+    { path: "/products/navdhan-sdk", level: "A common standard for what qualifies", line: "Part of the institutional exchange Kubar is building. NavDhan SDK brings receivables in to the common standard, from the platforms exporters already use." },
+  ] as const;
+  const names = ["The venue, last", "A record of performance", "A clean payment path", "Standing buyers", "A common standard for what qualifies"];
+
+  for (const { path, level, line } of pages) {
+    test(`${path}: the strip sits under the hero on the inset ground, with the page's level marked`, async ({ page }) => {
+      await page.setViewportSize({ width: 1440, height: 900 });
+      await page.goto(path);
+      const strip = page.getByRole("region", { name: "Where this sits" });
+      await expect(strip).toHaveCount(1);
+      // Directly under the hero: after the h1, before the first h2.
+      const order = await page.evaluate(() => {
+        const s = document.querySelector('section[aria-label="Where this sits"]')!;
+        // Everything before it in the page is the hero (it holds the h1) or the "On this page" row.
+        const before: Element[] = [];
+        for (let el = s.previousElementSibling; el; el = el.previousElementSibling) before.push(el);
+        return before.length > 0 && before.every((el) => el.querySelector("h1") !== null || /On this page/.test(el.textContent ?? "")) && s.nextElementSibling !== null;
+      });
+      expect(order).toBe(true);
+      const inset = await page.evaluate(() => {
+        const probe = document.createElement("div");
+        probe.style.background = "var(--color-inset)";
+        document.body.appendChild(probe);
+        const colour = getComputedStyle(probe).backgroundColor;
+        probe.remove();
+        return colour;
+      });
+      await expect(strip).toHaveCSS("background-color", inset);
+      // Full width: the ground reaches both edges of the screen.
+      const box = (await strip.boundingBox())!;
+      expect(box.x).toBe(0);
+      expect(box.width).toBe(1440);
+      // The words, exactly.
+      await expect(strip.getByText("Where this sits", { exact: true })).toBeVisible();
+      await expect(strip.getByText(line, { exact: true })).toBeVisible();
+      const link = strip.getByRole("link", { name: "Follow one receivable through all five" });
+      await expect(link).toHaveAttribute("href", "/#one-receivable");
+      // The five names, top of the stack first; the page's level is the current one, in ink.
+      const items = strip.locator("ol li");
+      await expect(items).toHaveText(names);
+      await expect(strip.locator('ol li[aria-current="true"]')).toHaveText(level);
+      const muted = await items.first().evaluate((el) => getComputedStyle(el).color);
+      expect(await strip.locator('ol li[aria-current="true"]').evaluate((el) => getComputedStyle(el).color)).not.toBe(muted);
+      // The art: one petrol top face and one rani tick, both for that level; four solid blocks and a dashed venue.
+      const art = strip.locator("svg[aria-hidden='true']").first();
+      const colours = await page.evaluate(() => {
+        const probe = document.createElement("div");
+        document.body.appendChild(probe);
+        const of = (value: string) => ((probe.style.color = value), getComputedStyle(probe).color);
+        const out = { petrol: of("var(--petrol-900)"), rani: of("var(--color-accent)") };
+        probe.remove();
+        return out;
+      });
+      const fills = await art.locator("polygon").evaluateAll((els) => els.map((el) => getComputedStyle(el).fill));
+      expect(fills.filter((fill) => fill === colours.petrol)).toHaveLength(1);
+      const strokes = await art.locator("line").evaluateAll((els) => els.map((el) => getComputedStyle(el).stroke));
+      expect(strokes.filter((stroke) => stroke === colours.rani)).toHaveLength(1);
+      await expect(art.locator("polygon")).toHaveCount(12);
+      await expect(art.locator("path")).toHaveCount(1);
+      // The marked level's tick is level with its name.
+      const tick = (await art.locator("line").evaluateAll((els, rani) => els.filter((el) => getComputedStyle(el).stroke === rani).map((el) => el.getBoundingClientRect().top), colours.rani))[0];
+      const name = (await strip.locator('ol li[aria-current="true"]').boundingBox())!;
+      expect(Math.abs(tick - (name.y + name.height / 2))).toBeLessThanOrEqual(2);
+      // The link leads to Home's story.
+      await link.click();
+      await expect(page).toHaveURL(/\/#one-receivable$/);
+      await expect(page.locator("#one-receivable")).toBeInViewport();
+    });
+
+    test(`${path}: side by side from 768, stacked below, every name inside the strip and unbroken where it should be`, async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      for (const [width, height] of [[360, 800], [375, 667], [390, 844], [430, 932], [744, 1133], [768, 1024], [820, 1180], [1024, 768], [1180, 820], [1440, 900]] as const) {
+        await page.setViewportSize({ width, height });
+        await page.goto(path);
+        const strip = page.getByRole("region", { name: "Where this sits" });
+        const stack = (await strip.locator(".sits-stack").boundingBox())!;
+        const words = (await strip.getByText("Where this sits", { exact: true }).boundingBox())!;
+        if (width >= 768) expect(words.x, `${width}: words beside the stack`).toBeGreaterThanOrEqual(stack.x + stack.width);
+        else expect(words.y, `${width}: words under the stack`).toBeGreaterThanOrEqual(stack.y + stack.height);
+        const report = await strip.locator("ol li").evaluateAll((els) => {
+          const rects = els.map((el) => {
+            const range = document.createRange();
+            range.selectNodeContents(el);
+            return { box: range.getBoundingClientRect(), lines: new Set([...range.getClientRects()].map((r) => Math.round(r.top))).size, size: parseFloat(getComputedStyle(el).fontSize) };
+          });
+          const margin = parseFloat(getComputedStyle(document.querySelector("main .page-container")!).paddingRight);
+          return {
+            inside: rects.every((r) => r.box.right <= innerWidth - margin + 0.5),
+            apart: rects.every((r, i) => i === 0 || r.box.top >= rects[i - 1].box.bottom - 0.5),
+            lines: rects.map((r) => r.lines),
+            sizes: rects.map((r) => r.size),
+          };
+        });
+        expect(report.inside, `${width}: names inside the margin`).toBe(true);
+        expect(report.apart, `${width}: no name touches the next`).toBe(true);
+        expect(report.sizes, `${width}`).toEqual([13, 13, 13, 13, 13]);
+        expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth), `${width}`).toBe(0);
+        // The link is one line.
+        expect((await strip.getByRole("link").boundingBox())!.height, `${width}: the link on one line`).toBeLessThanOrEqual(26);
+      }
+    });
+
+    test(`${path}: the strip is complete without script and reads cleanly`, async ({ browser, page }) => {
+      const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
+      const plain = await context.newPage();
+      await plain.goto(path);
+      const strip = plain.locator('section[aria-label="Where this sits"]');
+      await expect(strip.locator("ol li")).toHaveText(names);
+      await expect(strip.getByText(line, { exact: true })).toBeVisible();
+      await expect(strip.getByRole("link", { name: "Follow one receivable through all five" })).toBeVisible();
+      await expect(strip.locator("svg polygon").first()).toBeVisible();
+      await context.close();
+      await page.setViewportSize({ width: 390, height: 844 });
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await page.goto(path);
+      await expectNoAxeViolations(page);
+    });
+  }
+});

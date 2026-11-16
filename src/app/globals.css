@@ -635,6 +635,68 @@
       width: 16px;
     }
   }
+  /* "Where this sits" (WhereThisSits): the small stack and its names. --k is
+     the art's scale: 0.8 under 390 px wide, so every name but the last keeps
+     its line beside it. The art is 206 wide to its ruler's ticks and 240 tall;
+     the names start 212 across and take the width that is left. From 390 to
+     767 the art is at full size and a name may take two lines (the 390
+     frame); the levels are 34 px apart and no two neighbours both wrap. */
+  .sits-stack {
+    --k: 0.8;
+    --names: 152px;
+    width: calc(212px * var(--k) + var(--names));
+    max-width: 100%;
+    height: calc(240px * var(--k));
+  }
+  .sits-names li:not(:last-child) {
+    white-space: nowrap;
+  }
+  @media (min-width: 390px) {
+    .sits-stack {
+      --k: 1;
+    }
+  }
+  @media (min-width: 390px) and (max-width: 767.98px) {
+    .sits-names li:not(:last-child) {
+      white-space: normal;
+    }
+  }
+  @media (min-width: 768px) {
+    .sits-stack {
+      --names: 150px;
+    }
+  }
+  @media (min-width: 1024px) {
+    .sits-stack {
+      --names: 258px;
+    }
+  }
+  /* Under 360 wide (a 320 px reflow) there is no room beside the art: the names are a plain list under it. */
+  @media (max-width: 359.98px) {
+    .sits-stack {
+      height: auto;
+    }
+    .sits-names,
+    .sits-names li {
+      position: static !important;
+      transform: none !important;
+      white-space: normal !important;
+    }
+    .sits-names {
+      padding-top: 8px;
+    }
+  }
+  .sits-art {
+    width: calc(206px * var(--k));
+    height: calc(240px * var(--k));
+  }
+  .sits-scale {
+    transform: scale(var(--k));
+  }
+  .sits-names {
+    left: calc(212px * var(--k));
+  }
+
   /* Blocks (foundations, layers, steps): a resting shadow under each, in
      screen space; the top face takes accent-soft when its label is picked. */
   .iso-block {

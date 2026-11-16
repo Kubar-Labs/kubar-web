@@ -6,6 +6,7 @@ import { NextStep } from "@/components/blocks/Closing";
 import { PageHero } from "@/components/blocks/PageHero";
 import { Section, SectionHead } from "@/components/blocks/Section";
 import { FitStage } from "@/components/drawings/FitStage";
+import { WhereThisSits } from "@/components/blocks/WhereThisSits";
 import { EmbedPicker, type SketchCopy } from "@/components/sdk/EmbedPicker";
 import { IsoLayers } from "@/components/sdk/IsoLayers";
 import { NumberedRows, PlatformLanes } from "@/components/sdk/PlatformLanes";
@@ -28,6 +29,8 @@ const CONTACT = "/contact?intent=platform";
 
 export default function NavdhanSdk() {
   const t = useTranslations("navdhanSdk");
+  const common = useTranslations("common");
+  const foundationNames = (useTranslations("home").raw("foundations.slabs") as { name: string }[]).map((slab) => slab.name);
   return (
     <>
       {/* The hero carries "What you embed": the six capabilities beside the sketch (section 12, item 3). */}
@@ -36,6 +39,15 @@ export default function NavdhanSdk() {
         sub={t("hero.sub")}
         button={{ label: t("hero.button"), href: CONTACT }}
         below={<EmbedPicker heading={t("does.heading")} rows={t.raw("does.rows") as string[][]} copy={t.raw("sketch") as SketchCopy} />}
+      />
+
+      {/* Where this sits: the five foundations small, the common standard in petrol. */}
+      <WhereThisSits
+        label={common("whereThisSits")}
+        line={t("sits.line")}
+        link={{ label: t("sits.link"), href: "/#one-receivable" }}
+        foundations={foundationNames}
+        current={4}
       />
 
       {/* The two audiences as one two-column block from 1024 up (Figma 296:9538; section 13 C1). */}

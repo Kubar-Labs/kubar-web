@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { createPageMetadata } from "@/app/page-metadata";
 import { NextStep, Questions } from "@/components/blocks/Closing";
 import { PageHero } from "@/components/blocks/PageHero";
+import { WhereThisSits } from "@/components/blocks/WhereThisSits";
 import { OnThisPage, type IndexItem } from "@/components/layout/OnThisPage";
 import { Section, SectionHead } from "@/components/blocks/Section";
 import { EvidenceSources } from "@/components/protocol/EvidenceSources";
@@ -44,6 +45,7 @@ export default function KubarProtocol() {
   const t = useTranslations("kubarProtocol");
   const footnotes = useTranslations("footnotes");
   const common = useTranslations("common");
+  const foundationNames = (useTranslations("home").raw("foundations.slabs") as { name: string }[]).map((slab) => slab.name);
 
   return (
     <>
@@ -58,6 +60,16 @@ export default function KubarProtocol() {
       <div className="page-container">
         <OnThisPage label={common("onThisPage")} items={t.raw("index") as IndexItem[]} />
       </div>
+
+      {/* Where this sits: the five foundations small, Standing buyers in petrol. */}
+      <WhereThisSits
+        label={common("whereThisSits")}
+        line={t("sits.line")}
+        link={{ label: t("sits.link"), href: "/#one-receivable" }}
+        foundations={foundationNames}
+        current={3}
+        className="mt-10 lg:mt-12"
+      />
 
       <Section labelledBy="buy-heading" className="flex flex-col gap-10 lg:gap-16">
         <SectionHead id="buy-heading" heading={t("whatYouBuy.heading")} layout="wide" />
