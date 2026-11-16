@@ -1127,6 +1127,13 @@
     position: relative;
     height: calc(var(--party-h) + 8 * var(--row-h));
   }
+  /* Phones: the lanes at their smallest rows, which leaves the cards the room to hold a third
+     of the screen each without the current one sliding under the drawing (SPEC section 9). */
+  @media (max-width: 767.98px) {
+    .lanes {
+      --row-h: 22px;
+    }
+  }
   /* Narrow phones: the party boxes sit closer, so "Singapore" fits its box on
      one line at 10 px from 360 up. The type is never shrunk for it. */
   @media (max-width: 429.98px) {

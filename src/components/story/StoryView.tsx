@@ -15,7 +15,8 @@ import { cx as cn } from "@/lib/cx";
  * below it on tablets and phones. Nothing traps or drives the scroll. A
  * state becomes current when its card crosses a line 45% of the way down the
  * space left for the text; an IntersectionObserver watches that line, not a
- * scroll handler. The current card is raised (--elevation-2); the others sit
+ * scroll handler. (Home on phones puts the line lower, so the current card is
+ * never under the drawing: see the observer below.) The current card is raised (--elevation-2); the others sit
  * flat in the secondary text colour; the change takes 200 ms.
  *
  * The drawing (Lanes) is rendered on the server and follows the
@@ -39,6 +40,7 @@ export type LedgerState = {
 const DESKTOP = "(min-width: 1024px)";
 /** Where the content reaches 1040 px: How it works pins the relying lines with its stack from here. */
 const WIDE = "(min-width: 1200px)";
+const PHONE = "(max-width: 767.98px)";
 
 /** The 22 px line before "Data path" and "Money path" on a card. */
 function PathGlyph({ kind }: { kind: "data" | "money" }) {
@@ -142,7 +144,12 @@ export function StoryView({
       observer?.disconnect();
       const height = window.innerHeight;
       const top = headerHeight() + (window.matchMedia(DESKTOP).matches ? 0 : (pinRef.current?.offsetHeight ?? 0));
-      const line = Math.round(top + 0.45 * (height - top));
+      // Home on phones: a card turns current one slot's height below the drawing, so the card
+      // before it is still clear of the drawing when it hands over; never lower than 48 px above
+      // the foot of the screen. Everywhere else: 45% of the way down the space left for the text.
+      const phone = !long && window.matchMedia(PHONE).matches;
+      const tallest = Math.max(...steps.slice(0, -1).map((step) => step.offsetHeight));
+      const line = Math.round(phone ? top + Math.min(height - top - 48, tallest) : top + 0.45 * (height - top));
       observer = new IntersectionObserver(
         (entries) => {
           for (const entry of entries) {
@@ -166,18 +173,23 @@ export function StoryView({
     window.addEventListener("resize", schedule);
     const pinObserver = new ResizeObserver(schedule);
     if (pinRef.current) pinObserver.observe(pinRef.current);
+    // The last card's height, for the pin's release on phones (see the pin below).
+    const last = steps[steps.length - 1];
+    const lastObserver = new ResizeObserver(() => list.closest<HTMLElement>(".story")?.style.setProperty("--last-card", `${last.offsetHeight}px`));
+    lastObserver.observe(last);
     return () => {
       window.removeEventListener("resize", schedule);
       pinObserver.disconnect();
+      lastObserver.disconnect();
       observer?.disconnect();
       if (frame) cancelAnimationFrame(frame);
     };
-  }, [fits]);
+  }, [fits, long]);
 
   const idRow = (className: string) => <p className={cn("t-tag text-ink", className)}>{t("record")}</p>;
 
   return (
-    <div className="story" data-story-fits={fits ? "true" : "false"}>
+    <div className="story" data-story-fits={fits ? "true" : "false"} style={{ ["--last-card" as string]: "203px" }}>
       <div data-no-abbr data-story-state={state} className="story-on">
         {/* The drawing and the cards share a box that ends with the last card,
             so the drawing stops being pinned as the last card leaves. */}
@@ -187,13 +199,20 @@ export function StoryView({
               so the cards pass under it (story-pin, globals.css). */}
           <div
             ref={pinRef}
-            className="story-pin @container sticky top-(--header-height) z-10 -mx-(--page-margin) bg-page px-(--page-margin) pt-4 pb-3 lg:col-start-2 lg:row-start-1 lg:top-[calc(var(--header-height)+24px)] lg:mx-0 lg:bg-transparent lg:p-0"
+            className={cn(
+              "story-pin @container sticky top-(--header-height) z-10 -mx-(--page-margin) bg-page px-(--page-margin) pt-4 pb-3 lg:col-start-2 lg:row-start-1 lg:top-[calc(var(--header-height)+24px)] lg:mx-0 lg:bg-transparent lg:p-0",
+              // Home on phones: the drawing lets go as the last card reaches it, not after the card
+              // has slid under it. A sticky box may not leave its container by its margin, so a
+              // bottom margin the height of the last card releases it that much sooner; the cards'
+              // column takes the same margin back, and the layout is unchanged.
+              !long && "max-md:mb-(--last-card)",
+            )}
           >
             {idRow("mb-3 lg:hidden")}
             {lanes}
           </div>
 
-          <div className="flex flex-col lg:col-start-1 lg:row-start-1">
+          <div className={cn("flex flex-col lg:col-start-1 lg:row-start-1", !long && "max-md:-mt-(--last-card)")}>
             {idRow("mb-4 hidden border-b border-rule-strong pb-2.5 lg:block")}
             {/* Home's link has no arrow (section 13 B3); How it works keeps the frame's. */}
             <TextLink href={`#${skipTo}`} kind={long ? "anchor" : "plain"} className="tap-area mt-1 mb-4 self-start lg:mt-0 lg:mb-5">
@@ -222,7 +241,11 @@ export function StoryView({
                     className={cn(
                       "lg:pb-6",
                       n < states.length
-                        ? cn("pb-[min(96px,12svh)]", long ? "lg:min-h-[60svh]" : "lg:min-h-[36svh]")
+                        ? long
+                          ? "pb-[min(96px,12svh)] lg:min-h-[60svh]"
+                          : // Home on phones: 8 px between cards, and from the second state on a slot of
+                            // at least a third of the screen, which is the scroll its state holds for.
+                            cn("pb-2 md:pb-[min(96px,12svh)] lg:min-h-[36svh]", n > 1 && "max-md:min-h-[calc(100svh/3)]")
                         : "lg:min-h-[calc(0.55*(100svh-var(--header-height))+24px)]",
                     )}
                   >

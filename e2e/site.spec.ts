@@ -31,9 +31,26 @@ async function scrollToState(page: Page, n: number) {
 async function expectNoAxeViolations(page: Page) {
   // Measure only once nothing is moving: a drawing that is still fading in reads as low contrast.
   // (A fixed wait isn't enough: headless frames only advance when something asks for one.)
+  // Still means still twice running: no animation or transition in flight and the page not
+  // scrolling, on two polls in a row, since a smooth scroll brings drawings into view that then
+  // start to play.
+  let calm = 0;
   await expect
-    .poll(() => page.evaluate(() => document.getAnimations().filter((a) => a.playState === "running" && (a.effect?.getComputedTiming().iterations ?? 1) !== Infinity).length), { timeout: 10_000 })
-    .toBe(0);
+    .poll(
+      async () => {
+        const moving = await page.evaluate(() => {
+          const w = window as unknown as { __axeY?: number };
+          const scrolled = w.__axeY !== undefined && w.__axeY !== scrollY;
+          w.__axeY = scrollY;
+          const running = document.getAnimations().filter((a) => a.playState === "running" && (a.effect?.getComputedTiming().iterations ?? 1) !== Infinity).length;
+          return running + (scrolled ? 1 : 0);
+        });
+        calm = moving === 0 ? calm + 1 : 0;
+        return calm;
+      },
+      { timeout: 15_000, intervals: [100] },
+    )
+    .toBeGreaterThanOrEqual(2);
   const results = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
     .analyze();
@@ -598,9 +615,14 @@ test.describe("Home hero order", () => {
   });
 
   test("from 1024 to 1327: headline and subline across the top, routes left, record right, the top sheet on the first screen", async ({ page }) => {
+    // Still, and with its fonts: the load movement shifts the sheets and a fallback font the lines.
+    await page.emulateMedia({ reducedMotion: "reduce" });
     for (const [width, height] of [[1024, 768], [1080, 810], [1133, 744], [1180, 820], [1194, 834], [1280, 800]] as const) {
       await page.setViewportSize({ width, height });
       await page.goto("/");
+      await page.evaluate(() => document.fonts.ready);
+      // The headline is two lines once its own font is in (the fallback is wider).
+      await expect.poll(async () => (await page.locator("main h1").boundingBox())!.height, { message: `${width}: the headline in two lines` }).toBeLessThanOrEqual(120);
       const h1 = (await page.locator("main h1").boundingBox())!;
       const subline = (await page.locator("main h1 + p").boundingBox())!;
       const routes = (await page.locator("main section ul").first().boundingBox())!;
@@ -609,8 +631,9 @@ test.describe("Home hero order", () => {
       expect(subline.y, `${width}`).toBeGreaterThan(h1.y + h1.height);
       expect(record.x, `${width}: record right of the routes`).toBeGreaterThan(routes.x + routes.width);
       expect(Math.round(record.y), `${width}: level with the routes`).toBe(Math.round(routes.y));
-      const sheet = (await page.locator(".iso-record .iso-sheet-current").boundingBox())!;
-      expect(sheet.y + sheet.height, `${width}: the top sheet on the first screen`).toBeLessThanOrEqual(height);
+      // The sheet's own outline: a bounding box from the browser's quads takes in its shadow.
+      const sheetBottom = await page.locator(".iso-record .iso-sheet-current rect").first().evaluate((el) => el.getBoundingClientRect().bottom);
+      expect(sheetBottom, `${width}: the top sheet on the first screen`).toBeLessThanOrEqual(height);
       const firstRows = await page.locator(".iso-record ol li").evaluateAll((els, h) => els.filter((el) => el.getBoundingClientRect().bottom <= h).length, height);
       expect(firstRows, `${width}: the first rows on the first screen`).toBeGreaterThanOrEqual(3);
       await expect(page.locator('main a[href="#one-receivable"]').first()).toBeHidden();
@@ -2216,4 +2239,55 @@ test.describe("The laptop layout starts at 1024 (SPEC section 7)", () => {
       }
     });
   }
+});
+
+test.describe("Home's story on phones (SPEC section 9)", () => {
+  // The section is at most about 2,750 px at 390 x 844 with all eight cards; each state holds
+  // for a third of the screen; the current card is never under the pinned lanes.
+  test("it is short, every state holds for a third of the screen, and the current card stays clear of the lanes", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/");
+    await storyLive(page);
+    const story = await page.evaluate(() => {
+      const section = document.querySelector("#one-receivable")!.getBoundingClientRect();
+      const on = document.querySelector(".story-on")!;
+      return {
+        top: section.top + scrollY,
+        height: section.height,
+        cards: on.querySelectorAll(".story-card").length,
+        rows: getComputedStyle(on.querySelector(".lanes")!).getPropertyValue("--row-h").trim(),
+        slots: [...on.querySelectorAll(".story-card")].map((card) => card.parentElement!.getBoundingClientRect().height),
+      };
+    });
+    expect(story.cards).toBe(8);
+    expect(story.rows).toBe("22px");
+    expect(story.height).toBeLessThanOrEqual(2820);
+    // States 2 to 7 hold for their slot; the first and the last hold while the lanes arrive and leave.
+    for (const slot of story.slots.slice(1, 7)) expect(slot).toBeGreaterThanOrEqual(844 / 3 - 0.5);
+    // Walk the whole story: wherever the lanes are pinned, the current card's top is below them.
+    let worst = 0;
+    const seen = new Set<string>();
+    for (let y = story.top - 400; y < story.top + story.height; y += 40) {
+      await page.evaluate((y) => window.scrollTo({ top: y, behavior: "instant" }), y);
+      const at = await page.evaluate(
+        () =>
+          new Promise<{ state: string; under: number; stuck: boolean; shown: boolean }>((resolve) =>
+            // Two frames: the observer answers the scroll on the next one.
+            requestAnimationFrame(() =>
+              requestAnimationFrame(() => {
+                const on = document.querySelector(".story-on")!;
+                const pin = on.querySelector(".story-pin")!.getBoundingClientRect();
+                const card = on.querySelector(".story-card[data-current]")!.getBoundingClientRect();
+                resolve({ state: on.getAttribute("data-story-state")!, under: pin.bottom - card.top, stuck: Math.abs(pin.top - 65) < 1.5, shown: pin.top >= 65 && pin.bottom <= innerHeight });
+              }),
+            ),
+          ),
+      );
+      // The first state shows as the lanes scroll in; the rest while they are pinned.
+      if (at.shown) seen.add(at.state);
+      if (at.stuck) worst = Math.max(worst, at.under);
+    }
+    expect([...seen].sort()).toEqual(["1", "2", "3", "4", "5", "6", "7", "8"]);
+    expect(worst, "the current card's top is never under the lanes").toBeLessThanOrEqual(1);
+  });
 });
