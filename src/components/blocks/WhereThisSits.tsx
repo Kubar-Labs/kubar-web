@@ -1,3 +1,5 @@
+import { ViewTransition } from "react";
+import { STACK_TRANSITION } from "@/components/blocks/IsoFoundations";
 import { GroundShadow } from "@/components/drawings/iso";
 import { FootnoteMarker } from "@/components/ui/Footnote";
 import { TextLink } from "@/components/ui/TextLink";
@@ -79,45 +81,50 @@ export function WhereThisSits({
     <section aria-label={label} className={cn("bg-inset", className)}>
       <div className="page-container flex flex-col gap-6 py-8 md:flex-row md:items-center md:gap-6 md:py-8 lg:gap-24 lg:py-9">
         <div className="sits-stack relative shrink-0">
-          <svg aria-hidden="true" className="sits-art block overflow-visible">
-            <g className="sits-scale">
-              <GroundShadow cx={CX} cy={224} rx={70} ry={16} />
-              <line x1={RULER} x2={RULER} y1={levelY(levels - 1)} y2={levelY(0)} className="stroke-rule-control" strokeWidth={1} vectorEffect="non-scaling-stroke" />
-              {/* Bottom block first, so each block covers the foot of the one under it. */}
-              {[...foundations.keys()].reverse().map((i) => {
-                const name = foundations[i];
-                const level = levelOf(i);
-                const shape = faces(level);
-                const here = i === current;
-                const planned = level === levels - 1;
-                const y = levelY(level);
-                return (
-                  <g key={name}>
-                    {planned ? (
-                      <path d={shape.outline} className="fill-none stroke-ink" strokeWidth={1} strokeDasharray="3 2.5" vectorEffect="non-scaling-stroke" />
-                    ) : (
-                      <g className="stroke-rule" strokeWidth={1} strokeLinejoin="round">
-                        <polygon points={shape.left} className="fill-[var(--petrol-100)]" vectorEffect="non-scaling-stroke" />
-                        <polygon points={shape.right} className="fill-[var(--petrol-50)]" vectorEffect="non-scaling-stroke" />
-                        <polygon points={shape.top} className={here ? "fill-[var(--petrol-900)] stroke-[var(--petrol-900)]" : "fill-raised"} vectorEffect="non-scaling-stroke" />
+          {/* The stack carries across a page change, to and from Home's and About's drawings (SPEC section 12). */}
+          <ViewTransition name={STACK_TRANSITION} share="stack" default="none">
+            <div className="sits-art">
+              <svg aria-hidden="true" className="block size-full overflow-visible">
+                <g className="sits-scale">
+                  <GroundShadow cx={CX} cy={224} rx={70} ry={16} />
+                  <line x1={RULER} x2={RULER} y1={levelY(levels - 1)} y2={levelY(0)} className="stroke-rule-control" strokeWidth={1} vectorEffect="non-scaling-stroke" />
+                  {/* Bottom block first, so each block covers the foot of the one under it. */}
+                  {[...foundations.keys()].reverse().map((i) => {
+                    const name = foundations[i];
+                    const level = levelOf(i);
+                    const shape = faces(level);
+                    const here = i === current;
+                    const planned = level === levels - 1;
+                    const y = levelY(level);
+                    return (
+                      <g key={name}>
+                        {planned ? (
+                          <path d={shape.outline} className="fill-none stroke-ink" strokeWidth={1} strokeDasharray="3 2.5" vectorEffect="non-scaling-stroke" />
+                        ) : (
+                          <g className="stroke-rule" strokeWidth={1} strokeLinejoin="round">
+                            <polygon points={shape.left} className="fill-[var(--petrol-100)]" vectorEffect="non-scaling-stroke" />
+                            <polygon points={shape.right} className="fill-[var(--petrol-50)]" vectorEffect="non-scaling-stroke" />
+                            <polygon points={shape.top} className={here ? "fill-[var(--petrol-900)] stroke-[var(--petrol-900)]" : "fill-raised"} vectorEffect="non-scaling-stroke" />
+                          </g>
+                        )}
+                        <line
+                          x1={shape.leaderFrom}
+                          x2={RULER}
+                          y1={y}
+                          y2={y}
+                          className={here ? "stroke-ink" : "stroke-rule-control"}
+                          strokeWidth={1}
+                          strokeDasharray={planned ? "2 2" : undefined}
+                          vectorEffect="non-scaling-stroke"
+                        />
+                        <line x1={RULER} x2={RULER + (here ? 8 : 5)} y1={y} y2={y} className={here ? "stroke-accent" : "stroke-rule-control"} strokeWidth={here ? 2 : 1} vectorEffect="non-scaling-stroke" />
                       </g>
-                    )}
-                    <line
-                      x1={shape.leaderFrom}
-                      x2={RULER}
-                      y1={y}
-                      y2={y}
-                      className={here ? "stroke-ink" : "stroke-rule-control"}
-                      strokeWidth={1}
-                      strokeDasharray={planned ? "2 2" : undefined}
-                      vectorEffect="non-scaling-stroke"
-                    />
-                    <line x1={RULER} x2={RULER + (here ? 8 : 5)} y1={y} y2={y} className={here ? "stroke-accent" : "stroke-rule-control"} strokeWidth={here ? 2 : 1} vectorEffect="non-scaling-stroke" />
-                  </g>
-                );
-              })}
-            </g>
-          </svg>
+                    );
+                  })}
+                </g>
+              </svg>
+            </div>
+          </ViewTransition>
           {/* Top of the stack first. Each name is centred on its level (globals.css says where one may wrap). */}
           <ol className="sits-names absolute inset-y-0 right-0">
             {foundations.map((name, i) => (

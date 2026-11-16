@@ -1843,9 +1843,12 @@ test.describe("Contact (build step 5)", () => {
 
   test("a sent message posts the new contract and is replaced by the thanks", async ({ page }) => {
     let body: Record<string, unknown> = {};
+    // The reply is held until the test has seen "Sending…": a fixed delay raced the check on a busy machine.
+    let release!: () => void;
+    const held = new Promise<void>((resolve) => (release = resolve));
     await page.route("**/api/contact", async (route) => {
       body = route.request().postDataJSON();
-      await new Promise((resolve) => setTimeout(resolve, 400));
+      await held;
       await route.fulfill({ status: 200, contentType: "application/json", body: '{"success":true}' });
     });
     await page.goto("/contact?intent=institution");
@@ -1858,6 +1861,7 @@ test.describe("Contact (build step 5)", () => {
     await expect(sending).toBeVisible();
     await expect(sending).not.toHaveAttribute("disabled");
     expect((await sending.boundingBox())!.width).toBe(width);
+    release();
     const heading = page.getByRole("heading", { name: "Message sent." });
     await expect(heading).toBeFocused();
     await expect(page.getByText("Thank you, Arjun. Your message is with the team, and we’ll reply from a kubar.tech address.")).toBeVisible();
@@ -2543,4 +2547,206 @@ test.describe("Where this sits (SPEC section 8)", () => {
       await expectNoAxeViolations(page);
     });
   }
+});
+
+test.describe("The foundations stack carries from page to page (SPEC section 12)", () => {
+  // Records each view transition: the page's headline and the elements named before the change
+  // and after it, and the stack's morph (its group's animation) once the transition is ready.
+  // React runs a view transition for other transitions too (a router update after a prefetch, for
+  // one), so a test picks the one in which the headline changed: the page change.
+  const record = () => {
+    const w = window as unknown as { __vt: { page: string[]; before: string[]; after: string[] | null; morph: number[] | null }[] };
+    w.__vt = [];
+    const start = document.startViewTransition?.bind(document);
+    if (!start) return;
+    const named = () =>
+      [...document.querySelectorAll<HTMLElement | SVGElement>("*")]
+        .filter((el) => el.style?.viewTransitionName && el.style.viewTransitionName !== "none")
+        .map((el) => `${el.style.viewTransitionName} ${el.closest("section[aria-label='Where this sits']") ? "strip" : "drawing"}`);
+    document.startViewTransition = ((arg: ViewTransitionUpdateCallback | { update?: ViewTransitionUpdateCallback; types?: string[] }) => {
+      const update = typeof arg === "function" ? arg : arg?.update;
+      const headline = () => document.querySelector("h1")?.textContent ?? "";
+      const entry = { page: [headline()], before: named(), after: null as string[] | null, morph: null as number[] | null };
+      w.__vt.push(entry);
+      const wrapped = async () => {
+        const result = await update?.();
+        entry.after = named();
+        entry.page.push(headline());
+        return result;
+      };
+      const transition = start(typeof arg === "function" ? wrapped : { ...arg, update: wrapped });
+      transition.ready
+        .then(() => {
+          entry.morph = document
+            .getAnimations()
+            .filter((a) => (a.effect as KeyframeEffect | null)?.pseudoElement === "::view-transition-group(foundations)")
+            .map((a) => Number(a.effect!.getTiming().duration));
+        })
+        .catch(() => (entry.morph = []));
+      return transition;
+    }) as typeof document.startViewTransition;
+  };
+  type Recorded = { page: string[]; before: string[]; after: string[] | null; morph: number[] | null };
+  const allTransitions = (page: Page) => page.evaluate(() => (window as unknown as { __vt: Recorded[] }).__vt);
+  /** The page changes: transitions in which the headline changed. */
+  const transitions = async (page: Page) => (await allTransitions(page)).filter((t) => t.page.length === 2 && t.page[0] !== t.page[1]);
+  const clear = (page: Page) => page.evaluate(() => ((window as unknown as { __vt: unknown[] }).__vt.length = 0));
+
+  // A destination is prefetched first, as it is once a reader's link has been on screen for a
+  // moment; a page that is not yet prefetched arrives in two steps and no pair forms. Next
+  // prefetches a route in two parts, its tree and then its page segment: the page segment is
+  // the one that matters. Watched from before the first load.
+  const prefetched = new WeakMap<Page, Set<string>>();
+  function watchPrefetches(page: Page) {
+    const done = new Set<string>();
+    prefetched.set(page, done);
+    page.on("requestfinished", (request) => {
+      const segment = request.headers()["next-router-segment-prefetch"];
+      if (segment?.endsWith("/__PAGE__")) done.add(new URL(request.url()).pathname);
+    });
+  }
+  async function whenPrefetched(page: Page, path: string) {
+    await expect.poll(() => prefetched.get(page)!.has(path), { message: `${path} prefetched`, timeout: 15_000 }).toBe(true);
+  }
+
+  // About and Kubar Protocol at the top of the page: About's drawing and the strip are both on
+  // the first screen at 1440 x 900, so React names both and the stack morphs.
+  async function toKubarProtocol(page: Page) {
+    // The menu's own link, not the footer's of the same name (following that one scrolls the page away).
+    const products = page.locator("header").getByRole("button", { name: "Products" });
+    if ((await products.getAttribute("aria-expanded")) !== "true") await products.click();
+    const link = page.locator("header").getByRole("link", { name: /^Kubar Protocol/ });
+    await expect(link).toBeVisible();
+    await whenPrefetched(page, "/products/kubar-protocol");
+    await link.click();
+    await expect(page).toHaveURL(/\/products\/kubar-protocol$/);
+  }
+  async function toAbout(page: Page) {
+    await whenPrefetched(page, "/about");
+    await page.locator("header").getByRole("link", { name: "About", exact: true }).click();
+    await expect(page).toHaveURL(/\/about$/);
+  }
+
+  test("About and Kubar Protocol hand the stack over, every time: three rounds, and again after a reload", async ({ page }) => {
+    test.setTimeout(90_000);
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.addInitScript(record);
+    watchPrefetches(page);
+    await page.goto("/about");
+    for (const pass of ["first load", "after a reload"]) {
+      if (pass === "after a reload") {
+        await page.reload();
+      }
+      for (let round = 1; round <= 3; round++) {
+        for (const [go, from, to] of [
+          [toKubarProtocol, "drawing", "strip"],
+          [toAbout, "strip", "drawing"],
+        ] as const) {
+          // The page the reader leaves is at its top, and the link it uses is prefetched.
+          await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+          await page.waitForLoadState("networkidle");
+          await clear(page);
+          await go(page);
+          const where = `${pass}, round ${round}, ${from} to ${to}`;
+          await expect
+            .poll(async () => (await transitions(page)).find((t) => t.morph !== null)?.morph ?? null, { message: where })
+            .toEqual([320])
+            .catch(async (error) => {
+              throw new Error(`${where}: ${JSON.stringify(await allTransitions(page))} ${String(error).slice(0, 200)}`);
+            });
+          const [transition] = (await transitions(page)).filter((t) => t.morph !== null);
+          expect(transition.before, where).toEqual([`foundations ${from}`]);
+          expect(transition.after, where).toEqual([`foundations ${to}`]);
+        }
+      }
+    }
+  });
+
+  test("with reduced motion the pages change at once: nothing animates", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.addInitScript(record);
+    watchPrefetches(page);
+    await page.goto("/about");
+    await toKubarProtocol(page);
+    await expect.poll(async () => (await transitions(page)).find((t) => t.morph !== null)?.morph ?? null).toEqual([]);
+    // React's own zero-length animations (hiding the root's group) may still be there; nothing that moves.
+    expect(await page.evaluate(() => document.getAnimations().filter((a) => (a.effect as KeyframeEffect | null)?.pseudoElement?.startsWith("::view-transition") && Number(a.effect!.getTiming().duration) > 0).length)).toBe(0);
+  });
+
+  test("on an iPad in landscape, Home's drawing in view hands the stack to Kubar Protocol's strip", async ({ page }) => {
+    await page.setViewportSize({ width: 1180, height: 820 });
+    await page.addInitScript(record);
+    watchPrefetches(page);
+    await page.goto("/");
+    await page.evaluate(() => document.querySelector("section[aria-labelledby='foundations-heading'] .iso-foundations")!.scrollIntoView({ block: "center", behavior: "instant" }));
+    await clear(page);
+    await toKubarProtocol(page);
+    await expect.poll(async () => (await transitions(page)).find((t) => t.morph !== null)?.morph ?? null).toEqual([320]);
+    const [transition] = (await transitions(page)).filter((t) => t.morph !== null);
+    expect(transition.before).toEqual(["foundations drawing"]);
+    expect(transition.after).toEqual(["foundations strip"]);
+  });
+
+  test("a page whose stack is off screen hands nothing over, and leaves no ghost", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.addInitScript(record);
+    // The strip's own link: Home opens at the story, far above its foundations drawing.
+    await page.goto("/products/kubar-protocol");
+    await page.waitForLoadState("networkidle");
+    await clear(page);
+    await page.getByRole("region", { name: "Where this sits" }).getByRole("link", { name: "Follow one receivable through all five" }).click();
+    await expect(page).toHaveURL(/\/#one-receivable$/);
+    await expect.poll(async () => (await transitions(page)).length).toBeGreaterThan(0);
+    await expect.poll(async () => (await transitions(page))[0].after).toEqual([]);
+    // React hides the old stack's group at once, so its picture never lingers over Home.
+    expect(await page.evaluate(() => document.getAnimations().filter((a) => (a.effect as KeyframeEffect | null)?.pseudoElement === "::view-transition-group(foundations)" && Number(a.effect!.getTiming().duration) > 0).length)).toBe(0);
+  });
+});
+
+test.describe("A page change opens the new page at its top", () => {
+  // Next 16 keeps the page's smooth scrolling for a route change unless <html> carries
+  // data-scroll-behavior="smooth"; without it the new page opened at the old scroll position and
+  // glided to the top (SPEC section 12). In-page links still scroll smoothly.
+  test("the first frame of the new page is at its top, and an in-page link still glides", async ({ page }) => {
+    await page.setViewportSize({ width: 1180, height: 820 });
+    await page.goto("/how-it-works");
+    await page.waitForLoadState("networkidle");
+    await page.evaluate(() => window.scrollTo({ top: 5000, behavior: "instant" }));
+    await page.evaluate(() => {
+      const w = window as unknown as { __frames: string[] };
+      w.__frames = [];
+      const start = performance.now();
+      const tick = () => {
+        w.__frames.push(`${location.pathname} ${Math.round(scrollY)}`);
+        if (performance.now() - start < 700) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    });
+    await page.locator("header").getByRole("link", { name: "Contact", exact: true }).click();
+    await expect(page).toHaveURL(/\/contact$/);
+    await expect.poll(() => page.evaluate(() => (window as unknown as { __frames: string[] }).__frames.length), { timeout: 5000 }).toBeGreaterThan(30);
+    const frames = await page.evaluate(() => (window as unknown as { __frames: string[] }).__frames);
+    const onContact = frames.filter((f) => f.startsWith("/contact "));
+    expect(onContact.length).toBeGreaterThan(0);
+    expect(onContact[0], "the first frame of the new page").toBe("/contact 0");
+    // An in-page link: the scroll takes several frames.
+    await page.goto("/products/kubar-protocol");
+    await page.waitForLoadState("networkidle");
+    const positions = await page.evaluate(
+      () =>
+        new Promise<number[]>((resolve) => {
+          const seen: number[] = [];
+          document.querySelector<HTMLAnchorElement>('nav[aria-label="On this page"] a[href="#questions-heading"]')!.click();
+          const start = performance.now();
+          const tick = () => {
+            seen.push(Math.round(scrollY));
+            if (performance.now() - start < 400) requestAnimationFrame(tick);
+            else resolve(seen);
+          };
+          requestAnimationFrame(tick);
+        }),
+    );
+    expect(new Set(positions).size, "an in-page link scrolls over several frames").toBeGreaterThan(3);
+  });
 });

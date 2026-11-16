@@ -74,7 +74,9 @@ export default async function RootLayout({
 
   return (
     // The script below adds data-frames to <html>, so React must not report the difference.
-    <html lang="en" className={fontVariables} suppressHydrationWarning>
+    // data-scroll-behavior: Next 16 no longer turns smooth scrolling off for a route change unless
+    // asked; without it a new page opens at the old scroll position and glides to the top.
+    <html lang="en" className={fontVariables} data-scroll-behavior="smooth" suppressHydrationWarning>
       <body>
         {/* Movements that play as a page loads (the hero drawings; globals.css) start from a
             hidden or displaced state, so they may only start where frames are being drawn. This

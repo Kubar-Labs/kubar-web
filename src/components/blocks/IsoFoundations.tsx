@@ -1,3 +1,4 @@
+import { ViewTransition } from "react";
 import { GroundShadow } from "@/components/drawings/iso";
 import { PlayOnce } from "@/components/drawings/PlayOnce";
 import { FootnoteMarker } from "@/components/ui/Footnote";
@@ -26,6 +27,9 @@ import { cn } from "@/lib/utils";
  * order (REDRAW section 10). The markup is rendered on the server;
  * PlayOnce only sets the motion phase.
  */
+/** The one view-transition name the foundations stack carries from page to page. */
+export const STACK_TRANSITION = "foundations";
+
 export type Foundation = { name: string; line: string; where?: string; planned?: boolean };
 type FootnoteRef = (suffix: string) => { target: string; refId: string };
 
@@ -136,9 +140,15 @@ export function IsoFoundations({
   return (
     <div className={cn("bg-inset px-5 pt-5 pb-8 md:px-8 md:pt-8 md:pb-10 lg:px-6 lg:pt-10 lg:pb-12 xl:px-12", className)}>
       <PlayOnce className="iso-foundations relative">
-        {/* The frame's drawing everywhere but 1024 to 1199, which has its own (taller levels, shorter leaders). */}
-        <Stack foundations={foundations} g={FRAME} maskId={maskId} leaderEnd={584} className="mx-auto block h-auto w-full max-w-[560px] overflow-visible lg:mx-0 lg:max-xl:hidden" />
-        <Stack foundations={foundations} g={BAND} maskId={`${maskId}-band`} leaderEnd={544} className="hidden overflow-visible lg:max-xl:block" />
+        {/* The frame's drawing everywhere but 1024 to 1199, which has its own (taller levels, shorter
+            leaders). The stack carries across a page change: the strips on the product pages and
+            About's and Home's drawings share one view-transition name (SPEC section 12). */}
+        <ViewTransition name={STACK_TRANSITION} share="stack" default="none">
+          <div className="mx-auto w-full max-w-[560px] lg:mx-0">
+            <Stack foundations={foundations} g={FRAME} maskId={maskId} leaderEnd={584} className="block h-auto w-full overflow-visible lg:max-xl:hidden" />
+            <Stack foundations={foundations} g={BAND} maskId={`${maskId}-band`} leaderEnd={544} className="hidden overflow-visible lg:max-xl:block" />
+          </div>
+        </ViewTransition>
 
         {/* From 1024 to 1199 the panel's padding is 24 and the leaders are 40 shorter, so each
             sentence keeps to two lines beside the drawing at its full size; the column is capped so

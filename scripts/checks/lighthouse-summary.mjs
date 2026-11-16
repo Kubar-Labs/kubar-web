@@ -16,6 +16,9 @@ for (const file of readdirSync(dir).filter((f) => f.endsWith(".json")).sort()) {
       lcp: report.audits["largest-contentful-paint"].numericValue,
       cls: report.audits["cumulative-layout-shift"].numericValue,
       tbt: report.audits["total-blocking-time"].numericValue,
+      // Lighthouse's measure of the machine's CPU speed at the time of the run. Blocking time
+      // scales with it: a laptop on battery runs at about half the speed and doubles it.
+      bench: report.environment?.benchmarkIndex ?? 0,
     });
   byRoute.set(name, runs);
 }
@@ -25,7 +28,8 @@ if (byRoute.size === 0) {
 }
 const median = (values) => [...values].sort((a, b) => a - b)[Math.floor(values.length / 2)];
 let failed = false;
-console.log("route                      runs  score  LCP      CLS    TBT");
+console.log("route                      runs  score  LCP      CLS    TBT     machine");
+let slow = false;
 for (const [name, runs] of byRoute) {
   const good = runs.filter((r) => !r.error);
   const errors = runs.filter((r) => r.error).map((r) => r.error);
@@ -38,9 +42,12 @@ for (const [name, runs] of byRoute) {
   const cls = median(good.map((r) => r.cls));
   const over = lcp > BUDGET.lcp || cls > BUDGET.cls || errors.length > 0;
   failed ||= over;
+  const bench = Math.round(median(good.map((r) => r.bench)));
+  slow ||= bench < 1500;
   console.log(
-    `${name.padEnd(26)} ${String(good.length).padEnd(5)} ${String(median(good.map((r) => r.score))).padEnd(6)} ${(lcp / 1000).toFixed(2)} s   ${cls.toFixed(3)}  ${Math.round(median(good.map((r) => r.tbt)))} ms${over ? "   OVER BUDGET" : ""}${errors.length ? `   errors: ${errors.join(", ")}` : ""}`,
+    `${name.padEnd(26)} ${String(good.length).padEnd(5)} ${String(median(good.map((r) => r.score))).padEnd(6)} ${(lcp / 1000).toFixed(2)} s   ${cls.toFixed(3)}  ${`${Math.round(median(good.map((r) => r.tbt)))} ms`.padEnd(7)} ${bench}${over ? "   OVER BUDGET" : ""}${errors.length ? `   errors: ${errors.join(", ")}` : ""}`,
   );
 }
+if (slow) console.log("NOTE: the machine ran slow (a benchmark index under 1500, as on battery); blocking time and scores are not comparable with a fast run.");
 console.log(failed ? "FAILED: budget is LCP 2.0 s, CLS 0.05 (median of the runs)." : "WITHIN BUDGET (LCP 2.0 s, CLS 0.05; median of the runs).");
 process.exit(failed ? 1 : 0);
