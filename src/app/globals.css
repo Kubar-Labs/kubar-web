@@ -567,17 +567,72 @@
   .iso-leader.is-current {
     border-color: var(--color-accent);
   }
+  /* Home's record (RecordView). --s is the sheets' scale and --step their
+     spacing: phones draw the compact record (0.53, or 0.43 under 390 wide so
+     the longest name keeps its line; 18.9 px apart), tablets and laptops the
+     full one. A sheet draws 320 x 185 before --s; 20 px is kept above the top
+     sheet for its lift and --foot below the last for its edge and ground shadow. */
   .iso-record {
-    --iso-record-gap: 74px;
+    --s: 0.43;
+    --step: 18.9px;
+    --record-gap: 12px;
+    --foot: 30px;
+  }
+  /* Under 360 wide (a 320 px reflow) the sheets shrink again, so the names still clear the edge. */
+  @media (max-width: 359.98px) {
+    .iso-record {
+      --s: 0.32;
+    }
+  }
+  @media (min-width: 390px) {
+    .iso-record {
+      --s: 0.53;
+    }
   }
   @media (min-width: 768px) {
     .iso-record {
-      --iso-record-gap: 50px;
+      --s: 1;
+      --step: 35px;
+      --record-gap: 12px;
+      --foot: 54px;
     }
   }
-  @media (min-width: 1200px) {
+  @media (min-width: 1328px) {
     .iso-record {
-      --iso-record-gap: 78px;
+      --record-gap: 36px;
+    }
+  }
+  .record-stage {
+    margin-top: var(--record-gap);
+  }
+  .record-art {
+    width: calc(336px * var(--s));
+    height: calc((20px + 185px + var(--foot)) * var(--s) + (var(--count) - 1) * var(--step));
+  }
+  .record-place {
+    transform: translateY(calc(20px * var(--s) + var(--n) * var(--step)));
+  }
+  .record-scale {
+    transform: scale(var(--s));
+  }
+  /* The rows: each level with its sheet's right corner (115 px down a sheet). */
+  .record-rows {
+    top: calc(135px * var(--s) - var(--step) / 2);
+    left: calc(327px * var(--s) + 8px);
+    right: 0;
+  }
+  .iso-record .iso-leader {
+    top: 50%;
+    left: -8px;
+    width: 6px;
+  }
+  @media (min-width: 768px) {
+    .record-rows {
+      left: 356px;
+    }
+    .iso-record .iso-leader {
+      left: -24px;
+      width: 16px;
     }
   }
   /* Blocks (foundations, layers, steps): a resting shadow under each, in
@@ -1087,6 +1142,13 @@
       --gutter: 36px;
       --row-h: clamp(44px, (100svh - var(--header-height) - 64px - 48px) / 8, 74px);
       --dy: 7px;
+    }
+  }
+  /* 1024 to 1199: the lanes sit beside 380 px cards, and the party boxes sit closer so
+     "Singapore" keeps its line at 15 px. */
+  @media (min-width: 1024px) and (max-width: 1199.98px) {
+    .lanes {
+      --box-inset: 2px;
     }
   }
   .lane-current {

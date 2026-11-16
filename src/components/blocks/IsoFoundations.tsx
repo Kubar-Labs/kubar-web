@@ -32,14 +32,23 @@ type FootnoteRef = (suffix: string) => { target: string; refId: string };
 // The drawing, from the Figma frame (its own pixels; desktop scale).
 const CX = 280;
 const SIDE = [300, 260, 220, 180, 140]; // bottom block to the venue
-const STEP = 58;
-const THICK = 40;
-const BOTTOM_TOP = 242; // top vertex of the bottom block
 const WIDTH = 560;
-const HEIGHT = 640;
 const k = 0.866;
+/*
+ * Two builds of the same stack. A label sits on its block's level, and the
+ * levels are `step + 20` apart: 78 as drawn in the frame. From 1024 to 1199
+ * the labels' column is narrow enough that every sentence takes two lines
+ * (72 px with its title), so there the blocks are 14 px thicker and the
+ * levels 92 apart: the five labels keep an even 20 px between them.
+ */
+type Geometry = { step: number; thick: number; bottomTop: number; height: number; ground: number };
+const FRAME: Geometry = { step: 58, thick: 40, bottomTop: 242, height: 640, ground: 567 };
+const BAND: Geometry = { step: 72, thick: 54, bottomTop: 298, height: 710, ground: 637 };
 
-function faces(level: number) {
+function faces(level: number, g: Geometry = FRAME) {
+  const STEP = g.step;
+  const THICK = g.thick;
+  const BOTTOM_TOP = g.bottomTop;
   const s = SIDE[level];
   const y = BOTTOM_TOP - level * STEP;
   const top = { x: CX, y };
@@ -61,6 +70,46 @@ function faces(level: number) {
     leaderY: right.y + THICK / 2,
     leaderX: right.x + 8,
   };
+}
+
+/** The stack itself: four solid blocks and the venue's dashed outline, with a leader from each to its label. */
+function Stack({ foundations, g, maskId, leaderEnd, className }: { foundations: Foundation[]; g: Geometry; maskId: string; leaderEnd: number; className: string }) {
+  const levels = foundations.length;
+  const levelOf = (i: number) => levels - 1 - i;
+  return (
+    <svg aria-hidden="true" viewBox={`0 0 ${WIDTH} ${g.height}`} width={WIDTH} height={g.height} className={className}>
+      <defs>
+        <mask id={maskId} maskUnits="userSpaceOnUse" x={-20} y={-20} width={WIDTH + 40} height={g.height + 40}>
+          <path d={faces(levels - 1, g).outline} pathLength={1} className="iso-outline-mask" />
+        </mask>
+      </defs>
+      <GroundShadow cx={CX} cy={g.ground} rx={230} ry={55} />
+      {foundations
+        .map((f, i) => ({ f, i, level: levelOf(i) }))
+        .sort((a, b) => a.level - b.level)
+        .map(({ f, level }) => {
+          const shape = faces(level, g);
+          if (f.planned) {
+            return (
+              <g key={f.name}>
+                <path d={shape.outline} mask={`url(#${maskId})`} className="iso-venue" />
+                <line x1={shape.leaderX} x2={leaderEnd} y1={shape.leaderY} y2={shape.leaderY} className="iso-leader-line is-dashed hidden lg:inline" />
+              </g>
+            );
+          }
+          return (
+            <g key={f.name} className="iso-rise" style={{ ["--level" as string]: level }}>
+              <g className="iso-block">
+                <polygon points={shape.left} className="fill-[var(--petrol-100)]" />
+                <polygon points={shape.right} className="fill-[var(--petrol-50)]" />
+                <polygon points={shape.top} className="iso-top" />
+              </g>
+              <line x1={shape.leaderX} x2={leaderEnd} y1={shape.leaderY} y2={shape.leaderY} className="iso-leader-line hidden lg:inline" />
+            </g>
+          );
+        })}
+    </svg>
+  );
 }
 
 export function IsoFoundations({
@@ -87,52 +136,17 @@ export function IsoFoundations({
   return (
     <div className={cn("bg-inset px-5 pt-5 pb-8 md:px-8 md:pt-8 md:pb-10 lg:px-6 lg:pt-10 lg:pb-12 xl:px-12", className)}>
       <PlayOnce className="iso-foundations relative">
-        <svg
-          aria-hidden="true"
-          viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
-          width={WIDTH}
-          height={HEIGHT}
-          className="mx-auto block h-auto w-full max-w-[560px] overflow-visible lg:mx-0"
-        >
-          <defs>
-            <mask id={maskId} maskUnits="userSpaceOnUse" x={-20} y={-20} width={WIDTH + 40} height={HEIGHT + 40}>
-              <path d={faces(levels - 1).outline} pathLength={1} className="iso-outline-mask" />
-            </mask>
-          </defs>
-          <GroundShadow cx={CX} cy={567} rx={230} ry={55} />
-          {foundations
-            .map((f, i) => ({ f, i, level: levelOf(i) }))
-            .sort((a, b) => a.level - b.level)
-            .map(({ f, level }) => {
-              const shape = faces(level);
-              if (f.planned) {
-                return (
-                  <g key={f.name}>
-                    <path d={shape.outline} mask={`url(#${maskId})`} className="iso-venue" />
-                    <line x1={shape.leaderX} x2={544} y1={shape.leaderY} y2={shape.leaderY} className="iso-leader-line is-dashed hidden lg:inline xl:hidden" />
-                    <line x1={shape.leaderX} x2={584} y1={shape.leaderY} y2={shape.leaderY} className="iso-leader-line is-dashed hidden xl:inline" />
-                  </g>
-                );
-              }
-              return (
-                <g key={f.name} className="iso-rise" style={{ ["--level" as string]: level }}>
-                  <g className="iso-block">
-                    <polygon points={shape.left} className="fill-[var(--petrol-100)]" />
-                    <polygon points={shape.right} className="fill-[var(--petrol-50)]" />
-                    <polygon points={shape.top} className="iso-top" />
-                  </g>
-                  <line x1={shape.leaderX} x2={544} y1={shape.leaderY} y2={shape.leaderY} className="iso-leader-line hidden lg:inline xl:hidden" />
-                  <line x1={shape.leaderX} x2={584} y1={shape.leaderY} y2={shape.leaderY} className="iso-leader-line hidden xl:inline" />
-                </g>
-              );
-            })}
-        </svg>
+        {/* The frame's drawing everywhere but 1024 to 1199, which has its own (taller levels, shorter leaders). */}
+        <Stack foundations={foundations} g={FRAME} maskId={maskId} leaderEnd={584} className="mx-auto block h-auto w-full max-w-[560px] overflow-visible lg:mx-0 lg:max-xl:hidden" />
+        <Stack foundations={foundations} g={BAND} maskId={`${maskId}-band`} leaderEnd={544} className="hidden overflow-visible lg:max-xl:block" />
 
         {/* From 1024 to 1199 the panel's padding is 24 and the leaders are 40 shorter, so each
-            sentence keeps to two lines beside the drawing at its full size. */}
-        <ol className="mt-6 lg:absolute lg:inset-y-0 lg:right-0 lg:left-[560px] lg:mt-0 xl:right-[-24px] xl:left-[600px]">
+            sentence keeps to two lines beside the drawing at its full size; the column is capped so
+            every sentence but the last does take two, and the five labels read as one even list. */}
+        <ol className="mt-6 lg:absolute lg:inset-y-0 lg:right-0 lg:left-[560px] lg:mt-0 lg:max-xl:w-[360px] xl:right-[-24px] xl:left-[600px]">
           {foundations.map((f, i) => {
             const shape = faces(levelOf(i));
+            const band = faces(levelOf(i), BAND);
             return (
               <li
                 key={f.name}
@@ -140,22 +154,34 @@ export function IsoFoundations({
                 // words are all here), so a tap or click focuses it but Tab skips it.
                 tabIndex={f.planned ? undefined : -1}
                 data-level={levelOf(i)}
-                style={{ ["--label-top" as string]: `${shape.leaderY - 14}px` }}
-                className="flex flex-col gap-1 border-t border-rule py-4 outline-offset-4 lg:absolute lg:right-0 lg:left-0 lg:top-(--label-top) lg:border-0 lg:py-0"
+                style={{ ["--label-top" as string]: `${shape.leaderY - 14}px`, ["--label-top-band" as string]: `${band.leaderY - 14}px` }}
+                className="flex flex-col gap-1 border-t border-rule py-4 outline-offset-4 lg:absolute lg:right-0 lg:left-0 lg:top-(--label-top-band) lg:border-0 lg:py-0 xl:top-(--label-top)"
               >
                 {/* The block's rani top edges, laid over the drawing from inside its label, so a plain
                     descendant rule shows them (Safari doesn't restyle :has(li:hover) on hover). Desktop only. */}
                 {f.planned ? null : (
-                  <svg
-                    aria-hidden="true"
-                    viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
-                    width={WIDTH}
-                    height={HEIGHT}
-                    style={{ top: `${14 - shape.leaderY}px` }}
-                    className="pointer-events-none absolute left-[-560px] hidden overflow-visible lg:block xl:left-[-600px]"
-                  >
-                    <polygon points={shape.top} data-level={levelOf(i)} className="iso-top-edge" />
-                  </svg>
+                  <>
+                    <svg
+                      aria-hidden="true"
+                      viewBox={`0 0 ${WIDTH} ${FRAME.height}`}
+                      width={WIDTH}
+                      height={FRAME.height}
+                      style={{ top: `${14 - shape.leaderY}px` }}
+                      className="pointer-events-none absolute left-[-600px] hidden overflow-visible xl:block"
+                    >
+                      <polygon points={shape.top} data-level={levelOf(i)} className="iso-top-edge" />
+                    </svg>
+                    <svg
+                      aria-hidden="true"
+                      viewBox={`0 0 ${WIDTH} ${BAND.height}`}
+                      width={WIDTH}
+                      height={BAND.height}
+                      style={{ top: `${14 - band.leaderY}px` }}
+                      className="pointer-events-none absolute left-[-560px] hidden overflow-visible lg:max-xl:block"
+                    >
+                      <polygon points={band.top} data-level={levelOf(i)} className="iso-top-edge" />
+                    </svg>
+                  </>
                 )}
                 {f.planned && plannedStyle === "tag" ? (
                   <span className="t-tag text-ink-muted lg:hidden">

@@ -190,19 +190,28 @@ test.describe("primitives and registers (build step 2), on Home", () => {
     await expect(rows.first()).toContainText("Purchase confirmation");
     await expect(rows.first()).toHaveAttribute("aria-current", "true");
     // Every row tells assistive technology what its document proves.
-    await expect(rows.nth(6)).toContainText("Proves: The goods were cleared for export, as invoiced");
+    await expect(rows.nth(6)).toContainText("Filed. From: Indian Customs. Proves: The goods were cleared for export, as invoiced");
+    // One line each: the number and the name. No source and no status in the rows.
+    const seen = (row: typeof rows) => row.evaluate((li) => [...li.querySelectorAll("span")].filter((span) => span.offsetWidth > 1 && span.textContent).map((span) => span.textContent));
+    expect(await seen(rows.nth(6))).toEqual(["02", "Shipping bill"]);
+    const from = page.locator('.iso-record dl[aria-hidden="true"]');
+    await expect(from).toContainText("FromThe financier");
     const shown = page.locator('[aria-hidden="true"]').getByText("The financier bought the receivable, without recourse for the buyer’s credit");
     await expect(shown).toBeVisible();
     await expect(page.locator(".iso-lift.is-lifted")).toHaveCount(0);
     await rows.filter({ hasText: "Shipping bill" }).hover();
     await expect(page.locator('[aria-hidden="true"]').getByText("The goods were cleared for export, as invoiced")).toBeVisible();
+    await expect(from).toContainText("FromIndian Customs");
     await expect(page.locator(".iso-lift.is-lifted")).toHaveCount(1);
     await page.mouse.move(0, 0);
     await expect(shown).toBeVisible();
     await expect(page.locator(".iso-lift.is-lifted")).toHaveCount(0);
     await rows.filter({ hasText: "Bill of lading" }).focus();
     await expect(page.locator('[aria-hidden="true"]').getByText("The goods were shipped on board")).toBeVisible();
-    await expect(page.locator(".iso-record svg")).toHaveAttribute("aria-hidden", "true");
+    await expect(page.locator(".iso-record svg.record-art")).toHaveAttribute("aria-hidden", "true");
+    // "FILED" on the top sheet only; the link leads into How it works.
+    await expect(page.locator(".iso-record svg.record-art text", { hasText: "FILED" })).toHaveCount(1);
+    await expect(page.locator(".iso-record").getByRole("link", { name: "See how it works" })).toHaveAttribute("href", "/how-it-works");
   });
 
   test("Home marks its example in words, with no Illustrative tag", async ({ page }) => {
@@ -503,8 +512,9 @@ test.describe("Home drawings (redraw step 2)", () => {
     await page.goto("/");
     // Computed values, not whether :has() matches (a fill utility once beat the rule).
     const label = page.locator('.iso-foundations li[data-level="2"]');
-    const edge = page.locator('.iso-top-edge[data-level="2"]');
-    const face = page.locator(".iso-top").nth(2);
+    // The drawing has a second build for 1024 to 1199; this is the one on screen.
+    const edge = page.locator('svg:visible > .iso-top-edge[data-level="2"]');
+    const face = page.locator("svg:visible .iso-top").nth(2);
     const opacity = () => edge.evaluate((el) => getComputedStyle(el).opacity);
     const white = await face.evaluate((el) => getComputedStyle(el).fill);
     await expect(label).toHaveAttribute("tabindex", "-1");
@@ -527,7 +537,7 @@ test.describe("Home drawings (redraw step 2)", () => {
     await page.setViewportSize({ width: 390, height: 844 });
     await label.click();
     await expect(label).toBeFocused();
-    expect(await opacity()).toBe("0");
+    for (const hidden of await page.locator('.iso-top-edge[data-level="2"]').all()) expect(await hidden.evaluate((el) => getComputedStyle(el).opacity)).toBe("0");
   });
 
   test("standing is four plain statements, and the programmes sit in one row at desktop", async ({ page }) => {
@@ -547,36 +557,78 @@ test.describe("Home drawings (redraw step 2)", () => {
 });
 
 test.describe("Home hero order", () => {
-  test("below 1200 the record follows the headline in the page and on screen; from 1200 the desktop grid", async ({ page }) => {
-    const top = (selector: string) => page.locator(selector).first().evaluate((el) => el.getBoundingClientRect().top);
-    // Phones, tablets and iPads (portrait and landscape).
-    for (const [width, height] of [[390, 844], [375, 667], [744, 1133], [820, 1180], [1180, 820]] as const) {
+  const top = (page: Page, selector: string) => page.locator(selector).first().evaluate((el) => el.getBoundingClientRect().top);
+  const bottom = (page: Page, selector: string) => page.locator(selector).first().evaluate((el) => el.getBoundingClientRect().bottom);
+
+  test("below 1024: headline, subline, record, routes, anchor, in the page and on screen", async ({ page }) => {
+    for (const [width, height] of [[390, 844], [375, 667], [744, 1133], [820, 1180]] as const) {
       await page.setViewportSize({ width, height });
       await page.goto("/");
-      const h1Bottom = await page.locator("main h1").evaluate((el) => el.getBoundingClientRect().bottom);
-      const record = await top(".iso-record");
-      expect(Math.round(record - h1Bottom), `${width}: 24 px under the headline`).toBe(24);
-      // On the first screen.
-      expect(record, `${width}: the record starts on the first screen`).toBeLessThan(height);
-      expect(await top("main h1 ~ p"), `${width}: subline after the record`).toBeGreaterThan(record);
-      expect(await top('a[href="#one-receivable"]')).toBeGreaterThan(await top("main h1 ~ p"));
+      const order = [await top(page, "main h1"), await top(page, "main h1 + p"), await top(page, ".iso-record"), await top(page, "main section ul"), await top(page, 'a[href="#one-receivable"]')];
+      expect([...order].sort((a, b) => a - b), `${width}`).toEqual(order);
+      expect(Math.round(order[1] - (await bottom(page, "main h1"))), `${width}: the subline 24 px under the headline`).toBe(24);
+      await expect(page.locator("main h1 + p")).toHaveText("Indian export receivables, originated, insured and documented so an international financier can buy them again and again.");
     }
-    // The page order is the screen order: headline, record, subline, routes, anchor.
     const inOrder = await page.evaluate(() => {
-      const nodes = [
-        document.querySelector("main h1"),
-        document.querySelector(".iso-record"),
-        document.querySelector("main h1 ~ p:not(.iso-record *)"),
-        document.querySelector('a[href="#one-receivable"]'),
-      ];
+      const nodes = [document.querySelector("main h1"), document.querySelector("main h1 + p"), document.querySelector(".iso-record"), document.querySelector("main section ul"), document.querySelector('a[href="#one-receivable"]')];
       return nodes.every((node, i) => i === 0 || Boolean(nodes[i - 1]!.compareDocumentPosition(node!) & Node.DOCUMENT_POSITION_FOLLOWING));
     });
     expect(inOrder).toBe(true);
-    // From 1200: the record beside the headline, the routes under the headline.
-    await page.setViewportSize({ width: 1376, height: 1032 });
+  });
+
+  test("the phone hero is the compact record and no taller than 1,150 px at 390 x 844", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/");
-    expect(Math.round(await top(".iso-record"))).toBe(Math.round(await top("main h1")));
-    await expect(page.locator("main h1 ~ p").first()).toBeHidden();
+    expect(await page.locator("main > section").first().evaluate((el) => el.getBoundingClientRect().height)).toBeLessThanOrEqual(1150);
+    // The names alone beside a small stack, each on one line and inside the page.
+    const rows = page.locator(".iso-record ol li");
+    expect(await rows.first().evaluate((li) => [...li.querySelectorAll("span")].filter((span) => span.offsetWidth > 1 && span.textContent).map((span) => span.textContent))).toEqual(["Purchase confirmation"]);
+    for (const width of [360, 375, 390, 430]) {
+      await page.setViewportSize({ width, height: 844 });
+      const fits = await rows.evaluateAll((els) =>
+        els.every((li) => {
+          const name = li.querySelector(".t-ui-sm")!;
+          const range = document.createRange();
+          range.selectNodeContents(name);
+          return range.getClientRects().length === 1 && range.getBoundingClientRect().right <= innerWidth - 20 && getComputedStyle(name).fontSize === "13px";
+        }),
+      );
+      expect(fits, `${width}: every name on one line, inside the margin, at 13 px`).toBe(true);
+    }
+  });
+
+  test("from 1024 to 1327: headline and subline across the top, routes left, record right, the top sheet on the first screen", async ({ page }) => {
+    for (const [width, height] of [[1024, 768], [1080, 810], [1133, 744], [1180, 820], [1194, 834], [1280, 800]] as const) {
+      await page.setViewportSize({ width, height });
+      await page.goto("/");
+      const h1 = (await page.locator("main h1").boundingBox())!;
+      const subline = (await page.locator("main h1 + p").boundingBox())!;
+      const routes = (await page.locator("main section ul").first().boundingBox())!;
+      const record = (await page.locator(".iso-record").boundingBox())!;
+      expect(h1.height, `${width}: the headline in two lines`).toBeLessThanOrEqual(120);
+      expect(subline.y, `${width}`).toBeGreaterThan(h1.y + h1.height);
+      expect(record.x, `${width}: record right of the routes`).toBeGreaterThan(routes.x + routes.width);
+      expect(Math.round(record.y), `${width}: level with the routes`).toBe(Math.round(routes.y));
+      const sheet = (await page.locator(".iso-record .iso-sheet-current").boundingBox())!;
+      expect(sheet.y + sheet.height, `${width}: the top sheet on the first screen`).toBeLessThanOrEqual(height);
+      const firstRows = await page.locator(".iso-record ol li").evaluateAll((els, h) => els.filter((el) => el.getBoundingClientRect().bottom <= h).length, height);
+      expect(firstRows, `${width}: the first rows on the first screen`).toBeGreaterThanOrEqual(3);
+      await expect(page.locator('main a[href="#one-receivable"]').first()).toBeHidden();
+    }
+  });
+
+  test("from 1328: the headline, the subline and the routes left, the record beside all three", async ({ page }) => {
+    for (const width of [1328, 1376, 1440, 1920]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto("/");
+      expect(Math.round(await top(page, ".iso-record")), `${width}`).toBe(Math.round(await top(page, "main h1")));
+      const h1 = (await page.locator("main h1").boundingBox())!;
+      expect(Math.round(h1.width)).toBe(578);
+      expect(h1.height, `${width}: four lines`).toBe(240);
+      expect(await top(page, "main h1 + p")).toBeGreaterThan(h1.y + h1.height);
+      expect(await top(page, "main section ul")).toBeGreaterThan(await bottom(page, "main h1 + p"));
+      expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth), `${width}`).toBe(0);
+    }
   });
 });
 
@@ -2084,7 +2136,7 @@ test.describe("Drawings that move as the page loads", () => {
 test.describe("Lane heads", () => {
   // "Buyer, Singapore" takes two lines where its lane is narrow; the word is never cut and
   // the type never shrunk (10 px on phones, 13 px on tablets, 15 px on laptops).
-  for (const [width, height, size] of [[360, 800, "10px"], [375, 667, "10px"], [390, 844, "10px"], [430, 932, "10px"], [768, 1024, "13px"], [1200, 800, "15px"], [1440, 900, "15px"]] as const) {
+  for (const [width, height, size] of [[360, 800, "10px"], [375, 667, "10px"], [390, 844, "10px"], [430, 932, "10px"], [768, 1024, "13px"], [1024, 768, "15px"], [1200, 800, "15px"], [1440, 900, "15px"]] as const) {
     test(`every party's name fits its box at ${width}`, async ({ page }) => {
       await page.setViewportSize({ width, height });
       await page.goto("/");

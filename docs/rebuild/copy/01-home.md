@@ -198,7 +198,7 @@ The 1440 frame shows the story at state 05. The text for all eight states is the
 
 Hero, under the display:
 (16 Nov: the subline is the same at every width now; see the Hero section above. The page's meta description and the social card carry the same sentence.)
-[UI] Follow one receivable                  (anchor to the ledger)
+[UI] Follow one receivable                  (anchor to the story; below 1024 only, under the routes)
 
 The eight-state ledger (replaces the lanes and story panel at 768 and 390, and everywhere when reduced motion is on). Each state: number, name, what happens, party, data path. Money path cells follow the lanes.
 01 Shipped. The exporter ships the rice and invoices the buyer, with the instruction to pay the financier’s account. Party: Exporter. Data path: Kubar. Shipment and invoice data received.

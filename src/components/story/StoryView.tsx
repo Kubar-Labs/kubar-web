@@ -181,7 +181,7 @@ export function StoryView({
       <div data-no-abbr data-story-state={state} className="story-on">
         {/* The drawing and the cards share a box that ends with the last card,
             so the drawing stops being pinned as the last card leaves. */}
-        <div className={cn("lg:grid lg:items-start lg:gap-x-6", long ? "lg:grid-cols-[360px_minmax(0,1fr)] xl:grid-cols-[411px_minmax(0,1fr)]" : "lg:grid-cols-[411px_minmax(0,1fr)]")}>
+        <div className={cn("lg:grid lg:items-start lg:gap-x-6", long ? "lg:grid-cols-[360px_minmax(0,1fr)] xl:grid-cols-[411px_minmax(0,1fr)]" : "lg:grid-cols-[380px_minmax(0,1fr)] xl:grid-cols-[411px_minmax(0,1fr)]")}>
           {/* The pinned drawing. Phones and tablets pin the record's id row with it, on a
               ground that reaches the screen's edges and fades out over its last 24 px,
               so the cards pass under it (story-pin, globals.css). */}
@@ -213,13 +213,16 @@ export function StoryView({
                     // Each card's slot runs to the next card, so the slots tile the
                     // column and one always holds the line. Phones and tablets: a
                     // short gap, so the current card stays in view below the
-                    // drawing until the next one reaches the line. Desktop: about
-                    // 60svh a state, and the last slot just long enough for its card
-                    // to reach the line before the drawing leaves with it.
+                    // drawing until the next one reaches the line. Laptops: a slot is
+                    // the scroll its state holds for. Home gives each 36svh, a little
+                    // over a third of the screen, which keeps the section short; How
+                    // it works, whose cards are long, about 60svh. The last slot is
+                    // just long enough for its card to reach the line before the
+                    // drawing leaves with it.
                     className={cn(
                       "lg:pb-6",
                       n < states.length
-                        ? "pb-[min(96px,12svh)] lg:min-h-[60svh]"
+                        ? cn("pb-[min(96px,12svh)]", long ? "lg:min-h-[60svh]" : "lg:min-h-[36svh]")
                         : "lg:min-h-[calc(0.55*(100svh-var(--header-height))+24px)]",
                     )}
                   >
@@ -265,7 +268,7 @@ export function StoryView({
         </div>
 
         {closing ? <p className="t-body-sm pt-2 text-ink lg:hidden">{closing}</p> : null}
-        {after ? <div className={cn("pt-6 lg:pt-2", long ? "lg:ml-[384px] xl:ml-[435px]" : "lg:ml-[435px]")}>{after}</div> : null}
+        {after ? <div className={cn("pt-6 lg:pt-2", long ? "lg:ml-[384px] xl:ml-[435px]" : "lg:ml-[404px] xl:ml-[435px]")}>{after}</div> : null}
       </div>
 
       {/* The ledger: shown instead with reduced motion or on a very short screen. */}
