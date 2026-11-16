@@ -2291,3 +2291,61 @@ test.describe("Home's story on phones (SPEC section 9)", () => {
     expect(worst, "the current card's top is never under the lanes").toBeLessThanOrEqual(1);
   });
 });
+
+test.describe("Picks answer every time (repeated hover, and again after a reload)", () => {
+  // Every pick and play-once built from step 3 on gets this: each item hovered in order, in
+  // reverse, three rounds, then the same after a reload. Headless, so one pointer reaches the page.
+  // 96 hovers, each waiting out a 200 ms lift: more than the default 30 s when the suite runs in parallel.
+  test.describe.configure({ timeout: 120_000 });
+  test("Home's record: every row lifts its sheet and shows its From and Proves, every round", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/");
+    const rows = page.locator(".iso-record ol li");
+    const shown = page.locator('.iso-record dl[aria-hidden="true"]');
+    const sources = ["The financier", "The buyer", "The insurer, in the financier’s name", "The exporter’s bank", "The inspection agency", "The carrier", "Indian Customs", "The exporter"];
+    for (const pass of ["first load", "after a reload"]) {
+      if (pass === "after a reload") await page.reload();
+      await expect(rows).toHaveCount(8);
+      for (let round = 1; round <= 3; round++) {
+        for (const reverse of [false, true]) {
+          for (let k = 0; k < 8; k++) {
+            const i = reverse ? 7 - k : k;
+            await rows.nth(i).hover();
+            const where = `${pass}, round ${round}, ${reverse ? "up" : "down"}, row ${i}`;
+            await expect(page.locator(".iso-record .iso-lift.is-lifted"), where).toHaveCount(1);
+            await expect(page.locator(".iso-record .iso-lift.is-lifted"), where).toHaveCSS("transform", "matrix(1, 0, 0, 1, 0, -14)");
+            await expect(shown.locator("dd").first(), where).toHaveText(sources[i]);
+          }
+        }
+      }
+      // Off the record: back to 08, nothing lifted.
+      await page.mouse.move(5, 5);
+      await expect(page.locator(".iso-record .iso-lift.is-lifted")).toHaveCount(0);
+      await expect(shown.locator("dd").first()).toHaveText("The financier");
+    }
+  });
+
+  for (const [width, build] of [[1440, "the frame's"], [1180, "the 1024 to 1199"]] as const) {
+    test(`Home's foundations at ${width} (${build} build): every label marks its block, every round`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 900 });
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await page.goto("/");
+      const labels = page.locator(".iso-foundations ol > li[tabindex]");
+      for (const pass of ["first load", "after a reload"]) {
+        if (pass === "after a reload") await page.reload();
+        await expect(labels).toHaveCount(4);
+        for (let round = 1; round <= 3; round++) {
+          for (const reverse of [false, true]) {
+            for (let k = 0; k < 4; k++) {
+              const i = reverse ? 3 - k : k;
+              await labels.nth(i).hover();
+              await expect(labels.nth(i).locator("svg:visible > .iso-top-edge"), `${pass}, round ${round}, ${reverse ? "up" : "down"}, label ${i}`).toHaveCSS("opacity", "1");
+            }
+          }
+        }
+        await page.mouse.move(5, 5);
+        for (const edge of await page.locator(".iso-foundations svg:visible > .iso-top-edge").all()) await expect(edge).toHaveCSS("opacity", "0");
+      }
+    });
+  }
+});
