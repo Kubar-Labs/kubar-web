@@ -7,6 +7,7 @@ import { PageHero } from "@/components/blocks/PageHero";
 import { Section, SectionHead } from "@/components/blocks/Section";
 import { FitStage } from "@/components/drawings/FitStage";
 import { WhereThisSits } from "@/components/blocks/WhereThisSits";
+import { Footnote } from "@/components/ui/Footnote";
 import { EmbedPicker, type SketchCopy } from "@/components/sdk/EmbedPicker";
 import { IsoLayers } from "@/components/sdk/IsoLayers";
 import { NumberedRows, PlatformLanes } from "@/components/sdk/PlatformLanes";
@@ -30,6 +31,7 @@ const CONTACT = "/contact?intent=platform";
 export default function NavdhanSdk() {
   const t = useTranslations("navdhanSdk");
   const common = useTranslations("common");
+  const footnotes = useTranslations("footnotes");
   const foundationNames = (useTranslations("home").raw("foundations.slabs") as { name: string }[]).map((slab) => slab.name);
   return (
     <>
@@ -48,7 +50,14 @@ export default function NavdhanSdk() {
         link={{ label: t("sits.link"), href: "/#one-receivable" }}
         foundations={foundationNames}
         current={4}
+        footnote={{ target: "fn-1", refId: "fnref-1-sits" }}
       />
+      {/* Footnote ¹, once on the page, for the venue's name in the strip. */}
+      <div className="page-container pt-6">
+        <Footnote n={1} id="fn-1" backTo="fnref-1-sits" className="lg:max-w-[628px]">
+          {footnotes("status")}
+        </Footnote>
+      </div>
 
       {/* The two audiences as one two-column block from 1024 up (Figma 296:9538; section 13 C1). */}
       <Section className="grid gap-(--section-space) lg:grid-cols-2 lg:gap-12 xl:gap-20">

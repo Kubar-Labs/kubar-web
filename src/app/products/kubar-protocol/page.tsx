@@ -57,19 +57,19 @@ export default function KubarProtocol() {
         aside={<LimitDrawing className="block h-auto w-full" />}
         asidePlacement="beside"
       />
-      <div className="page-container">
-        <OnThisPage label={common("onThisPage")} items={t.raw("index") as IndexItem[]} />
-      </div>
-
-      {/* Where this sits: the five foundations small, Standing buyers in petrol. */}
+      {/* Where this sits, directly under the hero: the five foundations small, Standing buyers in
+          petrol. Its venue's marker links to the footnote under the venue section. */}
       <WhereThisSits
         label={common("whereThisSits")}
         line={t("sits.line")}
         link={{ label: t("sits.link"), href: "/#one-receivable" }}
         foundations={foundationNames}
         current={3}
-        className="mt-10 lg:mt-12"
+        footnote={{ target: "fn-1", refId: "fnref-1-sits" }}
       />
+      <div className="page-container pt-10 lg:pt-12">
+        <OnThisPage label={common("onThisPage")} items={t.raw("index") as IndexItem[]} />
+      </div>
 
       <Section labelledBy="buy-heading" className="flex flex-col gap-10 lg:gap-16">
         <SectionHead id="buy-heading" heading={t("whatYouBuy.heading")} layout="wide" />

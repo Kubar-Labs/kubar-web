@@ -5,7 +5,7 @@ Extracted from Figma, Kubar Protocol · 1440 (frame 167:6), 13 Nov 2026, in read
 ## Hero
 (15 Nov, REDRAW-2026-11-14.md section 12 item 5: under the hero, an "On this page" row: the label "On this page", then each section's name below as an anchor link: What you buy · How a programme runs · The evidence package · Insurance · The payment path · The loss history · Who holds what · Questions · Where you fit · Programme 1 · The venue. The same list opens from a fixed "On this page" button once the row has scrolled away.)
 (14 Nov: the kicker line above the headline is removed. REDRAW-2026-11-14.md, section 3.)
-(16 Nov: directly under the hero, a strip on the inset ground, "Where this sits": the five foundations drawn small with Standing buyers in petrol, the sentence and the link, which goes to /#one-receivable.)
+(16 Nov: directly under the hero, before the "On this page" row, a strip on the inset ground, "Where this sits": the five foundations drawn small with Standing buyers in petrol, the sentence and the link, which goes to /#one-receivable. The five names are Home's, the venue's with the marker ¹, which links to the footnote under The venue; no "Planned" in the strip. Phones name only Standing buyers.)
 [Fine] Where this sits
 [Body] Part of the institutional exchange Kubar is building. Kubar Protocol gives export receivables their standing buyers.
 [UI] Follow one receivable through all five          (→ /#one-receivable)

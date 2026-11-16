@@ -1,4 +1,5 @@
 import { GroundShadow } from "@/components/drawings/iso";
+import { FootnoteMarker } from "@/components/ui/Footnote";
 import { TextLink } from "@/components/ui/TextLink";
 import { cn } from "@/lib/utils";
 
@@ -18,10 +19,14 @@ import { cn } from "@/lib/utils";
  * is ink.
  *
  * The names are a real list, top of the stack first, with the page's level
- * as aria-current; the art is aria-hidden. Nothing moves and nothing needs
- * script. Under 390 px wide the art is drawn at 0.8 (it carries no words),
- * so every name but the last keeps to one line; from 390 to 767 it is at
- * full size and a long name takes two lines, as the 390 frame draws it.
+ * as aria-current; the art is aria-hidden. The venue's name carries the
+ * footnote marker ¹ (no "Planned" here). Nothing moves and nothing needs
+ * script.
+ *
+ * Phones (below 768) draw the stack at 0.55 and name only the page's level;
+ * the other four names stay in the list for screen readers (the venue's
+ * shows while its marker has keyboard focus), so the strip is at most
+ * 400 px tall at 390 x 844.
  */
 const CX = 92;
 const WIDTHS = [160, 136, 112, 90, 70]; // the top faces, bottom block to the venue
@@ -53,6 +58,7 @@ export function WhereThisSits({
   link,
   foundations,
   current,
+  footnote,
   className,
 }: {
   /** "Where this sits". */
@@ -63,6 +69,8 @@ export function WhereThisSits({
   foundations: string[];
   /** The page's own level, as an index into `foundations`. */
   current: number;
+  /** Footnote ¹ (the ITFS registration line), for the venue's name. */
+  footnote: { target: string; refId: string };
   className?: string;
 }) {
   const levels = foundations.length;
@@ -117,9 +125,13 @@ export function WhereThisSits({
                 key={name}
                 aria-current={i === current ? "true" : undefined}
                 style={{ ["--level-y" as string]: `${levelY(levelOf(i))}px` }}
-                className={cn("absolute right-0 left-0 top-[calc(var(--level-y)*var(--k))] -translate-y-1/2", i === current ? "t-ui-sm text-ink" : "t-fine text-ink-muted")}
+                className={cn(
+                  "absolute right-0 left-0 top-[calc(var(--level-y)*var(--k))] -translate-y-1/2",
+                  i === current ? "t-ui-sm text-ink" : "t-fine text-ink-muted max-md:sr-only max-md:focus-within:not-sr-only",
+                )}
               >
                 {name}
+                {i === 0 ? <FootnoteMarker n={1} {...footnote} /> : null}
               </li>
             ))}
           </ol>
@@ -127,7 +139,7 @@ export function WhereThisSits({
 
         <div className="flex min-w-0 flex-col items-start gap-3 md:max-w-[600px]">
           <p className="t-fine text-ink-muted">{label}</p>
-          <p className="t-body-lg text-ink">{line}</p>
+          <p className="t-body text-ink md:t-body-lg">{line}</p>
           <TextLink href={link.href} kind="arrow" className="tap-area">
             {link.label}
           </TextLink>

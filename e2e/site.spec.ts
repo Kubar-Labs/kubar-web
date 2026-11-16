@@ -1540,10 +1540,18 @@ test.describe("On this page index (section 12, item 5)", () => {
       }
       // Past the row: the button; it opens the list with the current section marked.
       const target = await row.getByRole("link").nth(2).getAttribute("href");
-      await page.locator(target!).scrollIntoViewIfNeeded();
-      await page.evaluate(() => window.scrollBy(0, 300));
+      // Instant scrolls: the page scrolls smoothly, and a second smooth scroll cuts the first short.
+      await page.evaluate((selector) => {
+        document.querySelector(selector)!.scrollIntoView({ block: "center", behavior: "instant" });
+        window.scrollBy({ top: 300, behavior: "instant" });
+      }, target!);
       await expect(button).toBeVisible();
       expect(await header()).toBe(before);
+      // A jump from the top of the page straight past the row (it starts below the fold) shows it too.
+      await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+      await expect(button).toHaveCount(0);
+      await page.evaluate((selector) => document.querySelector(selector)!.scrollIntoView({ block: "start", behavior: "instant" }), target!);
+      await expect(button).toBeVisible();
       // The button steps aside over anything pressable, so move on until it is clear.
       const clear = () => button.evaluate((el) => getComputedStyle(el.parentElement!).opacity === "1" && getComputedStyle(el.parentElement!).pointerEvents !== "none");
       for (let i = 0; i < 40 && !(await clear()); i++) {
@@ -1574,7 +1582,9 @@ test.describe("On this page index (section 12, item 5)", () => {
       // comparing rectangles all the way down the page.
       const total = await page.evaluate(() => document.documentElement.scrollHeight);
       let shownSomewhere = 0;
-      for (let top = 1200; top < total; top += 500) {
+      // From just past the row (the button only exists once the row has gone).
+      const start = await page.evaluate(() => Math.ceil(document.querySelector('nav[aria-label="On this page"]')!.getBoundingClientRect().bottom + scrollY));
+      for (let top = start; top < total; top += 500) {
         await page.evaluate((y) => window.scrollTo(0, y), top);
         await page.waitForTimeout(200);
         const state = await button.evaluate((el) => {
@@ -2400,15 +2410,14 @@ test.describe("Where this sits (SPEC section 8)", () => {
       await page.goto(path);
       const strip = page.getByRole("region", { name: "Where this sits" });
       await expect(strip).toHaveCount(1);
-      // Directly under the hero: after the h1, before the first h2.
+      // Directly under the hero: the element before it holds the h1. On Kubar Protocol the
+      // "On this page" row follows it.
       const order = await page.evaluate(() => {
         const s = document.querySelector('section[aria-label="Where this sits"]')!;
-        // Everything before it in the page is the hero (it holds the h1) or the "On this page" row.
-        const before: Element[] = [];
-        for (let el = s.previousElementSibling; el; el = el.previousElementSibling) before.push(el);
-        return before.length > 0 && before.every((el) => el.querySelector("h1") !== null || /On this page/.test(el.textContent ?? "")) && s.nextElementSibling !== null;
+        return { hero: s.previousElementSibling?.querySelector("h1") !== null, next: s.nextElementSibling?.textContent ?? "" };
       });
-      expect(order).toBe(true);
+      expect(order.hero).toBe(true);
+      if (path === "/products/kubar-protocol") expect(order.next).toMatch(/^On this page/);
       const inset = await page.evaluate(() => {
         const probe = document.createElement("div");
         probe.style.background = "var(--color-inset)";
@@ -2428,8 +2437,22 @@ test.describe("Where this sits (SPEC section 8)", () => {
       const link = strip.getByRole("link", { name: "Follow one receivable through all five" });
       await expect(link).toHaveAttribute("href", "/#one-receivable");
       // The five names, top of the stack first; the page's level is the current one, in ink.
+      // The venue's carries footnote 1 and no "Planned".
       const items = strip.locator("ol li");
-      await expect(items).toHaveText(names);
+      await expect(items).toHaveText([`${names[0]}¹`, ...names.slice(1)]);
+      await expect(strip.getByText("Planned")).toHaveCount(0);
+      const marker = items.first().getByRole("link", { name: "Footnote 1" });
+      await expect(marker).toHaveAttribute("href", "#fn-1");
+      const footnote = page.locator("#fn-1");
+      // Its words, without an abbreviation's tip (on NavDhan SDK this is the page's first ITFS).
+      await expect
+        .poll(() => footnote.evaluate((el) => { const copy = el.cloneNode(true) as HTMLElement; copy.querySelectorAll("[role='tooltip']").forEach((tip) => tip.remove()); return copy.textContent; }))
+        .toContain("Kubar’s own ITFS registration is targeted for 2027; until then Kubar acts as the financier’s origination and servicing agent.");
+      await expect(page.locator(".footnote")).toHaveCount(1);
+      await marker.click();
+      await expect(footnote).toBeFocused();
+      await footnote.getByRole("link", { name: "Back to text" }).click();
+      await expect(marker).toBeFocused();
       await expect(strip.locator('ol li[aria-current="true"]')).toHaveText(level);
       const muted = await items.first().evaluate((el) => getComputedStyle(el).color);
       expect(await strip.locator('ol li[aria-current="true"]').evaluate((el) => getComputedStyle(el).color)).not.toBe(muted);
@@ -2449,17 +2472,20 @@ test.describe("Where this sits (SPEC section 8)", () => {
       expect(strokes.filter((stroke) => stroke === colours.rani)).toHaveLength(1);
       await expect(art.locator("polygon")).toHaveCount(12);
       await expect(art.locator("path")).toHaveCount(1);
-      // The marked level's tick is level with its name.
-      const tick = (await art.locator("line").evaluateAll((els, rani) => els.filter((el) => getComputedStyle(el).stroke === rani).map((el) => el.getBoundingClientRect().top), colours.rani))[0];
-      const name = (await strip.locator('ol li[aria-current="true"]').boundingBox())!;
-      expect(Math.abs(tick - (name.y + name.height / 2))).toBeLessThanOrEqual(2);
+      // The marked level's tick is level with its name (both measured at once: the page may be scrolling).
+      const offset = await strip.evaluate((el, rani) => {
+        const tick = [...el.querySelectorAll("svg line")].find((line) => getComputedStyle(line).stroke === rani)!.getBoundingClientRect();
+        const name = el.querySelector('ol li[aria-current="true"]')!.getBoundingClientRect();
+        return Math.abs(tick.top + tick.height / 2 - (name.top + name.height / 2));
+      }, colours.rani);
+      expect(offset).toBeLessThanOrEqual(2);
       // The link leads to Home's story.
       await link.click();
       await expect(page).toHaveURL(/\/#one-receivable$/);
       await expect(page.locator("#one-receivable")).toBeInViewport();
     });
 
-    test(`${path}: side by side from 768, stacked below, every name inside the strip and unbroken where it should be`, async ({ page }) => {
+    test(`${path}: side by side from 768 with every name; stacked on phones, at most 400 px, naming only its own level`, async ({ page }) => {
       await page.emulateMedia({ reducedMotion: "reduce" });
       for (const [width, height] of [[360, 800], [375, 667], [390, 844], [430, 932], [744, 1133], [768, 1024], [820, 1180], [1024, 768], [1180, 820], [1440, 900]] as const) {
         await page.setViewportSize({ width, height });
@@ -2470,26 +2496,35 @@ test.describe("Where this sits (SPEC section 8)", () => {
         if (width >= 768) expect(words.x, `${width}: words beside the stack`).toBeGreaterThanOrEqual(stack.x + stack.width);
         else expect(words.y, `${width}: words under the stack`).toBeGreaterThanOrEqual(stack.y + stack.height);
         const report = await strip.locator("ol li").evaluateAll((els) => {
-          const rects = els.map((el) => {
+          const margin = parseFloat(getComputedStyle(document.querySelector("main .page-container")!).paddingRight);
+          return els.map((el) => {
             const range = document.createRange();
             range.selectNodeContents(el);
-            return { box: range.getBoundingClientRect(), lines: new Set([...range.getClientRects()].map((r) => Math.round(r.top))).size, size: parseFloat(getComputedStyle(el).fontSize) };
+            const box = range.getBoundingClientRect();
+            return { shown: el.getBoundingClientRect().width > 1, inside: box.right <= innerWidth - margin + 0.5, top: box.top, bottom: box.bottom, size: parseFloat(getComputedStyle(el).fontSize), current: el.getAttribute("aria-current") === "true" };
           });
-          const margin = parseFloat(getComputedStyle(document.querySelector("main .page-container")!).paddingRight);
-          return {
-            inside: rects.every((r) => r.box.right <= innerWidth - margin + 0.5),
-            apart: rects.every((r, i) => i === 0 || r.box.top >= rects[i - 1].box.bottom - 0.5),
-            lines: rects.map((r) => r.lines),
-            sizes: rects.map((r) => r.size),
-          };
         });
-        expect(report.inside, `${width}: names inside the margin`).toBe(true);
-        expect(report.apart, `${width}: no name touches the next`).toBe(true);
-        expect(report.sizes, `${width}`).toEqual([13, 13, 13, 13, 13]);
+        // Every name is in the list at 13 px, for screen readers at every width.
+        expect(report.map((r) => r.size), `${width}`).toEqual([13, 13, 13, 13, 13]);
+        const shown = report.filter((r) => r.shown);
+        if (width >= 768) {
+          expect(shown, `${width}: all five names shown`).toHaveLength(5);
+          expect(shown.every((r, i) => i === 0 || r.top >= shown[i - 1].bottom - 0.5), `${width}: no name touches the next`).toBe(true);
+        } else {
+          expect(shown.map((r) => r.current), `${width}: only the page's own level is named`).toEqual([true]);
+          if (width === 390) expect((await strip.boundingBox())!.height, "390 x 844: the strip is at most 400 px tall").toBeLessThanOrEqual(400);
+        }
+        expect(shown.every((r) => r.inside), `${width}: names inside the margin`).toBe(true);
         expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth), `${width}`).toBe(0);
-        // The link is one line.
-        expect((await strip.getByRole("link").boundingBox())!.height, `${width}: the link on one line`).toBeLessThanOrEqual(26);
+        expect((await strip.getByRole("link", { name: "Follow one receivable through all five" }).boundingBox())!.height, `${width}: the link on one line`).toBeLessThanOrEqual(26);
       }
+      // On a phone the venue's name shows while its marker has keyboard focus.
+      await page.setViewportSize({ width: 390, height: 844 });
+      await page.goto(path);
+      const venue = page.getByRole("region", { name: "Where this sits" }).locator("ol li").first();
+      expect((await venue.boundingBox())!.width).toBeLessThanOrEqual(1);
+      await venue.getByRole("link", { name: "Footnote 1" }).focus();
+      expect((await venue.boundingBox())!.width).toBeGreaterThan(40);
     });
 
     test(`${path}: the strip is complete without script and reads cleanly`, async ({ browser, page }) => {
@@ -2497,7 +2532,7 @@ test.describe("Where this sits (SPEC section 8)", () => {
       const plain = await context.newPage();
       await plain.goto(path);
       const strip = plain.locator('section[aria-label="Where this sits"]');
-      await expect(strip.locator("ol li")).toHaveText(names);
+      await expect(strip.locator("ol li")).toHaveText([`${names[0]}¹`, ...names.slice(1)]);
       await expect(strip.getByText(line, { exact: true })).toBeVisible();
       await expect(strip.getByRole("link", { name: "Follow one receivable through all five" })).toBeVisible();
       await expect(strip.locator("svg polygon").first()).toBeVisible();

@@ -478,9 +478,10 @@
      style with a dotted underline in muted ink; the tooltip opens below. */
   /* A footnote marker is one small figure: its target reaches 24 px with
      padding that the negative margin takes back out of the line. */
+  /* The marker's target: at least 24 px wide even beside 13 px text (the glyph is about 3 px). */
   .footnote-marker {
-    padding: 6px 10px;
-    margin-inline: -10px;
+    padding: 6px 11px;
+    margin-inline: -11px;
   }
 
   .abbr {
@@ -636,54 +637,30 @@
     }
   }
   /* "Where this sits" (WhereThisSits): the small stack and its names. --k is
-     the art's scale: 0.8 under 390 px wide, so every name but the last keeps
-     its line beside it. The art is 206 wide to its ruler's ticks and 240 tall;
-     the names start 212 across and take the width that is left. From 390 to
-     767 the art is at full size and a name may take two lines (the 390
-     frame); the levels are 34 px apart and no two neighbours both wrap. */
+     the art's scale. The art is 206 wide to its ruler's ticks and 240 tall;
+     the names start 212 across and take the width that is left. Phones draw
+     the art at 0.55 and show only the page's own name, which may take two
+     lines; from 768 the art is at full size and every name keeps its line
+     but the last. */
   .sits-stack {
-    --k: 0.8;
-    --names: 152px;
-    width: calc(212px * var(--k) + var(--names));
-    max-width: 100%;
+    --k: 0.55;
+    width: 100%;
     height: calc(240px * var(--k));
   }
   .sits-names li:not(:last-child) {
     white-space: nowrap;
   }
-  @media (min-width: 390px) {
-    .sits-stack {
-      --k: 1;
-    }
-  }
-  @media (min-width: 390px) and (max-width: 767.98px) {
-    .sits-names li:not(:last-child) {
-      white-space: normal;
-    }
-  }
   @media (min-width: 768px) {
     .sits-stack {
+      --k: 1;
       --names: 150px;
+      width: calc(212px * var(--k) + var(--names));
+      max-width: 100%;
     }
   }
   @media (min-width: 1024px) {
     .sits-stack {
       --names: 258px;
-    }
-  }
-  /* Under 360 wide (a 320 px reflow) there is no room beside the art: the names are a plain list under it. */
-  @media (max-width: 359.98px) {
-    .sits-stack {
-      height: auto;
-    }
-    .sits-names,
-    .sits-names li {
-      position: static !important;
-      transform: none !important;
-      white-space: normal !important;
-    }
-    .sits-names {
-      padding-top: 8px;
     }
   }
   .sits-art {

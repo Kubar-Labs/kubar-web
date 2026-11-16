@@ -11,6 +11,10 @@ Extracted from Figma, NavDhan SDK · 1440 (frame 170:6), 13 Nov 2026, in reading
 [Fine] Where this sits
 [Body] Part of the institutional exchange Kubar is building. NavDhan SDK brings receivables in to the common standard, from the platforms exporters already use.
 [UI] Follow one receivable through all five        (→ /#one-receivable)
+(16 Nov: the five names are Home's, the venue's with the marker ¹; no "Planned" in the strip. Phones name only the common standard. Footnote ¹ shows once on the page, under the strip:)
+[Fine] ¹
+[Fine] Kubar’s own ITFS registration is targeted for 2027; until then Kubar acts as the financier’s origination and servicing agent.
+[Fine] Back to text
 
 (Build step 6, REDRAW-2026-11-14.md section 12 item 3: the hero carries "What you embed" (see that section below): the H3 and the six capabilities in the left column under the button, beside the sketch. Picking a row outlines its part of the sketch; "Eligibility check" is picked from the start.)
 The embed sketch (component "Embed sketch", 140:2523): a schematic, not a screenshot. From 1000 to 1199 the sketch sits beside the list; from 768 to 999 the sketch comes first, then the six rows. On phones (below 768) there is no full sketch: the six rows are an accordion, and an open row shows its own piece of the sketch under its sentence.
