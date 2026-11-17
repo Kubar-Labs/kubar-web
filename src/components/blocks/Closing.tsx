@@ -10,8 +10,8 @@ import { ButtonLink } from "@/components/ui/Button";
  * Next step (Figma C4 91:354): the last section before the footer: the
  * heading, a line in muted Body large, the filled button and "Or email".
  */
-export function Questions({ items, className }: { items: { q: string; a: string }[]; className?: string }) {
-  return <QuestionList items={items} className={className} />;
+export function Questions({ items, shown, showAll, className }: { items: { q: string; a: string }[]; shown?: number; showAll?: string; className?: string }) {
+  return <QuestionList items={items} shown={shown} showAll={showAll} className={className} />;
 }
 
 type NextStepProps = {

@@ -100,7 +100,7 @@ export default function KubarProtocol() {
         />
       </Section>
 
-      <Section labelledBy="evidence-heading" className="flex flex-col gap-10 lg:gap-16">
+      <Section labelledBy="evidence-heading" ground="inset" className="flex flex-col gap-10 lg:gap-16">
         <SectionHead id="evidence-heading" heading={t("evidence.heading")} lead={t("evidence.lead")} />
         <div className="flex flex-col gap-12 lg:max-w-[1062px]">
           {/* The ten elements show once: each row is a button that opens its "Checked against" line. */}
@@ -122,13 +122,13 @@ export default function KubarProtocol() {
         </div>
       </Section>
 
-      <Section labelledBy="insurance-heading" className="flex flex-col gap-10 lg:gap-16">
+      <Section labelledBy="insurance-heading" ground="inset" className="flex flex-col gap-10 lg:gap-16">
         <SectionHead id="insurance-heading" heading={t("insurance.heading")} lead={t("insurance.lead")} />
         {/* Under the lead, in the lead's column; narrower laptops move it left so its labels fit. */}
         <BuyerLimit className="lg:ml-[min(300px,calc(100%-660px))] xl:ml-[clamp(300px,calc(100%-800px),480px)]" labels={t.raw("insurance.labels") as [string, string, string]} />
       </Section>
 
-      <Section labelledBy="payment-heading" className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-12 xl:gap-20">
+      <Section labelledBy="payment-heading" ground="inset" className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-12 xl:gap-20">
         <SectionHead id="payment-heading" heading={t("payment.heading")} layout="stacked" />
         <MoneyPath
           className="min-w-0 flex-1"
@@ -143,7 +143,7 @@ export default function KubarProtocol() {
       </Section>
 
       {/* The drawing's labels carry the lead, which stays as its description for screen readers. */}
-      <Section labelledBy="loss-heading" className="flex flex-col gap-10 xl:flex-row xl:items-start xl:gap-10 min-[1366px]:gap-20">
+      <Section labelledBy="loss-heading" ground="inset" className="flex flex-col gap-10 xl:flex-row xl:items-start xl:gap-10 min-[1366px]:gap-20">
         {/* Laptops narrow the heading's column a little, so the drawing's labels keep their lines. From
             1024 to 1199 the heading runs across the top and the drawing sits under it at full size,
             centred with its labels: beside a heading they would collide. */}
@@ -161,7 +161,8 @@ export default function KubarProtocol() {
 
       <Section labelledBy="questions-heading" className="flex flex-col gap-10 lg:gap-16">
         <SectionHead id="questions-heading" heading={t("questions.heading")} layout="wide" />
-        <Questions items={t.raw("questions.items") as { q: string; a: string }[]} />
+        {/* The first four show; the control under them opens the other seven in place. */}
+        <Questions items={t.raw("questions.items") as { q: string; a: string }[]} shown={4} showAll={t("questions.showAll")} />
       </Section>
 
       <Section labelledBy="fit-heading" className="flex flex-col gap-10 lg:gap-16">
@@ -181,7 +182,7 @@ export default function KubarProtocol() {
         <Corridor rows={t.raw("programme1.rows") as [string, string][]} />
       </Section>
 
-      <Section labelledBy="venue-heading" className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-12 xl:gap-20">
+      <Section labelledBy="venue-heading" ground="inset" className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-12 xl:gap-20">
         <SectionHead id="venue-heading" heading={t("venue.heading")} layout="stacked" />
         <div className="flex min-w-0 flex-1 flex-col gap-12">
           <VenueRegister

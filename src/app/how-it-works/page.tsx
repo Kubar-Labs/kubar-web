@@ -102,7 +102,7 @@ export default function HowItWorks() {
         />
       </Section>
 
-      <Section labelledBy="unpaid-heading" className="flex flex-col gap-10 lg:gap-16">
+      <Section labelledBy="unpaid-heading" ground="inset" className="flex flex-col gap-10 lg:gap-16">
         <SectionHead id="unpaid-heading" heading={t("unpaid.heading")} layout="wide" />
         <div className="flex flex-col gap-10 lg:gap-8">
           <UnpaidFlow steps={t.raw("unpaid.rows") as UnpaidStep[]} none={t("unpaid.none")} />

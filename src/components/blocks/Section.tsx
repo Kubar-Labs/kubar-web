@@ -11,17 +11,23 @@ import { cn } from "@/lib/utils";
  * "wide" is a heading with no lead, up to 800. Below the laptop width everything
  * stacks. From 1024 to 1199 the heading column is 320 and the gap 48, so the
  * body keeps its room on an iPad in landscape.
+ *
+ * Pacing (SPEC section 8): a section may sit on the inset ground, the full
+ * width of the screen, as the frames draw the sections a reader studies.
+ * Two in a row share one ground.
  */
 type SectionProps = {
   id?: string;
   labelledBy?: string;
+  /** "inset": the quiet ground (--color-inset), edge to edge. */
+  ground?: "page" | "inset";
   className?: string;
   children: React.ReactNode;
 };
 
-export function Section({ id, labelledBy, className, children }: SectionProps) {
+export function Section({ id, labelledBy, ground = "page", className, children }: SectionProps) {
   return (
-    <section id={id} aria-labelledby={labelledBy}>
+    <section id={id} aria-labelledby={labelledBy} className={ground === "inset" ? "bg-inset" : undefined}>
       <div className={cn("page-container py-(--section-space)", className)}>{children}</div>
     </section>
   );

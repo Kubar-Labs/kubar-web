@@ -85,7 +85,7 @@ export default function NavdhanSdk() {
         </div>
       </Section>
 
-      <Section labelledBy="rules-heading" className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-12 xl:gap-20">
+      <Section labelledBy="rules-heading" ground="inset" className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-12 xl:gap-20">
         <SectionHead id="rules-heading" heading={t("rules.heading")} layout="stacked" />
         {/* Not a sequence, so no numbers (REDRAW rule 7). */}
         <NumberedRows numbered={false} items={t.raw("rules.items") as string[]} className="min-w-0 flex-1" />

@@ -73,17 +73,23 @@ export default async function RootLayout({
   }
 
   return (
-    // The script below adds data-frames to <html>, so React must not report the difference.
+    // The script below adds data-js and data-frames to <html>, so React must not report the difference.
     // data-scroll-behavior: Next 16 no longer turns smooth scrolling off for a route change unless
     // asked; without it a new page opens at the old scroll position and glides to the top.
     <html lang="en" className={fontVariables} data-scroll-behavior="smooth" suppressHydrationWarning>
       <body>
-        {/* Movements that play as a page loads (the hero drawings; globals.css) start from a
-            hidden or displaced state, so they may only start where frames are being drawn. This
-            marks the document on its first frame, before anything is painted. In a background
-            tab or a hidden pane no frame comes, the mark is never set, and the drawings stay as
-            the server drew them: complete. */}
-        <script dangerouslySetInnerHTML={{ __html: "requestAnimationFrame(function(){document.documentElement.setAttribute('data-frames','')})" }} />
+        {/* data-js: script runs, so a list shown in part (Fold) may hide its folded items before
+            anything is painted; without script they show.
+            data-frames: movements that play as a page loads (the hero drawings; globals.css)
+            start from a hidden or displaced state, so they may only start where frames are being
+            drawn. This marks the document on its first frame, before anything is painted. In a
+            background tab or a hidden pane no frame comes, the mark is never set, and the
+            drawings stay as the server drew them: complete. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: "document.documentElement.setAttribute('data-js','');requestAnimationFrame(function(){document.documentElement.setAttribute('data-frames','')})",
+          }}
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

@@ -38,11 +38,13 @@ export default function About() {
 
   return (
     <>
+      {/* From 1024 the headline on the left, the sub and its footnote on the right (Figma 334:2634). */}
       <PageHero
+        layout="split"
         headline={t("hero.headline")}
         sub={t.rich("hero.sub", { marker: () => <FootnoteMarker n={1} target="fn-1" refId="fnref-1" /> })}
       >
-        <Footnote n={1} id="fn-1" backTo="fnref-1" className="mt-10 lg:mt-16 lg:max-w-[628px]">
+        <Footnote n={1} id="fn-1" backTo="fnref-1" className="mt-10 lg:mt-8">
           {footnotes("status")}
         </Footnote>
       </PageHero>
@@ -97,7 +99,7 @@ export default function About() {
       </Section>
 
       {/* Why GIFT City: the words beside the three zones. Its marker links to the footnote under the hero. */}
-      <Section labelledBy="gift-heading" className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-10 min-[1366px]:gap-20">
+      <Section labelledBy="gift-heading" ground="inset" className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-10 min-[1366px]:gap-20">
         <SectionHead
           id="gift-heading"
           layout="stacked"

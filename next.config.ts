@@ -50,7 +50,7 @@ const nextConfig: NextConfig = {
       { source: "/privacy", destination: "/legal/privacy", permanent: true },
       {
         source: "/opengraph-image",
-        destination: "/media/kubar-labs-social-bd9a99c9.png",
+        destination: "/media/kubar-labs-social-86333cc0.png",
         permanent: true,
       },
       {

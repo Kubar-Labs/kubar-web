@@ -26,7 +26,27 @@ for (const [width, height] of sizes) {
   if (selector && selector !== "-") {
     const target = page.locator(selector).first();
     await target.evaluate((el) => el.scrollIntoView({ block: "start", behavior: "instant" }));
-    await target.screenshot({ path, animations: "disabled" });
+    // Fixed things outside the element (the header, the "On this page" button, which shows a frame
+    // or two after the scroll) would be drawn over it.
+    await target.evaluate(
+      (el) =>
+        new Promise((resolve) =>
+          requestAnimationFrame(() =>
+            requestAnimationFrame(() => {
+              for (const other of document.querySelectorAll("body *")) {
+                if (!el.contains(other) && !other.contains(el) && getComputedStyle(other).position === "fixed") other.style.visibility = "hidden";
+              }
+              resolve();
+            }),
+          ),
+        ),
+    );
+    // Clipped from the whole page: an element as tall as the screen is otherwise cut at its foot.
+    const clip = await target.evaluate((el) => {
+      const r = el.getBoundingClientRect();
+      return { x: r.left + scrollX, y: r.top + scrollY, width: r.width, height: r.height };
+    });
+    await page.screenshot({ path, fullPage: true, clip, animations: "disabled" });
   } else {
     await page.screenshot({ path, animations: "disabled" });
   }

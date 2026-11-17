@@ -1419,6 +1419,17 @@
   }
 }
 
+/* A list shown in part (Fold.tsx). Unlayered, so it wins over the items' own
+   layout utilities. With script (data-js, set before the first paint) the
+   folded items wait for the control; without, every item shows and the
+   control is hidden. */
+html[data-js] [data-folded] {
+  display: none;
+}
+html:not([data-js]) .fold-control {
+  display: none;
+}
+
 /* The pinned story or its ledger (StoryView.tsx). Unlayered, so it wins over
    the layout utilities on the story. The ledger shows with reduced motion
    (decided here, so it holds without script) or when even the smallest rows

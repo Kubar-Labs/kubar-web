@@ -289,11 +289,11 @@ test.describe("rendered words match docs/rebuild/copy", () => {
   const pages: [string, string, RegExp][] = [
     ["/", "01-home.md", /^(State 08 · Planned|05 of 08|01 … 08|Purchased|Back to text)/],
     // Words of 16 Nov whose place is built in a later step are skipped until then: the
-    // controls (steps 6 and 8) and the eight things that can be held (step 9).
+    // money path's controls (step 8) and the eight things that can be held (step 9).
     [
       "/products/kubar-protocol",
       "02-kubar-protocol.md",
-      /^(Back to text|Show all 11 questions|All three|The relationship with the exporter$|Disputes, returns, set-off and fraud$|The collection account$|The insurance policy$)/,
+      /^(Back to text|All three|The relationship with the exporter$|Disputes, returns, set-off and fraud$|The collection account$|The insurance policy$)/,
     ],
     // Nothing to skip: the copy has no Illustrative tag since 15 Nov.
     ["/products/navdhan-sdk", "03-navdhan-sdk.md", /^(Skip the five steps)/], // step 10

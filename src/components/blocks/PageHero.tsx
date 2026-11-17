@@ -7,9 +7,14 @@ import { cn } from "@/lib/utils";
  * kicker line (removed 14 Nov). The h1 in Heading/Display across ten columns, the sub in muted Body large across six,
  * then the page's actions: a filled button and a link. No status line.
  * `children` sits under the actions (How it works sets its own routes there).
+ *
+ * "split" (About, Figma 334:2634): from 1024 the h1 on the left and the sub
+ * with `children` (the footnote) on the right, 520 and 680 at 1440, 80 apart
+ * (48 below 1200); below 1024 they stack as on every other page.
  */
 type PageHeroProps = {
   headline: React.ReactNode;
+  layout?: "stacked" | "split";
   sub?: React.ReactNode;
   button?: { label: string; href: string };
   link?: { label: string; href: string };
@@ -33,6 +38,7 @@ type PageHeroProps = {
 
 export function PageHero({
   headline,
+  layout = "stacked",
   sub,
   button,
   link,
@@ -64,6 +70,20 @@ export function PageHero({
       {children}
     </>
   );
+
+  if (layout === "split") {
+    return (
+      <section>
+        <div className="page-container flex flex-col pt-8 pb-12 lg:grid lg:grid-cols-[520fr_680fr] lg:items-start lg:gap-12 lg:pt-16 lg:pb-[72px] xl:gap-20">
+          <h1 className="t-display text-ink">{headline}</h1>
+          <div className="flex flex-col">
+            {sub ? <p className="t-body-lg pt-8 text-ink-muted max-lg:max-w-(--measure) lg:pt-0">{sub}</p> : null}
+            {children}
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   if (aside && asidePlacement === "beside") {
     return (

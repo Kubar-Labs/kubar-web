@@ -7,7 +7,7 @@ import { expect, test, type Page } from "@playwright/test";
  * legal pages in step 5).
  */
 const publicRoutes = ["/", "/products/kubar-protocol", "/products/navdhan-sdk", "/how-it-works", "/about", "/contact", "/legal/privacy", "/legal/terms"] as const;
-const OG_IMAGE = /^https:\/\/kubar\.tech\/media\/kubar-labs-social-bd9a99c9\.png(?:\?.*)?$/;
+const OG_IMAGE = /^https:\/\/kubar\.tech\/media\/kubar-labs-social-86333cc0\.png(?:\?.*)?$/;
 
 /**
  * The pinned story (REDRAW-2026-11-14.md, section 3a): wait until its observer
@@ -734,7 +734,10 @@ test.describe("Kubar Protocol (redraw step 4)", () => {
     await expect(page.getByRole("link", { name: "partnerships@kubar.tech" })).toHaveAttribute("href", "mailto:partnerships@kubar.tech");
     await expect(page.locator("#fn-1")).toHaveCount(1);
     await expect(page.getByText("Planned", { exact: true })).toHaveCount(1);
-    // Eleven questions, the two halves of "How a programme runs" and the five parties of "Who holds what".
+    // Eleven questions (four shown until "Show all 11 questions"), the two halves of "How a
+    // programme runs" and the five parties of "Who holds what".
+    await expect(page.getByRole("heading", { level: 3 })).toHaveCount(11);
+    await page.getByRole("button", { name: "Show all 11 questions" }).click();
     await expect(page.getByRole("heading", { level: 3 })).toHaveCount(18);
   });
 
@@ -932,7 +935,8 @@ test.describe("Kubar Protocol (redraw step 4)", () => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/products/kubar-protocol");
     const questions = page.locator("section", { has: page.locator("#questions-heading") });
-    const buttons = questions.getByRole("button");
+    await questions.getByRole("button", { name: "Show all 11 questions" }).click();
+    const buttons = questions.locator("h3").getByRole("button");
     await expect(buttons).toHaveCount(11);
     await expect(buttons.first()).toHaveAttribute("aria-expanded", "true");
     await expect(buttons.nth(1)).toHaveAttribute("aria-expanded", "false");
@@ -1990,7 +1994,7 @@ test.describe("Metadata, social card and structured data (build step 6)", () => 
   }
 
   test("the social image is a 1200 by 630 PNG, cached for a year, and /opengraph-image points at it", async ({ page, request }) => {
-    const image = await request.get("/media/kubar-labs-social-bd9a99c9.png");
+    const image = await request.get("/media/kubar-labs-social-86333cc0.png");
     expect(image.status()).toBe(200);
     expect(image.headers()["content-type"]).toBe("image/png");
     expect(image.headers()["cache-control"]).toContain("immutable");
@@ -2001,8 +2005,9 @@ test.describe("Metadata, social card and structured data (build step 6)", () => 
     await expect(page.locator('meta[property="og:image:width"]')).toHaveAttribute("content", "1200");
     const redirect = await request.get("/opengraph-image", { maxRedirects: 0 });
     expect(redirect.status()).toBe(308);
-    expect(redirect.headers().location).toBe("/media/kubar-labs-social-bd9a99c9.png");
-    expect((await request.get("/media/kubar-labs-og-b2add55b.png")).status()).toBe(404);
+    expect(redirect.headers().location).toBe("/media/kubar-labs-social-86333cc0.png");
+    // Earlier cards are gone.
+    for (const old of ["/media/kubar-labs-og-b2add55b.png", "/media/kubar-labs-social-bd9a99c9.png"]) expect((await request.get(old)).status(), old).toBe(404);
   });
 
   test("the Organisation JSON-LD names the entity, the new logo, partnerships@ and LinkedIn only", async ({ page, request }) => {
@@ -2748,5 +2753,204 @@ test.describe("A page change opens the new page at its top", () => {
         }),
     );
     expect(new Set(positions).size, "an in-page link scrolls over several frames").toBeGreaterThan(3);
+  });
+});
+
+test.describe("Pacing (SPEC sections 7 and 8, 16 Nov)", () => {
+  const INSET = "rgb(236, 236, 232)";
+  const inset: [string, string][] = [
+    ["/products/kubar-protocol", "evidence-heading"],
+    ["/products/kubar-protocol", "insurance-heading"],
+    ["/products/kubar-protocol", "payment-heading"],
+    ["/products/kubar-protocol", "loss-heading"],
+    ["/products/kubar-protocol", "venue-heading"],
+    ["/products/navdhan-sdk", "rules-heading"],
+    ["/how-it-works", "unpaid-heading"],
+    ["/about", "gift-heading"],
+  ];
+
+  test("the sections a reader studies sit on the inset ground, edge to edge; the others stay white", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    for (const [width, height] of [[390, 844], [768, 1024], [1180, 820], [1440, 900]] as const) {
+      await page.setViewportSize({ width, height });
+      for (const path of [...new Set(inset.map(([path]) => path))]) {
+        await page.goto(path);
+        const grounds = await page.evaluate(() =>
+          [...document.querySelectorAll<HTMLElement>("main > section[aria-labelledby]")].map((section) => {
+            const box = section.getBoundingClientRect();
+            return { id: section.getAttribute("aria-labelledby")!, ground: getComputedStyle(section).backgroundColor, left: box.left, width: box.width };
+          }),
+        );
+        const wanted = inset.filter(([p]) => p === path).map(([, id]) => id);
+        for (const id of wanted) {
+          const section = grounds.find((g) => g.id === id);
+          expect(section, `${path} ${id} at ${width}`).toBeDefined();
+          expect(section!.ground, `${path} ${id} at ${width}`).toBe(INSET);
+          expect(section!.left, `${path} ${id} at ${width}: from the left edge`).toBe(0);
+          expect(section!.width, `${path} ${id} at ${width}: the full width`).toBe(width);
+        }
+        for (const other of grounds.filter((g) => !wanted.includes(g.id))) {
+          expect(other.ground, `${path} ${other.id} at ${width}`).toBe("rgba(0, 0, 0, 0)");
+        }
+        // The venue's footnote is inside its ground.
+        if (path === "/products/kubar-protocol") {
+          await expect(page.locator("section[aria-labelledby='venue-heading'] #fn-1")).toHaveCount(1);
+        }
+      }
+    }
+  });
+
+  test("the inset sections read cleanly", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    for (const path of ["/products/kubar-protocol", "/products/navdhan-sdk", "/how-it-works", "/about"]) {
+      await page.goto(path);
+      for (const [, id] of inset.filter(([p]) => p === path)) {
+        await page.locator(`#${id}`).scrollIntoViewIfNeeded();
+      }
+      await expectNoAxeViolations(page);
+    }
+  });
+
+  test.describe("Questions: four, then all eleven (Fold)", () => {
+    const first = ["What am I buying?", "Why isn’t the exporter’s own bank financing this?", "Who carries the buyer’s credit, and who carries disputes?", "Is the cover in my name?"];
+    const fifth = "Who holds the money?";
+    const section = (page: Page) => page.locator("section", { has: page.locator("#questions-heading") });
+    // The questions shown, by the words a reader sees (each h3 holds its words twice: the phone's
+    // button and the wider screens' text, one of them hidden).
+    const shownQuestions = (page: Page) => section(page).getByRole("heading", { level: 3 });
+
+    for (const [width, height] of [[390, 844], [768, 1024], [1180, 820], [1440, 900]] as const) {
+      test(`at ${width}: four questions and the control; one press opens the other seven, moves focus to the fifth and takes the control away`, async ({ page }) => {
+        await page.setViewportSize({ width, height });
+        await page.goto("/products/kubar-protocol");
+        const questions = section(page);
+        const control = questions.getByRole("button", { name: "Show all 11 questions" });
+        await expect.poll(() => shownQuestions(page).allInnerTexts()).toEqual(first);
+        await expect(control).toBeVisible();
+        // The control: underlined words and a plus, under the list at the section's gap, tall enough to press.
+        const list = (await questions.locator("h3").first().locator("xpath=../..").boundingBox())!;
+        const box = (await control.boundingBox())!;
+        expect(Math.round(box.y - (list.y + list.height)), "under the list at the section's gap").toBe(width >= 1024 ? 64 : 40);
+        expect(box.height).toBeGreaterThanOrEqual(width >= 1024 ? 40 : 44);
+        await expect(control.locator("span")).toHaveCSS("text-decoration-line", "underline");
+        await expect(control.locator("svg")).toHaveCount(1);
+        // The folded list closes with a hairline, not the register's closing rule.
+        await expect(questions.locator("h3").nth(3).locator("xpath=..")).toHaveCSS("border-bottom-width", "1px");
+        await control.click();
+        await expect(shownQuestions(page)).toHaveCount(11);
+        expect(await shownQuestions(page).nth(4).innerText()).toBe(fifth);
+        await expect(control).toHaveCount(0);
+        const focused = await page.evaluate(() => {
+          const el = document.activeElement!;
+          return { tag: el.tagName, text: el.textContent ?? "" };
+        });
+        expect(focused.text.startsWith(fifth), `focus on the fifth question, not ${focused.tag}`).toBe(true);
+        // Below 768 the fifth question's own button takes the focus; from 768 the question itself.
+        expect(focused.tag).toBe(width < 768 ? "BUTTON" : "DIV");
+        await expect(questions.locator("h3").last().locator("xpath=..")).toHaveCSS("border-bottom-width", "2px");
+        if (width >= 768) await expect(questions.locator("p:visible")).toHaveCount(11);
+        await expectNoAxeViolations(page);
+      });
+    }
+
+    test("by keyboard: Tab reaches the control, Enter opens the rest, and the next Tab goes on from the fifth question", async ({ page }) => {
+      await page.setViewportSize({ width: 390, height: 844 });
+      await page.goto("/products/kubar-protocol");
+      const questions = section(page);
+      const control = questions.getByRole("button", { name: "Show all 11 questions" });
+      // From the fourth question's button, the next stop is the control.
+      await questions.locator("h3").nth(3).getByRole("button").focus();
+      await page.keyboard.press("Tab");
+      await expect(control).toBeFocused();
+      await page.keyboard.press("Enter");
+      const fifth = questions.locator("h3").nth(4).getByRole("button");
+      await expect(fifth).toBeFocused();
+      await page.keyboard.press("Tab");
+      await expect(questions.locator("h3").nth(5).getByRole("button")).toBeFocused();
+      // The accordion works on the opened questions too.
+      await page.keyboard.press("Enter");
+      await expect(questions.locator("h3").nth(5).getByRole("button")).toHaveAttribute("aria-expanded", "true");
+      await expect(questions.locator("p:visible")).toHaveCount(1);
+    });
+
+    test("it holds: shown, reloaded, shown again, three rounds", async ({ page }) => {
+      await page.setViewportSize({ width: 1440, height: 900 });
+      for (let round = 1; round <= 3; round++) {
+        if (round === 1) await page.goto("/products/kubar-protocol");
+        else await page.reload();
+        const questions = section(page);
+        await expect(shownQuestions(page), `round ${round}`).toHaveCount(4);
+        await questions.getByRole("button", { name: "Show all 11 questions" }).click();
+        await expect(shownQuestions(page), `round ${round}`).toHaveCount(11);
+        await expect(questions.getByRole("button", { name: "Show all 11 questions" }), `round ${round}`).toHaveCount(0);
+      }
+    });
+
+    test("nothing moves as the page loads: before the page's script runs, the same four show with the control", async ({ page }) => {
+      await page.setViewportSize({ width: 1440, height: 900 });
+      // The page's own script never arrives; the layout's first script (inline) still marks the document.
+      await page.route("**/_next/static/chunks/**", (route) => route.abort());
+      await page.goto("/products/kubar-protocol");
+      await expect(page.locator("html")).toHaveAttribute("data-js", "");
+      const questions = section(page);
+      await expect.poll(() => shownQuestions(page).allInnerTexts()).toEqual(first);
+      await expect(questions.getByRole("button", { name: "Show all 11 questions" })).toBeVisible();
+    });
+
+    test("a link to a folded question opens the list and goes there", async ({ page }) => {
+      await page.setViewportSize({ width: 1440, height: 900 });
+      await page.goto("/products/kubar-protocol#question-8");
+      const answer = page.locator("#question-8");
+      await expect(answer).toBeVisible();
+      await expect(answer).toBeInViewport();
+      await expect(page.getByRole("button", { name: "Show all 11 questions" })).toHaveCount(0);
+      // And one followed after the page has loaded.
+      await page.goto("/products/kubar-protocol");
+      await expect(page.locator("#question-6")).toBeHidden();
+      await page.evaluate(() => (location.hash = "#question-6"));
+      await expect(page.locator("#question-6")).toBeVisible();
+      await expect(page.locator("#question-6")).toBeInViewport();
+    });
+
+    for (const [width, height] of [[390, 844], [1440, 900]] as const) {
+      test(`without script at ${width}: all eleven show, open, and the control is hidden`, async ({ browser }) => {
+        const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width, height } });
+        const page = await context.newPage();
+        await page.goto("/products/kubar-protocol");
+        await expect(page.locator("html")).not.toHaveAttribute("data-js");
+        const questions = section(page);
+        await expect(shownQuestions(page)).toHaveCount(11);
+        await expect(questions.locator("p:visible")).toHaveCount(11);
+        await expect(questions.getByRole("button", { name: "Show all 11 questions" })).toBeHidden();
+        await context.close();
+      });
+    }
+  });
+
+  test.describe("About's hero (Figma 334:2634)", () => {
+    for (const [width, height] of [[390, 844], [768, 1024], [1024, 768], [1180, 820], [1440, 900], [1920, 1080]] as const) {
+      test(`at ${width}: ${width >= 1024 ? "the headline on the left, the lead and its footnote on the right" : "the headline, lead and footnote stacked"}`, async ({ page }) => {
+        await page.setViewportSize({ width, height });
+        await page.goto("/about");
+        const h1 = (await page.locator("main h1").boundingBox())!;
+        const lead = (await page.locator("main h1 + div > p").first().boundingBox())!;
+        const footnote = (await page.locator("#fn-1").boundingBox())!;
+        if (width >= 1024) {
+          expect(lead.x, "the lead beside the headline").toBeGreaterThan(h1.x + h1.width);
+          expect(Math.abs(lead.y - h1.y), "the lead's top level with the headline's").toBeLessThanOrEqual(2);
+          expect(Math.round(footnote.y - (lead.y + lead.height)), "the footnote 32 under the lead").toBe(32);
+          expect(Math.abs(footnote.x - lead.x)).toBeLessThanOrEqual(1);
+          if (width === 1440) {
+            expect(Math.round(h1.width)).toBe(520);
+            expect(Math.round(lead.x)).toBe(680);
+            expect(Math.round(lead.width)).toBe(680);
+          }
+        } else {
+          expect(lead.y, "the lead under the headline").toBeGreaterThanOrEqual(h1.y + h1.height - 0.5);
+          expect(footnote.y).toBeGreaterThanOrEqual(lead.y + lead.height - 0.5);
+        }
+        expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
+      });
+    }
   });
 });
