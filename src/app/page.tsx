@@ -15,6 +15,7 @@ import { RouteRows, type Route } from "@/components/registers/RouteRows";
 import { Standing } from "@/components/registers/Standing";
 import { Footnote, FootnoteMarker } from "@/components/ui/Footnote";
 import { FootnoteDisclosure } from "@/components/ui/FootnoteDisclosure";
+import { noBreak } from "@/components/ui/NoBreak";
 import { TextLink } from "@/components/ui/TextLink";
 
 /*
@@ -48,7 +49,7 @@ export default function Home() {
           <h1 className="t-display text-ink lg:col-span-2 min-[1328px]:col-span-1 min-[1328px]:col-start-1 min-[1328px]:row-start-1">
             {t.rich("display", {
               marker: () => <FootnoteMarker n={1} target={FN_STATUS} refId="fnref-1" />,
-              nb: (chunks) => <span className="whitespace-nowrap">{chunks}</span>,
+              nb: noBreak,
             })}
           </h1>
           <p className="t-body-lg text-ink-muted lg:col-span-2 lg:max-w-[760px] lg:pb-4 min-[1328px]:col-span-1 min-[1328px]:col-start-1 min-[1328px]:row-start-2 min-[1328px]:max-w-none min-[1328px]:pb-0">
@@ -94,7 +95,7 @@ export default function Home() {
       <Band id="closing-line" line={t("band.line")} link={{ label: t("band.link"), href: "/how-it-works" }} />
 
       <Section labelledBy="foundations-heading" className="flex flex-col gap-10 lg:gap-16">
-        <SectionHead id="foundations-heading" heading={t("foundations.heading")} lead={t("foundations.lead")} />
+        <SectionHead id="foundations-heading" heading={t("foundations.heading")} lead={t.rich("foundations.lead", { nb: noBreak })} />
         <ExchangeColumns
           exchanges={t.raw("foundations.exchanges") as string[]}
           rows={t.raw("foundations.rows") as ComparisonRow[]}

@@ -1004,110 +1004,7 @@ test.describe("NavDhan SDK (build step 4)", () => {
 });
 
 test.describe("NavDhan SDK (build step 6)", () => {
-  test("the hero carries What you embed: picking a row marks it and outlines its part of the sketch", async ({ page, browser }) => {
-    await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto("/products/navdhan-sdk");
-    const hero = page.locator("main section").first();
-    await expect(hero.getByRole("heading", { name: "What you embed." })).toBeVisible();
-    const rows = hero.getByRole("button", { pressed: undefined }).filter({ hasNot: page.locator("svg") });
-    const row = (name: string) => hero.getByRole("button", { name: new RegExp(`^${name}`) });
-    const sketch = hero.getByRole("img");
-    await expect(hero.locator("ul > li > button:visible")).toHaveCount(6);
-    expect(await rows.count()).toBeGreaterThanOrEqual(6);
-    // Eligibility check is picked from the start.
-    await expect(row("Eligibility check")).toHaveAttribute("aria-pressed", "true");
-    const outlined = () => sketch.locator(".outline-2:visible");
-    await expect(outlined()).toHaveCount(1);
-    await expect(outlined()).toContainText("Buyer country");
-    await expect(row("Eligibility check")).toHaveCSS("border-left-color", "rgb(2, 39, 50)");
-    // Hover picks; the pick stays when the pointer leaves.
-    await row("Indicative offer").hover();
-    await expect(row("Indicative offer")).toHaveAttribute("aria-pressed", "true");
-    await expect(outlined()).toContainText("All-in price");
-    await page.mouse.move(5, 5);
-    await expect(row("Indicative offer")).toHaveAttribute("aria-pressed", "true");
-    // Shipment and document capture outlines the Shipment list.
-    await row("Shipment and document capture").click();
-    await expect(outlined()).toContainText("Bill of lading");
-    // The two rows with no part in the sketch swap the panel's content.
-    await expect(sketch.getByText("Identity check", { exact: true })).toBeHidden();
-    await row("Consented onboarding").focus();
-    await expect(sketch.getByText("Identity check", { exact: true })).toBeVisible();
-    await expect(sketch.getByText("Consent recorded", { exact: true })).toBeVisible();
-    await expect(sketch.getByText("Indicative offer", { exact: true })).toBeHidden();
-    await expect(sketch.getByText("Purchased", { exact: true })).toBeHidden();
-    await page.keyboard.press("Tab");
-    await page.keyboard.press("Tab");
-    await page.keyboard.press("Tab");
-    await page.keyboard.press("Tab");
-    await page.keyboard.press("Tab");
-    await expect(row("Events for your product")).toHaveAttribute("aria-pressed", "true");
-    await expect(sketch.getByText("Purchased", { exact: true })).toBeVisible();
-    await expect(sketch.getByText("Indicative offer", { exact: true })).toBeVisible();
-    // The sketch sits beside the list.
-    const list = (await hero.locator("ul").first().boundingBox())!;
-    const art = (await sketch.boundingBox())!;
-    expect(art.x).toBeGreaterThan(list.x + list.width);
-    await expectNoAxeViolations(page);
-    // From 1024 the sketch keeps its 519 px and the list takes the rest (about 40% at 1024).
-    // 1000 to 1023: the list about 45% wide. Below 1000: the accordion, no full sketch.
-    await page.setViewportSize({ width: 1024, height: 900 });
-    const l2 = (await hero.locator("ul").first().boundingBox())!;
-    const a2 = (await sketch.boundingBox())!;
-    expect(a2.x).toBeGreaterThan(l2.x + l2.width - 1);
-    expect(Math.round(a2.width)).toBe(519);
-    expect(l2.width / 944).toBeGreaterThan(0.38);
-    expect(l2.width / 944).toBeLessThan(0.5);
-    await page.setViewportSize({ width: 1010, height: 900 });
-    const l3 = (await hero.locator("ul").first().boundingBox())!;
-    expect(l3.width / 930).toBeGreaterThan(0.4);
-    expect(l3.width / 930).toBeLessThan(0.5);
-    for (const width of [999, 820, 768]) {
-      await page.setViewportSize({ width, height: 1180 });
-      await expect(sketch, `${width}`).toBeHidden();
-      await expect(hero.getByRole("button", { expanded: true }), `${width}`).toHaveCount(1);
-    }
-    // Phones: no full sketch; the rows are an accordion, each opening its own piece of the sketch.
-    const phone = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
-    const tab = await phone.newPage();
-    await tab.goto("/products/navdhan-sdk");
-    const phoneHero = tab.locator("main section").first();
-    await expect(phoneHero.getByRole("img")).toBeHidden();
-    const accordion = phoneHero.locator("ul > li > button:visible");
-    await expect(accordion).toHaveCount(6);
-    const open = (name: string) => phoneHero.getByRole("button", { name: new RegExp(`^${name}`), expanded: true });
-    await expect(phoneHero.getByRole("button", { expanded: true })).toHaveCount(1);
-    await expect(open("Eligibility check")).toBeVisible();
-    const piece = (name: string) => phoneHero.locator("li", { has: tab.getByRole("button", { name: new RegExp(`^${name}`) }) }).locator("div[id]:visible");
-    await expect(piece("Eligibility check")).toContainText("Buyer country");
-    const pieces: [string, string][] = [
-      ["Consented onboarding", "Identity checkBusiness checkConsent recorded"],
-      ["Shipment and document capture", "Bill of lading"],
-      ["Indicative offer", "All-in price"],
-      ["Application and status", "Settlement"],
-      ["Events for your product", "InvoicePurchased"],
-    ];
-    for (const [name, text] of pieces) {
-      const button = phoneHero.locator("ul > li > button:visible", { hasText: name });
-      await button.scrollIntoViewIfNeeded();
-      await button.tap();
-      await expect(button).toHaveAttribute("aria-expanded", "true");
-      await expect(phoneHero.getByRole("button", { expanded: true })).toHaveCount(1);
-      await expect(piece(name)).toContainText(text);
-      const box = (await piece(name).boundingBox())!;
-      const rowBox = (await button.boundingBox())!;
-      expect(box.y).toBeGreaterThanOrEqual(rowBox.y + rowBox.height - 1);
-      expect(box.x + box.width).toBeLessThanOrEqual(390 - 20 + 1);
-    }
-    expect(await tab.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
-    // A row closed on a phone, then a wider screen: Eligibility check is picked again.
-    await phoneHero.getByRole("button", { expanded: true }).tap();
-    await expect(phoneHero.getByRole("button", { expanded: true })).toHaveCount(0);
-    await tab.setViewportSize({ width: 1024, height: 768 });
-    await expect(phoneHero.getByRole("button", { name: /^Eligibility check/, pressed: true })).toBeVisible();
-    await expect(phoneHero.getByRole("img").locator(".outline-2:visible")).toContainText("Buyer country");
-    await phone.close();
-  });
+  // What you embed and its sketch: see "The embed sketch, drawn like the product (step 7)".
 
   test("two audiences side by side, no numbers on the rules, no column heads, the layers drawn", async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
@@ -2953,4 +2850,247 @@ test.describe("Pacing (SPEC sections 7 and 8, 16 Nov)", () => {
       });
     }
   });
+});
+
+test.describe("The embed sketch, drawn like the product (step 7)", () => {
+  const names = ["Consented onboarding", "Shipment and document capture", "Eligibility check", "Indicative offer", "Application and status", "Events for your product"];
+  const keys = ["onboarding", "shipment", "eligibility", "offer", "application", "events"];
+  const hero = (page: Page) => page.locator("main section").first();
+  const sketch = (page: Page) => page.locator(".embed-sketch[role='img']");
+  const pickRow = (page: Page, name: string) => hero(page).getByRole("button", { name: new RegExp(`^${name}`), pressed: undefined }).and(page.locator("[aria-pressed]"));
+  const colours = { ink: "rgb(2, 39, 50)", rani: "rgb(173, 36, 104)", rule: "rgb(204, 212, 214)" };
+
+  // What one state of the sketch shows (the whole sketch, or a phone's widget).
+  async function expectState(scope: import("@playwright/test").Locator, key: string, platform: boolean) {
+    const i = keys.indexOf(key);
+    const part = Math.min(i, 4);
+    const widget = scope.locator("[data-widget]");
+    await expect(widget).toBeVisible();
+    // The five-part progress line: done in ink, the current part in rani, the rest in the rule colour.
+    const parts = widget.locator("[data-part] > span");
+    await expect(parts).toHaveCount(5);
+    for (let p = 0; p < 5; p++) await expect(parts.nth(p), `${key}: part ${p + 1}`).toHaveCSS("background-color", p < part ? colours.ink : p === part ? colours.rani : colours.rule);
+    // The part's name as the screen's title.
+    await expect(widget.locator("p.t-ui-lg")).toHaveText(names[part]);
+    // Field rows with a round ink tick, and a button naming the next part.
+    const fields = { onboarding: ["Identity check", "Business check", "Consent recorded"], shipment: ["Booking", "Invoice", "Inspection report", "Bill of lading"], eligibility: ["Buyer country", "Terms", "Size", "Goods"] }[key];
+    await expect(widget.locator("[data-field]")).toHaveText(fields ?? []);
+    if (fields) for (const field of await widget.locator("[data-field]").all()) await expect(field).toHaveCSS("border-radius", "8px");
+    await expect(widget.locator("[data-next]")).toHaveText(i < 4 ? [names[i + 1]] : []);
+    // The offer: two columns and two empty dotted boxes. The application: a connected timeline.
+    await expect(widget.locator("[data-empty]")).toHaveCount(key === "offer" ? 2 : 0);
+    if (key === "offer") {
+      await expect(widget.getByText("All-in price", { exact: true })).toBeVisible();
+      await expect(widget.getByText("The exporter’s own alternative", { exact: true })).toBeVisible();
+      for (const box of await widget.locator("[data-empty]").all()) await expect(box).toHaveCSS("border-top-style", "dashed");
+    }
+    const timeline = key === "application" || key === "events";
+    await expect(widget.locator("ol > li")).toHaveText(timeline ? ["Submission", "Documents outstanding", "Purchase", "Settlement"] : []);
+    if (timeline) {
+      expect(await widget.locator("[data-dot]").evaluateAll((els) => els.map((el) => el.getAttribute("data-dot")))).toEqual(["done", "done", "current", "open"]);
+      await expect(widget.locator("[data-dot='current'] circle")).toHaveCSS("stroke", colours.rani);
+    }
+    // The platform: square, its records captured after onboarding, the dashed path for the records, the chip for events.
+    const shown = scope.locator("[data-platform]");
+    if (platform) {
+      await expect(shown).toHaveCSS("border-radius", "0px");
+      await expect(shown.locator("[data-captured]")).toHaveCount(key === "onboarding" ? 0 : 4);
+      await expect(shown.locator("[data-path]")).toHaveCount(key === "shipment" ? 1 : 0);
+      await expect(shown.locator("[data-chip]")).toHaveText(key === "events" ? ["Purchased"] : []);
+      if (key === "events") await expect(shown.locator("[data-chip] span")).toHaveCSS("background-color", colours.rani);
+    } else {
+      await expect(scope.getByText("Your platform", { exact: true })).toBeHidden();
+    }
+    // No figures anywhere in the sketch.
+    expect(await scope.evaluate((el) => el.textContent ?? "")).not.toMatch(/\d/);
+  }
+
+  test("at 1440: the sketch beside the list, drawn like the product, one state per row", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/products/navdhan-sdk");
+    const list = (await hero(page).locator("ul").first().boundingBox())!;
+    const art = (await sketch(page).boundingBox())!;
+    expect(Math.round(list.width)).toBe(640);
+    expect(Math.round(art.width)).toBe(580);
+    expect(Math.round(art.height)).toBe(489);
+    expect(Math.round(art.x - (list.x + list.width)), "60 apart").toBe(60);
+    expect(Math.round(art.x + art.width)).toBe(1360);
+    // The widget: 310 × 413, 12 px corners, the raised shadow.
+    const widget = sketch(page).locator("[data-widget]");
+    const box = (await widget.boundingBox())!;
+    expect([Math.round(box.width), Math.round(box.height)]).toEqual([310, 413]);
+    expect([Math.round(box.x - art.x), Math.round(box.y - art.y)]).toEqual([252, 58]);
+    await expect(widget).toHaveCSS("border-radius", "12px");
+    // The raised shadow (--elevation-2), after Tailwind's empty ring layers.
+    await expect(widget).toHaveCSS("box-shadow", /rgba\(2, 39, 50, 0\.08\) 0px 2px 4px 0px, rgba\(2, 39, 50, 0\.12\) 0px 14px 36px 0px$/);
+    // Eligibility check is picked from the start.
+    await expect(pickRow(page, "Eligibility check")).toHaveAttribute("aria-pressed", "true");
+    await expect(sketch(page)).toHaveAttribute("data-state", "eligibility");
+    await expectState(sketch(page), "eligibility", true);
+    // Each row shows its own state; the picked row has the ink rule on its left.
+    for (const [i, name] of names.entries()) {
+      await pickRow(page, name).click();
+      await expect(pickRow(page, name)).toHaveAttribute("aria-pressed", "true");
+      await expect(pickRow(page, name)).toHaveCSS("border-left-color", colours.ink);
+      await expect(sketch(page)).toHaveAttribute("data-state", keys[i]);
+      await expectState(sketch(page), keys[i], true);
+    }
+    await expect(hero(page).locator("[aria-pressed='true']")).toHaveCount(1);
+    await expectNoAxeViolations(page);
+  });
+
+  test("by keyboard: Tab reaches the picked row, the arrow keys, Home and End move within the six and pick", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/products/navdhan-sdk");
+    // One tab stop in the group: the picked row.
+    expect(await hero(page).locator("[aria-pressed]").evaluateAll((els) => els.map((el) => (el as HTMLElement).tabIndex))).toEqual([-1, -1, 0, -1, -1, -1]);
+    await page.getByRole("link", { name: "Talk about an integration" }).first().focus();
+    await page.keyboard.press("Tab");
+    await expect(pickRow(page, "Eligibility check")).toBeFocused();
+    const step = async (key: string, name: string) => {
+      await page.keyboard.press(key);
+      await expect(pickRow(page, name)).toBeFocused();
+      await expect(pickRow(page, name)).toHaveAttribute("aria-pressed", "true");
+      await expect(sketch(page)).toHaveAttribute("data-state", keys[names.indexOf(name)]);
+    };
+    await step("ArrowDown", "Indicative offer");
+    await step("ArrowRight", "Application and status");
+    await step("ArrowDown", "Events for your product");
+    await step("ArrowDown", "Consented onboarding");
+    await step("ArrowUp", "Events for your product");
+    await step("ArrowLeft", "Application and status");
+    await step("Home", "Consented onboarding");
+    await step("End", "Events for your product");
+    expect(await hero(page).locator("[aria-pressed]").evaluateAll((els) => els.map((el) => (el as HTMLElement).tabIndex))).toEqual([-1, -1, -1, -1, -1, 0]);
+    // Tab leaves the group; Shift+Tab comes back to the picked row.
+    await page.keyboard.press("Tab");
+    await expect(hero(page).locator("[aria-pressed]:focus")).toHaveCount(0);
+    await page.keyboard.press("Shift+Tab");
+    await expect(pickRow(page, "Events for your product")).toBeFocused();
+    await expect(pickRow(page, "Events for your product")).toHaveAttribute("aria-pressed", "true");
+  });
+
+  test("hover picks, and keeps picking: down, up, three rounds, and again after a reload", async ({ page }) => {
+    test.setTimeout(60_000);
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/products/navdhan-sdk");
+    for (const pass of ["first load", "after a reload"]) {
+      if (pass === "after a reload") await page.reload();
+      await sketch(page).scrollIntoViewIfNeeded();
+      for (let round = 1; round <= 3; round++) {
+        for (const order of [names, [...names].reverse()]) {
+          for (const name of order) {
+            await pickRow(page, name).hover();
+            await expect(pickRow(page, name), `${pass}, round ${round}: ${name}`).toHaveAttribute("aria-pressed", "true");
+            await expect(sketch(page), `${pass}, round ${round}: ${name}`).toHaveAttribute("data-state", keys[names.indexOf(name)]);
+          }
+        }
+      }
+      // The pick stays when the pointer leaves.
+      await page.mouse.move(5, 5);
+      await expect(pickRow(page, names[0])).toHaveAttribute("aria-pressed", "true");
+    }
+  });
+
+  test("on an iPad in landscape a tap picks, and the sketch keeps its 580 px beside the list", async ({ browser }) => {
+    for (const [width, height] of [[1000, 800], [1024, 768], [1180, 820], [1366, 1024]] as const) {
+      const context = await browser.newContext({ viewport: { width, height }, hasTouch: true });
+      const page = await context.newPage();
+      await page.goto("/products/navdhan-sdk");
+      const list = (await hero(page).locator("ul").first().boundingBox())!;
+      const art = (await sketch(page).boundingBox())!;
+      expect(Math.round(art.width), `${width}`).toBe(580);
+      expect(art.x, `${width}: beside the list`).toBeGreaterThan(list.x + list.width);
+      // Its top level with the list's heading.
+      expect(Math.abs(art.y - (await hero(page).getByRole("heading", { name: "What you embed." }).boundingBox())!.y), `${width}: level with the list`).toBeLessThanOrEqual(1);
+      for (const name of ["Indicative offer", "Events for your product", "Consented onboarding"]) {
+        await pickRow(page, name).tap();
+        await expect(pickRow(page, name), `${width}: ${name}`).toHaveAttribute("aria-pressed", "true");
+        await expect(sketch(page), `${width}: ${name}`).toHaveAttribute("data-state", keys[names.indexOf(name)]);
+      }
+      expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth), `${width}`).toBe(0);
+      await context.close();
+    }
+  });
+
+  for (const [width, height, platform] of [[768, 1024, true], [820, 1180, true], [390, 844, false], [360, 800, false]] as const) {
+    test(`at ${width}: the rows open one at a time, each showing its state ${platform ? "in the platform" : "in the widget alone"}`, async ({ browser }) => {
+      const context = await browser.newContext({ viewport: { width, height }, hasTouch: true, isMobile: width < 768 });
+      const page = await context.newPage();
+      await page.goto("/products/navdhan-sdk");
+      await expect(sketch(page)).toBeHidden();
+      const row = (name: string) => hero(page).getByRole("button", { name: new RegExp(`^${name}`), expanded: undefined }).and(page.locator("[aria-expanded]"));
+      await expect(hero(page).locator("[aria-expanded='true']")).toHaveCount(1);
+      await expect(row("Eligibility check")).toHaveAttribute("aria-expanded", "true");
+      for (const [i, name] of names.entries()) {
+        if ((await row(name).getAttribute("aria-expanded")) !== "true") await row(name).tap();
+        await expect(row(name)).toHaveAttribute("aria-expanded", "true");
+        await expect(hero(page).locator("[aria-expanded='true']")).toHaveCount(1);
+        const piece = page.locator(`[id="${await row(name).getAttribute("aria-controls")}"] .embed-sketch`);
+        await expect(piece).toHaveAttribute("data-state", keys[i]);
+        await expectState(piece, keys[i], platform);
+        // Under its own row, inside the content.
+        const box = (await piece.boundingBox())!;
+        const rowBox = (await row(name).boundingBox())!;
+        expect(box.y).toBeGreaterThanOrEqual(rowBox.y + rowBox.height - 1);
+        expect(box.x + box.width).toBeLessThanOrEqual(width - (width < 768 ? 20 : 40) + 1);
+        const widget = (await piece.locator("[data-widget]").boundingBox())!;
+        expect(Math.round(widget.height)).toBe(413);
+        if (platform) expect(Math.round((await piece.locator("[data-platform]").boundingBox())!.width)).toBe(580);
+        else expect(widget.width).toBeLessThanOrEqual(310);
+      }
+      expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
+      await expectNoAxeViolations(page);
+      await context.close();
+    });
+  }
+
+  for (const [width, height] of [[1440, 900], [390, 844]] as const) {
+    test(`without script at ${width}: the rows and the eligibility check, complete`, async ({ browser }) => {
+      const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width, height } });
+      const page = await context.newPage();
+      await page.goto("/products/navdhan-sdk");
+      for (const name of names) await expect(hero(page).getByText(name, { exact: true }).filter({ visible: true }).first()).toBeVisible();
+      const shown = width >= 1000 ? sketch(page) : hero(page).locator(".embed-sketch").filter({ visible: true });
+      await expect(shown).toHaveCount(1);
+      await expect(shown).toHaveAttribute("data-state", "eligibility");
+      await expectState(shown, "eligibility", width >= 768);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
+      await context.close();
+    });
+  }
+});
+
+test.describe("\"cross-border\" never breaks at its hyphen in running copy (17 Nov)", () => {
+  // The widths where it broke before the <nb> marks: Home's foundations lead and About's hero lead.
+  for (const [path, widths] of [["/", [320, 380, 1030, 1210]], ["/about", [340, 1180, 1300]]] as const) {
+    test(`${path} at ${widths.join(", ")}`, async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await page.goto(path);
+      for (const width of widths) {
+        await page.setViewportSize({ width, height: 900 });
+        const broken = await page.evaluate(() => {
+          const found: string[] = [];
+          const walker = document.createTreeWalker(document.querySelector("main")!, NodeFilter.SHOW_TEXT);
+          for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+            const text = node.textContent ?? "";
+            for (let i = text.indexOf("cross-border"); i !== -1; i = text.indexOf("cross-border", i + 1)) {
+              if (!node.parentElement?.getClientRects().length) continue;
+              const before = document.createRange();
+              before.setStart(node, i);
+              before.setEnd(node, i + 6);
+              const after = document.createRange();
+              after.setStart(node, i + 6);
+              after.setEnd(node, i + 12);
+              const a = before.getClientRects();
+              const b = after.getClientRects();
+              if (a.length && b.length && Math.abs(a[a.length - 1].top - b[0].top) > 2) found.push(text.slice(Math.max(0, i - 30), i + 20));
+            }
+          }
+          return found;
+        });
+        expect(broken, `${path} at ${width}`).toEqual([]);
+      }
+    });
+  }
 });

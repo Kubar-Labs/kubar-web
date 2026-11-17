@@ -40,8 +40,13 @@ test.describe("what the site never shows", () => {
       }
       const italic = await page.evaluate(() => [...document.querySelectorAll("body *")].filter((el) => getComputedStyle(el).fontStyle !== "normal").length);
       expect(italic).toBe(0);
+      // Corners stay square. The one exception is what NavDhan SDK's embed sketch draws inside its square
+      // platform: the widget, drawn like the product (step 7: 12 px corners, 8 px fields, round dots).
       const rounded = await page.evaluate(
-        () => [...document.querySelectorAll("main *, header *, footer *")].filter((el) => parseFloat(getComputedStyle(el).borderTopLeftRadius) > 0).length,
+        () =>
+          [...document.querySelectorAll("main *, header *, footer *")].filter(
+            (el) => parseFloat(getComputedStyle(el).borderTopLeftRadius) > 0 && !el.closest(".embed-sketch [data-platform]"),
+          ).length,
       );
       expect(rounded).toBe(0);
       // REDRAW-2026-11-14.md rule 5: no hairline between sections; the header keeps its own rule.
@@ -312,14 +317,21 @@ test.describe("rendered words match docs/rebuild/copy", () => {
       await page.waitForTimeout(400);
       // textContent, so words kept for screen readers or for other widths count too;
       // abbreviation tooltips are taken out first.
-      const rendered = norm(
-        await page.evaluate(() => {
+      const read = () =>
+        page.evaluate(() => {
           const clone = document.body.cloneNode(true) as HTMLElement;
           clone.querySelectorAll("[role='tooltip'], .footnote-marker, script, style").forEach((el) => el.remove());
           clone.querySelectorAll("td, th, p, li, h1, h2, h3, h4, dt, dd, option, label, button, div").forEach((el) => el.append(" "));
           return clone.textContent ?? "";
-        }),
-      );
+        });
+      let text = await read();
+      // NavDhan SDK's embed sketch draws one row's state at a time (step 7): pick each row and read it too.
+      for (const row of path === "/products/navdhan-sdk" ? await page.locator("main [aria-pressed]").all() : []) {
+        await row.click();
+        await expect(row).toHaveAttribute("aria-pressed", "true");
+        text += ` ${await read()}`;
+      }
+      const rendered = norm(text);
       const missing: string[] = [];
       if (path.startsWith("/legal")) {
         const text = readFileSync(join(copyDir, file), "utf8");

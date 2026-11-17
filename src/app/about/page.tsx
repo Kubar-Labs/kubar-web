@@ -12,6 +12,7 @@ import { FinanceProgrammes, TechnologyProgrammes } from "@/components/registers/
 import { Register } from "@/components/registers/Register";
 import { Standing } from "@/components/registers/Standing";
 import { Footnote, FootnoteMarker } from "@/components/ui/Footnote";
+import { noBreak } from "@/components/ui/NoBreak";
 import { TextLink } from "@/components/ui/TextLink";
 
 /*
@@ -42,7 +43,7 @@ export default function About() {
       <PageHero
         layout="split"
         headline={t("hero.headline")}
-        sub={t.rich("hero.sub", { marker: () => <FootnoteMarker n={1} target="fn-1" refId="fnref-1" /> })}
+        sub={t.rich("hero.sub", { marker: () => <FootnoteMarker n={1} target="fn-1" refId="fnref-1" />, nb: noBreak })}
       >
         <Footnote n={1} id="fn-1" backTo="fnref-1" className="mt-10 lg:mt-8">
           {footnotes("status")}

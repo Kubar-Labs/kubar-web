@@ -96,7 +96,7 @@
     },
     "foundations": {
       "heading": "An exchange needs more than a venue.",
-      "lead": "India already runs specialised exchanges for businesses and financial institutions, not the public. At GIFT City, cross-border trade finance has the rules for such an exchange, but not yet the asset. So Kubar builds the foundations first and the venue last.",
+      "lead": "India already runs specialised exchanges for businesses and financial institutions, not the public. At GIFT City, <nb>cross-border</nb> trade finance has the rules for such an exchange, but not yet the asset. So Kubar builds the foundations first and the venue last.",
       "exchangeHead": "Exchange",
       "exchanges": [
         "TReDS",
@@ -1630,7 +1630,7 @@
     },
     "hero": {
       "headline": "Foundations first.",
-      "sub": "Kubar Labs is building the institutional exchange<marker></marker> for cross-border trade finance, from GIFT City. We started with the asset: export receivables an international financier can buy again and again, insured in its own name. A venue needs something financiers will bid on, so we build that first: receivables with cover, documents, a clean payment path and a history."
+      "sub": "Kubar Labs is building the institutional exchange<marker></marker> for <nb>cross-border</nb> trade finance, from GIFT City. We started with the asset: export receivables an international financier can buy again and again, insured in its own name. A venue needs something financiers will bid on, so we build that first: receivables with cover, documents, a clean payment path and a history."
     },
     "order": {
       "heading": "What we’re building.",

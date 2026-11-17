@@ -49,7 +49,8 @@ describe("routes and redirects (HANDOFF section 5)", () => {
 });
 
 describe("copy matches docs/rebuild/copy word for word", () => {
-  const allMessages = JSON.stringify(messages);
+  // <nb> keeps a word on one line (a typesetting mark, not words), so it is left out of the comparisons.
+  const allMessages = JSON.stringify(messages).replace(/<\/?nb>/g, "");
 
   /** Every tagged line of a copy file, without its tag and trailing notes. */
   function copyLines(file: string) {
@@ -277,6 +278,21 @@ describe("metadata (SPEC section 4)", () => {
       // The spec's table types a straight apostrophe; the site sets a typographic one.
       expect(metas[route].description.replace(/’/g, "'"), route).toBe(description);
     }
+  });
+
+  it("keeps \"cross-border\" on one line wherever it is running copy (<nb>)", () => {
+    // Titles, descriptions and alt text are not laid out on the page.
+    const unset = new Set(["site.homeTitle", "site.socialImageAlt", "about.meta.description"]);
+    const loose: string[] = [];
+    const walk = (value: unknown, path: string) => {
+      if (typeof value === "string") {
+        if (!unset.has(path) && value.replace(/<nb>cross-border<\/nb>/g, "").includes("cross-border")) loose.push(path);
+      } else if (value && typeof value === "object") {
+        for (const [key, child] of Object.entries(value)) walk(child, path ? `${path}.${key}` : key);
+      }
+    };
+    walk(messages, "");
+    expect(loose).toEqual([]);
   });
 
   it("points the social card and the /opengraph-image redirect at one existing file", async () => {
