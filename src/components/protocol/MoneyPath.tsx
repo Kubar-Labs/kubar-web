@@ -5,25 +5,30 @@ import { usePlayOnce } from "@/lib/usePlayOnce";
 import { cx as cn } from "@/lib/cx";
 
 /*
- * The money path (step 8): one drawing on Kubar Protocol ("The money moves
- * only between banks.", Figma 325:2486) and How it works ("Where the money
- * moves.", 333:2868, centred in the section). Three plates in a row, Buyer,
+ * The money path (step 8): one drawing on Kubar Protocol ("The money never
+ * passes through Kubar.", Figma 325:2486) and How it works ("Where the money
+ * moves.", 333:2736, centred in the section). Three plates in a row, Buyer,
  * Singapore; Financier, with a petrol top and a white opening (the
  * receivable, held by the financier); Exporter's bank. The three payments are
- * arrows above them, numbered 1 to 3 with their words. Kubar sits below on a
- * dashed data path with a mark for each payment, matched, and "Kubar holds
- * none" (rule 11.4: the secondary colour). The line under the drawing stays.
+ * arrows above them, numbered 1 to 3 with their words. The face value stops
+ * on its way (17 Nov): a ring at its line's midpoint, the collection account
+ * in the exporter's name, with its caption ("Collection account, in the
+ * exporter's name, swept to the financier"). Kubar sits below on a dashed
+ * data path with a mark for each payment, matched, and "Kubar holds none"
+ * (rule 11.4: the secondary colour). The line under the drawing stays.
  *
  * It plays once when 45% of it is in view (usePlayOnce): payment 1, then 2,
  * then 3, 1.1 s apart. For each the arrow draws in 700 ms, a rani dot runs
  * along it, its words go from 35% to full and its mark on Kubar's path fills
  * (globals.css, .money-run; the order, timing and easing of
- * docs/rebuild/prototypes/motion-pieces.html). Under it, four controls replay
- * one payment or all three. A payment that has played stays drawn: the other
- * layout, shown later (a tablet turned), doesn't play it again. Still (no
- * script, reduced motion, or the drawing already in view): all three arrows
- * drawn, every mark filled; the controls need script and motion, so they are
- * hidden then.
+ * docs/rebuild/prototypes/motion-pieces.html). The stop's ring appears with
+ * the arrowhead and its caption with the payment's words; the dot runs
+ * through it without pausing. Under it, four controls replay one payment or
+ * all three. A payment that has played stays drawn: the other layout, shown
+ * later (a tablet turned), doesn't play it again. Still (no script, reduced
+ * motion, or the drawing already in view): all three arrows drawn, the stop
+ * shown and every mark filled; the controls need script and motion, so they
+ * are hidden then.
  *
  * From 900 px the plates sit in a row (760 × 424, never scaled); below that
  * they stack top to bottom and the arrows run down (320 × 652, the
@@ -51,6 +56,8 @@ type Layout = {
   arrows: { x: number; y: number; length: number; down: boolean }[];
   /** Each payment's number (left, top) and the box its words wrap in. */
   labels: { nx: number; ny: number; x: number; y: number; w: number; centred: boolean }[];
+  /** The face value's stop: its ring's centre, and its caption, centred under the ring at `top` or, without one, under the payment's words. */
+  stop: { x: number; y: number; caption: { top?: number; width: number } };
   /** Kubar's row: the line's y, the box, where the line starts and ends, the label's top, the chip and the marks' x. */
   kubar: { y: number; box: [number, number]; from: number; to: number; label: number; chip: [number, number]; marks: number[] };
 };
@@ -75,6 +82,8 @@ const WIDE: Layout = {
     // Two lines, broken after "the balance," as the frame breaks them.
     { nx: 394, ny: 124, x: 510, y: 86, w: 240, centred: true },
   ],
+  // The line's midpoint (it stops 5 short of the head's tip); the caption on two lines, as the frame sets it.
+  stop: { x: 247.5, y: 96, caption: { top: 106, width: 270 } },
   kubar: { y: 392, box: [28, 378], from: 100, to: 732, label: 364, chip: [610, 358], marks: [250, 400, 550] },
 };
 
@@ -92,10 +101,13 @@ const NARROW: Layout = {
   ],
   labels: [
     { nx: 116, ny: 340.6, x: 132, y: 340.6, w: 188, centred: false },
-    { nx: 116, ny: 164, x: 132, y: 164, w: 188, centred: false },
+    // From the top of its arrow, with the stop's caption under it (the prototype's).
+    { nx: 116, ny: 138.6, x: 132, y: 138.6, w: 188, centred: false },
     // Three lines, broken as the prototype breaks them.
     { nx: 116, ny: 384.6, x: 132, y: 384.6, w: 160, centred: false },
   ],
+  // The caption in three lines, broken as the prototype breaks them.
+  stop: { x: 74, y: 171.5, caption: { width: 164 } },
   kubar: { y: 620, box: [0, 607], from: 70, to: 320, label: 588, chip: [196, 584], marks: [130, 200, 270] },
 };
 
@@ -119,16 +131,19 @@ function Plate({ cx, cy, a, t, financier }: { cx: number; cy: number; a: number;
   );
 }
 
-function Drawing({ layout, parties, payments, kubarNote, dataPath, runs, className }: {
+function Drawing({ layout, parties, payments, stop, kubarNote, dataPath, runs, className }: {
   layout: Layout;
   parties: string[];
   payments: string[];
+  /** The stop's caption, in two parts: the account, then where its payments go. */
+  stop: [string, string];
   kubarNote: string;
   dataPath: string;
   runs: Run[];
   className?: string;
 }) {
   const { width, height, plates, a, t, arrows, labels, kubar } = layout;
+  const { caption } = layout.stop;
   const h = a * K;
   // A payment that plays is remounted (its key), so its movement starts again from the beginning.
   const run = (i: number) => {
@@ -159,6 +174,7 @@ function Drawing({ layout, parties, payments, kubarNote, dataPath, runs, classNa
               <line {...line} pathLength={1} className="money-line stroke-ink" strokeWidth={1.5} />
               <polygon points={points(head)} className="money-head fill-ink" />
               <circle cx={x} cy={y} r={4} className="money-dot fill-accent" />
+              {i === 1 ? <circle cx={layout.stop.x} cy={layout.stop.y} r={3.75} className="money-stop fill-raised stroke-ink" strokeWidth={1.5} /> : null}
             </g>
           );
         })}
@@ -183,7 +199,18 @@ function Drawing({ layout, parties, payments, kubarNote, dataPath, runs, classNa
             </p>
             <p className={cn("t-fine absolute text-ink", label.centred && "-translate-x-1/2 text-center")} style={{ left: label.x, top: label.y, width: label.w }}>
               {payments[i]}
+              {i === 1 && caption.top === undefined ? (
+                <span data-stop="" className="block" style={{ width: caption.width }}>
+                  {stop.join(" ")}
+                </span>
+              ) : null}
             </p>
+            {i === 1 && caption.top !== undefined ? (
+              <p data-stop="" className="t-fine absolute -translate-x-1/2 text-center whitespace-nowrap text-ink" style={{ left: layout.stop.x, top: caption.top, width: caption.width }}>
+                <span className="block">{stop[0]}</span>
+                <span className="block">{stop[1]}</span>
+              </p>
+            ) : null}
           </div>
         );
       })}
@@ -209,6 +236,7 @@ export function MoneyPath({
   parties,
   payments,
   routes,
+  sweep,
   kubarNote,
   dataPath,
   under,
@@ -221,8 +249,10 @@ export function MoneyPath({
   parties: string[];
   /** Purchase price (financier to bank), face value (buyer to financier), deferred price (financier to bank). */
   payments: string[];
-  /** Each payment's from and to, for the table that assistive technology reads. */
+  /** Each payment's from and to, for the table that assistive technology reads. The face value's "to" is the collection account. */
   routes: [string, string][];
+  /** Where the collection account's payments go ("swept to the financier"): the rest of the stop's caption. */
+  sweep: string;
   kubarNote: string;
   /** The data path's label ("Data path · Kubar"). */
   dataPath: string;
@@ -259,7 +289,8 @@ export function MoneyPath({
     const lit = () => setReplays((current) => current.map((r) => (r && r !== "lit" && r.seq === n ? "lit" : r)));
     timers.current.push(window.setTimeout(lit, 80 + (to - from) * 1100 + 1100));
   };
-  const props = { parties, payments, kubarNote, dataPath, runs };
+  const stop: [string, string] = [`${routes[1][1]},`, sweep];
+  const props = { parties, payments, stop, kubarNote, dataPath, runs };
 
   return (
     <div data-money="" className={cn("mx-auto w-full max-w-[760px]", className)}>
@@ -301,7 +332,7 @@ export function MoneyPath({
               <tr key={payment}>
                 <th scope="row">{payment}</th>
                 <td>{routes[i][0]}</td>
-                <td>{routes[i][1]}</td>
+                <td>{i === 1 ? stop.join(" ") : routes[i][1]}</td>
               </tr>
             ))}
           </tbody>

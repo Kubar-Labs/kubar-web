@@ -97,6 +97,7 @@ export default function HowItWorks() {
           parties={t.raw("money.parties") as string[]}
           payments={t.raw("money.payments") as string[]}
           routes={t.raw("money.routes") as [string, string][]}
+          sweep={t("money.sweep")}
           kubarNote={t("money.kubarNote")}
           dataPath={story("dataPath")}
           under={t("money.under")}

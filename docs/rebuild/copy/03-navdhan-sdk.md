@@ -7,11 +7,11 @@ Extracted from Figma, NavDhan SDK · 1440 (frame 170:6), 13 Nov 2026, in reading
 [Display] Trade finance inside the software your exporters already use.
 [BodyL] Embed NavDhan SDK and your exporters can check eligibility, apply and be paid for their export receivables without leaving your platform. Financiers buy; Kubar runs the programme; you keep the relationship.
 [UI] Talk about an integration                     (filled button → /contact?intent=platform)
-(16 Nov: directly under the hero, a strip on the inset ground, "Where this sits": the five foundations drawn small with the common standard in petrol, the sentence and the link, which goes to /#one-receivable.)
+(16 Nov: directly under the hero, a strip on the inset ground, "Where this sits": the foundations drawn small with the page's own level in petrol, the sentence and the link, which goes to /#one-receivable. 17 Nov: six foundations, and the level in petrol is Distribution through trade platforms, Figma 310:1331.)
 [Fine] Where this sits
-[Body] Part of the institutional exchange Kubar is building. NavDhan SDK brings receivables in to the common standard, from the platforms exporters already use.
-[UI] Follow one receivable through all five        (→ /#one-receivable)
-(16 Nov: the five names are Home's, the venue's with the marker ¹; no "Planned" in the strip. Phones name only the common standard. Footnote ¹ shows once on the page, under the strip:)
+[Body] Part of the institutional exchange Kubar is building. NavDhan SDK is its distribution: exporters reach the programme from the platforms they already use, and those platforms’ shipment data is one source for each receivable’s record.
+[UI] Follow one receivable through all six         (→ /#one-receivable)
+(16 Nov: the names are Home's, the venue's with the marker ¹; no "Planned" in the strip. Phones name only the page's own level. Footnote ¹ shows once on the page, under the strip:)
 [Fine] ¹
 [Fine] Kubar’s own ITFS registration is targeted for 2027; until then Kubar acts as the financier’s origination and servicing agent.
 [Fine] Back to text
@@ -76,7 +76,7 @@ Desktop: a five-step register beside three lanes (Your platform, Kubar Protocol 
 [Code] 02  [Body] NavDhan SDK checks the shipment against the programme’s rules and shows an indicative offer.
 [Code] 03  [Body] With the exporter’s consent, the shipment data and documents go to Kubar Protocol, which assembles the evidence package.
 [Code] 04  [Body] A financier buys the receivable and pays the exporter’s own bank.
-[Code] 05  [Body] The buyer pays the financier on the due date. Your platform shows each step as it happens.
+[Code] 05  [Body] On the due date the buyer pays the account on its invoice, and the payment reaches the financier. Your platform shows each step as it happens.
 Lane labels (desktop): [UI] Your platform, [UI] Kubar Protocol, [UI] The financier; path labels [Tag] NavDhan SDK, With the exporter’s consent, The evidence package, Each step as it happens.
 [UI] See how it works                                    (→ /how-it-works)
 

@@ -5,10 +5,10 @@ Extracted from Figma, Kubar Protocol · 1440 (frame 167:6), 13 Nov 2026, in read
 ## Hero
 (15 Nov, REDRAW-2026-11-14.md section 12 item 5: under the hero, an "On this page" row: the label "On this page", then each section's name below as an anchor link: What you buy · How a programme runs · The evidence package · Insurance · The payment path · The loss history · Who holds what · Questions · Where you fit · Programme 1 · The venue. The same list opens from a fixed "On this page" button once the row has scrolled away.)
 (14 Nov: the kicker line above the headline is removed. REDRAW-2026-11-14.md, section 3.)
-(16 Nov: directly under the hero, before the "On this page" row, a strip on the inset ground, "Where this sits": the five foundations drawn small with Standing buyers in petrol, the sentence and the link, which goes to /#one-receivable. The five names are Home's, the venue's with the marker ¹, which links to the footnote under The venue; no "Planned" in the strip. Phones name only Standing buyers.)
+(16 Nov: directly under the hero, before the "On this page" row, a strip on the inset ground, "Where this sits": the foundations drawn small with Standing buyers in petrol, the sentence and the link, which goes to /#one-receivable. The names are Home's, the venue's with the marker ¹, which links to the footnote under The venue; no "Planned" in the strip. Phones name only Standing buyers. 17 Nov: six foundations, Figma 309:2495.)
 [Fine] Where this sits
 [Body] Part of the institutional exchange Kubar is building. Kubar Protocol gives export receivables their standing buyers.
-[UI] Follow one receivable through all five          (→ /#one-receivable)
+[UI] Follow one receivable through all six           (→ /#one-receivable)
 [Display] Underwrite once. Buy every receivable that fits.
 [BodyL] Kubar runs the programme around your limit: origination, the evidence package, the data your insurer needs and the matching of every payment. You buy each receivable without recourse for the buyer’s credit, insured in your own name.
 [UI] Start a programme conversation                  (filled button → /contact?intent=institution)
@@ -27,7 +27,7 @@ Extracted from Figma, Kubar Protocol · 1440 (frame 167:6), 13 Nov 2026, in read
 [Tag] Deferred purchase price    [BodyS] The balance, less your discount and charges, paid when the buyer pays
 [Tag] Recourse                   [BodyS] None for the buyer’s credit; the exporter answers for disputes, returns, set-off and fraud
 [Tag] Cover                      [BodyS] Credit insurance on the buyer, in your name
-[Tag] Payment                    [BodyS] The buyer pays your collection account
+[Tag] Payment                    [BodyS] The buyer pays the exporter’s collection account; the sweep passes it to you
 [Tag] Evidence                   [BodyS] One package, with your own read access
 
 Beside it, the money timeline (drawn to scale on a day axis; Figma component "Money timeline", 123:1184):
@@ -35,16 +35,16 @@ Beside it, the money timeline (drawn to scale on a day axis; Figma component "Mo
 [Label] Kubar holds none                (secondary colour; rule 11.4)
 [Tag] Received
 [Tag] Paid out
-[BodyS] $225,000 · face value, from the buyer, into your collection account
+[BodyS] $225,000 · face value, from the buyer, swept to you from the exporter’s collection account
 [BodyS] $202,500 · the purchase price, 90% of face, to the exporter’s bank
 [BodyS] Meanwhile you carry the buyer’s credit, insured in your name
 [BodyS] The deferred purchase price: the balance (10% of face), less your discount and charges, to the exporter. Its amount depends on pricing, so it has no figure.     (dotted box, no figure)
 [Code] Shipment · day 0
 [Code] Purchase
 [Code] Due date · day 75
-[Fine] Days after shipment. The purchase date is illustrative: it follows the documents, the insurer’s limit check and the buyer’s acknowledgement.
+[Fine] Days after shipment. The purchase date is illustrative: it follows the documents, the insurer’s limit check and the exporter’s bank’s no-objection.
 
-At 768 and 390 the small drawing (the day 0 and day 75 bars, 350 wide) sits above the words as a list; its labels there: "Day 0", "Paid out · at purchase", "Received · day 75", "Paid out · later", "Meanwhile", "Day 75", and the receiving account is named "Financier’s collection account".
+At 768 and 390 the small drawing (the day 0 and day 75 bars, 350 wide) sits above the words as a list; its labels there: "Day 0", "Paid out · at purchase", "Received · day 75", "Paid out · later", "Meanwhile", "Day 75".
 
 ## How a programme runs
 [H2] How a programme runs.
@@ -55,15 +55,15 @@ Step 4 (REDRAW-2026-11-14.md, Kubar Protocol): "Set up once" as six numbered dot
 [Code] 02  [BodyS] You agree the terms and set a programme limit
 [Code] 03  [BodyS] The insurer approves limits on the buyers, in your name
 [Code] 04  [BodyS] You appoint Kubar as your origination and servicing agent
-[Code] 05  [BodyS] Exporters join: identity checks, their bank’s no-objection, a notice on their invoices
-[Code] 06  [BodyS] Buyers are told to pay your account, and acknowledge it
+[Code] 05  [BodyS] Exporters join: identity checks, their bank’s no-objection, their collection account on their invoices
+[Code] 06  [BodyS] Buyers pay the account on the invoice, in the exporter’s name; a standing sweep passes each payment to you, and the exporter can’t redirect it
 [UI] See every step in detail                                                           (→ /how-it-works)
 [Tag] Then, for every receivable
 [Code] 01  [BodyS] The exporter, or its platform, submits the shipment
 [Code] 02  [BodyS] Kubar checks it against the programme’s rules and assembles the evidence package
 [Code] 03  [BodyS] You accept it under your limit
            [BodyS] The credit decision is yours; Kubar can’t override it.               (note with a 2 px rani rule on its left)
-[Code] 04  [BodyS] You pay the purchase price; the buyer pays you on the due date; you pay the exporter the balance
+[Code] 04  [BodyS] You pay the purchase price; on the due date the buyer’s payment reaches you through the sweep; you pay the exporter the balance
 [Code] 05  [BodyS] The outcome enters the loss history
 [Code] RCV-0001 · RCV-0002 · RCV-0003 · …
 [BodyS] Every receivable that fits, inside your limit
@@ -74,12 +74,12 @@ Step 4 (REDRAW-2026-11-14.md, Kubar Protocol): "Set up once" as six numbered dot
 [BodyL] Financiers have lost money on paper they couldn’t verify. So each receivable comes with one record: you buy on it, the insurer prices on it, and the exporter’s bank closes the shipping bill against it.
 Drawing (desktop only; component "Evidence sources", 130:2584): ten elements, each with its source, joined by dashed data-path stubs to one spine and one arrow into the record.
 [BodyS] Identity of the exporter and the buyer                       [Tag] From Government registries; screening
-[BodyS] Commercial invoice, with the instruction to pay you          [Tag] From The exporter
+[BodyS] Commercial invoice, naming the exporter’s collection account  [Tag] From The exporter
 [BodyS] Shipping bill                                                [Tag] From Indian Customs
 [BodyS] Bill of lading, electronic where the carrier issues one      [Tag] From The carrier
 [BodyS] Inspection report, where the programme requires one          [Tag] From The inspection agency
 [BodyS] Insurance limit                                              [Tag] From The insurer
-[BodyS] Buyer’s acknowledgement                                      [Tag] From The buyer
+[BodyS] Sweep instruction                                            [Tag] From The payment provider
 [BodyS] No-objection                                                 [Tag] From The exporter’s bank
 [BodyS] Programme checks                                             [Tag] From Kubar
 [BodyS] Purchase and settlement                                      [Tag] From You and the exporter’s bank
@@ -91,12 +91,12 @@ Register (all sizes):
 (15 Nov, section 14: the table and its column heads "Element" and "From" are gone; each row below is a button showing the element and "From" its source, and opens the line:)
 [Tag] Checked against
 Identity of the exporter and the buyer | Government registries; screening | Kubar’s checks, kept on file
-Commercial invoice, with the instruction to pay you | The exporter | The shipping bill; the e-invoice reference where one applies
+Commercial invoice, naming the exporter’s collection account | The exporter | The shipping bill; the e-invoice reference where one applies
 Shipping bill | Indian Customs | The invoice: goods, quantity, value and buyer
 Bill of lading, electronic where the carrier issues one | The carrier | The shipped-on-board date and vessel
 Inspection report, where the programme requires one | The inspection agency | The report’s reference
 Insurance limit | The insurer | Headroom on the buyer’s limit
-Buyer’s acknowledgement | The buyer | Signatory, date and channel
+Sweep instruction | The payment provider | The instruction on the exporter’s collection account
 No-objection | The exporter’s bank | The bank’s letter
 Programme checks | Kubar | Eligibility, concentration, sanctions and related-party results
 Purchase and settlement | You and the exporter’s bank | Payment references; the closure of the shipping bill
@@ -110,7 +110,7 @@ Purchase and settlement | You and the exporter’s bank | Payment references; th
 [BodyL] The credit-insurance policy is yours: you are the insured, on buyer limits the insurer approves. Kubar insures nothing. It gives the insurer what it needs to set and keep those limits: the pool, each receivable as it’s bought and how each one paid. No receivable is bought without headroom on an approved limit.
 
 ## The payment path
-[H2] The money moves only between banks.
+[H2] The money never passes through Kubar.
 (17 Nov, next build step 8: the money path, Figma 325:2486, shared with How it works. Three plates, Buyer, Singapore; Financier; Exporter’s bank; the three payments as arrows above them, numbered 1 to 3; Kubar below on its dashed data path, labelled as on the stories, with a mark for each payment and "Kubar holds none". Below 900 px the plates stack and the arrows run down, as in docs/rebuild/prototypes/motion-pieces.html.)
 [UI] Kubar
 [UI] Buyer, Singapore
@@ -119,6 +119,8 @@ Purchase and settlement | You and the exporter’s bank | Payment references; th
 [BodyS] Purchase price, at purchase (90% of face)
 [BodyS] Face value, on the due date
 [BodyS] Deferred purchase price: the balance, less discount and charges
+(17 Nov: the face value stops on its way, Figma 325:2486: a 9 px ring at the midpoint of its arrow, with a caption centred under it on two lines; in the narrow drawing the caption's three lines follow the payment's words. It shows "Collection account, in the exporter’s name," then "swept to the financier".)
+[Fine] swept to the financier
 (16 Nov: four controls under the drawing, each of the first three with its payment's number, 1 to 3, in mono; they replay one payment or all three.)
 [UI] Purchase price
 [UI] Face value
@@ -128,8 +130,10 @@ Purchase and settlement | You and the exporter’s bank | Payment references; th
 [Tag] Kubar holds none                             (17 Nov: at the end of Kubar's path, on a white chip; was "No account, no payment, no release")
 (17 Nov: in the table that assistive technology reads in place of the drawing, each payment with its from and to:)
 [Fine] Financier → Exporter’s bank
-[Fine] Buyer → Financier’s collection account
+[Fine] Buyer → Collection account, in the exporter’s name
 [Fine] Financier → Exporter’s bank
+(17 Nov: the face value's "to" there reads "Collection account, in the exporter’s name, swept to the financier". The table's caption, which describes the drawing:)
+[Fine] Three payments move between the buyer, the financier and the exporter’s bank. The buyer’s payment passes through a collection account in the exporter’s name. None touches Kubar.
 [BodyS] Every payment carries the receivable’s reference, and Kubar matches each one to its receivable.
 
 ## The loss history
@@ -138,10 +142,10 @@ Purchase and settlement | You and the exporter’s bank | Payment references; th
 [BodyL] Recorded by buyer, exporter and commodity, it lets an insurer price the pool, and it brings in the next financier.
 
 ## Who holds what
-[H2] You hold the receivable, the policy and the account.
+[H2] You hold the receivable, its proceeds and the policy.
 (Step 4: the register becomes five blocks, "You, the financier" as the petrol card, so the column head "Party" is not shown; "Holds" and "Doesn’t hold" label each block's two lines.)
 [Fine] Holds | [Fine] Doesn’t hold
-You, the financier | The receivable, the collection account, the insurance policy and the buyer’s credit risk | Recourse to the exporter for the buyer’s credit
+You, the financier | The receivable and its proceeds, the insurance policy and the buyer’s credit risk | Recourse to the exporter for the buyer’s credit
 The insurer | The buyer’s credit risk on the covered share | Dispute or fraud risk
 The exporter | Disputes, returns, set-off and fraud on its own trades | The receivable, once sold
 The exporter’s bank | Its relationship with the exporter | The receivables sold
@@ -149,7 +153,7 @@ Kubar | Origination, the evidence package, servicing and reporting | Money or cr
 (first column [UI], the others [BodyS])
 (16 Nov: the eight things that can be held, cut from the rows' own words, as chips beside the five parties:)
 [UI] The receivable
-[UI] The collection account
+[UI] The proceeds                                  (17 Nov: held by the financier)
 [UI] The insurance policy
 [UI] The buyer’s credit risk
 [UI] Disputes, returns, set-off and fraud
@@ -170,9 +174,9 @@ Kubar | Origination, the evidence package, servicing and reporting | Money or cr
 [UIL] Is the cover in my name?
 [Body] Yes. In a programme the credit-insurance policy is in your name, on buyer limits the insurer approves. Until that policy is signed, a programme can start on exporters’ own policies with claims assigned to you; we say which applies before you buy anything.
 [UIL] Who holds the money?
-[Body] You do. The buyer pays your collection account, and you pay the exporter’s account at its own bank. Kubar never holds an account, receives a payment or releases funds.
+[Body] The buyer pays a collection account in the exporter’s name, and a standing sweep passes each payment to you; the exporter can’t redirect it. You pay the exporter’s account at its own bank. Kubar never holds an account, receives a payment or releases funds.
 [UIL] How do I know the shipment and the invoice are real?
-[Body] Each element of the evidence package comes from a system the exporter doesn’t control: Indian Customs for the shipping bill, the carrier for the bill of lading, the insurer for the limit, the buyer for its acknowledgement and the exporter’s bank for its no-objection. Kubar checks them against each other before anything is offered to you.
+[Body] Each element of the evidence package comes from a system the exporter doesn’t control: Indian Customs for the shipping bill, the carrier for the bill of lading, the insurer for the limit and the exporter’s bank for its no-objection. Kubar checks them against each other before anything is offered to you.
 [UIL] Who is Kubar, and under what mandate does it act?
 [Body] Kubar Labs is the brand of Kubar Protocol Private Limited, founded in India in 2024. Under a written mandate from you, Kubar designs the pool and its rules, checks and documents each receivable, services it and reports. The purchase runs on your licence and your credit policies; Kubar never makes the credit decision, holds money or carries credit risk. Kubar’s own ITFS registration is targeted for 2027; until then Kubar acts as the financier’s origination and servicing agent.
 [UIL] What happens if a buyer doesn’t pay?
@@ -196,10 +200,10 @@ Funds | Later, buying receivables from financiers
 (first column [UI], the other [BodyS])
 
 ## Programme 1
-(16 Nov: the programme names both countries; the worked example names one, Singapore.)
-[H2] Programme 1: rice to buyers in the UAE and Singapore.
+(16 Nov: the programme names both countries; the worked example names one, Singapore. 17 Nov: agricultural commodities, and the wider Gulf.)
+[H2] Programme 1: agricultural commodities to buyers in the UAE, Singapore and the wider Gulf.
 (Step 4: the register becomes the corridor, REDRAW-2026-11-14.md, Kubar Protocol, so its column heads "Field" and "Entry" are not shown. The Status row was removed earlier.)
-Exporters | Indian rice exporters
+Exporters | Indian agri-commodity exporters
 Buyers | Importers in the UAE, Singapore and the wider Gulf, on approved insurance limits
 Terms | Open account
 Financier | A bank’s unit at GIFT City. In discussions with IBUs

@@ -637,17 +637,18 @@
     }
   }
   /* "Where this sits" (WhereThisSits): the small stack and its names. --k is
-     the art's scale. The art is 206 wide to its ruler's ticks and 240 tall;
+     the art's scale. The art is 206 wide to its ruler's ticks and 274 tall;
      the names start 212 across and take the width that is left. Phones draw
      the art at 0.55 and show only the page's own name, which may take two
      lines; from 768 the art is at full size and every name keeps its line
-     but the last. */
+     but distribution's, which takes two where the names are 150 wide (its
+     neighbours leave room), and the last. */
   .sits-stack {
     --k: 0.55;
     width: 100%;
-    height: calc(240px * var(--k));
+    height: calc(274px * var(--k));
   }
-  .sits-names li:not(:last-child) {
+  .sits-names li:not(:nth-child(2), :last-child) {
     white-space: nowrap;
   }
   @media (min-width: 768px) {
@@ -665,7 +666,7 @@
   }
   .sits-art {
     width: calc(206px * var(--k));
-    height: calc(240px * var(--k));
+    height: calc(274px * var(--k));
   }
   .sits-scale {
     transform: scale(var(--k));
@@ -738,6 +739,7 @@
     vector-effect: non-scaling-stroke;
   }
   .iso-leader-line {
+    fill: none;
     stroke: var(--color-rule);
     stroke-width: 1;
   }
@@ -771,8 +773,14 @@
   [data-phase="armed"] .iso-outline-mask {
     stroke-dashoffset: 1;
   }
+  /* --after: the last solid block's level, so the outline draws once it has risen. */
   [data-phase="playing"] .iso-outline-mask {
-    transition: stroke-dashoffset 480ms var(--ease-standard) calc(3 * 80ms + var(--duration-write));
+    transition: stroke-dashoffset 480ms var(--ease-standard) calc(var(--after) * 80ms + var(--duration-write));
+  }
+  /* Home's foundations from 1024: where the panel is narrow the drawing gives up to 80 px, so
+     the labels' column keeps 360. */
+  .iso-stacked {
+    --iso-w: clamp(480px, calc(100% - 400px), 560px);
   }
 
   /* Arrivals on page load: a sheet drops in from 24 px above; a row fades in. */
@@ -847,9 +855,10 @@
      Armed (below the fold): the arrows undrawn, their words at 35%, the marks empty.
      A payment that plays (.money-run, --at after the start) draws its line in 700 ms,
      shows its head as the line arrives, runs a rani dot along it, brings its words to
-     full and fills its mark on Kubar's path. A replay remounts the payment, so its
-     movement starts again from the beginning. Once played it is .money-lit: drawn,
-     with no movement left to restart when the other layout shows (a tablet turned). */
+     full and fills its mark on Kubar's path. The face value's stop (.money-stop, a ring)
+     shows with its head. A replay remounts the payment, so its movement starts again
+     from the beginning. Once played it is .money-lit: drawn, with no movement left to
+     restart when the other layout shows (a tablet turned). */
   .money-line {
     fill: none;
     stroke-dasharray: 1;
@@ -875,7 +884,7 @@
   [data-phase="armed"] .money-still .money-line {
     stroke-dashoffset: 1;
   }
-  [data-phase="armed"] .money-still .money-head {
+  [data-phase="armed"] .money-still :is(.money-head, .money-stop) {
     opacity: 0;
   }
   [data-phase="armed"] .money-words.money-still {
@@ -888,7 +897,7 @@
   .money-run .money-line {
     animation: money-draw 700ms ease var(--at) both;
   }
-  .money-run .money-head {
+  .money-run :is(.money-head, .money-stop) {
     animation: money-show 200ms ease calc(var(--at) + 600ms) both;
   }
   .money-run .money-dot {
@@ -948,7 +957,7 @@
     }
   }
   @media (prefers-reduced-motion: reduce) {
-    .money-run :is(.money-line, .money-head, .money-dot),
+    .money-run :is(.money-line, .money-head, .money-stop, .money-dot),
     :is(.money-words, .money-mark).money-run {
       animation: none;
     }

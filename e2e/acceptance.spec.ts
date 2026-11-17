@@ -298,7 +298,7 @@ test.describe("rendered words match docs/rebuild/copy", () => {
     [
       "/products/kubar-protocol",
       "02-kubar-protocol.md",
-      /^(Back to text|The relationship with the exporter$|Disputes, returns, set-off and fraud$|The collection account$|The insurance policy$)/,
+      /^(Back to text|The relationship with the exporter$|Disputes, returns, set-off and fraud$|The proceeds$|The insurance policy$)/,
     ],
     // Nothing to skip: the copy has no Illustrative tag since 15 Nov.
     ["/products/navdhan-sdk", "03-navdhan-sdk.md", /^(Skip the five steps)/], // step 10

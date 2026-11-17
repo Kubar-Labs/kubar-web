@@ -59,14 +59,14 @@ export default function KubarProtocol() {
         aside={<LimitDrawing className="block h-auto w-full" />}
         asidePlacement="beside"
       />
-      {/* Where this sits, directly under the hero: the five foundations small, Standing buyers in
+      {/* Where this sits, directly under the hero: the six foundations small, Standing buyers in
           petrol. Its venue's marker links to the footnote under the venue section. */}
       <WhereThisSits
         label={common("whereThisSits")}
         line={t("sits.line")}
         link={{ label: t("sits.link"), href: "/#one-receivable" }}
         foundations={foundationNames}
-        current={3}
+        current={4}
         footnote={{ target: "fn-1", refId: "fnref-1-sits" }}
       />
       <div className="page-container pt-10 lg:pt-12">
@@ -140,6 +140,7 @@ export default function KubarProtocol() {
           parties={t.raw("payment.parties") as string[]}
           payments={t.raw("payment.payments") as string[]}
           routes={t.raw("payment.routes") as [string, string][]}
+          sweep={t("payment.sweep")}
           kubarNote={t("payment.kubarNote")}
           dataPath={story("dataPath")}
           under={t("payment.under")}

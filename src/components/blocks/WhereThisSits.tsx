@@ -9,16 +9,17 @@ import { cn } from "@/lib/utils";
  * "Where this sits" (Figma: Kubar Protocol 309:2495 at 1440, 314:3130 at 768,
  * 314:2805 at 390; NavDhan SDK 310:1331, 320:1567, 320:1440; SPEC section
  * 8). A strip on the inset ground directly under a product page's hero: the
- * five foundations drawn small, the page's own level in petrol, then the
+ * six foundations drawn small, the page's own level in petrol, then the
  * sentence and the link to Home's story. Side by side from 768, stacked
  * below.
  *
- * The stack is Home's (IsoFoundations) at a quarter of its size: four solid
- * blocks, widest at the bottom, and the venue dashed on top. A ruler stands
- * beside it with a tick at each level, and the five names sit on their
- * levels. Rani marks the one element the drawing is about (rule 11.4): the
- * page's level has a rani tick; its block's top face is petrol and its name
- * is ink.
+ * The stack is Home's (IsoFoundations) at a quarter of its size: five solid
+ * blocks, widest at the bottom, and the venue dashed on top (17 Nov: the
+ * drawing 34 taller for distribution, on the footprint the venue had). A
+ * ruler stands beside it with a tick at each level, and the six names sit on
+ * their levels. Rani marks the one element the drawing is about (rule 11.4):
+ * the page's level has a rani tick; its block's top face is petrol and its
+ * name is ink.
  *
  * The names are a real list, top of the stack first, with the page's level
  * as aria-current; the art is aria-hidden. The venue's name carries the
@@ -26,16 +27,16 @@ import { cn } from "@/lib/utils";
  * script.
  *
  * Phones (below 768) draw the stack at 0.55 and name only the page's level;
- * the other four names stay in the list for screen readers (the venue's
- * shows while its marker has keyboard focus), so the strip is at most
- * 400 px tall at 390 x 844.
+ * the other five names stay in the list for screen readers (the venue's
+ * shows while its marker has keyboard focus).
  */
 const CX = 92;
-const WIDTHS = [160, 136, 112, 90, 70]; // the top faces, bottom block to the venue
-const TOPS = [119.81, 92.74, 65.67, 38.02, 9.79]; // each top vertex
-const THICK = 16;
+const WIDTHS = [160, 136, 112, 90, 70, 50]; // the top faces, bottom block to the venue
+const TOPS = [153.81, 126.74, 99.67, 72.02, 43.79, 15.57]; // each top vertex
+// Each block's thickness: the top two are scaled like Home's (Figma 309:2495).
+const THICK = [16, 16, 16, 16, 12.44, 11.43];
 const RULER = 196;
-/** Each level's line: the right corner of its block's top face. 166, 132, 98, 64, 30. */
+/** Each level's line: the right corner of its block's top face. 200, 166, 132, 98, 64, 30. */
 const levelY = (level: number) => TOPS[level] + WIDTHS[level] / (4 * 0.866);
 
 function faces(level: number) {
@@ -43,7 +44,7 @@ function faces(level: number) {
   const rise = half / (2 * 0.866) * 2 * 0.5; // half the diamond's height
   const y = TOPS[level];
   const top = [CX, y], right = [CX + half, y + rise], front = [CX, y + 2 * rise], left = [CX - half, y + rise];
-  const down = ([px, py]: number[]) => [px, py + THICK];
+  const down = ([px, py]: number[]) => [px, py + THICK[level]];
   const pts = (...p: number[][]) => p.map(([px, py]) => `${px.toFixed(2)},${py.toFixed(2)}`).join(" ");
   return {
     top: pts(top, right, front, left),
@@ -67,7 +68,7 @@ export function WhereThisSits({
   label: string;
   line: string;
   link: { label: string; href: string };
-  /** The five names, top of the stack first: the venue, then down to the common standard. */
+  /** The six names, top of the stack first: the venue, then down to the common standard. */
   foundations: string[];
   /** The page's own level, as an index into `foundations`. */
   current: number;
@@ -86,7 +87,7 @@ export function WhereThisSits({
             <div className="sits-art">
               <svg aria-hidden="true" className="block size-full overflow-visible">
                 <g className="sits-scale">
-                  <GroundShadow cx={CX} cy={224} rx={70} ry={16} />
+                  <GroundShadow cx={CX} cy={258} rx={70} ry={16} />
                   <line x1={RULER} x2={RULER} y1={levelY(levels - 1)} y2={levelY(0)} className="stroke-rule-control" strokeWidth={1} vectorEffect="non-scaling-stroke" />
                   {/* Bottom block first, so each block covers the foot of the one under it. */}
                   {[...foundations.keys()].reverse().map((i) => {

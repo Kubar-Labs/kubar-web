@@ -7,9 +7,10 @@ import { cn } from "@/lib/utils";
  * three columns: Insurer and Financier; Trade platform, Kubar (petrol) and
  * Exporter; Exporter's bank and Buyer under Kubar and Exporter. Each card
  * has the party's name and its "Does" sentence from the register. Five
- * agreements are 1.5 px ink lines with a label on each, no arrowheads; three
- * papers a party signs alone are a small tag inside its card; a two-line
- * key sits at the bottom left.
+ * agreements are 1.5 px ink lines with a label on each, no arrowheads; two
+ * papers a party signs alone are a small tag inside its card (the buyer signs
+ * nothing new, so its card has none: 17 Nov); a two-line key sits at the
+ * bottom left.
  *
  * At 1440 the cards are 304 × 204 with 184 between columns and 100 between
  * rows. On narrower laptops the columns share the width (160 between them)
@@ -27,7 +28,7 @@ export type SignsMapCopy = {
   /** Line labels, by agreement. */
   lines: { policy: string; mandate: string; purchase: string; platform: string; services: string };
   /** Tags, by the party that signs alone. */
-  tags: { financier: string; bank: string; buyer: string };
+  tags: { financier: string; bank: string };
   key: string[];
 };
 
@@ -71,7 +72,7 @@ function Across({ touches, children }: { touches: string; children: string }) {
 
 export function SignsMap({ rows, copy, className }: { rows: string[][]; copy: SignsMapCopy; className?: string }) {
   const parties = ORDER.map((key, i) => ({ key, name: rows[i][0], does: rows[i][1] }));
-  const tag = (key: Party) => (key === "financier" || key === "bank" || key === "buyer" ? copy.tags[key] : null);
+  const tag = (key: Party) => (key === "financier" || key === "bank" ? copy.tags[key] : null);
 
   return (
     <PickStage item="[data-party]" from="data-party" className={cn("signs-map", className)}>

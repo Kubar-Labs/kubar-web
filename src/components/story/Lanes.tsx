@@ -36,7 +36,8 @@ const ROWS: (Arrow | Mark)[][] = [
   [{ kind: "data", from: 0, to: 1, label: "s1" }],
   [{ kind: "mark", at: 1, label: "s2" }],
   [{ kind: "data", from: 2, to: 1, label: "s3" }],
-  [{ kind: "data", from: 3, to: 1, label: "s4" }],
+  // 17 Nov: the exporter's bank's no-objection, from its lane to Kubar's (118:1085); it ran from the Buyer's.
+  [{ kind: "data", from: 5, to: 1, label: "s4" }],
   [
     { kind: "data", from: 1, to: 4, label: "s5data", dy: -1 },
     { kind: "money", from: 4, to: 5, label: "s5money", dy: 1 },

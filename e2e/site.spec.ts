@@ -442,6 +442,30 @@ test.describe("Home, complete (build step 3)", () => {
     await expectNoAxeViolations(page);
   });
 
+  test("the lanes: step 04's no-objection runs from the exporter's bank's lane to Kubar's (17 Nov)", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/");
+    const lanes = page.locator(".story-on .lanes");
+    await expect(lanes).toHaveCount(1);
+    const row = await lanes.evaluate((el) => {
+      const lifelines = [...el.querySelectorAll(":scope > span.w-px")].map((line) => line.getBoundingClientRect().left);
+      const four = el.querySelector('.lane-row[data-row="4"]')!;
+      const arrows = [...four.querySelectorAll(":scope > span.h-3")].map((arrow) => {
+        const box = arrow.getBoundingClientRect();
+        return { left: box.left, right: box.right, toKubar: arrow.classList.contains("-scale-x-100"), dashed: arrow.querySelector("line")!.getAttribute("stroke-dasharray") };
+      });
+      return { lifelines, arrows, labels: [...four.querySelectorAll(":scope > span.t-fine")].map((label) => label.textContent) };
+    });
+    expect(row.labels).toEqual(["No-objection"]);
+    expect(row.arrows).toHaveLength(1);
+    const [arrow] = row.arrows;
+    // Columns: Exporter, Kubar, Insurer, Buyer, Financier, Exporter's bank.
+    expect(Math.abs(arrow.left - row.lifelines[1]), "from Kubar's lifeline").toBeLessThanOrEqual(1);
+    expect(Math.abs(arrow.right - row.lifelines[5]), "to the exporter's bank's").toBeLessThanOrEqual(1);
+    expect(arrow.toKubar, "its head at Kubar").toBe(true);
+    expect(arrow.dashed, "a data arrow").toBe("5 3");
+  });
+
   test("contact routes carry their intents and people link out", async ({ page }) => {
     await page.goto("/");
     // The first two routes are cards, each one link; the financial-institution card is petrol.
@@ -473,7 +497,7 @@ test.describe("Home drawings (redraw step 2)", () => {
     await page.goto("/");
     const map = page.locator(".party-map");
     await expect(map.getByRole("heading", { level: 3 })).toHaveText(["Buyers", "Financiers", "Exporters", "Trade platforms", "Kubar", "Credit insurers"]);
-    await expect(map.getByText("Money path: only between banks")).toBeVisible();
+    await expect(map.getByText("Money path: never through Kubar")).toBeVisible();
     await expect(map.getByText("Data path: documents and records")).toBeVisible();
     // Six arrows between the cards at desktop: two solid (money), four dashed (data); none of money touches Kubar.
     const arrows = map.locator("svg:visible .draw-arrow");
@@ -833,7 +857,7 @@ test.describe("Kubar Protocol (redraw step 4)", () => {
     await expect(page.locator("[data-money] .money-art p:visible", { hasText: "Kubar holds none" })).toHaveCSS("background-color", "rgb(255, 255, 255)");
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/products/kubar-protocol");
-    await expect(page.getByRole("row", { name: /Face value, on the due date/ })).toContainText("Financier’s collection account");
+    await expect(page.getByRole("row", { name: /Face value, on the due date/ })).toContainText("Collection account, in the exporter’s name, swept to the financier");
     await expect(page.getByRole("row", { name: /Face value, on the due date/ })).toContainText("Buyer");
   });
 
@@ -1084,7 +1108,7 @@ test.describe("How it works (build step 4)", () => {
     // The documents in their new order, top down.
     await expect(stack.locator("ol > li")).toHaveText([
       "Doc 08Purchase confirmation",
-      "Doc 07Buyer’s acknowledgement",
+      "Doc 07Sweep instruction",
       "Doc 06Credit-insurance cover",
       "Doc 05No-objection",
       "Doc 04Inspection report, where the programme requires one",
@@ -1253,7 +1277,7 @@ test.describe("How it works (build step 5)", () => {
     await expect(map.locator("> div")).toHaveAttribute("aria-hidden", "true");
     await expect(map.locator("[data-party]")).toHaveCount(7);
     await expect(map.locator("[tabindex]")).toHaveCount(0);
-    for (const text of ["The policy", "The mandate", "Purchase agreement", "Agreement with Kubar", "Services agreement", "Programme terms", "Its no-objection", "Its acknowledgement", "A line is an agreement between the two parties it joins.", "A tag is a paper one party signs on its own."]) {
+    for (const text of ["The policy", "The mandate", "Purchase agreement", "Agreement with Kubar", "Services agreement", "Programme terms", "Its no-objection", "A line is an agreement between the two parties it joins.", "A tag is a paper one party signs on its own."]) {
       await expect(map.getByText(text, { exact: true }), text).toBeVisible();
     }
     // 304 × 204 cards, 184 between columns, 100 between rows; Kubar under the Financier, in petrol.
@@ -1523,7 +1547,7 @@ test.describe("About (build step 4)", () => {
     await expect(page.getByText("Planned", { exact: true })).toHaveCount(1);
     await expect(page.getByText("Where we are")).toHaveCount(0);
     await expect(page.getByRole("link", { name: "Email us (partnerships@kubar.tech)" })).toHaveAttribute("href", "mailto:partnerships@kubar.tech");
-    await expect(page.getByRole("link", { name: "Follow one receivable through all five" })).toHaveAttribute("href", "/how-it-works");
+    await expect(page.getByRole("link", { name: "Follow one receivable through all six" })).toHaveAttribute("href", "/how-it-works");
   });
 
   test("build step 7: the foundations are drawn, the cuts are in, and Why GIFT City has its three zones", async ({ page }) => {
@@ -1537,8 +1561,9 @@ test.describe("About (build step 4)", () => {
     }
     const blocks = page.locator(".iso-foundations");
     await expect(blocks.locator("svg").first()).toHaveAttribute("aria-hidden", "true");
-    await expect(blocks.locator("ol > li")).toHaveCount(5);
+    await expect(blocks.locator("ol > li")).toHaveCount(6);
     await expect(blocks.locator("ol > li").first()).toContainText("The venue");
+    await expect(blocks.locator("ol > li").nth(1)).toContainText("Distribution through trade platformsNavDhan SDK, inside the platforms exporters already use");
     await expect(blocks.locator("ol > li").first()).toContainText("Planned");
     // Standing as on Home: the statements beside the heading.
     const heading = (await page.locator("#standing-heading").boundingBox())!;
@@ -1549,7 +1574,7 @@ test.describe("About (build step 4)", () => {
     const art = gift.locator("svg[aria-hidden='true']").first();
     const words = (await gift.getByText(/^GIFT City is India’s international financial services centre/).boundingBox())!;
     expect((await art.boundingBox())!.x).toBeGreaterThan(words.x + words.width);
-    for (const text of ["Onshore India", "The exporter and its own bank", "GIFT City", "A bank’s unit buys the receivable, in foreign currency", "Abroad", "The buyer pays the financier’s account", "The receivable", "Purchase price", "Payment on the due date"]) {
+    for (const text of ["Onshore India", "The exporter and its own bank", "GIFT City", "A bank’s unit buys the receivable, in foreign currency", "Abroad", "The buyer pays the account on its invoice; the payment reaches the financier", "The receivable", "Purchase price", "Payment on the due date"]) {
       await expect(gift.getByText(text, { exact: true }).locator("visible=true"), text).toHaveCount(1);
     }
     for (const width of [1200, 1280, 1366, 768, 390, 375]) {
@@ -1605,7 +1630,7 @@ test.describe("Contact (build step 5)", () => {
     await page.getByLabel("Full name").fill("Arjun Mehta");
     await page.getByLabel("Work email").fill("arjun.mehta@bank.example");
     await page.getByLabel("Organisation").fill("A bank’s IFSC Banking Unit");
-    await page.getByLabel("What would you like to discuss?").fill("We finance rice exporters and would like to understand how a programme would run for us.");
+    await page.getByLabel("What would you like to discuss?").fill("We finance agri-commodity exporters and would like to understand how a programme would run for us.");
   };
   const send = (page: import("@playwright/test").Page) => page.getByRole("button", { name: "Send message" }).click();
 
@@ -1771,7 +1796,7 @@ test.describe("Contact (build step 5)", () => {
       email: "arjun.mehta@bank.example",
       organisation: "A bank’s IFSC Banking Unit",
       role: "Head of trade finance",
-      message: "We finance rice exporters and would like to understand how a programme would run for us.",
+      message: "We finance agri-commodity exporters and would like to understand how a programme would run for us.",
       website: "",
     });
     await expectNoAxeViolations(page);
@@ -2155,8 +2180,9 @@ test.describe("The laptop layout starts at 1024 (SPEC section 7)", () => {
 });
 
 test.describe("Home's story on phones (SPEC section 9)", () => {
-  // The section is at most about 2,750 px at 390 x 844 with all eight cards; each state holds
-  // for a third of the screen; the current card is never under the pinned lanes.
+  // The section is about 2,750 px at 390 x 844 with all eight cards (2,853 as built since the
+  // payment model's words of 17 Nov); each state holds for a third of the screen; the current card
+  // is never under the pinned lanes.
   test("it is short, every state holds for a third of the screen, and the current card stays clear of the lanes", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/");
@@ -2174,7 +2200,7 @@ test.describe("Home's story on phones (SPEC section 9)", () => {
     });
     expect(story.cards).toBe(8);
     expect(story.rows).toBe("22px");
-    expect(story.height).toBeLessThanOrEqual(2820);
+    expect(story.height).toBeLessThanOrEqual(2870);
     // States 2 to 7 hold for their slot; the first and the last hold while the lanes arrive and leave.
     for (const slot of story.slots.slice(1, 7)) expect(slot).toBeGreaterThanOrEqual(844 / 3 - 0.5);
     // Walk the whole story: wherever the lanes are pinned, the current card's top is below them.
@@ -2215,7 +2241,7 @@ test.describe("Picks answer every time (repeated hover, and again after a reload
     await page.goto("/");
     const rows = page.locator(".iso-record ol li");
     const shown = page.locator('.iso-record dl[aria-hidden="true"]');
-    const sources = ["The financier", "The buyer", "The insurer, in the financier’s name", "The exporter’s bank", "The inspection agency", "The carrier", "Indian Customs", "The exporter"];
+    const sources = ["The financier", "The payment provider", "The insurer, in the financier’s name", "The exporter’s bank", "The inspection agency", "The carrier", "Indian Customs", "The exporter"];
     for (const pass of ["first load", "after a reload"]) {
       if (pass === "after a reload") await page.reload();
       await expect(rows).toHaveCount(8);
@@ -2238,21 +2264,47 @@ test.describe("Picks answer every time (repeated hover, and again after a reload
     }
   });
 
-  for (const [width, build] of [[1440, "the frame's"], [1180, "the 1024 to 1199"]] as const) {
-    test(`Home's foundations at ${width} (${build} build): every label marks its block, every round`, async ({ page }) => {
+  // Home's labels stand in the page's flow beside the drawing (step 8.5), About's on their levels;
+  // either way a label's rani edges must land on its own block's top face, the new slab's too.
+  for (const [path, width, build] of [
+    ["/", 1440, "the frame's, with the doglegs"],
+    ["/", 1180, "labels beside it, no leaders"],
+    ["/about", 1440, "the frame's"],
+    ["/about", 1180, "the 1024 to 1199"],
+  ] as const) {
+    test(`${path} foundations at ${width} (${build}): every label marks its own block, the new slab too, every round`, async ({ page }) => {
+      test.setTimeout(60_000);
       await page.setViewportSize({ width, height: 900 });
       await page.emulateMedia({ reducedMotion: "reduce" });
-      await page.goto("/");
+      await page.goto(path);
       const labels = page.locator(".iso-foundations ol > li[tabindex]");
+      // Each label's edge, and the top face of the block on its level, as boxes on the page.
+      const boxes = (i: number) =>
+        labels.nth(i).evaluate((li) => {
+          const level = li.getAttribute("data-level");
+          const edge = [...li.querySelectorAll("svg > .iso-top-edge")].find((e) => e.getClientRects().length > 0)!.getBoundingClientRect();
+          const face = [...document.querySelectorAll(`.iso-foundations .iso-rise[data-level="${level}"] .iso-top`)].find((e) => e.getClientRects().length > 0)!.getBoundingClientRect();
+          return [edge.x, edge.y, edge.width, edge.height, face.x, face.y, face.width, face.height].map(Math.round);
+        });
       for (const pass of ["first load", "after a reload"]) {
         if (pass === "after a reload") await page.reload();
-        await expect(labels).toHaveCount(4);
+        await expect(labels).toHaveCount(5);
+        await expect(labels.nth(0)).toContainText("Distribution through trade platforms");
         for (let round = 1; round <= 3; round++) {
           for (const reverse of [false, true]) {
-            for (let k = 0; k < 4; k++) {
-              const i = reverse ? 3 - k : k;
+            for (let k = 0; k < 5; k++) {
+              const i = reverse ? 4 - k : k;
+              const where = `${pass}, round ${round}, ${reverse ? "up" : "down"}, label ${i}`;
               await labels.nth(i).hover();
-              await expect(labels.nth(i).locator("svg:visible > .iso-top-edge"), `${pass}, round ${round}, ${reverse ? "up" : "down"}, label ${i}`).toHaveCSS("opacity", "1");
+              await expect(labels.nth(i).locator("svg:visible > .iso-top-edge"), where).toHaveCSS("opacity", "1");
+              // Only its own block is marked.
+              await expect(page.locator(".iso-foundations svg:visible > .iso-top-edge").filter({ visible: true }), where).toHaveCount(5);
+              const marked = await page.locator(".iso-foundations svg:visible > .iso-top-edge").evaluateAll((els) => els.filter((e) => getComputedStyle(e).opacity !== "0").length);
+              expect(marked, where).toBe(1);
+              if (round === 1 && !reverse) {
+                const [ex, ey, ew, eh, fx, fy, fw, fh] = await boxes(i);
+                for (const [a, b] of [[ex, fx], [ey, fy], [ew, fw], [eh, fh]]) expect(Math.abs(a - b), `${where}: the edge on its block`).toBeLessThanOrEqual(2);
+              }
             }
           }
         }
@@ -2261,6 +2313,52 @@ test.describe("Picks answer every time (repeated hover, and again after a reload
       }
     });
   }
+
+  test("the sixth slab is drawn without script and with reduced motion, and Home's doglegs end on their titles at 1440", async ({ browser }) => {
+    for (const [path, width, height] of [["/", 1440, 900], ["/", 1180, 820], ["/", 390, 844], ["/about", 1440, 900], ["/about", 1180, 820], ["/about", 390, 844]] as const) {
+      for (const options of [{ javaScriptEnabled: false }, { reducedMotion: "reduce" as const }]) {
+        const context = await browser.newContext({ ...options, viewport: { width, height } });
+        const page = await context.newPage();
+        await page.goto(path);
+        const where = `${path} ${width} ${JSON.stringify(options)}`;
+        const stack = page.locator(".iso-foundations");
+        await stack.evaluate((el) => el.scrollIntoView({ block: "center", behavior: "instant" }));
+        await expect(stack, where).toHaveAttribute("data-phase", "done");
+        // Six labels, top of the stack first; five solid blocks, risen, and the venue's outline drawn.
+        const names = await stack.locator("ol > li > span:not(.t-tag) > span.t-ui-lg").allTextContents();
+        expect(names, where).toEqual([path === "/" ? "The venue, last" : "The venue", "Distribution through trade platforms", "A record of performance", "A clean payment path", "Standing buyers", "A common standard an insurer can price"]);
+        const blocks = stack.locator(".iso-rise").filter({ visible: true });
+        await expect(blocks, where).toHaveCount(5);
+        for (const block of await blocks.all()) {
+          await expect(block, where).toHaveCSS("opacity", "1");
+          await expect(block, where).toHaveCSS("transform", "none");
+        }
+        const slab = stack.locator('.iso-rise[data-level="4"]').filter({ visible: true });
+        const record = stack.locator('.iso-rise[data-level="3"]').filter({ visible: true });
+        // The new slab on the venue's old footprint: 242 wide at full size, one rise above the record.
+        const [s, r] = [(await slab.locator(".iso-top").boundingBox())!, (await record.locator(".iso-top").boundingBox())!];
+        const scale = (await stack.locator("svg[viewBox]").filter({ visible: true }).first().boundingBox())!.width / 560;
+        expect(Math.abs(s.width / scale - 241.8), where).toBeLessThanOrEqual(1.5);
+        expect(s.y, where).toBeLessThan(r.y);
+        for (const mask of await stack.locator(".iso-outline-mask").all()) expect(await mask.evaluate((el) => getComputedStyle(el).strokeDashoffset), where).toBe("0px");
+        if (path === "/" && width === 1440) {
+          // Each leader ends 16 px short of its label, 14 px under the label's top.
+          const ends = await stack.evaluate((el) => {
+            const svg = [...el.querySelectorAll("svg[viewBox]")].find((s) => s.getClientRects().length > 0 && !s.closest("li"))!;
+            const paths = [...svg.querySelectorAll<SVGPathElement>(".iso-leader-line")].filter((p) => getComputedStyle(p).display !== "none");
+            const tops = [...el.querySelectorAll("ol > li")].map((li) => li.getBoundingClientRect());
+            const frame = svg.getBoundingClientRect();
+            return paths.map((p) => {
+              const end = p.getPointAtLength(p.getTotalLength());
+              return { x: frame.left + end.x, y: frame.top + end.y };
+            }).reverse().map((end, i) => [Math.round(tops[i].left - end.x), Math.round(end.y - tops[i].top)]);
+          });
+          expect(ends, where).toEqual(Array(6).fill([16, 14]));
+        }
+        await context.close();
+      }
+    }
+  });
 });
 
 test.describe("Home's hero without script", () => {
@@ -2274,7 +2372,7 @@ test.describe("Home's hero without script", () => {
       await expect(page.locator("html")).not.toHaveAttribute("data-frames");
       const rows = record.locator("ol li");
       await expect(rows).toHaveCount(8);
-      for (const [i, name] of ["Purchase confirmation", "Buyer’s acknowledgement", "Credit-insurance cover", "No-objection", "Inspection report", "Bill of lading", "Shipping bill", "Commercial invoice"].entries()) {
+      for (const [i, name] of ["Purchase confirmation", "Sweep instruction", "Credit-insurance cover", "No-objection", "Inspection report", "Bill of lading", "Shipping bill", "Commercial invoice"].entries()) {
         await expect(rows.nth(i).getByText(name, { exact: true })).toBeVisible();
         await expect(rows.nth(i)).toHaveCSS("opacity", "1");
       }
@@ -2303,9 +2401,11 @@ test.describe("Home's hero without script", () => {
 test.describe("Where this sits (SPEC section 8)", () => {
   const pages = [
     { path: "/products/kubar-protocol", level: "Standing buyers", line: "Part of the institutional exchange Kubar is building. Kubar Protocol gives export receivables their standing buyers." },
-    { path: "/products/navdhan-sdk", level: "A common standard for what qualifies", line: "Part of the institutional exchange Kubar is building. NavDhan SDK brings receivables in to the common standard, from the platforms exporters already use." },
+    { path: "/products/navdhan-sdk", level: "Distribution through trade platforms", line: "Part of the institutional exchange Kubar is building. NavDhan SDK is its distribution: exporters reach the programme from the platforms they already use, and those platforms’ shipment data is one source for each receivable’s record." },
   ] as const;
-  const names = ["The venue, last", "A record of performance", "A clean payment path", "Standing buyers", "A common standard for what qualifies"];
+  const names = ["The venue, last", "Distribution through trade platforms", "A record of performance", "A clean payment path", "Standing buyers", "A common standard an insurer can price"];
+  // At 390 × 844: NavDhan SDK's sentence takes six lines since 17 Nov.
+  const tallest = { "/products/kubar-protocol": 400, "/products/navdhan-sdk": 460 } as const;
 
   for (const { path, level, line } of pages) {
     test(`${path}: the strip sits under the hero on the inset ground, with the page's level marked`, async ({ page }) => {
@@ -2337,9 +2437,9 @@ test.describe("Where this sits (SPEC section 8)", () => {
       // The words, exactly.
       await expect(strip.getByText("Where this sits", { exact: true })).toBeVisible();
       await expect(strip.getByText(line, { exact: true })).toBeVisible();
-      const link = strip.getByRole("link", { name: "Follow one receivable through all five" });
+      const link = strip.getByRole("link", { name: "Follow one receivable through all six" });
       await expect(link).toHaveAttribute("href", "/#one-receivable");
-      // The five names, top of the stack first; the page's level is the current one, in ink.
+      // The six names, top of the stack first; the page's level is the current one, in ink.
       // The venue's carries footnote 1 and no "Planned".
       const items = strip.locator("ol li");
       await expect(items).toHaveText([`${names[0]}¹`, ...names.slice(1)]);
@@ -2359,7 +2459,7 @@ test.describe("Where this sits (SPEC section 8)", () => {
       await expect(strip.locator('ol li[aria-current="true"]')).toHaveText(level);
       const muted = await items.first().evaluate((el) => getComputedStyle(el).color);
       expect(await strip.locator('ol li[aria-current="true"]').evaluate((el) => getComputedStyle(el).color)).not.toBe(muted);
-      // The art: one petrol top face and one rani tick, both for that level; four solid blocks and a dashed venue.
+      // The art: one petrol top face and one rani tick, both for that level; five solid blocks and a dashed venue.
       const art = strip.locator("svg[aria-hidden='true']").first();
       const colours = await page.evaluate(() => {
         const probe = document.createElement("div");
@@ -2373,7 +2473,7 @@ test.describe("Where this sits (SPEC section 8)", () => {
       expect(fills.filter((fill) => fill === colours.petrol)).toHaveLength(1);
       const strokes = await art.locator("line").evaluateAll((els) => els.map((el) => getComputedStyle(el).stroke));
       expect(strokes.filter((stroke) => stroke === colours.rani)).toHaveLength(1);
-      await expect(art.locator("polygon")).toHaveCount(12);
+      await expect(art.locator("polygon")).toHaveCount(15);
       await expect(art.locator("path")).toHaveCount(1);
       // The marked level's tick is level with its name (both measured at once: the page may be scrolling).
       const offset = await strip.evaluate((el, rani) => {
@@ -2388,7 +2488,7 @@ test.describe("Where this sits (SPEC section 8)", () => {
       await expect(page.locator("#one-receivable")).toBeInViewport();
     });
 
-    test(`${path}: side by side from 768 with every name; stacked on phones, at most 400 px, naming only its own level`, async ({ page }) => {
+    test(`${path}: side by side from 768 with every name; stacked on phones, short, naming only its own level`, async ({ page }) => {
       await page.emulateMedia({ reducedMotion: "reduce" });
       for (const [width, height] of [[360, 800], [375, 667], [390, 844], [430, 932], [744, 1133], [768, 1024], [820, 1180], [1024, 768], [1180, 820], [1440, 900]] as const) {
         await page.setViewportSize({ width, height });
@@ -2408,18 +2508,18 @@ test.describe("Where this sits (SPEC section 8)", () => {
           });
         });
         // Every name is in the list at 13 px, for screen readers at every width.
-        expect(report.map((r) => r.size), `${width}`).toEqual([13, 13, 13, 13, 13]);
+        expect(report.map((r) => r.size), `${width}`).toEqual([13, 13, 13, 13, 13, 13]);
         const shown = report.filter((r) => r.shown);
         if (width >= 768) {
-          expect(shown, `${width}: all five names shown`).toHaveLength(5);
+          expect(shown, `${width}: all six names shown`).toHaveLength(6);
           expect(shown.every((r, i) => i === 0 || r.top >= shown[i - 1].bottom - 0.5), `${width}: no name touches the next`).toBe(true);
         } else {
           expect(shown.map((r) => r.current), `${width}: only the page's own level is named`).toEqual([true]);
-          if (width === 390) expect((await strip.boundingBox())!.height, "390 x 844: the strip is at most 400 px tall").toBeLessThanOrEqual(400);
+          if (width === 390) expect((await strip.boundingBox())!.height, `390 x 844: the strip is at most ${tallest[path]} px tall`).toBeLessThanOrEqual(tallest[path]);
         }
         expect(shown.every((r) => r.inside), `${width}: names inside the margin`).toBe(true);
         expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth), `${width}`).toBe(0);
-        expect((await strip.getByRole("link", { name: "Follow one receivable through all five" }).boundingBox())!.height, `${width}: the link on one line`).toBeLessThanOrEqual(26);
+        expect((await strip.getByRole("link", { name: "Follow one receivable through all six" }).boundingBox())!.height, `${width}: the link on one line`).toBeLessThanOrEqual(26);
       }
       // On a phone the venue's name shows while its marker has keyboard focus.
       await page.setViewportSize({ width: 390, height: 844 });
@@ -2437,7 +2537,7 @@ test.describe("Where this sits (SPEC section 8)", () => {
       const strip = plain.locator('section[aria-label="Where this sits"]');
       await expect(strip.locator("ol li")).toHaveText([`${names[0]}¹`, ...names.slice(1)]);
       await expect(strip.getByText(line, { exact: true })).toBeVisible();
-      await expect(strip.getByRole("link", { name: "Follow one receivable through all five" })).toBeVisible();
+      await expect(strip.getByRole("link", { name: "Follow one receivable through all six" })).toBeVisible();
       await expect(strip.locator("svg polygon").first()).toBeVisible();
       await context.close();
       await page.setViewportSize({ width: 390, height: 844 });
@@ -2594,7 +2694,7 @@ test.describe("The foundations stack carries from page to page (SPEC section 12)
     await page.goto("/products/kubar-protocol");
     await page.waitForLoadState("networkidle");
     await clear(page);
-    await page.getByRole("region", { name: "Where this sits" }).getByRole("link", { name: "Follow one receivable through all five" }).click();
+    await page.getByRole("region", { name: "Where this sits" }).getByRole("link", { name: "Follow one receivable through all six" }).click();
     await expect(page).toHaveURL(/\/#one-receivable$/);
     await expect.poll(async () => (await transitions(page)).length).toBeGreaterThan(0);
     await expect.poll(async () => (await transitions(page))[0].after).toEqual([]);
@@ -3163,10 +3263,11 @@ test.describe("The money path (step 8)", () => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto("/how-it-works");
     await expect(art(page)).toHaveAttribute("data-phase", "armed");
-    // Before it plays: the arrows undrawn, their words at 35%, the marks empty.
+    // Before it plays: the arrows undrawn, their words at 35%, the marks empty, the face value's stop hidden.
     await expect(drawing(page).locator(".money-line").first()).toHaveCSS("stroke-dashoffset", "1px");
     await expect(drawing(page).locator(".money-words").first()).toHaveCSS("opacity", "0.35");
     await expect(drawing(page).locator("[data-mark]").first()).toHaveCSS("fill", "rgb(255, 255, 255)");
+    await expect(drawing(page).locator(".money-stop")).toHaveCSS("opacity", "0");
     await art(page).evaluate((el) => el.scrollIntoView({ block: "center", behavior: "instant" }));
     await expect(art(page)).toHaveAttribute("data-phase", "playing");
     for (let i = 0; i < 3; i++) {
@@ -3177,12 +3278,17 @@ test.describe("The money path (step 8)", () => {
       expect((await animations(page, ".money-words")).filter((a) => a.includes(` ${at} `))).toEqual([`money-words ${at} 300 ease`]);
       expect(await animations(page, `[data-mark="${i}"]`)).toEqual([`money-mark ${at + 700} 300 ease`]);
     }
+    // The face value's stop: the ring shows with its arrowhead, its caption with its words, and the
+    // dot runs straight through (its run is the same as the other payments').
+    expect(await animations(page, '[data-pay="1"] .money-stop')).toEqual(["money-show 1780 200 ease"]);
+    await expect(drawing(page).locator(".money-words").nth(1).locator("[data-stop]")).toHaveText("Collection account, in the exporter’s name,swept to the financier");
     // The dot is rani; the arrows are ink.
     await expect(drawing(page).locator(".money-dot").first()).toHaveCSS("fill", "rgb(173, 36, 104)");
     await expect.poll(() => running(page), { timeout: 6000 }).toBe(0);
     for (const line of await drawing(page).locator(".money-line").all()) await expect(line).toHaveCSS("stroke-dashoffset", "0px");
     for (const words of await drawing(page).locator(".money-words").all()) await expect(words).toHaveCSS("opacity", "1");
     for (const mark of await drawing(page).locator("[data-mark]").all()) await expect(mark).toHaveCSS("fill", "rgb(2, 39, 50)");
+    await expect(drawing(page).locator(".money-stop")).toHaveCSS("opacity", "1");
     await expectNoAxeViolations(page);
     // Once played it stays drawn: the narrow layout, and the wide one again, show it still (a tablet turned).
     for (const [width, height] of [[820, 1180], [1440, 900]] as const) {
@@ -3212,12 +3318,25 @@ test.describe("The money path (step 8)", () => {
             .map((a) => Math.round(Number((a.effect as KeyframeEffect).getTiming().delay))),
         );
       });
+    // The face value's stop: its ring's start, while it waits or shows.
+    const stop = () =>
+      art(page).evaluate((el) => {
+        const shown = [...el.children].find((child) => child.getClientRects().length > 0)!;
+        return shown
+          .querySelector(".money-stop")!
+          .getAnimations()
+          .filter((a) => a.playState === "running")
+          .map((a) => Math.round(Number((a.effect as KeyframeEffect).getTiming().delay)));
+      });
     const press = async (n: number, where: string) => {
       await controls.nth(n).click();
       // The payments it replays start again from the beginning, 1.1 s apart; the others don't move.
+      // The stop goes with the face value: hidden again, then shown with its arrowhead.
       const expected = [0, 1, 2].map((i) => (n === 3 ? [80 + i * 1100] : i === n ? [80] : []));
       await expect.poll(moving, { message: where, timeout: 2000 }).toEqual(expected);
+      expect(await stop(), `${where}: the stop`).toEqual(n === 1 ? [680] : n === 3 ? [1780] : []);
       await expect.poll(() => running(page), { message: `${where}: over`, timeout: 5000 }).toBe(0);
+      await expect(drawing(page).locator(".money-stop"), `${where}: the stop shows`).toHaveCSS("opacity", "1");
     };
     for (const pass of ["first load", "after a reload"]) {
       if (pass === "after a reload") await page.reload();
@@ -3263,6 +3382,44 @@ test.describe("The money path (step 8)", () => {
           for (const line of await drawing(page).locator(".money-line").all()) await expect(line, where).toHaveCSS("stroke-dashoffset", "0px");
           for (const head of await drawing(page).locator(".money-head").all()) await expect(head, where).toHaveCSS("opacity", "1");
           for (const mark of await drawing(page).locator("[data-mark]").all()) await expect(mark, where).toHaveCSS("fill", "rgb(2, 39, 50)");
+          // The face value's stop: the ring, white with an ink edge, on its line's midpoint, and its caption.
+          const ring = drawing(page).locator(".money-stop");
+          await expect(ring, where).toHaveCSS("opacity", "1");
+          await expect(ring, where).toHaveCSS("fill", "rgb(255, 255, 255)");
+          await expect(ring, where).toHaveCSS("stroke", "rgb(2, 39, 50)");
+          // (A line has no width or no height, so it is measured in the page.)
+          const centres = await drawing(page).evaluate((el) => {
+            const centre = (node: Element) => { const r = node.getBoundingClientRect(); return [r.x + r.width / 2, r.y + r.height / 2]; };
+            return [centre(el.querySelector('[data-pay="1"] .money-line')!), centre(el.querySelector(".money-stop")!)];
+          });
+          const [[lx, ly], [rx, ry]] = centres;
+          expect(Math.abs(rx - lx) + Math.abs(ry - ly), `${where}: the ring on its line's midpoint`).toBeLessThanOrEqual(1);
+          const dot = (await ring.boundingBox())!;
+          const caption = drawing(page).locator("[data-stop]");
+          await expect(caption, where).toBeVisible();
+          await expect(caption, where).toHaveCSS("opacity", "1");
+          if (width >= 900) {
+            // Centred under the ring, on two lines.
+            const box = (await caption.boundingBox())!;
+            expect(Math.abs(box.x + box.width / 2 - (dot.x + dot.width / 2)), where).toBeLessThanOrEqual(1);
+            expect(box.y, where).toBeGreaterThan(dot.y + dot.height);
+            expect(Math.round(box.height), where).toBe(40);
+          } else {
+            // Three lines under "Face value, on the due date", broken as the prototype breaks them.
+            const lines = await caption.evaluate((el) => {
+              const range = document.createRange();
+              const text = el.firstChild!;
+              const tops = new Map<number, string>();
+              for (let i = 0; i < text.textContent!.length; i++) {
+                range.setStart(text, i);
+                range.setEnd(text, i + 1);
+                const top = Math.round(range.getBoundingClientRect().top);
+                tops.set(top, (tops.get(top) ?? "") + text.textContent![i]);
+              }
+              return [...tops.values()].map((line) => line.trim());
+            });
+            expect(lines, where).toEqual(["Collection account, in the", "exporter’s name, swept to", "the financier"]);
+          }
           await expect(drawing(page).getByText("Kubar holds none", { exact: true }), where).toBeVisible();
           await expect(money(page).locator("[data-replay]").first(), where).toBeHidden();
           expect(await art(page).evaluate((el) => el.getAnimations({ subtree: true }).length), where).toBe(0);
@@ -3277,10 +3434,10 @@ test.describe("The money path (step 8)", () => {
     for (const [path] of pages) {
       await page.goto(path);
       await expect(art(page)).toHaveAttribute("aria-hidden", "true");
-      const table = money(page).getByRole("table", { name: "Three payments move between the buyer, the financier and the exporter’s bank. None touches Kubar." });
+      const table = money(page).getByRole("table", { name: "Three payments move between the buyer, the financier and the exporter’s bank. The buyer’s payment passes through a collection account in the exporter’s name. None touches Kubar." });
       await expect(table.getByRole("row")).toHaveCount(4);
       await expect(table.getByRole("row", { name: /^Purchase price, at purchase/ })).toContainText("Exporter’s bank");
-      await expect(table.getByRole("row", { name: /^Face value/ })).toContainText("Financier’s collection account");
+      await expect(table.getByRole("row", { name: /^Face value/ })).toContainText("Collection account, in the exporter’s name, swept to the financier");
       await expect(money(page).locator(".sr-only > p", { hasText: "Kubar holds none" })).toHaveCount(1);
       await art(page).evaluate((el) => el.scrollIntoView({ block: "center", behavior: "instant" }));
       await expectNoAxeViolations(page);

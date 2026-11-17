@@ -103,6 +103,7 @@ export default function Home() {
         />
         <IsoFoundations
           id="home-foundations"
+          labels="stacked"
           foundations={t.raw("foundations.slabs") as Foundation[]}
           footnote={(suffix) => ({ target: FN_STATUS, refId: `fnref-1-${suffix}` })}
         />

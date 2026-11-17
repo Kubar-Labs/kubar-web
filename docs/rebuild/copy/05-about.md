@@ -13,15 +13,17 @@ Extracted from Figma, About · 1440 (frame 173:6), 13 Nov 2026, in reading order
 [H2] What we’re building.
 (Build step 7, REDRAW-2026-11-14.md section 5: drawn as the isometric foundations from Home, with About's own sentences below and "Planned" as the venue's state word.)
 Foundations stack, built from the bottom up:
-(After step 3, REDRAW-2026-11-14.md section 10: the H3 "Five foundations, built from the bottom up" is cut.)
+(After step 3, REDRAW-2026-11-14.md section 10: the H3 over the blocks is cut.)
+(17 Nov: six foundations, top to bottom; distribution is new, between the venue and the record. Figma 262:1578: the leaders stay straight.)
 [UIL] The venue                               [BodyS] An ITFS for institutional financiers only, with Kubar as its neutral operator¹      [State] Planned (muted; the venue keeps its status word)
+[UIL] Distribution through trade platforms    [BodyS] NavDhan SDK, inside the platforms exporters already use
 [UIL] A record of performance                 [BodyS] The loss history, receivable by receivable
-[UIL] A clean payment path                    [BodyS] Payment matching, with the money moving only between banks
+[UIL] A clean payment path                    [BodyS] Payment matching, with the money never passing through Kubar
 [UIL] Standing buyers                         [BodyS] Programmes: a financier underwrites once and buys every receivable that fits
-[UIL] A common standard for what qualifies    [BodyS] The programme rules and the evidence package
+[UIL] A common standard an insurer can price  [BodyS] The programme rules and the evidence package
 (16 Nov: a sentence above the link.)
-[Body] India is where we start: Indian exports, financed from GIFT City. The same five foundations are built for trade across Asia’s other emerging markets.
-[UI] Follow one receivable through all five   → /how-it-works
+[Body] India is where we start: Indian exports, financed from GIFT City. The same foundations are built for trade across Asia’s other emerging markets.
+[UI] Follow one receivable through all six    → /how-it-works
 (No In build / In preparation labels on the other four rows: removed.)
 
 ## Team  (id="team")
@@ -76,7 +78,7 @@ Programme marks (logo and name, no kind labels from 14 Nov): GIFT IFIH Young Bui
 (Build step 7, section 12 item 4: beside the text, three isometric platforms, each with a title and a line, and three labelled arrows. New strings, Vaibhav, 15 Nov:)
 [UIL] Onshore India                [BodyS] The exporter and its own bank
 [UIL] GIFT City                    [BodyS] A bank’s unit buys the receivable, in foreign currency
-[UIL] Abroad                       [BodyS] The buyer pays the financier’s account
+[UIL] Abroad                       [BodyS] The buyer pays the account on its invoice; the payment reaches the financier
 [Fine] The receivable
 [Fine] Purchase price
 [Fine] Payment on the due date

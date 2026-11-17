@@ -43,13 +43,13 @@ export default function NavdhanSdk() {
         below={<EmbedPicker heading={t("does.heading")} rows={t.raw("does.rows") as string[][]} copy={t.raw("sketch") as SketchCopy} />}
       />
 
-      {/* Where this sits: the five foundations small, the common standard in petrol. */}
+      {/* Where this sits: the six foundations small, distribution through trade platforms in petrol. */}
       <WhereThisSits
         label={common("whereThisSits")}
         line={t("sits.line")}
         link={{ label: t("sits.link"), href: "/#one-receivable" }}
         foundations={foundationNames}
-        current={4}
+        current={1}
         footnote={{ target: "fn-1", refId: "fnref-1-sits" }}
       />
       {/* Footnote ¹, once on the page, for the venue's name in the strip. */}
