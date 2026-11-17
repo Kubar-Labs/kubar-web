@@ -848,7 +848,8 @@
      A payment that plays (.money-run, --at after the start) draws its line in 700 ms,
      shows its head as the line arrives, runs a rani dot along it, brings its words to
      full and fills its mark on Kubar's path. A replay remounts the payment, so its
-     movement starts again from the beginning. */
+     movement starts again from the beginning. Once played it is .money-lit: drawn,
+     with no movement left to restart when the other layout shows (a tablet turned). */
   .money-line {
     fill: none;
     stroke-dasharray: 1;

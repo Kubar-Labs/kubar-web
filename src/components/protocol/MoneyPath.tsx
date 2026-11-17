@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePlayOnce } from "@/lib/usePlayOnce";
 import { cx as cn } from "@/lib/cx";
 
@@ -19,9 +19,11 @@ import { cx as cn } from "@/lib/cx";
  * along it, its words go from 35% to full and its mark on Kubar's path fills
  * (globals.css, .money-run; the order, timing and easing of
  * docs/rebuild/prototypes/motion-pieces.html). Under it, four controls replay
- * one payment or all three. Still (no script, reduced motion, or the drawing
- * already in view): all three arrows drawn, every mark filled; the controls
- * need script and motion, so they are hidden then.
+ * one payment or all three. A payment that has played stays drawn: the other
+ * layout, shown later (a tablet turned), doesn't play it again. Still (no
+ * script, reduced motion, or the drawing already in view): all three arrows
+ * drawn, every mark filled; the controls need script and motion, so they are
+ * hidden then.
  *
  * From 900 px the plates sit in a row (760 × 424, never scaled); below that
  * they stack top to bottom and the arrows run down (320 × 652, the
@@ -30,7 +32,9 @@ import { cx as cn } from "@/lib/cx";
  * sideways. The drawing is hidden from assistive technology: the table of
  * payments (from and to) and "Kubar holds none" stay in the markup for it.
  */
-type Run = { seq: number; at: number } | null;
+// A payment's motion: playing (remounted with its start), lit once it has played (still, whatever the
+// phase, so a drawing shown later, as when a tablet turns, doesn't play again), or following the phase.
+type Run = { seq: number; at: number } | "lit" | null;
 
 // Where everything sits, in each drawing's own pixels.
 type Layout = {
@@ -129,6 +133,7 @@ function Drawing({ layout, parties, payments, kubarNote, dataPath, runs, classNa
   // A payment that plays is remounted (its key), so its movement starts again from the beginning.
   const run = (i: number) => {
     const r = runs[i];
+    if (r === "lit") return { key: `${i}-lit`, className: "money-lit", style: undefined };
     return {
       key: `${i}-${r ? `run-${r.seq}` : "still"}`,
       className: r ? "money-run" : "money-still",
@@ -232,13 +237,27 @@ export function MoneyPath({
   const [ref, phase] = usePlayOnce<HTMLDivElement>(0.45);
   // A replay of one payment or all three; until then the first play, when the drawing is 45% in view.
   const [replays, setReplays] = useState<Run[]>([null, null, null]);
+  const [played, setPlayed] = useState(false);
   const seq = useRef(0);
-  const first = (i: number): Run => (phase === "playing" ? { seq: 0, at: 80 + i * 1100 } : null);
+  const timers = useRef<number[]>([]);
+  // A payment's movement is over 1.1 s after it starts; the first play, after the third.
+  useEffect(() => {
+    if (phase !== "playing") return;
+    const timer = window.setTimeout(() => setPlayed(true), 80 + 2 * 1100 + 1100);
+    return () => window.clearTimeout(timer);
+  }, [phase]);
+  useEffect(() => {
+    const pending = timers.current;
+    return () => pending.forEach((timer) => window.clearTimeout(timer));
+  }, []);
+  const first = (i: number): Run => (phase === "playing" ? (played ? "lit" : { seq: 0, at: 80 + i * 1100 }) : null);
   const runs = replays.map((replay, i) => replay ?? first(i));
   const replay = (from: number, to: number) => {
     seq.current += 1;
     const n = seq.current;
     setReplays((current) => current.map((r, i) => (i >= from && i <= to ? { seq: n, at: 80 + (i - from) * 1100 } : r)));
+    const lit = () => setReplays((current) => current.map((r) => (r && r !== "lit" && r.seq === n ? "lit" : r)));
+    timers.current.push(window.setTimeout(lit, 80 + (to - from) * 1100 + 1100));
   };
   const props = { parties, payments, kubarNote, dataPath, runs };
 

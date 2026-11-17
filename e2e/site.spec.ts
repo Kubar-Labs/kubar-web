@@ -3184,6 +3184,13 @@ test.describe("The money path (step 8)", () => {
     for (const words of await drawing(page).locator(".money-words").all()) await expect(words).toHaveCSS("opacity", "1");
     for (const mark of await drawing(page).locator("[data-mark]").all()) await expect(mark).toHaveCSS("fill", "rgb(2, 39, 50)");
     await expectNoAxeViolations(page);
+    // Once played it stays drawn: the narrow layout, and the wide one again, show it still (a tablet turned).
+    for (const [width, height] of [[820, 1180], [1440, 900]] as const) {
+      await page.setViewportSize({ width, height });
+      await expect(drawing(page).locator(".money-line")).toHaveCount(3);
+      expect(await running(page), `${width}: no replay`).toBe(0);
+      for (const line of await drawing(page).locator(".money-line").all()) await expect(line, `${width}`).toHaveCSS("stroke-dashoffset", "0px");
+    }
   });
 
   test("the controls replay one payment or all three, every time: down, up, three rounds, and after a reload", async ({ page }) => {
