@@ -841,6 +841,118 @@
     transition: opacity var(--duration-hover) var(--ease-standard) calc(var(--draw-delay, 0ms) + var(--duration-write));
   }
 
+  /* The money path (MoneyPath.tsx, step 8), with the order, timing and easing of
+     docs/rebuild/prototypes/motion-pieces.html. Still (the server's render, no script,
+     reduced motion or already in view): every arrow drawn and every mark filled.
+     Armed (below the fold): the arrows undrawn, their words at 35%, the marks empty.
+     A payment that plays (.money-run, --at after the start) draws its line in 700 ms,
+     shows its head as the line arrives, runs a rani dot along it, brings its words to
+     full and fills its mark on Kubar's path. A replay remounts the payment, so its
+     movement starts again from the beginning. */
+  .money-line {
+    fill: none;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+  }
+  .money-dot {
+    opacity: 0;
+  }
+  .money-mark {
+    fill: var(--color-ink);
+    stroke: var(--color-ink);
+  }
+  .money-ground {
+    fill: rgb(2 39 50 / 0.18);
+    filter: blur(6px);
+  }
+  /* Narrower than a 360 px phone (the 320 px reflow check): the narrow drawing at 0.875, so it fits. */
+  @media (max-width: 359.98px) {
+    .money-narrow {
+      zoom: 0.875;
+    }
+  }
+  [data-phase="armed"] .money-still .money-line {
+    stroke-dashoffset: 1;
+  }
+  [data-phase="armed"] .money-still .money-head {
+    opacity: 0;
+  }
+  [data-phase="armed"] .money-words.money-still {
+    opacity: 0.35;
+  }
+  [data-phase="armed"] .money-mark.money-still {
+    fill: var(--color-page);
+    stroke: var(--color-ink-muted);
+  }
+  .money-run .money-line {
+    animation: money-draw 700ms ease var(--at) both;
+  }
+  .money-run .money-head {
+    animation: money-show 200ms ease calc(var(--at) + 600ms) both;
+  }
+  .money-run .money-dot {
+    animation: money-go 750ms ease var(--at) forwards;
+  }
+  .money-words.money-run {
+    animation: money-words 300ms ease var(--at) both;
+  }
+  .money-mark.money-run {
+    animation: money-mark 300ms ease calc(var(--at) + 700ms) both;
+  }
+  @keyframes money-draw {
+    from {
+      stroke-dashoffset: 1;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  @keyframes money-show {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes money-words {
+    from {
+      opacity: 0.35;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes money-go {
+    0% {
+      opacity: 1;
+      transform: translate(0, 0);
+    }
+    90% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      transform: translate(var(--dx), var(--dy));
+    }
+  }
+  @keyframes money-mark {
+    from {
+      fill: var(--color-page);
+      stroke: var(--color-ink-muted);
+    }
+    to {
+      fill: var(--color-ink);
+      stroke: var(--color-ink);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .money-run :is(.money-line, .money-head, .money-dot),
+    :is(.money-words, .money-mark).money-run {
+      animation: none;
+    }
+  }
+
   /* The who-takes-part map: a card under the pointer or focus, or the last
      one tapped, dims the arrows that don't touch it to 30%. PickStage sets
      data-picked to the card's party (a `:has(…:hover)` rule isn't restyled
@@ -1422,11 +1534,11 @@
 /* A list shown in part (Fold.tsx). Unlayered, so it wins over the items' own
    layout utilities. With script (data-js, set before the first paint) the
    folded items wait for the control; without, every item shows and the
-   control is hidden. */
+   control is hidden. The money path's replays need script too. */
 html[data-js] [data-folded] {
   display: none;
 }
-html:not([data-js]) .fold-control {
+html:not([data-js]) :is(.fold-control, .money-controls) {
   display: none;
 }
 

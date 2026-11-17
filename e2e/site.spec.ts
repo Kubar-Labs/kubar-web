@@ -803,11 +803,11 @@ test.describe("Kubar Protocol (redraw step 4)", () => {
       expect(Math.round(loop.width), `${width}: loop at full size`).toBe(760);
       expect(loop.x + loop.width, `${width}: loop inside the page`).toBeLessThanOrEqual(width);
       await expect(page.locator(".programme-loop .loop-card .t-body-sm").first()).toHaveCSS("font-size", "15px");
-      // The payment lanes beside the heading.
+      // The money path beside the heading from 1400, where it has its full 760; below that under it (step 8).
       const heading = await box("#payment-heading");
-      const lanes = await box("[role='img'][aria-label^='Three payments']");
-      expect(lanes.x, `${width}: lanes beside the heading`).toBeGreaterThan(heading.x + heading.width);
-      expect(lanes.y, `${width}: lanes level with the heading`).toBeLessThan(heading.y + heading.height);
+      const money = await box("[data-money] .money-art");
+      if (width >= 1400) expect(money.x, `${width}: money path beside the heading`).toBeGreaterThan(heading.x + heading.width);
+      else expect(money.y, `${width}: money path under the heading`).toBeGreaterThan(heading.y + heading.height);
     }
   });
 
@@ -828,14 +828,11 @@ test.describe("Kubar Protocol (redraw step 4)", () => {
     for (const label of ["Exporters", "Buyers", "Financier", "Cover", "Next"]) {
       await expect(page.locator("dt", { hasText: new RegExp(`^${label}$`) }).last()).toHaveCSS("color", muted);
     }
-    // At 1440 the note sits on its grey chip.
-    await expect(page.locator("[role='img'][aria-label^='Three payments'] p", { hasText: "Kubar holds none" })).toHaveClass(/bg-accent-soft/);
-    // Below 1200: "Kubar" with the chip, and "Buyer → Financier’s collection account".
+    // The money path's note sits on Kubar's path, on a white chip; the table that assistive technology
+    // reads gives each payment its from and to (step 8).
+    await expect(page.locator("[data-money] .money-art p:visible", { hasText: "Kubar holds none" })).toHaveCSS("background-color", "rgb(255, 255, 255)");
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/products/kubar-protocol");
-    const kubarRow = page.locator("p", { has: page.locator("span", { hasText: "Kubar holds none" }) }).filter({ hasText: /^Kubar/ });
-    await expect(kubarRow.first()).toBeVisible();
-    await expect(kubarRow.first()).not.toContainText("Kubar:");
     await expect(page.getByRole("row", { name: /Face value, on the due date/ })).toContainText("Financier’s collection account");
     await expect(page.getByRole("row", { name: /Face value, on the due date/ })).toContainText("Buyer");
   });
@@ -2801,8 +2798,10 @@ test.describe("Pacing (SPEC sections 7 and 8, 16 Nov)", () => {
       await expect(answer).toBeVisible();
       await expect(answer).toBeInViewport();
       await expect(page.getByRole("button", { name: "Show all 11 questions" })).toHaveCount(0);
-      // And one followed after the page has loaded.
+      // And one followed after the page has loaded. Once it has hydrated: until then Next's router
+      // replaces the address with the one the page loaded at, dropping a hash set in between.
       await page.goto("/products/kubar-protocol");
+      await expect(page.locator("[data-money] .money-art")).toHaveAttribute("data-phase", "armed");
       await expect(page.locator("#question-6")).toBeHidden();
       await page.evaluate(() => (location.hash = "#question-6"));
       await expect(page.locator("#question-6")).toBeVisible();
@@ -3093,4 +3092,191 @@ test.describe("\"cross-border\" never breaks at its hyphen in running copy (17 N
       }
     });
   }
+});
+
+test.describe("The money path (step 8)", () => {
+  const pages = [
+    ["/products/kubar-protocol", "payment-heading"],
+    ["/how-it-works", "money-heading"],
+  ] as const;
+  const money = (page: Page) => page.locator("[data-money]");
+  const art = (page: Page) => money(page).locator(".money-art");
+  const drawing = (page: Page) => art(page).locator("> div").filter({ visible: true });
+  // The movement of one payment, or of its mark, as CSS animations: name, delay and duration in ms, easing.
+  const animations = (page: Page, selector: string) =>
+    art(page).evaluate((el, selector) => {
+      const shown = [...el.children].find((child) => child.getClientRects().length > 0)!;
+      return [...shown.querySelectorAll(selector)].flatMap((node) =>
+        node
+          .getAnimations({ subtree: true })
+          .filter((a) => a.playState === "running" || a.playState === "finished")
+          .map((a) => {
+            // A CSS animation's timing function is on its keyframes, not its effect.
+            const effect = a.effect as KeyframeEffect;
+            const timing = effect.getTiming();
+            return `${(a as CSSAnimation).animationName} ${Math.round(Number(timing.delay))} ${Math.round(Number(timing.duration))} ${effect.getKeyframes()[0].easing}`;
+          }),
+      );
+    }, selector);
+  const running = (page: Page) =>
+    art(page).evaluate((el) => el.getAnimations({ subtree: true }).filter((a) => a.playState === "running").length);
+
+  for (const [path, heading] of pages) {
+    test(`${path}: the plates in a row from 900, stacked below it; never sideways`, async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      for (const [width, height] of [[1440, 900], [1366, 768], [1180, 820], [1024, 768], [900, 800], [899, 800], [820, 1180], [768, 1024], [430, 932], [390, 844], [375, 667], [360, 800]] as const) {
+        await page.setViewportSize({ width, height });
+        await page.goto(path);
+        const box = (await drawing(page).boundingBox())!;
+        const names = await drawing(page).locator("p.t-ui-lg").evaluateAll((els) => els.map((el) => { const r = el.getBoundingClientRect(); return { text: el.textContent, x: r.x + r.width / 2, y: r.y }; }));
+        expect(names.map((n) => n.text), `${width}`).toEqual(["Buyer, Singapore", "Financier", "Exporter’s bank"]);
+        if (width >= 900) {
+          expect(Math.round(box.width), `${width}: 760 wide`).toBe(760);
+          expect(new Set(names.map((n) => Math.round(n.y))).size, `${width}: the plates in a row`).toBe(1);
+          expect(names[0].x < names[1].x && names[1].x < names[2].x, `${width}: buyer, financier, exporter's bank`).toBe(true);
+          const head = (await page.locator(`#${heading}`).boundingBox())!;
+          if (path === "/products/kubar-protocol" && width >= 1400) {
+            expect(box.x, `${width}: beside the heading`).toBeGreaterThan(head.x + head.width);
+            if (width === 1440) expect(Math.round(box.x)).toBe(560);
+          } else {
+            expect(box.y, `${width}: under the heading`).toBeGreaterThan(head.y + head.height);
+            const content = await page.evaluate(() => document.querySelector("main .page-container")!.getBoundingClientRect());
+            expect(Math.abs(box.x + box.width / 2 - (content.x + content.width / 2)), `${width}: centred in the section`).toBeLessThanOrEqual(1);
+          }
+        } else {
+          expect(Math.round(box.width), `${width}: the narrow drawing`).toBe(320);
+          expect(names[0].y < names[1].y && names[1].y < names[2].y, `${width}: stacked top to bottom`).toBe(true);
+          expect(Math.abs(box.x + box.width / 2 - width / 2), `${width}: centred`).toBeLessThanOrEqual(1);
+        }
+        // Every word inside the drawing; nothing past the screen.
+        const outside = await drawing(page).evaluate((el) => {
+          const frame = el.getBoundingClientRect();
+          return [...el.querySelectorAll("p")].filter((p) => { const r = p.getBoundingClientRect(); return r.left < frame.left - 0.5 || r.right > frame.right + 0.5 || r.bottom > frame.bottom + 0.5; }).map((p) => p.textContent);
+        });
+        expect(outside, `${width}`).toEqual([]);
+        expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth), `${width}`).toBe(0);
+      }
+    });
+  }
+
+  test("it plays once at 45% in view: payment 1, then 2, then 3, 1.1 s apart, and ends drawn", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/how-it-works");
+    await expect(art(page)).toHaveAttribute("data-phase", "armed");
+    // Before it plays: the arrows undrawn, their words at 35%, the marks empty.
+    await expect(drawing(page).locator(".money-line").first()).toHaveCSS("stroke-dashoffset", "1px");
+    await expect(drawing(page).locator(".money-words").first()).toHaveCSS("opacity", "0.35");
+    await expect(drawing(page).locator("[data-mark]").first()).toHaveCSS("fill", "rgb(255, 255, 255)");
+    await art(page).evaluate((el) => el.scrollIntoView({ block: "center", behavior: "instant" }));
+    await expect(art(page)).toHaveAttribute("data-phase", "playing");
+    for (let i = 0; i < 3; i++) {
+      const at = 80 + i * 1100;
+      expect(await animations(page, `[data-pay="${i}"] .money-line`), `payment ${i + 1}`).toEqual([`money-draw ${at} 700 ease`]);
+      expect(await animations(page, `[data-pay="${i}"] .money-dot`)).toEqual([`money-go ${at} 750 ease`]);
+      expect(await animations(page, `[data-pay="${i}"] .money-head`)).toEqual([`money-show ${at + 600} 200 ease`]);
+      expect((await animations(page, ".money-words")).filter((a) => a.includes(` ${at} `))).toEqual([`money-words ${at} 300 ease`]);
+      expect(await animations(page, `[data-mark="${i}"]`)).toEqual([`money-mark ${at + 700} 300 ease`]);
+    }
+    // The dot is rani; the arrows are ink.
+    await expect(drawing(page).locator(".money-dot").first()).toHaveCSS("fill", "rgb(173, 36, 104)");
+    await expect.poll(() => running(page), { timeout: 6000 }).toBe(0);
+    for (const line of await drawing(page).locator(".money-line").all()) await expect(line).toHaveCSS("stroke-dashoffset", "0px");
+    for (const words of await drawing(page).locator(".money-words").all()) await expect(words).toHaveCSS("opacity", "1");
+    for (const mark of await drawing(page).locator("[data-mark]").all()) await expect(mark).toHaveCSS("fill", "rgb(2, 39, 50)");
+    await expectNoAxeViolations(page);
+  });
+
+  test("the controls replay one payment or all three, every time: down, up, three rounds, and after a reload", async ({ page }) => {
+    test.setTimeout(180_000);
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/products/kubar-protocol");
+    const controls = money(page).locator("[data-replay]");
+    await expect(controls).toHaveText(["1Purchase price", "2Face value", "3Deferred purchase price", "All three"]);
+    for (const control of await controls.locator(".t-code").all()) await expect(control).toHaveCSS("font-family", /mono/i);
+    // Each payment's running line animations, as "delay".
+    const moving = () =>
+      art(page).evaluate((el) => {
+        const shown = [...el.children].find((child) => child.getClientRects().length > 0)!;
+        return [0, 1, 2].map((i) =>
+          shown
+            .querySelector(`[data-pay="${i}"] .money-line`)!
+            .getAnimations()
+            .filter((a) => a.playState === "running")
+            .map((a) => Math.round(Number((a.effect as KeyframeEffect).getTiming().delay))),
+        );
+      });
+    const press = async (n: number, where: string) => {
+      await controls.nth(n).click();
+      // The payments it replays start again from the beginning, 1.1 s apart; the others don't move.
+      const expected = [0, 1, 2].map((i) => (n === 3 ? [80 + i * 1100] : i === n ? [80] : []));
+      await expect.poll(moving, { message: where, timeout: 2000 }).toEqual(expected);
+      await expect.poll(() => running(page), { message: `${where}: over`, timeout: 5000 }).toBe(0);
+    };
+    for (const pass of ["first load", "after a reload"]) {
+      if (pass === "after a reload") await page.reload();
+      await art(page).evaluate((el) => el.scrollIntoView({ block: "center", behavior: "instant" }));
+      await expect.poll(() => running(page), { timeout: 6000 }).toBe(0);
+      for (let round = 1; round <= 3; round++) {
+        for (const n of [0, 1, 2, 3, 3, 2, 1, 0]) await press(n, `${pass}, round ${round}, control ${n + 1}`);
+      }
+    }
+  });
+
+  test("by keyboard: each control is a stop and Enter replays", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/how-it-works");
+    await art(page).evaluate((el) => el.scrollIntoView({ block: "center", behavior: "instant" }));
+    await expect.poll(() => running(page), { timeout: 6000 }).toBe(0);
+    const controls = money(page).locator("[data-replay]");
+    await controls.first().focus();
+    for (const n of [1, 2, 3]) {
+      await page.keyboard.press("Tab");
+      await expect(controls.nth(n)).toBeFocused();
+    }
+    await page.keyboard.press("Enter");
+    await expect.poll(async () => (await animations(page, ".money-line")).length).toBe(3);
+    // On a phone the controls wrap inside the screen, centred, each at least 44 px tall.
+    for (const control of await controls.all()) {
+      const box = (await control.boundingBox())!;
+      expect(box.height).toBeGreaterThanOrEqual(44);
+      expect(box.x + box.width).toBeLessThanOrEqual(390 - 20 + 0.5);
+    }
+  });
+
+  for (const [path] of pages) {
+    test(`${path}: still with reduced motion, and without script: every arrow drawn, every mark filled, no controls`, async ({ browser }) => {
+      for (const options of [{ reducedMotion: "reduce" as const }, { javaScriptEnabled: false }]) {
+        for (const [width, height] of [[1440, 900], [390, 844]] as const) {
+          const context = await browser.newContext({ ...options, viewport: { width, height } });
+          const page = await context.newPage();
+          await page.goto(path);
+          await art(page).evaluate((el) => el.scrollIntoView({ block: "center", behavior: "instant" }));
+          const where = `${JSON.stringify(options)} at ${width}`;
+          await expect(art(page), where).toHaveAttribute("data-phase", "done");
+          for (const line of await drawing(page).locator(".money-line").all()) await expect(line, where).toHaveCSS("stroke-dashoffset", "0px");
+          for (const head of await drawing(page).locator(".money-head").all()) await expect(head, where).toHaveCSS("opacity", "1");
+          for (const mark of await drawing(page).locator("[data-mark]").all()) await expect(mark, where).toHaveCSS("fill", "rgb(2, 39, 50)");
+          await expect(drawing(page).getByText("Kubar holds none", { exact: true }), where).toBeVisible();
+          await expect(money(page).locator("[data-replay]").first(), where).toBeHidden();
+          expect(await art(page).evaluate((el) => el.getAnimations({ subtree: true }).length), where).toBe(0);
+          await context.close();
+        }
+      }
+    });
+  }
+
+  test("assistive technology reads the table, not the drawing", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    for (const [path] of pages) {
+      await page.goto(path);
+      await expect(art(page)).toHaveAttribute("aria-hidden", "true");
+      const table = money(page).getByRole("table", { name: "Three payments move between the buyer, the financier and the exporter’s bank. None touches Kubar." });
+      await expect(table.getByRole("row")).toHaveCount(4);
+      await expect(table.getByRole("row", { name: /^Purchase price, at purchase/ })).toContainText("Exporter’s bank");
+      await expect(table.getByRole("row", { name: /^Face value/ })).toContainText("Financier’s collection account");
+      await expect(money(page).locator(".sr-only > p", { hasText: "Kubar holds none" })).toHaveCount(1);
+      await art(page).evaluate((el) => el.scrollIntoView({ block: "center", behavior: "instant" }));
+      await expectNoAxeViolations(page);
+    }
+  });
 });

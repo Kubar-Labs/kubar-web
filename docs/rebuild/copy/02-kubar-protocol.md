@@ -111,7 +111,7 @@ Purchase and settlement | You and the exporter’s bank | Payment references; th
 
 ## The payment path
 [H2] The money moves only between banks.
-Drawing (component "Money path", 120:1167; shared with How it works): four parties, Kubar filled and off to the side, solid money arrows only between the three banks' columns.
+(17 Nov, next build step 8: the money path, Figma 325:2486, shared with How it works. Three plates, Buyer, Singapore; Financier; Exporter’s bank; the three payments as arrows above them, numbered 1 to 3; Kubar below on its dashed data path, labelled as on the stories, with a mark for each payment and "Kubar holds none". Below 900 px the plates stack and the arrows run down, as in docs/rebuild/prototypes/motion-pieces.html.)
 [UI] Kubar
 [UI] Buyer, Singapore
 [UI] Financier
@@ -124,12 +124,12 @@ Drawing (component "Money path", 120:1167; shared with How it works): four parti
 [UI] Face value
 [UI] Deferred purchase price
 [UI] All three
-[Tag] Kubar holds none                             (under Kubar, on its grey chip; was "No account, no payment, no release")
-Below 1200, the three payments as rows, each with its from and to (Figma 120:1141), then Kubar with the chip:
+[Tag] Data path · Kubar                           (17 Nov: over Kubar's dashed path)
+[Tag] Kubar holds none                             (17 Nov: at the end of Kubar's path, on a white chip; was "No account, no payment, no release")
+(17 Nov: in the table that assistive technology reads in place of the drawing, each payment with its from and to:)
 [Fine] Financier → Exporter’s bank
 [Fine] Buyer → Financier’s collection account
 [Fine] Financier → Exporter’s bank
-[Fine] Kubar   [Fine] Kubar holds none     (on the grey chip)
 [BodyS] Every payment carries the receivable’s reference, and Kubar matches each one to its receivable.
 
 ## The loss history

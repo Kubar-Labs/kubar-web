@@ -79,7 +79,7 @@ The record they lock into:
 
 ## The money path
 [H2] Where the money moves.
-Same drawing as Kubar Protocol (component "Money path", 120:1167):
+Same drawing as Kubar Protocol (17 Nov, next build step 8: the money path, Figma 333:2868, centred in the section):
 [UI] Kubar · Buyer, Singapore · Financier · Exporter’s bank
 [BodyS] Purchase price, at purchase (90% of face)
 [BodyS] Face value, on the due date
@@ -89,8 +89,9 @@ Same drawing as Kubar Protocol (component "Money path", 120:1167):
 [UI] Face value
 [UI] Deferred purchase price
 [UI] All three
-[Tag] Kubar holds none                 (was "No account, no payment, no release")
-Below 1200, the three payments as rows, each with its from and to (Figma 120:1141), then Kubar with the chip:
+[Tag] Data path · Kubar               (17 Nov: over Kubar's dashed path)
+[Tag] Kubar holds none                 (was "No account, no payment, no release"; 17 Nov: at the end of Kubar's path)
+(17 Nov: in the table that assistive technology reads in place of the drawing, each payment with its from and to:)
 [Fine] Financier → Exporter’s bank
 [Fine] Buyer → Financier’s collection account
 [Fine] Financier → Exporter’s bank

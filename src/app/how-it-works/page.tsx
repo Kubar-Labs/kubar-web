@@ -39,6 +39,8 @@ export default function HowItWorks() {
   const t = useTranslations("howItWorks");
   const footnotes = useTranslations("footnotes");
   const common = useTranslations("common");
+  // The money path's data path is labelled as on the stories ("Data path · Kubar").
+  const story = useTranslations("story");
   const states = t.raw("rail.states") as LedgerState[];
   const evidence = t.raw("evidence") as EvidenceCopy;
   const routes = t.raw("next.routes") as { tag: string; label: string; href: string }[];
@@ -90,14 +92,16 @@ export default function HowItWorks() {
 
       <Section id="money" labelledBy="money-heading" className="flex flex-col gap-10 lg:gap-16">
         <SectionHead id="money-heading" heading={t("money.heading")} layout="wide" />
+        {/* Centred in the section (Figma 333:2868). */}
         <MoneyPath
-          wide
           parties={t.raw("money.parties") as string[]}
           payments={t.raw("money.payments") as string[]}
           routes={t.raw("money.routes") as [string, string][]}
           kubarNote={t("money.kubarNote")}
+          dataPath={story("dataPath")}
           under={t("money.under")}
           columns={t.raw("money.columns") as { payment: string; from: string; to: string }}
+          controls={t.raw("money.controls") as string[]}
           alt={t("money.alt")}
         />
       </Section>

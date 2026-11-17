@@ -45,6 +45,8 @@ export default function KubarProtocol() {
   const t = useTranslations("kubarProtocol");
   const footnotes = useTranslations("footnotes");
   const common = useTranslations("common");
+  // The money path's data path is labelled as on the stories ("Data path · Kubar").
+  const story = useTranslations("story");
   const foundationNames = (useTranslations("home").raw("foundations.slabs") as { name: string }[]).map((slab) => slab.name);
 
   return (
@@ -128,16 +130,21 @@ export default function KubarProtocol() {
         <BuyerLimit className="lg:ml-[min(300px,calc(100%-660px))] xl:ml-[clamp(300px,calc(100%-800px),480px)]" labels={t.raw("insurance.labels") as [string, string, string]} />
       </Section>
 
-      <Section labelledBy="payment-heading" ground="inset" className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-12 xl:gap-20">
-        <SectionHead id="payment-heading" heading={t("payment.heading")} layout="stacked" />
+      {/* The heading beside the drawing from 1400, where the drawing has its full 760 (Figma 325:2486);
+          below that the heading runs across the top and the drawing sits under it, centred, as on
+          How it works. */}
+      <Section labelledBy="payment-heading" ground="inset" className="flex flex-col gap-10 lg:gap-16 min-[1400px]:flex-row min-[1400px]:items-start min-[1400px]:gap-20">
+        <SectionHead id="payment-heading" heading={t("payment.heading")} layout="stacked" className="lg:w-auto xl:w-auto min-[1400px]:w-[400px]" />
         <MoneyPath
-          className="min-w-0 flex-1"
+          className="min-[1400px]:mx-0"
           parties={t.raw("payment.parties") as string[]}
           payments={t.raw("payment.payments") as string[]}
           routes={t.raw("payment.routes") as [string, string][]}
           kubarNote={t("payment.kubarNote")}
+          dataPath={story("dataPath")}
           under={t("payment.under")}
           columns={t.raw("payment.columns") as { payment: string; from: string; to: string }}
+          controls={t.raw("payment.controls") as string[]}
           alt={t("payment.alt")}
         />
       </Section>
