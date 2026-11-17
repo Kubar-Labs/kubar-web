@@ -759,10 +759,11 @@ test.describe("Kubar Protocol (redraw step 4)", () => {
     await expect(page.locator("#fn-1")).toHaveCount(1);
     await expect(page.getByText("Planned", { exact: true })).toHaveCount(1);
     // Eleven questions (four shown until "Show all 11 questions"), the two halves of "How a
-    // programme runs" and the five parties of "Who holds what".
-    await expect(page.getByRole("heading", { level: 3 })).toHaveCount(11);
+    // programme runs" and the picked institution's role (step 9: Who holds what is a pick, whose
+    // party names are buttons; the other roles wait out of sight).
+    await expect(page.getByRole("heading", { level: 3 })).toHaveCount(7);
     await page.getByRole("button", { name: "Show all 11 questions" }).click();
-    await expect(page.getByRole("heading", { level: 3 })).toHaveCount(18);
+    await expect(page.getByRole("heading", { level: 3 })).toHaveCount(14);
   });
 
   test("redraw: the limit drawing, the sheet marked An example, the loop, the holders and the corridor", async ({ page }) => {
@@ -793,8 +794,8 @@ test.describe("Kubar Protocol (redraw step 4)", () => {
     // A card only raises: a tap or click focuses it, Tab skips it.
     const card = loop.locator(".loop-card").nth(2);
     await expect(card).toHaveAttribute("tabindex", "-1");
-    // Who holds what: the financier is the petrol card.
-    await expect(page.locator('[data-ground="petrol"]').filter({ hasText: "You, the financier" })).toHaveCount(1);
+    // Who holds what: a pick since step 9, the financier picked on load (its cards stand in without script).
+    await expect(page.locator('[data-pick="holds"] [aria-pressed="true"]')).toHaveText("You, the financier");
     // Programme 1: Next in a dashed box; the venue has no numbers.
     await expect(page.locator("dl.border-dashed")).toContainText("Chemicals and pharmaceutical formulations");
     await expect(page.locator("section", { has: page.getByRole("heading", { name: "The venue comes last." }) }).locator(".t-code")).toHaveCount(0);
@@ -916,7 +917,8 @@ test.describe("Kubar Protocol (redraw step 4)", () => {
     await loss.scrollIntoViewIfNeeded();
     await expect(loss).toHaveAttribute("data-phase", "playing");
     await expect(loss.locator(".loss-settle")).toHaveCSS("transform", "none");
-    // Insurance: the lead stays, the box sits under it with three labels and no movement.
+    // Insurance: the lead stays, the box sits under it with three labels; it plays once in view (step 9),
+    // without the hero's settle on load.
     const insurance = page.locator("section", { has: page.locator("#insurance-heading") });
     await expect(insurance.getByText(/^The credit-insurance policy is yours/)).toBeVisible();
     await expect(insurance.locator("ul > li")).toHaveText(["An approved buyer limit", "Headroom", "Receivables bought"]);
@@ -2354,6 +2356,12 @@ test.describe("Picks answer every time (repeated hover, and again after a reload
             }).reverse().map((end, i) => [Math.round(tops[i].left - end.x), Math.round(end.y - tops[i].top)]);
           });
           expect(ends, where).toEqual(Array(6).fill([16, 14]));
+          // The venue's leader is dashed, 1 px, dash 6 5, in ink, like its outline (step 9; 246:3160 corrected).
+          const venue = stack.locator("svg:visible .iso-leader-line.is-dashed");
+          await expect(venue, where).toHaveCount(1);
+          await expect(venue, where).toHaveCSS("stroke-dasharray", "6px, 5px");
+          await expect(venue, where).toHaveCSS("stroke", "rgb(2, 39, 50)");
+          await expect(venue, where).toHaveCSS("stroke-width", "1px");
         }
         await context.close();
       }
@@ -2713,18 +2721,21 @@ test.describe("A page change opens the new page at its top", () => {
     await page.waitForLoadState("networkidle");
     await page.evaluate(() => window.scrollTo({ top: 5000, behavior: "instant" }));
     await page.evaluate(() => {
-      const w = window as unknown as { __frames: string[] };
+      const w = window as unknown as { __frames: string[]; __framesDone: boolean };
       w.__frames = [];
+      w.__framesDone = false;
       const start = performance.now();
       const tick = () => {
         w.__frames.push(`${location.pathname} ${Math.round(scrollY)}`);
         if (performance.now() - start < 700) requestAnimationFrame(tick);
+        else w.__framesDone = true;
       };
       requestAnimationFrame(tick);
     });
     await page.locator("header").getByRole("link", { name: "Contact", exact: true }).click();
     await expect(page).toHaveURL(/\/contact$/);
-    await expect.poll(() => page.evaluate(() => (window as unknown as { __frames: string[] }).__frames.length), { timeout: 5000 }).toBeGreaterThan(30);
+    // The 700 ms of frames recorded, however many the machine drew (a busy run draws fewer).
+    await expect.poll(() => page.evaluate(() => (window as unknown as { __framesDone: boolean }).__framesDone), { timeout: 5000 }).toBe(true);
     const frames = await page.evaluate(() => (window as unknown as { __frames: string[] }).__frames);
     const onContact = frames.filter((f) => f.startsWith("/contact "));
     expect(onContact.length).toBeGreaterThan(0);
@@ -3441,6 +3452,374 @@ test.describe("The money path (step 8)", () => {
       await expect(money(page).locator(".sr-only > p", { hasText: "Kubar holds none" })).toHaveCount(1);
       await art(page).evaluate((el) => el.scrollIntoView({ block: "center", behavior: "instant" }));
       await expectNoAxeViolations(page);
+    }
+  });
+});
+
+test.describe("Kubar Protocol picks and motion (step 9)", () => {
+  const KP = "/products/kubar-protocol";
+
+  // Who holds what: each party's chips (the brief's map, the proceeds since 17 Nov) and its two sentences.
+  const parties = [
+    { name: "You, the financier", held: ["The receivable", "The proceeds", "The insurance policy", "The buyer’s credit risk"], not: ["Recourse to the exporter for the buyer’s credit"], holds: "The receivable and its proceeds, the insurance policy and the buyer’s credit risk", doesnt: "Recourse to the exporter for the buyer’s credit" },
+    { name: "The insurer", held: ["The buyer’s credit risk"], not: ["Disputes, returns, set-off and fraud"], holds: "The buyer’s credit risk on the covered share", doesnt: "Dispute or fraud risk" },
+    { name: "The exporter", held: ["Disputes, returns, set-off and fraud"], not: ["The receivable"], holds: "Disputes, returns, set-off and fraud on its own trades", doesnt: "The receivable, once sold" },
+    { name: "The exporter’s bank", held: ["The relationship with the exporter"], not: ["The receivable"], holds: "Its relationship with the exporter", doesnt: "The receivables sold" },
+    { name: "Kubar", held: ["Origination, the evidence package, servicing and reporting"], not: ["The proceeds", "The buyer’s credit risk"], holds: "Origination, the evidence package, servicing and reporting", doesnt: "Money or credit risk" },
+  ];
+  const institutions = [
+    ["Banks’ units at GIFT City (IFSC Banking Units)", "Programme financier: set a limit and buy every receivable that fits"],
+    ["IFSC finance companies and factors", "Programme financier; later, a lane for smaller receivables held on a finance company’s balance sheet"],
+    ["Banks, factors and finance companies abroad", "Bid for programmes on Kubar’s own venue once it is registered¹, with no entity at GIFT City, if they meet its admission rules"],
+    ["Credit insurers", "Cover the buyers in the financier’s name, with the evidence behind every receivable and a loss history over time"],
+    ["Funds", "Later, buying receivables from financiers"],
+  ];
+  const holdsList = (page: Page) => page.locator('[data-pick="holds"]');
+  const fitList = (page: Page) => page.locator('[data-pick="fit"]');
+  const holdsPick = (page: Page) => holdsList(page).locator("xpath=..");
+  const fitPick = (page: Page) => fitList(page).locator("xpath=..");
+  const party = (page: Page, name: string) => holdsList(page).getByRole("button", { name, exact: true });
+  const institution = (page: Page, name: string) => fitList(page).getByRole("button", { name, exact: true });
+
+  /** The chips by state, and the sentences on show. */
+  const board = (page: Page) =>
+    holdsPick(page).evaluate((el) => {
+      const chips = [...el.querySelectorAll<HTMLElement>(".hold-chip")];
+      const of = (state: string) => chips.filter((chip) => chip.dataset.state === state).map((chip) => chip.textContent);
+      const shown = [...el.querySelectorAll("dl")].find((dl) => getComputedStyle(dl).visibility === "visible")!;
+      return { held: of("held"), not: of("not"), say: [...shown.querySelectorAll("dd")].map((dd) => dd.textContent) };
+    });
+  async function expectParty(page: Page, i: number, where: string) {
+    const p = parties[i];
+    await expect(party(page, p.name), where).toHaveAttribute("aria-pressed", "true");
+    await expect(holdsList(page).locator('[aria-pressed="true"]'), where).toHaveCount(1);
+    expect(await board(page), where).toEqual({ held: p.held, not: p.not, say: [p.holds, p.doesnt] });
+  }
+  async function expectInstitution(page: Page, i: number, where: string) {
+    await expect(institution(page, institutions[i][0]), where).toHaveAttribute("aria-pressed", "true");
+    await expect(fitList(page).locator('[aria-pressed="true"]'), where).toHaveCount(1);
+    const shown = fitPick(page).locator("h3").filter({ visible: true });
+    await expect(shown, where).toHaveCount(1);
+    await expect(shown, where).toHaveText(institutions[i][1]);
+  }
+
+  test("who holds what, at 1440 as the frame draws it: the financier picked on load, its four held in petrol and recourse outlined in rani", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(KP);
+    await expectParty(page, 0, "on load");
+    // The list is 380 wide; the board starts 64 to its right (Figma 326:2432).
+    const list = (await holdsList(page).boundingBox())!;
+    const chips = (await holdsPick(page).locator(".hold-chip").first().boundingBox())!;
+    expect(Math.round(list.width)).toBe(380);
+    expect(Math.round(chips.x - (list.x + list.width))).toBe(64);
+    // The picked party in petrol with an arrow; a held chip petrol with a white dot; the one not held in rani.
+    await expect(party(page, "You, the financier")).toHaveCSS("background-color", "rgb(2, 39, 50)");
+    const chip = (text: string) => holdsPick(page).locator(".hold-chip", { hasText: text });
+    await expect(chip("The proceeds")).toHaveCSS("background-color", "rgb(2, 39, 50)");
+    await expect(chip("The proceeds").locator(".hold-dot")).toHaveCSS("fill", "rgb(255, 255, 255)");
+    await expect(chip("Recourse to the exporter")).toHaveCSS("border-top-color", "rgb(173, 36, 104)");
+    await expect(chip("Recourse to the exporter").locator(".hold-dot")).toHaveCSS("stroke", "rgb(173, 36, 104)");
+    await expect(chip("Recourse to the exporter").locator(".hold-dot")).toHaveCSS("fill", "rgba(0, 0, 0, 0)");
+    await expect(chip("Disputes, returns")).toHaveCSS("color", "rgb(78, 104, 111)");
+    // The colours change over 250 ms, as the prototype does.
+    await expect(chip("The proceeds")).toHaveCSS("transition-duration", "0.25s, 0.25s, 0.25s, 0.25s");
+    // Without script the cards stand in for it; with script they are hidden, and the chips are decoration.
+    await expect(page.locator('[data-ground="petrol"]').filter({ hasText: "You, the financier" })).toBeHidden();
+    await expect(holdsPick(page).locator("ul[aria-hidden='true'] .hold-chip")).toHaveCount(8);
+    await expectNoAxeViolations(page);
+  });
+
+  for (const [width, height] of [[1440, 900], [1180, 820]] as const) {
+    test(`who holds what at ${width}: hover picks every party, down, up, three rounds, and again after a reload; the board never moves`, async ({ page }) => {
+      test.setTimeout(90_000);
+      await page.setViewportSize({ width, height });
+      await page.goto(KP);
+      const places = () => holdsPick(page).evaluate((el) => [...el.querySelectorAll(".hold-chip")].map((chip) => { const r = chip.getBoundingClientRect(); return `${Math.round(r.x)},${Math.round(r.y)},${Math.round(r.width)}`; }).join(" ") + ` h${Math.round(el.getBoundingClientRect().height)}`);
+      for (const pass of ["first load", "after a reload"]) {
+        if (pass === "after a reload") await page.reload();
+        await holdsPick(page).scrollIntoViewIfNeeded();
+        const at = await places();
+        for (let round = 1; round <= 3; round++) {
+          for (const order of [[0, 1, 2, 3, 4], [4, 3, 2, 1, 0]]) {
+            for (const i of order) {
+              await party(page, parties[i].name).hover();
+              await expectParty(page, i, `${pass}, round ${round}: ${parties[i].name}`);
+              expect(await places(), `${pass}, round ${round}: ${parties[i].name}: every chip in its place`).toBe(at);
+            }
+          }
+        }
+        // The pick stays when the pointer leaves.
+        await page.mouse.move(5, 5);
+        await expectParty(page, 0, `${pass}: after the pointer leaves`);
+      }
+    });
+  }
+
+  test("where each institution fits, at 1440: the first picked on load, its role in H3; hover picks, down, up, three rounds, and after a reload", async ({ page }) => {
+    test.setTimeout(90_000);
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(KP);
+    await expectInstitution(page, 0, "on load");
+    const list = (await fitList(page).boundingBox())!;
+    const role = (await fitPick(page).locator("h3").filter({ visible: true }).boundingBox())!;
+    expect(Math.round(list.width)).toBe(480);
+    expect(Math.round(role.x - (list.x + list.width))).toBe(64);
+    await expect(fitPick(page).getByText("Role", { exact: true })).toBeVisible();
+    await expect(fitPick(page).locator("h3").filter({ visible: true })).toHaveCSS("font-size", "28px");
+    // The register stands in without script; with it, it is hidden.
+    await expect(page.locator("section", { has: page.locator("#fit-heading") }).locator("table")).toBeHidden();
+    const height = () => fitPick(page).evaluate((el) => Math.round(el.getBoundingClientRect().height));
+    for (const pass of ["first load", "after a reload"]) {
+      if (pass === "after a reload") await page.reload();
+      await fitPick(page).scrollIntoViewIfNeeded();
+      const h = await height();
+      for (let round = 1; round <= 3; round++) {
+        for (const order of [[0, 1, 2, 3, 4], [4, 3, 2, 1, 0]]) {
+          for (const i of order) {
+            await institution(page, institutions[i][0]).hover();
+            await expectInstitution(page, i, `${pass}, round ${round}: ${institutions[i][0]}`);
+            expect(await height(), `${pass}, round ${round}: the same height`).toBe(h);
+          }
+        }
+      }
+    }
+    // The role abroad carries footnote 1, which leads to the footnote under the venue.
+    await institution(page, institutions[2][0]).click();
+    const marker = fitPick(page).locator("h3").filter({ visible: true }).getByRole("link", { name: "Footnote 1" });
+    await expect(marker).toHaveAttribute("href", "#fn-1");
+    await marker.click();
+    await expect(page.locator("#fn-1")).toBeFocused();
+    await expectNoAxeViolations(page);
+  });
+
+  test("both picks by keyboard: Tab reaches the picked one, the arrow keys, Home and End move within the five and pick", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(KP);
+    for (const [list, names, check] of [
+      [holdsList, parties.map((p) => p.name), (i: number, where: string) => expectParty(page, i, where)],
+      [fitList, institutions.map(([name]) => name), (i: number, where: string) => expectInstitution(page, i, where)],
+    ] as const) {
+      // One tab stop in the group: the picked one.
+      expect(await list(page).locator("[aria-pressed]").evaluateAll((els) => els.map((el) => (el as HTMLElement).tabIndex))).toEqual([0, -1, -1, -1, -1]);
+      // Tab reaches the picked one: from the stop before the group.
+      await list(page).locator('[aria-pressed="true"]').focus();
+      await page.keyboard.press("Shift+Tab");
+      await expect(list(page).locator("[aria-pressed]:focus")).toHaveCount(0);
+      await page.keyboard.press("Tab");
+      await expect(list(page).locator('[aria-pressed="true"]')).toBeFocused();
+      const step = async (key: string, i: number) => {
+        await page.keyboard.press(key);
+        await expect(list(page).getByRole("button", { name: names[i], exact: true })).toBeFocused();
+        await check(i, `${key} to ${names[i]}`);
+      };
+      await step("ArrowDown", 1);
+      await step("ArrowRight", 2);
+      await step("ArrowUp", 1);
+      await step("ArrowLeft", 0);
+      await step("ArrowUp", 4);
+      await step("Home", 0);
+      await step("End", 4);
+      expect(await list(page).locator("[aria-pressed]").evaluateAll((els) => els.map((el) => (el as HTMLElement).tabIndex))).toEqual([-1, -1, -1, -1, 0]);
+      // Tab leaves the group; Shift+Tab comes back to the picked one.
+      await page.keyboard.press("Tab");
+      await expect(list(page).locator("[aria-pressed]:focus")).toHaveCount(0);
+      await page.keyboard.press("Shift+Tab");
+      await expect(list(page).getByRole("button", { name: names[4], exact: true })).toBeFocused();
+    }
+  });
+
+  for (const [width, height] of [[390, 844], [820, 1180]] as const) {
+    test(`at ${width} a tap picks, the pick sits over its board, and nothing moves under it`, async ({ browser }) => {
+      const context = await browser.newContext({ viewport: { width, height }, hasTouch: true, isMobile: width < 768 });
+      const page = await context.newPage();
+      await page.goto(KP);
+      // Stacked, as the prototype has it: the list, then the board (or the role) under it.
+      const list = (await holdsList(page).boundingBox())!;
+      const firstChip = (await holdsPick(page).locator(".hold-chip").first().boundingBox())!;
+      expect(firstChip.y).toBeGreaterThan(list.y + list.height);
+      const fit = (await fitList(page).boundingBox())!;
+      const label = (await fitPick(page).getByText("Role", { exact: true }).boundingBox())!;
+      expect(label.y).toBeGreaterThan(fit.y + fit.height);
+      const heights = () => page.evaluate(() => [...document.querySelectorAll('[data-pick]')].map((el) => Math.round(el.parentElement!.getBoundingClientRect().height)).join(" "));
+      const before = await heights();
+      for (const i of [3, 1, 4, 0]) {
+        await party(page, parties[i].name).tap();
+        await expectParty(page, i, `${width}: ${parties[i].name}`);
+        await institution(page, institutions[i][0]).tap();
+        await expectInstitution(page, i, `${width}: ${institutions[i][0]}`);
+        expect(await heights(), `${width}: the two picks keep their heights`).toBe(before);
+      }
+      // A long chip wraps inside the screen's margin.
+      const margin = width < 768 ? 20 : 40;
+      for (const chip of await holdsPick(page).locator(".hold-chip").all()) {
+        const box = (await chip.boundingBox())!;
+        expect(box.x + box.width, `${width}`).toBeLessThanOrEqual(width - margin + 0.5);
+      }
+      expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
+      await context.close();
+    });
+  }
+
+  test("without script: today's cards and register, every party and every institution; with reduced motion the picks still pick", async ({ browser }) => {
+    for (const [width, height] of [[1440, 900], [390, 844]] as const) {
+      const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width, height } });
+      const page = await context.newPage();
+      await page.goto(KP);
+      await expect(holdsPick(page)).toBeHidden();
+      await expect(fitPick(page)).toBeHidden();
+      const holds = page.locator("section", { has: page.locator("#holds-heading") });
+      for (const p of parties) {
+        await expect(holds.getByText(p.holds, { exact: true }).filter({ visible: true }), `${width}: ${p.name}`).toHaveCount(1);
+        await expect(holds.getByText(p.doesnt, { exact: true }).filter({ visible: true }), `${width}: ${p.name}`).toHaveCount(1);
+      }
+      const register = page.locator("section", { has: page.locator("#fit-heading") }).locator("table");
+      await expect(register).toBeVisible();
+      await expect(register.getByRole("row")).toHaveCount(6);
+      await expect(register.getByRole("link", { name: "Footnote 1" })).toHaveAttribute("href", "#fn-1");
+      await context.close();
+    }
+    const context = await browser.newContext({ reducedMotion: "reduce", viewport: { width: 1440, height: 900 } });
+    const page = await context.newPage();
+    await page.goto(KP);
+    await party(page, "Kubar").click();
+    await expectParty(page, 4, "reduced motion");
+    await expect(holdsPick(page).locator(".hold-chip").first()).toHaveCSS("transition-duration", "0s");
+    await institution(page, "Funds").click();
+    await expectInstitution(page, 4, "reduced motion");
+    await context.close();
+  });
+
+  /** The running or waiting transitions and animations under a drawing: what moves, from when, for how long. */
+  const motion = (page: Page, selector: string) =>
+    page.locator(selector).first().evaluate((el) =>
+      el
+        .getAnimations({ subtree: true })
+        .filter((a) => a.playState === "running")
+        .map((a) => {
+          const target = (a.effect as KeyframeEffect).target as Element;
+          const timing = (a.effect as KeyframeEffect).getTiming();
+          const name = "transitionProperty" in a ? (a as CSSTransition).transitionProperty : (a as CSSAnimation).animationName;
+          const tag = target.getAttribute("class")?.split(" ").find((c) => /^(limit|tl|draw)-/.test(c)) ?? target.tagName;
+          return `${tag} ${name} ${Math.round(Number(timing.delay))}+${Math.round(Number(timing.duration))}`;
+        })
+        .sort(),
+    );
+  const idle = (page: Page, selector: string) =>
+    expect.poll(() => page.locator(selector).first().evaluate((el) => el.getAnimations({ subtree: true }).filter((a) => a.playState === "running").length), { timeout: 8000 }).toBe(0);
+
+  test("cover in your name plays once in three phases: the box draws, the receivables settle as the headroom shortens, RCV-0003 comes to rest", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(KP);
+    const limit = page.locator(".buyer-limit");
+    await expect(limit).toHaveAttribute("data-phase", "armed");
+    // Waiting: the edges undrawn, the receivables and the labels not there yet, the bracket at the whole limit's height.
+    await expect(limit.locator(".limit-draw-mask").first()).toHaveCSS("stroke-dashoffset", "1px");
+    for (const part of [".limit-sheet", ".limit-next", ".limit-floor", "li.limit-label"]) await expect(limit.locator(part).first(), part).toHaveCSS("opacity", "0");
+    await limit.evaluate((el) => el.scrollIntoView({ block: "center", behavior: "instant" }));
+    await expect(limit).toHaveAttribute("data-phase", "playing");
+    const moving = await motion(page, ".buyer-limit");
+    // The box over 600 ms (each of its eight edges), then the floor; then the parts in order.
+    expect(moving.filter((m) => m.startsWith("limit-draw-mask"))).toEqual(Array(8).fill("limit-draw-mask stroke-dashoffset 0+600"));
+    expect(moving).toEqual(expect.arrayContaining([
+      "limit-floor opacity 600+320",
+      "limit-sheet transform 600+320",
+      "limit-sheet transform 920+320",
+      "limit-next transform 1240+600",
+      "limit-post limit-post 600+640",
+      "limit-foot limit-foot 600+640",
+    ]));
+    await idle(page, ".buyer-limit");
+    // At rest, as drawn (the bracket's two steps hold their last keyframe, the drawn shape).
+    for (const part of [".limit-sheet", ".limit-next", ".limit-post", ".limit-foot"]) {
+      for (const el of await limit.locator(part).all()) expect(await el.evaluate((node) => getComputedStyle(node).transform), part).toMatch(/^(none|matrix\(1, 0, 0, 1, 0, 0\))$/);
+    }
+    for (const el of await limit.locator("li.limit-label").all()) await expect(el).toHaveCSS("opacity", "1");
+    await expectNoAxeViolations(page);
+  });
+
+  test("what you buy plays once: the paid-out bar down, the bracket across, the received bar up, then the deferred price, each label with its bar", async ({ page }) => {
+    for (const [width, height, expected] of [
+      [1440, 900, ["tl-down transform 0+600", "tl-label opacity 0+600", "tl-across transform 600+600", "tl-label opacity 600+600", "tl-up transform 1200+600", "tl-label opacity 1200+600", "tl-down transform 1800+600", "tl-label opacity 1800+600"]],
+      [390, 844, ["tl-down transform 0+600", "tl-up transform 600+600", "tl-down transform 1200+600"]],
+    ] as const) {
+      await page.setViewportSize({ width, height });
+      await page.goto(KP);
+      const timeline = page.locator("[data-phase]", { has: page.getByText("When the money moves · your side", { exact: true }) }).first();
+      await expect(timeline).toHaveAttribute("data-phase", "armed");
+      // Waiting: the bars of the drawing on show have no height yet (offsetWidth: a transform doesn't change it).
+      expect(await timeline.evaluate((el) => [...el.querySelectorAll<HTMLElement>(":is(.tl-down, .tl-up)")].filter((bar) => bar.offsetWidth > 0).map((bar) => getComputedStyle(bar).transform)), `${width}`).toEqual(Array(3).fill("matrix(1, 0, 0, 0, 0, 0)"));
+      await timeline.evaluate((el) => el.scrollIntoView({ block: "center", behavior: "instant" }));
+      await expect(timeline).toHaveAttribute("data-phase", "playing");
+      const moving = await timeline.evaluate((el) =>
+        [...el.querySelectorAll(":is(.tl-down, .tl-up, .tl-across, .tl-label)")]
+          .filter((node) => node.getClientRects().length > 0)
+          .flatMap((node) => node.getAnimations().filter((a) => a.playState === "running").map((a) => {
+            const timing = (a.effect as KeyframeEffect).getTiming();
+            const tag = node.getAttribute("class")!.split(" ").find((c) => c.startsWith("tl-"));
+            return `${tag} ${(a as CSSTransition).transitionProperty} ${Math.round(Number(timing.delay))}+${Math.round(Number(timing.duration))}`;
+          })),
+      );
+      expect(moving.sort(), `${width}`).toEqual([...expected].sort());
+      await expect.poll(() => timeline.evaluate((el) => el.getAnimations({ subtree: true }).filter((a) => a.playState === "running").length), { timeout: 8000 }).toBe(0);
+      expect(await timeline.evaluate((el) => [...el.querySelectorAll<HTMLElement>(":is(.tl-down, .tl-up, .tl-across)")].filter((bar) => bar.offsetWidth > 0).map((bar) => getComputedStyle(bar).transform)), `${width}`).toEqual(Array(width >= 1280 ? 4 : 3).fill("none"));
+    }
+  });
+
+  for (const [path, selector, expected] of [
+    [KP, "section:has(#programme1-heading) .draw-scene", ["draw-solid stroke-dashoffset 0+600"]],
+    ["/about", "section:has(#gift-heading) .draw-scene", ["draw-mask stroke-dashoffset 0+600", "draw-solid stroke-dashoffset 600+600", "draw-solid stroke-dashoffset 1200+600"]],
+  ] as const) {
+    test(`${path}: the arrows draw once in view, 600 ms each, in reading order`, async ({ page }) => {
+      for (const [width, height] of [[1440, 900], [390, 844]] as const) {
+        await page.setViewportSize({ width, height });
+        await page.goto(path);
+        const stage = page.locator(selector);
+        await expect(stage, `${width}`).toHaveAttribute("data-phase", "armed");
+        const lines = stage.locator(":is(.draw-solid, .draw-mask)");
+        const shown = await stage.evaluate((el) => [...el.querySelectorAll(":is(.draw-solid, .draw-mask)")].filter((line) => (line.closest("svg") as Element).getClientRects().length > 0).length);
+        expect(shown, `${width}`).toBe(expected.length);
+        await expect(lines.first()).toHaveCSS("stroke-dashoffset", "1px");
+        await stage.evaluate((el) => el.scrollIntoView({ block: "center", behavior: "instant" }));
+        await expect(stage, `${width}`).toHaveAttribute("data-phase", "playing");
+        const moving = await stage.evaluate((el) =>
+          [...el.querySelectorAll(":is(.draw-solid, .draw-mask)")]
+            .filter((line) => (line.closest("svg") as Element).getClientRects().length > 0)
+            .flatMap((line) => line.getAnimations().filter((a) => a.playState === "running").map((a) => {
+              const timing = (a.effect as KeyframeEffect).getTiming();
+              return `${line.getAttribute("class")!.split(" ")[0]} ${(a as CSSTransition).transitionProperty} ${Math.round(Number(timing.delay))}+${Math.round(Number(timing.duration))}`;
+            })),
+        );
+        expect(moving, `${width}`).toEqual([...expected]);
+        await expect.poll(() => stage.evaluate((el) => el.getAnimations({ subtree: true }).filter((a) => a.playState === "running").length), { timeout: 8000 }).toBe(0);
+        for (const head of await stage.locator(".draw-head").all()) expect(await head.evaluate((el) => getComputedStyle(el).opacity), `${width}`).toBe("1");
+      }
+    });
+  }
+
+  test("still with reduced motion and without script: the box, the timeline, the corridor and the three zones as drawn", async ({ browser }) => {
+    for (const options of [{ reducedMotion: "reduce" as const }, { javaScriptEnabled: false }]) {
+      for (const [width, height] of [[1440, 900], [390, 844]] as const) {
+        const context = await browser.newContext({ ...options, viewport: { width, height } });
+        const page = await context.newPage();
+        const where = `${JSON.stringify(options)} at ${width}`;
+        for (const [path, selector] of [[KP, ".buyer-limit"], [KP, "[data-phase]:has(.tl-down)"], [KP, "section:has(#programme1-heading) .draw-scene"], ["/about", "section:has(#gift-heading) .draw-scene"]] as const) {
+          await page.goto(path);
+          const stage = page.locator(selector).first();
+          await stage.evaluate((el) => el.scrollIntoView({ block: "center", behavior: "instant" }));
+          await expect(stage, `${where} ${selector}`).toHaveAttribute("data-phase", "done");
+          expect(await stage.evaluate((el) => el.getAnimations({ subtree: true }).length), `${where} ${selector}`).toBe(0);
+          const state = await stage.evaluate((el) => {
+            const parts = [...el.querySelectorAll(":is(.limit-sheet, .limit-next, .limit-floor, .limit-post, .tl-down, .tl-up, .tl-across, .tl-label, .draw-head, li.limit-label)")];
+            return {
+              hidden: parts.filter((p) => getComputedStyle(p).opacity !== "1").length,
+              moved: parts.filter((p) => !["none", "matrix(1, 0, 0, 1, 0, 0)"].includes(getComputedStyle(p).transform)).length,
+              undrawn: [...el.querySelectorAll(":is(.draw-solid, .draw-mask, .limit-draw-mask)")].filter((p) => getComputedStyle(p).strokeDashoffset !== "0px").length,
+            };
+          });
+          expect(state, `${where} ${selector}`).toEqual({ hidden: 0, moved: 0, undrawn: 0 });
+        }
+        await context.close();
+      }
     }
   });
 });

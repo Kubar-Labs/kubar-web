@@ -1,3 +1,5 @@
+import { Arrow } from "@/components/drawings/Arrow";
+import { PlayOnce } from "@/components/drawings/PlayOnce";
 import { cn } from "@/lib/utils";
 
 /*
@@ -8,6 +10,10 @@ import { cn } from "@/lib/utils";
  * phones the cards stack and the arrow points down. The labels are Sans/Fine
  * in the secondary colour at every width (rani is kept for footnote markers,
  * the current state and errors).
+ *
+ * The arrow draws once when the row is in view, over 600 ms (step 9;
+ * globals.css, .draw-scene). Still (no script, reduced motion, or already in
+ * view): drawn.
  */
 type Row = [label: string, value: string];
 
@@ -26,7 +32,7 @@ export function Corridor({ rows, className }: { rows: Row[]; className?: string 
 
   return (
     <div className={cn("flex flex-col gap-7 lg:gap-10", className)}>
-      <div className="flex flex-col md:flex-row md:items-stretch md:gap-6">
+      <PlayOnce className="draw-scene flex flex-col md:flex-row md:items-stretch md:gap-6">
         <dl className={cn(card, "md:min-w-0 md:flex-1")}>
           <Pair label={exporters[0]} value={exporters[1]} />
         </dl>
@@ -34,20 +40,22 @@ export function Corridor({ rows, className }: { rows: Row[]; className?: string 
           <dt className="t-fine text-ink-muted">{terms[0]}</dt>
           <dd className="t-ui-lg text-ink">{terms[1]}</dd>
           <dd aria-hidden="true">
-            <svg width="12" height="28" viewBox="0 0 12 28" className="md:hidden">
-              <line x1={6} x2={6} y1={0} y2={18} className="stroke-ink" strokeWidth={2} />
-              <polygon points="6,28 0.23,18 11.77,18" className="fill-ink" />
+            {/* Down on phones; across, 100 wide on tablets and 200 from 1024. */}
+            <svg width="12" height="28" viewBox="0 0 12 28" className="overflow-visible md:hidden">
+              <Arrow id="corridor-down" kind="money" d="M6 0 L6 18" head="6,28 0.23,18 11.77,18" />
             </svg>
-            <svg viewBox="0 0 200 12" preserveAspectRatio="none" className="hidden h-3 w-[100px] md:block lg:w-[200px]">
-              <line x1={0} x2={190} y1={6} y2={6} className="stroke-ink" strokeWidth={2} vectorEffect="non-scaling-stroke" />
-              <polygon points="200,6 190,0.23 190,11.77" className="fill-ink" />
+            <svg width="100" height="12" viewBox="0 0 100 12" className="hidden overflow-visible md:block lg:hidden">
+              <Arrow id="corridor-tablet" kind="money" d="M0 6 L90 6" head="100,6 90,0.23 90,11.77" />
+            </svg>
+            <svg width="200" height="12" viewBox="0 0 200 12" className="hidden overflow-visible lg:block">
+              <Arrow id="corridor" kind="money" d="M0 6 L190 6" head="200,6 190,0.23 190,11.77" />
             </svg>
           </dd>
         </dl>
         <dl className={cn(card, "md:min-w-0 md:flex-1")}>
           <Pair label={buyers[0]} value={buyers[1]} />
         </dl>
-      </div>
+      </PlayOnce>
       <div className="grid gap-6 md:grid-cols-2 md:gap-12">
         <dl className="flex flex-col gap-3">
           <Pair label={financier[0]} value={financier[1]} />

@@ -118,7 +118,6 @@ function Stack({
   maskId,
   leader,
   leaderClass,
-  dashedVenueLeader,
   className,
 }: {
   foundations: Foundation[];
@@ -128,8 +127,6 @@ function Stack({
   leader: (level: number) => string;
   /** Where the leaders show. */
   leaderClass: string;
-  /** About draws the venue's leader dashed, like its outline; Home's is a plain one (246:3160). */
-  dashedVenueLeader: boolean;
   className: string;
 }) {
   const levels = foundations.length;
@@ -152,7 +149,8 @@ function Stack({
             return (
               <g key={f.name}>
                 <path d={shape.outline} mask={`url(#${maskId})`} className="iso-venue" />
-                <path d={leader(level)} className={cn("iso-leader-line", dashedVenueLeader && "is-dashed", leaderClass)} />
+                {/* Dashed, like the venue's outline (Home's corrected in 246:3160, 1 px, dash 6 5). */}
+                <path d={leader(level)} className={cn("iso-leader-line is-dashed", leaderClass)} />
               </g>
             );
           }
@@ -212,7 +210,6 @@ export function IsoFoundations({
                 maskId={maskId}
                 leader={(level) => dogleg(level, STACKED_TOPS[levelOf(level)])}
                 leaderClass="hidden min-[1440px]:inline"
-                dashedVenueLeader={false}
                 className="block h-auto w-full overflow-visible"
               />
             ) : (
@@ -223,7 +220,6 @@ export function IsoFoundations({
                   maskId={maskId}
                   leader={(level) => straight(level, FRAME, LEADER_END)}
                   leaderClass="hidden lg:inline"
-                  dashedVenueLeader
                   className="block h-auto w-full overflow-visible lg:max-xl:hidden"
                 />
                 <Stack
@@ -232,7 +228,6 @@ export function IsoFoundations({
                   maskId={`${maskId}-band`}
                   leader={(level) => straight(level, BAND, 544)}
                   leaderClass="hidden lg:inline"
-                  dashedVenueLeader
                   className="hidden overflow-visible lg:max-xl:block"
                 />
               </>

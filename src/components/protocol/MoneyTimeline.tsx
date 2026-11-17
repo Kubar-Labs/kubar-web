@@ -1,3 +1,4 @@
+import { PlayOnce } from "@/components/drawings/PlayOnce";
 import { cn } from "@/lib/utils";
 
 /*
@@ -6,7 +7,15 @@ import { cn } from "@/lib/utils";
  * financier's side, drawn to scale from zero against the days after
  * shipment. $202,500 paid out at purchase below the line, $225,000 received
  * on day 75 above it, and the deferred purchase price as a dotted box with
- * no figure. Nothing animates (HANDOFF section 7).
+ * no figure.
+ *
+ * It plays once in view (step 9; globals.css, .tl-down and after): the
+ * paid-out bar grows down at purchase, the "meanwhile" bracket draws across,
+ * the received bar grows up at the due date, then the deferred purchase
+ * price, each over 600 ms after the one before, each label fading in with
+ * its bar. The small drawing has no bracket, so its bars follow each other
+ * straight on. Still (no script, reduced motion, or already in view): as
+ * drawn.
  *
  * Desktop: the drawing takes its column's width (737 at 1440, about 580 on a
  * 1280 laptop); the day axis and the bars follow the width, the words keep
@@ -24,6 +33,8 @@ export type TimelineCopy = {
 const AT = { ship: 90 / 737, buy: 153 / 737, due: 680 / 737 };
 const pct = (x: number) => `${(x * 100).toFixed(3)}%`;
 const guide = "absolute w-0 border-l border-dashed border-rule";
+// When each part starts as it plays: the paid-out bar, the bracket, the received bar, the deferred price.
+const at = (ms: number) => ({ ["--at" as string]: `${ms}ms` }) as React.CSSProperties;
 
 export function MoneyTimeline({ copy, className }: { copy: TimelineCopy; className?: string }) {
   const list: [string, string, boolean][] = [
@@ -33,7 +44,7 @@ export function MoneyTimeline({ copy, className }: { copy: TimelineCopy; classNa
     [copy.stacked.meanwhile, copy.meanwhile, true],
   ];
   return (
-    <div className={className}>
+    <PlayOnce className={className}>
       {/* Desktop: the drawing at its column's width. */}
       <div role="img" aria-label={copy.alt} className="relative hidden h-[594px] w-full min-[1280px]:block">
         <p className="t-fine absolute top-0 left-0 text-ink-muted">{copy.title}</p>
@@ -44,32 +55,34 @@ export function MoneyTimeline({ copy, className }: { copy: TimelineCopy; classNa
         <span className="absolute top-[280px] right-0 left-5 h-px bg-rule-strong" />
         <p className="t-fine absolute top-[256px] left-0 text-ink-muted">{copy.received}</p>
         <p className="t-fine absolute top-[288px] left-0 text-ink-muted">{copy.paidOut}</p>
-        <span className="absolute top-[281px] h-[182px] w-7 -translate-x-1/2 bg-ink" style={{ left: pct(AT.buy) }} />
-        <span className="absolute top-[78px] h-[203px] w-7 -translate-x-1/2 bg-ink" style={{ left: pct(AT.due) }} />
-        <span className="absolute top-[281px] h-5 w-7 border border-dashed border-ink-muted" style={{ left: `calc(${pct(AT.due)} + 20px)` }} />
+        <span className="tl-down absolute top-[281px] h-[182px] w-7 -translate-x-1/2 bg-ink" style={{ left: pct(AT.buy), ...at(0) }} />
+        <span className="tl-up absolute top-[78px] h-[203px] w-7 -translate-x-1/2 bg-ink" style={{ left: pct(AT.due), ...at(1200) }} />
+        <span className="tl-down absolute top-[281px] h-5 w-7 border border-dashed border-ink-muted" style={{ left: `calc(${pct(AT.due)} + 20px)`, ...at(1800) }} />
         <p
-          className="t-body-sm absolute top-[79.5px] w-[300px] max-w-[60%] text-right text-ink"
-          style={{ right: `calc(${pct(1 - AT.due)} + 26px)` }}
+          className="tl-label t-body-sm absolute top-[79.5px] w-[300px] max-w-[60%] text-right text-ink"
+          style={{ right: `calc(${pct(1 - AT.due)} + 26px)`, ...at(1200) }}
         >
           {copy.receivedText}
         </p>
-        <p className="t-body-sm absolute top-[416px] w-[280px] max-w-[55%] text-ink" style={{ left: `calc(${pct(AT.buy)} + 24px)` }}>
+        <p className="tl-label t-body-sm absolute top-[416px] w-[280px] max-w-[55%] text-ink" style={{ left: `calc(${pct(AT.buy)} + 24px)`, ...at(0) }}>
           {copy.paidText}
         </p>
         <span
-          className="absolute top-[235px] h-2.5 border-x border-ink-muted"
-          style={{ left: `calc(${pct(AT.buy)} + 18px)`, right: `calc(${pct(1 - AT.due)} + 18px)` }}
+          className="tl-across absolute top-[235px] h-2.5 border-x border-ink-muted"
+          style={{ left: `calc(${pct(AT.buy)} + 18px)`, right: `calc(${pct(1 - AT.due)} + 18px)`, ...at(600) }}
         >
           <span className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-ink-muted" />
         </span>
         {/* Over the bracket: one line at 1440, two on a narrower laptop, never past the day 75 bar. */}
         <p
-          className="t-body-sm absolute bottom-[360px] text-ink-muted"
-          style={{ left: `calc(${pct(AT.buy)} + 26px)`, right: `calc(${pct(1 - AT.due)} + 26px)` }}
+          className="tl-label t-body-sm absolute bottom-[360px] text-ink-muted"
+          style={{ left: `calc(${pct(AT.buy)} + 26px)`, right: `calc(${pct(1 - AT.due)} + 26px)`, ...at(600) }}
         >
           {copy.meanwhile}
         </p>
-        <p className="t-body-sm absolute top-[316px] right-0 w-[330px] max-w-[57%] text-right text-ink-muted">{copy.deferred}</p>
+        <p className="tl-label t-body-sm absolute top-[316px] right-0 w-[330px] max-w-[57%] text-right text-ink-muted" style={at(1800)}>
+          {copy.deferred}
+        </p>
         <p className="t-code absolute top-[494px] whitespace-nowrap text-ink-muted" style={{ left: pct(AT.ship) }}>
           {copy.shipment}
         </p>
@@ -91,9 +104,9 @@ export function MoneyTimeline({ copy, className }: { copy: TimelineCopy; classNa
             <span key={x} className={cn(guide, "top-0 h-[254px]")} style={{ left: pct(x / 350) }} />
           ))}
           <span className="absolute top-[128.5px] right-0 left-0 h-px bg-rule-strong" />
-          <span className="absolute top-[129.5px] h-[101px] w-5 -translate-x-1/2 bg-ink" style={{ left: pct(50 / 350) }} />
-          <span className="absolute top-[16.5px] h-[113px] w-5 -translate-x-1/2 bg-ink" style={{ left: pct(300 / 350) }} />
-          <span className="absolute top-[129.5px] size-5 border border-dashed border-ink-muted" style={{ left: `calc(${pct(300 / 350)} + 16px)` }} />
+          <span className="tl-down absolute top-[129.5px] h-[101px] w-5 -translate-x-1/2 bg-ink" style={{ left: pct(50 / 350), ...at(0) }} />
+          <span className="tl-up absolute top-[16.5px] h-[113px] w-5 -translate-x-1/2 bg-ink" style={{ left: pct(300 / 350), ...at(600) }} />
+          <span className="tl-down absolute top-[129.5px] size-5 border border-dashed border-ink-muted" style={{ left: `calc(${pct(300 / 350)} + 16px)`, ...at(1200) }} />
           <span className="t-code absolute top-[257.75px] text-ink-muted" style={{ left: pct(14 / 350) }}>
             {copy.dayZero}
           </span>
@@ -111,6 +124,6 @@ export function MoneyTimeline({ copy, className }: { copy: TimelineCopy; classNa
         </dl>
         <p className="t-body-sm pt-1 text-ink-muted">{copy.note}</p>
       </div>
-    </div>
+    </PlayOnce>
   );
 }

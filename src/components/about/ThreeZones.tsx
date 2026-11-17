@@ -1,4 +1,7 @@
+import { Arrow } from "@/components/drawings/Arrow";
 import { IsoSheetShape } from "@/components/drawings/iso";
+import { PlayOnce } from "@/components/drawings/PlayOnce";
+import { cn } from "@/lib/utils";
 
 /*
  * Three zones · isometric (Figma 290:2574 in About's section 173:417;
@@ -7,7 +10,12 @@ import { IsoSheetShape } from "@/components/drawings/iso";
  * GIFT City (petrol top, a small receivable sheet on it) and Abroad. Above
  * them a dashed arrow "The receivable" and a solid arrow "Purchase price"
  * between the first two, and a solid arrow "Payment on the due date" from
- * Abroad to GIFT City. A schematic, not a map. No motion.
+ * Abroad to GIFT City. A schematic, not a map.
+ *
+ * The arrows draw once in view, in reading order, 600 ms each: the
+ * receivable, the purchase price, the payment (step 9; globals.css,
+ * .draw-scene). Still (no script, reduced motion, or already in view):
+ * drawn.
  *
  * The words are real text; the art is aria-hidden. From 768 up the drawing
  * takes its column's width and the words sit on it at the frame's
@@ -102,9 +110,11 @@ function Platform({ gift }: { gift: boolean }) {
   );
 }
 
-/** A vertical arrow between two stacked zones: dashed for data, solid for money. */
-function Vertical({ kind, up }: { kind: "data" | "money"; up: boolean }) {
-  const ink = kind === "data" ? "ink-muted" : "ink";
+// Each arrow's place in the reading order: when it starts drawing, in ms.
+const DELAY = [0, 600, 1200];
+
+/** A vertical arrow between two stacked zones: dashed for data, solid for money, drawn in its turn. */
+function Vertical({ kind, up, n }: { kind: "data" | "money"; up: boolean; n: number }) {
   return (
     <svg
       aria-hidden="true"
@@ -113,18 +123,12 @@ function Vertical({ kind, up }: { kind: "data" | "money"; up: boolean }) {
       viewBox="0 0 10 32"
       className="shrink-0 overflow-visible"
     >
-      <line
-        x1={5}
-        x2={5}
-        y1={up ? 7 : 0}
-        y2={up ? 32 : 25}
-        className={kind === "data" ? "stroke-ink-muted" : "stroke-ink"}
-        strokeWidth={kind === "data" ? 1.5 : 2}
-        strokeDasharray={kind === "data" ? "5 3" : undefined}
-      />
-      <polygon
-        points={up ? "5,0 0.8,7 9.2,7" : "5,32 0.8,25 9.2,25"}
-        className={ink === "ink" ? "fill-ink" : "fill-ink-muted"}
+      <Arrow
+        id={`zones-phone-${n}`}
+        kind={kind}
+        d={up ? "M5 32 L5 7" : "M5 0 L5 25"}
+        head={up ? "5,0 0.8,7 9.2,7" : "5,32 0.8,25 9.2,25"}
+        delay={DELAY[n]}
       />
     </svg>
   );
@@ -139,7 +143,7 @@ export function ThreeZones({
 }) {
   const [receivable, purchase, payment] = copy.arrows;
   return (
-    <div className={className}>
+    <PlayOnce className={cn("draw-scene", className)}>
       {/* The drawing and its arrow labels share one box, so the labels keep their places on it. */}
       <div className="relative hidden md:block">
         <svg
@@ -205,38 +209,11 @@ export function ThreeZones({
               className="fill-inset"
             />
           </IsoSheetShape>
-          {/* The receivable goes to GIFT City (data); the purchase price comes back; the buyer's payment comes in. */}
-          <line
-            x1={152}
-            x2={372}
-            y1={44}
-            y2={44}
-            className="stroke-ink-muted"
-            strokeWidth={1.5}
-            strokeDasharray="5 3"
-          />
-          <polygon
-            points="379,44 372,39.8 372,48.2"
-            className="fill-ink-muted"
-          />
-          <line
-            x1={159}
-            x2={379}
-            y1={72}
-            y2={72}
-            className="stroke-ink"
-            strokeWidth={2}
-          />
-          <polygon points="152,72 159,67.8 159,76.2" className="fill-ink" />
-          <line
-            x1={426}
-            x2={646}
-            y1={58}
-            y2={58}
-            className="stroke-ink"
-            strokeWidth={2}
-          />
-          <polygon points="419,58 426,53.8 426,62.2" className="fill-ink" />
+          {/* The receivable goes to GIFT City (data); the purchase price comes back; the buyer's
+              payment comes in. Each draws from where it starts. */}
+          <Arrow id="zones-receivable" kind="data" d="M152 44 L372 44" head="379,44 372,39.8 372,48.2" delay={DELAY[0]} />
+          <Arrow id="zones-purchase" kind="money" d="M379 72 L159 72" head="152,72 159,67.8 159,76.2" delay={DELAY[1]} />
+          <Arrow id="zones-payment" kind="money" d="M646 58 L426 58" head="419,58 426,53.8 426,62.2" delay={DELAY[2]} />
         </svg>
 
         {/* From 768 up: the arrow labels on the drawing, at the frame's proportions; the zones under it. */}
@@ -277,16 +254,16 @@ export function ThreeZones({
               <ul className="flex flex-col gap-2 py-3 pl-[55px]">
                 {(i === 1
                   ? ([
-                      [receivable, "data", false],
-                      [purchase, "money", true],
+                      [receivable, "data", false, 0],
+                      [purchase, "money", true, 1],
                     ] as const)
-                  : ([[payment, "money", true]] as const)
-                ).map(([label, kind, up]) => (
+                  : ([[payment, "money", true, 2]] as const)
+                ).map(([label, kind, up, n]) => (
                   <li
                     key={label}
                     className="t-fine flex items-center gap-3 text-ink-muted"
                   >
-                    <Vertical kind={kind} up={up} />
+                    <Vertical kind={kind} up={up} n={n} />
                     {label}
                   </li>
                 ))}
@@ -302,6 +279,6 @@ export function ThreeZones({
           </li>
         ))}
       </ol>
-    </div>
+    </PlayOnce>
   );
 }

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Fragment } from "react";
 import { useTranslations } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import { createPageMetadata } from "@/app/page-metadata";
@@ -10,7 +11,9 @@ import { Section, SectionHead } from "@/components/blocks/Section";
 import { EvidenceSources } from "@/components/protocol/EvidenceSources";
 import { MoneyPath } from "@/components/protocol/MoneyPath";
 import { Corridor } from "@/components/protocol/Corridor";
+import { FitPick } from "@/components/protocol/FitPick";
 import { HoldsCards } from "@/components/protocol/HoldsCards";
+import { HoldsPick } from "@/components/protocol/HoldsPick";
 import { LimitDrawing } from "@/components/protocol/LimitDrawing";
 import { MoneyTimeline, type TimelineCopy } from "@/components/protocol/MoneyTimeline";
 import { ProgrammeRuns, type ProgrammeStep } from "@/components/protocol/ProgrammeRuns";
@@ -161,7 +164,14 @@ export default function KubarProtocol() {
 
       <Section id="who-holds-what" labelledBy="holds-heading" className="flex flex-col gap-10 lg:gap-16">
         <SectionHead id="holds-heading" heading={t("holds.heading")} layout="wide" />
+        {/* A pick with script (step 9); without it, today's cards, every party at once. */}
+        <HoldsPick
+          rows={t.raw("holds.rows") as [string, string, string][]}
+          labels={(t.raw("holds.columns") as string[]).slice(1) as [string, string]}
+          things={t.raw("holds.things") as string[]}
+        />
         <HoldsCards
+          className="without-script"
           rows={t.raw("holds.rows") as [string, string, string][]}
           labels={(t.raw("holds.columns") as string[]).slice(1) as [string, string]}
         />
@@ -175,12 +185,21 @@ export default function KubarProtocol() {
 
       <Section labelledBy="fit-heading" className="flex flex-col gap-10 lg:gap-16">
         <SectionHead id="fit-heading" heading={t("fit.heading")} layout="wide" />
+        {/* A pick with script (step 9); without it, today's register, all five at once. */}
+        <FitPick
+          institutions={(t.raw("fit.rows") as string[][]).map(([institution]) => institution)}
+          label={(t.raw("fit.columns") as string[])[1]}
+          roles={(t.raw("fit.rows") as string[][]).map(([institution, role]) => (
+            <Fragment key={institution}>{withMarker(role, <FootnoteMarker n={1} target="fn-1" refId="fnref-1-fit" />)}</Fragment>
+          ))}
+        />
         <Register
+          className="without-script"
           columns={t.raw("fit.columns") as string[]}
           widths={[434, 846]}
           rows={(t.raw("fit.rows") as string[][]).map(([institution, role]) => [
             institution,
-            withMarker(role, <FootnoteMarker n={1} target="fn-1" refId="fnref-1-fit" />),
+            withMarker(role, <FootnoteMarker n={1} target="fn-1" refId="fnref-1-fit-table" />),
           ])}
         />
       </Section>

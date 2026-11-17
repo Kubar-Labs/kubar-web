@@ -843,10 +843,15 @@
     opacity: 0;
   }
   [data-phase="playing"] :is(.draw-solid, .draw-mask) {
-    transition: stroke-dashoffset var(--duration-write) var(--ease-standard) var(--draw-delay, 0ms);
+    transition: stroke-dashoffset var(--draw-duration, var(--duration-write)) var(--ease-standard) var(--draw-delay, 0ms);
   }
   [data-phase="playing"] .draw-head {
-    transition: opacity var(--duration-hover) var(--ease-standard) calc(var(--draw-delay, 0ms) + var(--duration-write));
+    transition: opacity var(--duration-hover) var(--ease-standard) calc(var(--draw-delay, 0ms) + var(--draw-duration, var(--duration-write)));
+  }
+  /* Arrows that take the scene's time, one after another (Programme 1's corridor, About's three
+     zones; step 9). */
+  .draw-scene {
+    --draw-duration: var(--duration-scene);
   }
 
   /* The money path (MoneyPath.tsx, step 8), with the order, timing and easing of
@@ -960,6 +965,189 @@
     .money-run :is(.money-line, .money-head, .money-stop, .money-dot),
     :is(.money-words, .money-mark).money-run {
       animation: none;
+    }
+  }
+
+  /* Cover in your name (BuyerLimit, step 9) plays once in three phases. The limit box draws
+     over the scene's time (its dashed edges revealed through a mask whose solid copies draw, then
+     the floor) with its label; then the headroom bracket and its label show at the whole
+     limit's height; RCV-0001 and RCV-0002 settle inside the box, from 24 px up, one after the
+     other, and the bracket shortens with each (its post scales from the top, its foot rises);
+     RCV-0003 comes to rest above the rim from 40 px up. --at: when a part starts. */
+  .limit-draw-mask {
+    fill: none;
+    stroke: white;
+    stroke-width: 6;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+  }
+  .limit-post {
+    transform-box: fill-box;
+    transform-origin: top;
+  }
+  [data-phase="armed"] .limit-draw-mask {
+    stroke-dashoffset: 1;
+  }
+  [data-phase="armed"] :is(.limit-floor, .limit-part) {
+    opacity: 0;
+  }
+  [data-phase="armed"] .limit-sheet {
+    opacity: 0;
+    transform: translateY(-24px);
+  }
+  [data-phase="armed"] .limit-next {
+    opacity: 0;
+    transform: translateY(-40px);
+  }
+  [data-phase="armed"] .limit-post {
+    transform: scaleY(1.2743);
+  }
+  [data-phase="armed"] .limit-foot {
+    transform: translateY(19.2px);
+  }
+  [data-phase="playing"] .limit-draw-mask {
+    transition: stroke-dashoffset var(--duration-scene) var(--ease-standard);
+  }
+  /* The floor shows once the edges have drawn, so it never cuts the ground shadow along an edge
+     that isn't there yet. */
+  [data-phase="playing"] .limit-floor {
+    transition: opacity var(--duration-write) var(--ease-standard) var(--duration-scene);
+  }
+  [data-phase="playing"] .limit-part {
+    transition: opacity var(--duration-write) var(--ease-standard) var(--at, 0ms);
+  }
+  [data-phase="playing"] .limit-sheet {
+    transition:
+      opacity var(--duration-write) var(--ease-standard) var(--at, 0ms),
+      transform var(--duration-write) var(--ease-standard) var(--at, 0ms);
+  }
+  [data-phase="playing"] .limit-next {
+    transition:
+      opacity var(--duration-write) var(--ease-standard) var(--at, 0ms),
+      transform var(--duration-scene) var(--ease-standard) var(--at, 0ms);
+  }
+  /* Two steps, each with its receivable: 600 to 920 ms and 920 to 1240 ms. */
+  [data-phase="playing"] .limit-post {
+    animation: limit-post 640ms var(--ease-standard) 600ms both;
+  }
+  [data-phase="playing"] .limit-foot {
+    animation: limit-foot 640ms var(--ease-standard) 600ms both;
+  }
+  @keyframes limit-post {
+    0% {
+      transform: scaleY(1.2743);
+    }
+    50% {
+      transform: scaleY(1.1371);
+    }
+    100% {
+      transform: scaleY(1);
+    }
+  }
+  @keyframes limit-foot {
+    0% {
+      transform: translateY(19.2px);
+    }
+    50% {
+      transform: translateY(9.6px);
+    }
+    100% {
+      transform: translateY(0);
+    }
+  }
+  /* The labels are beside the box on laptops; under it they are a plain list and don't wait. */
+  @media (min-width: 1024px) {
+    [data-phase="armed"] .limit-label {
+      opacity: 0;
+    }
+    [data-phase="playing"] .limit-label {
+      transition: opacity var(--duration-write) var(--ease-standard) var(--at, 0ms);
+    }
+  }
+
+  /* What you buy (MoneyTimeline, step 9) plays once: the paid-out bar grows down at purchase,
+     the "meanwhile" bracket draws across, the received bar grows up at the due date, then the
+     deferred purchase price; each over the scene's time, one after the other (--at), and each
+     label fades in with its bar. */
+  .tl-down {
+    transform-origin: top;
+  }
+  .tl-up {
+    transform-origin: bottom;
+  }
+  .tl-across {
+    transform-origin: left;
+  }
+  [data-phase="armed"] :is(.tl-down, .tl-up) {
+    transform: scaleY(0);
+  }
+  [data-phase="armed"] .tl-across {
+    transform: scaleX(0);
+  }
+  [data-phase="armed"] .tl-label {
+    opacity: 0;
+  }
+  [data-phase="playing"] :is(.tl-down, .tl-up, .tl-across) {
+    transition: transform var(--duration-scene) var(--ease-standard) var(--at, 0ms);
+  }
+  [data-phase="playing"] .tl-label {
+    transition: opacity var(--duration-scene) var(--ease-standard) var(--at, 0ms);
+  }
+
+  /* Who holds what (HoldsPick, step 9): a chip for each thing that can be held. Every chip
+     keeps its box from pick to pick, so the board never reflows: room for its dot always, and
+     the same 1 px border (the rani outline's other half pixel is an outline just inside it,
+     which takes no room; a border's width would round differently from one state to the next,
+     and a shadow is only ever an elevation). Held:
+     petrol with a white dot. Not held: a 1.5 px rani outline and a hollow rani dot. Held by
+     another party: a rule outline and muted words. The colours change over 250 ms (the
+     prototype's). */
+  .hold-chip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 15px;
+    border: 1px solid var(--color-rule);
+    outline: 0.5px solid transparent;
+    outline-offset: -1.5px;
+    color: var(--color-ink-muted);
+    transition:
+      background-color 250ms ease,
+      border-color 250ms ease,
+      color 250ms ease,
+      outline-color 250ms ease;
+  }
+  .hold-chip[data-state="held"] {
+    border-color: var(--color-action);
+    background-color: var(--color-action);
+    color: var(--color-on-action);
+  }
+  .hold-chip[data-state="not"] {
+    border-color: var(--color-accent);
+    background-color: var(--color-raised);
+    outline-color: var(--color-accent);
+    color: var(--color-ink);
+  }
+  /* The dot: a circle drawn in SVG (corners stay square), 8 px with its 1.5 px edge. */
+  .hold-dot {
+    flex: none;
+    fill: transparent;
+    stroke: transparent;
+    transition:
+      fill 250ms ease,
+      stroke 250ms ease;
+  }
+  .hold-chip[data-state="held"] .hold-dot {
+    fill: var(--color-on-action);
+    stroke: var(--color-on-action);
+  }
+  .hold-chip[data-state="not"] .hold-dot {
+    stroke: var(--color-accent);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hold-chip,
+    .hold-dot {
+      transition: none;
     }
   }
 
@@ -1549,6 +1737,14 @@ html[data-js] [data-folded] {
   display: none;
 }
 html:not([data-js]) :is(.fold-control, .money-controls) {
+  display: none;
+}
+/* A pick that needs script (Kubar Protocol's HoldsPick and FitPick), and the cards or the register
+   that stand in for it without. */
+html:not([data-js]) .with-script {
+  display: none;
+}
+html[data-js] .without-script {
   display: none;
 }
 

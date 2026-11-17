@@ -151,6 +151,7 @@ The exporter | Disputes, returns, set-off and fraud on its own trades | The rece
 The exporter’s bank | Its relationship with the exporter | The receivables sold
 Kubar | Origination, the evidence package, servicing and reporting | Money or credit risk
 (first column [UI], the others [BodyS])
+(17 Nov, next build step 9: a pick, Figma 326:2432. The five parties on the left, "You, the financier" picked on load; the eight things as chips on the right, what the picked party holds in petrol and what it doesn't hold outlined in rani; its two sentences, "Holds" and "Doesn’t hold", under them. Without script the five blocks above show.)
 (16 Nov: the eight things that can be held, cut from the rows' own words, as chips beside the five parties:)
 [UI] The receivable
 [UI] The proceeds                                  (17 Nov: held by the financier)
@@ -192,6 +193,7 @@ Kubar | Origination, the evidence package, servicing and reporting | Money or cr
 ## Where you fit
 [H2] Where each institution fits.
 [Tag] Institution | [Tag] Role                         (the Status column is removed)
+(17 Nov, next build step 9: a pick, Figma 332:2432. The five institutions on the left, the first picked on load; on the right "Role" and the picked institution's role in H3, with its footnote marker where it has one. Without script the register below shows all five.)
 Banks’ units at GIFT City (IFSC Banking Units) | Programme financier: set a limit and buy every receivable that fits
 IFSC finance companies and factors | Programme financier; later, a lane for smaller receivables held on a finance company’s balance sheet
 Banks, factors and finance companies abroad | Bid for programmes on Kubar’s own venue once it is registered¹, with no entity at GIFT City, if they meet its admission rules

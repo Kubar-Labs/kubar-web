@@ -52,6 +52,8 @@ const picks = [
   { route: "/", name: "foundations", item: "ol > li[data-level][tabindex]", expect: "marked", sideBySide: true },
   { route: "/products/kubar-protocol", name: "evidence row", item: '.evidence-sources button[aria-expanded="false"]', expect: "expanded", click: true },
   { route: "/products/kubar-protocol", name: "programme loop", item: ".programme-loop .loop-card[data-step]", expect: "picked", click: true },
+  { route: "/products/kubar-protocol", name: "who holds what", item: '[data-pick="holds"] button[aria-pressed="false"]', expect: "pressed" },
+  { route: "/products/kubar-protocol", name: "where you fit", item: '[data-pick="fit"] button[aria-pressed="false"]', expect: "pressed" },
   { route: "/products/navdhan-sdk", name: "embed picker", item: 'button[aria-pressed="false"]', expect: "pressed" },
   { route: "/products/navdhan-sdk", name: "embed accordion", item: 'main button[aria-expanded="false"]', expect: "expanded", click: true },
   { route: "/products/navdhan-sdk", name: "layers", item: "ol > li[tabindex='-1']", expect: "marked", sideBySide: true },
@@ -180,8 +182,9 @@ async function checkPicks(page, size, route) {
     }
     if (!item) continue;
     if (pick.sideBySide) {
-      // The highlight exists only where the labels sit beside the drawing.
-      const beside = await item.evaluate((el) => getComputedStyle(el).position === "absolute");
+      // The highlight exists only where the labels sit beside the drawing: from 1024. (Not their
+      // position: Home's labels stand in the flow beside it since 17 Nov.)
+      const beside = await page.evaluate(() => matchMedia("(min-width: 1024px)").matches);
       if (!beside) continue;
     }
     await item.scrollIntoViewIfNeeded();
