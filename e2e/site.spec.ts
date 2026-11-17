@@ -1401,6 +1401,8 @@ test.describe("rule 11.4: rani only for footnote markers, the current state, err
   });
 
   test("NavDhan SDK's lanes drawing is fitted to its column on laptops", async ({ page }) => {
+    // Since step 10 this is the journey's register, shown with reduced motion.
+    await page.emulateMedia({ reducedMotion: "reduce" });
     for (const width of [1200, 1280, 1440]) {
       await page.setViewportSize({ width, height: 900 });
       await page.goto("/products/navdhan-sdk");
@@ -3820,6 +3822,349 @@ test.describe("Kubar Protocol picks and motion (step 9)", () => {
         }
         await context.close();
       }
+    }
+  });
+});
+
+test.describe("NavDhan SDK's pinned journey (step 10)", () => {
+  const SDK = "/products/navdhan-sdk";
+  const steps = [
+    "Your exporter books and documents a shipment in your platform, as it does today.",
+    "NavDhan SDK checks the shipment against the programme’s rules and shows an indicative offer.",
+    "With the exporter’s consent, the shipment data and documents go to Kubar Protocol, which assembles the evidence package.",
+    "A financier buys the receivable and pays the exporter’s own bank.",
+    "On the due date the buyer pays the account on its invoice, and the payment reaches the financier. Your platform shows each step as it happens.",
+  ];
+  const RANI = "rgb(173, 36, 104)";
+  const MUTED = "rgb(78, 104, 111)";
+  const INK = "rgb(2, 39, 50)";
+  const story = (page: Page) => page.locator('.story[data-variant="sdk"]');
+  const on = (page: Page) => story(page).locator(".story-on");
+  const register = (page: Page) => story(page).locator(".story-ledger");
+  const overflow = (page: Page) => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+
+  /** The journey once still: the state, the current card, and on the lanes the rows drawn, the band's row and the rani number. */
+  async function journeyAt(page: Page) {
+    await expect.poll(() => on(page).evaluate((el) => el.getAnimations({ subtree: true }).filter((a) => a.playState === "running").length)).toBe(0);
+    return on(page).evaluate(async (el) => {
+      // Still twice running, a frame apart: a state that has just changed starts its transitions on the next frame.
+      for (let calm = 0; calm < 2; ) {
+        await new Promise((resolve) => requestAnimationFrame(resolve));
+        calm = el.getAnimations({ subtree: true }).some((a) => a.playState === "running") ? 0 : calm + 1;
+      }
+      const lanes = el.querySelector(".run-lanes")!;
+      const numbers = [...lanes.querySelectorAll<HTMLElement>(".run-no")];
+      const band = lanes.querySelector(".run-current")!.getBoundingClientRect();
+      const mid = (r: DOMRect) => r.top + r.height / 2;
+      const cards = [...el.querySelectorAll<HTMLElement>(".story-card")];
+      return {
+        state: el.getAttribute("data-story-state"),
+        current: cards.flatMap((card, i) => (card.getAttribute("aria-current") === "step" ? [i + 1] : [])),
+        counters: cards.map((card) => getComputedStyle(card.querySelector("p")!).color),
+        drawn: [...lanes.querySelectorAll(".run-row")].map((row) => getComputedStyle(row).opacity),
+        band: numbers.findIndex((no) => Math.abs(mid(no.getBoundingClientRect()) - mid(band)) < 1) + 1,
+        rani: numbers.filter((no) => getComputedStyle(no).color === "rgb(173, 36, 104)").map((no) => no.textContent),
+      };
+    });
+  }
+  const expected = (n: number) => ({
+    state: String(n),
+    current: [n],
+    counters: steps.map((_, i) => (i + 1 === n ? RANI : MUTED)),
+    drawn: steps.map((_, i) => (i < n ? "1" : "0")),
+    band: n,
+    rani: [`0${n}`],
+  });
+
+  test("five cards in reading order, \"01 of 05\" and the sentence; the lanes beside them as the frame draws them (331:1202)", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(SDK);
+    await storyLive(page);
+    await expect(page.locator(".story")).toHaveCount(1);
+    const cards = on(page).locator("ol > li .story-card");
+    await expect(cards).toHaveCount(5);
+    for (const [i, step] of steps.entries()) {
+      await expect(cards.nth(i).locator("p").first()).toHaveText(`0${i + 1} of 05`);
+      await expect(cards.nth(i).locator("p").first()).toHaveClass(/t-tag/);
+      await expect(cards.nth(i).locator("p").nth(1)).toHaveText(step);
+      await expect(cards.nth(i).locator("p").nth(1)).toHaveClass(/t-body-lg/);
+    }
+    // The register waits as the fallback; the lanes are decoration.
+    await expect(register(page)).toBeHidden();
+    await expect(on(page).locator(".run-lanes")).toHaveAttribute("aria-hidden", "true");
+    await scrollToState(page, 3);
+    await expect(on(page)).toHaveAttribute("data-story-state", "3");
+    expect(await journeyAt(page)).toEqual(expected(3));
+    // The frame's measurements at 1440, relative to the lanes.
+    const g = await on(page).evaluate((el) => {
+      const r = (node: Element | null) => {
+        const b = node!.getBoundingClientRect();
+        return { x: b.x, y: b.y, w: b.width, h: b.height, cx: b.x + b.width / 2, cy: b.y + b.height / 2 };
+      };
+      const lanes = el.querySelector(".run-lanes")!;
+      const o = r(lanes);
+      const at = (node: Element | null) => {
+        const b = r(node);
+        return [b.x - o.x, b.y - o.y, b.w, b.h].map(Math.round);
+      };
+      const row = (n: number) => lanes.querySelector(`.run-row[data-row="${n}"]`)!;
+      const centre = (node: Element) => [Math.round(r(node).cx - o.x), Math.round(r(node).cy - o.y)];
+      return {
+        lanes: [Math.round(o.x), Math.round(o.w), Math.round(o.h)],
+        card: at(el.querySelector(".story-card")),
+        skip: at(el.querySelector(".story-pin a")),
+        parties: [...lanes.querySelectorAll(".run-party")].map(at),
+        lifelines: [...lanes.querySelectorAll(":scope > span.w-px")].map((line) => at(line)[0]),
+        rules: [...lanes.querySelectorAll(":scope > span.h-px")].map((line) => at(line)[1]),
+        band: at(lanes.querySelector(".run-current")),
+        mark: at(lanes.querySelector(".run-current > span")),
+        numbers: [...lanes.querySelectorAll(".run-no")].map((no) => [at(no)[0], centre(no)[1]]),
+        squares: [1, 2, 4, 5].map((n) => [...row(n).querySelectorAll(":scope > span.bg-ink")].map(centre)),
+        labels: [2, 3, 4, 5].map((n) => at(row(n).querySelector(".t-ui-sm")).slice(0, 2)),
+        arrows: [3, 4, 5].map((n) => {
+          const arrow = row(n).querySelector(":scope > span.h-\\[10px\\]")!;
+          const line = arrow.querySelector("line")!;
+          return { at: [at(arrow)[0], at(arrow)[0] + at(arrow)[2], centre(arrow)[1]], back: getComputedStyle(arrow).scale.startsWith("-1"), dash: line.getAttribute("stroke-dasharray"), colour: getComputedStyle(line).stroke };
+        }),
+      };
+    });
+    expect(g.lanes).toEqual([544, 816, 472]);
+    expect(g.card.slice(0, 1).concat(g.card.slice(2, 3))).toEqual([-464, 400]);
+    expect(g.skip[1], "the skip link 44 above the lanes").toBe(-44);
+    expect(g.skip[0]).toBe(0);
+    expect(g.parties).toEqual([[88, 0, 176, 76], [344, 0, 176, 76], [600, 0, 176, 76]]);
+    expect(g.lifelines).toEqual([176, 432, 688]);
+    expect(g.rules).toEqual([168, 244, 320, 396]);
+    expect(g.band).toEqual([48, 244, 768, 76]);
+    expect(g.mark).toEqual([43, 244, 5, 76]);
+    expect(g.numbers).toEqual([[0, 130], [0, 206], [0, 282], [0, 358], [0, 434]]);
+    // Row 1 and 2: a square on your platform; 4 and 5: a square on the financier, on the row's line.
+    expect(g.squares).toEqual([[[176, 130]], [[176, 206]], [[688, 370]], [[688, 446]]]);
+    for (const [n, [x, y]] of [[2, [190, 197]], [3, [188, 258]], [4, [444, 334]], [5, [188, 410]]] as const) {
+      const [lx, ly] = g.labels[n - 2];
+      expect(Math.abs(lx - x), `row ${n} label x`).toBeLessThanOrEqual(1);
+      expect(Math.abs(ly - y), `row ${n} label y`).toBeLessThanOrEqual(1);
+    }
+    expect(g.arrows).toEqual([
+      { at: [176, 432, 294], back: false, dash: "6 4", colour: MUTED },
+      { at: [432, 683, 370], back: false, dash: null, colour: INK },
+      { at: [176, 432, 446], back: true, dash: "6 4", colour: MUTED },
+    ]);
+    // Kubar Protocol: petrol, with the mark; the other two white with an ink edge.
+    const kubar = on(page).locator(".run-party").nth(1);
+    await expect(kubar).toHaveCSS("background-color", INK);
+    await expect(kubar.locator("svg")).toBeVisible();
+    await expect(on(page).locator(".run-party").first()).toHaveCSS("border-top-color", INK);
+    await expect(on(page).locator(".run-party")).toHaveText(["Your platform", "Kubar Protocol", "The financier"]);
+    await expect(on(page).locator(".run-row .t-ui-sm")).toHaveText(["NavDhan SDK", "With the exporter’s consent", "The evidence package", "Each step as it happens"]);
+    await expectNoAxeViolations(page);
+  });
+
+  for (const [width, height] of [[1440, 900], [1180, 820], [390, 844]] as const) {
+    test(`at ${width} row n lights with card n: down, up, three rounds, and again after a reload`, async ({ browser }) => {
+      test.setTimeout(120_000);
+      const context = await browser.newContext({ viewport: { width, height }, hasTouch: width < 1200, isMobile: width < 768 });
+      const page = await context.newPage();
+      await page.goto(SDK);
+      for (const pass of ["first load", "after a reload"]) {
+        if (pass === "after a reload") await page.reload();
+        await storyLive(page);
+        for (let round = 1; round <= 3; round++) {
+          for (const order of [[1, 2, 3, 4, 5], [5, 4, 3, 2, 1]]) {
+            for (const n of order) {
+              await scrollToState(page, n);
+              await expect(on(page), `${pass}, round ${round}`).toHaveAttribute("data-story-state", String(n));
+              expect(await journeyAt(page), `${pass}, round ${round}, state ${n}`).toEqual(expected(n));
+              await expect(on(page).locator(".story-card[data-current]"), `${pass}: one card raised`).toHaveCount(1);
+            }
+          }
+        }
+      }
+      expect(await overflow(page)).toBe(0);
+      await context.close();
+    });
+  }
+
+  test("it pins at every size it must, also as the address bar hides and shows, and lets go after the last card", async ({ page }) => {
+    for (const [width, height] of [[1440, 790], [1366, 650], [1536, 730], [1280, 590], [1024, 768], [1180, 820], [820, 1050], [768, 1024], [390, 664], [375, 667], [360, 800]] as const) {
+      const where = `${width}x${height}`;
+      await page.setViewportSize({ width, height });
+      await page.goto(SDK);
+      await storyLive(page);
+      await expect(story(page), where).toHaveAttribute("data-story-fits", "true");
+      const lanes = on(page).locator(".run-lanes");
+      await scrollToState(page, 2);
+      await expect(on(page), where).toHaveAttribute("data-story-state", "2");
+      await scrollToState(page, 3);
+      await expect(on(page), where).toHaveAttribute("data-story-state", "3");
+      const pinned = Math.round((await lanes.boundingBox())!.y);
+      // Pinned under the header: 24 px and the skip link (44) on laptops; the pin's 16 and the link's 36 below.
+      const header = await page.evaluate(() => parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--header-height")));
+      expect(pinned, `${where} pinned under the header`).toBe(header + (width >= 1024 ? 68 : 52));
+      await page.setViewportSize({ width, height: height + 56 });
+      await scrollToState(page, 4);
+      await expect(on(page), `${where} + 56`).toHaveAttribute("data-story-state", "4");
+      await expect(on(page)).toBeVisible();
+      expect(Math.round((await lanes.boundingBox())!.y), `${where} + 56 pinned`).toBe(pinned);
+      await page.setViewportSize({ width, height });
+      await scrollToState(page, 5);
+      await expect(on(page), where).toHaveAttribute("data-story-state", "5");
+      expect(Math.round((await lanes.boundingBox())!.y), `${where} pinned at 05`).toBe(pinned);
+      // The skip link stays with the lanes.
+      expect((await on(page).getByRole("link", { name: "Skip the five steps" }).boundingBox())!.y, where).toBeLessThan(pinned);
+      await page.evaluate(() => {
+        const last = document.querySelectorAll(".story-on .story-card")[4].parentElement!.getBoundingClientRect();
+        window.scrollTo({ top: last.bottom + scrollY - 40, behavior: "instant" });
+      });
+      expect((await lanes.boundingBox())!.y, `${where} released`).toBeLessThan(pinned - 100);
+      expect(await overflow(page), where).toBe(0);
+    }
+  });
+
+  test("on phones every state holds for a third of the screen and the current card stays clear of the lanes; the narrow lanes keep their words readable", async ({ browser }) => {
+    for (const [width, height] of [[390, 844], [360, 800], [375, 667]] as const) {
+      const where = `${width}x${height}`;
+      const context = await browser.newContext({ viewport: { width, height }, hasTouch: true, isMobile: true });
+      const page = await context.newPage();
+      await page.goto(SDK);
+      await storyLive(page);
+      const section = await page.evaluate(() => {
+        const box = document.querySelector('.story[data-variant="sdk"]')!.getBoundingClientRect();
+        const on = document.querySelector('.story[data-variant="sdk"] .story-on')!;
+        const lanes = on.querySelector(".run-lanes")!;
+        const lines = (node: Element) => {
+          const range = document.createRange();
+          range.selectNodeContents(node);
+          return new Set([...range.getClientRects()].map((rect) => Math.round(rect.top))).size;
+        };
+        return {
+          top: box.top + scrollY,
+          height: box.height,
+          slots: [...on.querySelectorAll(".story-card")].map((card) => card.parentElement!.getBoundingClientRect().height),
+          parties: [...lanes.querySelectorAll(".run-party")].map((party) => [getComputedStyle(party).fontSize, lines(party)]),
+          labels: [...lanes.querySelectorAll(".run-row .t-ui-sm")].map((label) => [getComputedStyle(label).fontSize, lines(label), Math.round(label.getBoundingClientRect().right)]),
+          numbers: [...lanes.querySelectorAll(".run-no")].map((no) => getComputedStyle(no).fontSize),
+          right: Math.round(lanes.getBoundingClientRect().right),
+        };
+      });
+      // The party names at 12 px on one line each; the labels at 13, inside the drawing; the numbers at the tag's 11.
+      expect(section.parties, where).toEqual(Array(3).fill(["12px", 1]));
+      for (const [size, count, right] of section.labels) {
+        expect([size, count], where).toEqual(["13px", 1]);
+        expect(right, where).toBeLessThanOrEqual(section.right);
+      }
+      expect(section.numbers, where).toEqual(Array(5).fill("11px"));
+      for (const slot of section.slots.slice(1, 4)) expect(slot, where).toBeGreaterThanOrEqual(height / 3 - 0.5);
+      let worst = 0;
+      const seen = new Set<string>();
+      for (let y = section.top - 400; y < section.top + section.height; y += 40) {
+        await page.evaluate((y) => window.scrollTo({ top: y, behavior: "instant" }), y);
+        const at = await page.evaluate(
+          () =>
+            new Promise<{ state: string; under: number; stuck: boolean; shown: boolean }>((resolve) =>
+              requestAnimationFrame(() =>
+                requestAnimationFrame(() => {
+                  const on = document.querySelector('.story[data-variant="sdk"] .story-on')!;
+                  const pin = on.querySelector(".story-pin")!.getBoundingClientRect();
+                  const card = on.querySelector(".story-card[data-current]")!.getBoundingClientRect();
+                  resolve({ state: on.getAttribute("data-story-state")!, under: pin.bottom - card.top, stuck: Math.abs(pin.top - 65) < 1.5, shown: pin.top >= 65 && pin.bottom <= innerHeight });
+                }),
+              ),
+            ),
+        );
+        if (at.shown) seen.add(at.state);
+        if (at.stuck) worst = Math.max(worst, at.under);
+      }
+      expect([...seen].sort(), where).toEqual(["1", "2", "3", "4", "5"]);
+      expect(worst, `${where}: the current card's top is never under the lanes`).toBeLessThanOrEqual(1);
+      expect(await overflow(page), where).toBe(0);
+      await context.close();
+    }
+  });
+
+  test("laptops: the lanes fit their column, the party names keep one line and nothing scrolls sideways", async ({ page }) => {
+    for (const width of [1024, 1080, 1133, 1180, 1200, 1280, 1366, 1920]) {
+      await page.setViewportSize({ width, height: 800 });
+      await page.goto(SDK);
+      await storyLive(page);
+      expect(await overflow(page), `${width}`).toBe(0);
+      const fit = await on(page).evaluate((el) => {
+        const lanes = el.querySelector(".run-lanes")!.getBoundingClientRect();
+        const content = el.closest(".page-container")!;
+        const style = getComputedStyle(content);
+        const right = content.getBoundingClientRect().right - parseFloat(style.paddingRight);
+        return {
+          inside: lanes.right <= right + 0.5,
+          names: [...el.querySelectorAll(".run-party")].map((party) => [...party.childNodes].filter((node) => node.nodeType === 3).map((node) => {
+            const range = document.createRange();
+            range.selectNodeContents(node);
+            return range.getClientRects().length;
+          })[0]),
+          labels: [...el.querySelectorAll(".run-row .t-ui-sm")].every((label) => label.getBoundingClientRect().right <= lanes.right),
+        };
+      });
+      expect(fit, `${width}`).toEqual({ inside: true, names: [1, 1, 1], labels: true });
+    }
+  });
+
+  test("with reduced motion, on a short screen or without script, the register shows as today, with every word", async ({ browser }) => {
+    const cases = [
+      { reducedMotion: "reduce" as const, viewport: { width: 1440, height: 900 } },
+      { reducedMotion: "reduce" as const, viewport: { width: 390, height: 844 } },
+      { viewport: { width: 1280, height: 520 } },
+      { viewport: { width: 375, height: 548 } },
+      { viewport: { width: 844, height: 390 } },
+      { javaScriptEnabled: false, viewport: { width: 1440, height: 900 } },
+      { javaScriptEnabled: false, viewport: { width: 390, height: 844 } },
+    ];
+    for (const options of cases) {
+      const where = JSON.stringify(options);
+      const context = await browser.newContext(options);
+      const page = await context.newPage();
+      await page.goto(SDK);
+      if (options.javaScriptEnabled !== false && !options.reducedMotion) await expect(story(page), where).toHaveAttribute("data-story-fits", "false");
+      await expect(on(page), where).toBeHidden();
+      await expect(register(page), where).toBeVisible();
+      const rows = register(page).locator("table tr");
+      await expect(rows, where).toHaveCount(5);
+      for (const [i, step] of steps.entries()) await expect(rows.nth(i), where).toContainText(step);
+      await expect(page.getByRole("link", { name: "See how it works" }), where).toBeVisible();
+      expect(await overflow(page), where).toBe(0);
+      await context.close();
+    }
+  });
+
+  test("Skip the five steps sits above the lanes and goes to the next section; See how it works follows the cards", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(SDK);
+    await storyLive(page);
+    const skip = on(page).getByRole("link", { name: "Skip the five steps" });
+    await expect(skip).toHaveAttribute("href", "#rules");
+    await expect(skip).toHaveClass(/tap-area/);
+    // The first stop in the journey: Tab from the section's heading reaches it.
+    await page.locator("#runs-heading").evaluate((el) => {
+      el.setAttribute("tabindex", "-1");
+      (el as HTMLElement).focus();
+    });
+    await page.keyboard.press("Tab");
+    await expect(skip).toBeFocused();
+    await page.keyboard.press("Tab");
+    await expect(page.getByRole("link", { name: "See how it works" })).toBeFocused();
+    await expect(page.getByRole("link", { name: "See how it works" })).toHaveAttribute("href", "/how-it-works");
+    // Below the last card, in the cards' column.
+    const last = (await on(page).locator(".story-card").last().boundingBox())!;
+    const link = (await page.getByRole("link", { name: "See how it works" }).boundingBox())!;
+    expect(link.y).toBeGreaterThan(last.y + last.height);
+    expect(Math.round(link.x)).toBe(Math.round(last.x));
+    await skip.click();
+    await expect(page).toHaveURL(/#rules$/);
+    await expect(page.locator("#rules-heading")).toBeInViewport();
+  });
+
+  test("one pinned journey a page", async ({ page }) => {
+    for (const path of publicRoutes) {
+      await page.goto(path);
+      expect(await page.locator(".story").count(), path).toBeLessThanOrEqual(1);
     }
   });
 });

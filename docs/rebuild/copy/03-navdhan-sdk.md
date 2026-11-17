@@ -70,7 +70,9 @@ Events for your product | Status updates you can show your users
 [H2] How it runs on your platform.
 (16 Nov: the page's pinned journey; this link sits above the lanes and goes to the next section.)
 [UI] Skip the five steps
-Desktop: a five-step register beside three lanes (Your platform, Kubar Protocol filled, The financier; component "Platform lanes", 138:2455). At 768 and 390: the register only.
+(17 Nov, next build step 10: the page's pinned journey, Figma 331:1202. The three lanes pin and the five steps are cards that scroll past them, each with its counter and its sentence; row n of the lanes lights with card n, the lane labels below on the rows. Side by side from 1024; below, the lanes pin above the cards, redrawn narrow on phones. With reduced motion, on a short screen or without script, the register below shows as today.)
+[Tag] 01 of 05                                           (the cards' counters, 01 of 05 to 05 of 05)
+The register: desktop, a five-step register beside three lanes (Your platform, Kubar Protocol filled, The financier; component "Platform lanes", 138:2455). At 768 and 390: the register only.
 (After step 3, REDRAW-2026-11-14.md section 10: the column heads "Step" and "What happens" are cut; they name nothing.)
 [Code] 01  [Body] Your exporter books and documents a shipment in your platform, as it does today.
 [Code] 02  [Body] NavDhan SDK checks the shipment against the programme’s rules and shows an indicative offer.

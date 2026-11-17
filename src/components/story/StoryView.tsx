@@ -27,6 +27,11 @@ import { cx as cn } from "@/lib/cx";
  * `children` shows instead. Reduced motion is decided in CSS, so it holds
  * without script too; the height check needs script, and without it the
  * cards still carry every word.
+ *
+ * NavDhan SDK ("sdk", step 10) pins its three lanes (RunLanes) the same way,
+ * with five cards: "01 of 05" and the step's sentence. Its skip link sits
+ * above the lanes, pinned with them; it has no record row. Without script
+ * its register shows instead (globals.css), so the drawing is complete.
  */
 export type LedgerState = {
   no: string;
@@ -38,6 +43,7 @@ export type LedgerState = {
 };
 
 const DESKTOP = "(min-width: 1024px)";
+const TABLET = "(min-width: 768px)";
 /** Where the content reaches 1040 px: How it works pins the relying lines with its stack from here. */
 const WIDE = "(min-width: 1200px)";
 const PHONE = "(max-width: 767.98px)";
@@ -76,12 +82,15 @@ export function StoryView({
   copy: unknown;
   /** The eight states. */
   states: LedgerState[];
-  /** State 08's footnote marker, rendered on the server. */
-  marker: React.ReactNode;
+  /** State 08's footnote marker, rendered on the server (Home and How it works). */
+  marker?: React.ReactNode;
   /** The lanes drawing, rendered on the server; it follows data-story-state in CSS. */
   lanes: React.ReactNode;
-  /** "howItWorks": the sentence in Sans/Body, and the evidence stack as the pinned drawing (sized by its own rule). */
-  variant?: "home" | "howItWorks";
+  /**
+   * "howItWorks": the sentence in Sans/Body, and the evidence stack as the pinned drawing (sized by
+   * its own rule). "sdk": NavDhan SDK's five steps beside its lanes, the skip link above them.
+   */
+  variant?: "home" | "howItWorks" | "sdk";
   /** What follows the cards, under the drawing's column at desktop. */
   after?: React.ReactNode;
   /** How it works: the line that ends the eight states on tablets and phones. */
@@ -91,6 +100,7 @@ export function StoryView({
 }) {
   const t = reader(copy);
   const long = variant === "howItWorks";
+  const sdk = variant === "sdk";
   const pinRef = useRef<HTMLDivElement>(null);
   const stepsRef = useRef<HTMLOListElement>(null);
   const [state, setState] = useState(1);
@@ -107,17 +117,25 @@ export function StoryView({
     const check = () => {
       frame = 0;
       const svh = probe.getBoundingClientRect().height;
-      // The lanes need their smallest rows; the evidence stack its smallest height (globals.css, .story-stack).
+      // The lanes need their smallest rows; the evidence stack its smallest height (globals.css,
+      // .story-stack). NavDhan SDK (globals.css, .story[data-variant="sdk"]): on laptops rows of at
+      // least 56 px under the header, 24 px, the skip link (44) and the party row (92), with 24 px
+      // to spare; below, the pinned link and lanes at their smallest (328 px on phones, 416 on
+      // tablets) must leave 240 px for the cards.
       const ok = window.matchMedia(DESKTOP).matches
         ? long
           ? window.matchMedia(WIDE).matches
             ? svh - headerHeight() - 256 >= 250
             : svh - headerHeight() - 110 >= 346
-          : (svh - headerHeight() - 64 - 48) / 8 >= 44
-        : long && !window.matchMedia("(min-width: 768px)").matches
-          ? // On a phone the pinned stack and its list would take over half of a short screen.
-            svh >= 620
-          : (0.45 * svh - 40 - 24) / 8 >= 22;
+          : sdk
+            ? (svh - headerHeight() - 184) / 5 >= 56
+            : (svh - headerHeight() - 64 - 48) / 8 >= 44
+        : sdk
+          ? svh - headerHeight() - (window.matchMedia(TABLET).matches ? 416 : 328) >= 240
+          : long && !window.matchMedia(TABLET).matches
+            ? // On a phone the pinned stack and its list would take over half of a short screen.
+              svh >= 620
+            : (0.45 * svh - 40 - 24) / 8 >= 22;
       setFits(ok);
     };
     const schedule = () => {
@@ -130,7 +148,7 @@ export function StoryView({
       if (frame) cancelAnimationFrame(frame);
       probe.remove();
     };
-  }, [long]);
+  }, [long, sdk]);
 
   // Which state is current: the card crossing the 45% line.
   useEffect(() => {
@@ -144,7 +162,7 @@ export function StoryView({
       observer?.disconnect();
       const height = window.innerHeight;
       const top = headerHeight() + (window.matchMedia(DESKTOP).matches ? 0 : (pinRef.current?.offsetHeight ?? 0));
-      // Home on phones: a card turns current one slot's height below the drawing, so the card
+      // Home and NavDhan SDK on phones: a card turns current one slot's height below the drawing, so the card
       // before it is still clear of the drawing when it hands over; never lower than 48 px above
       // the foot of the screen. Everywhere else: 45% of the way down the space left for the text.
       const phone = !long && window.matchMedia(PHONE).matches;
@@ -189,35 +207,59 @@ export function StoryView({
   const idRow = (className: string) => <p className={cn("t-tag text-ink", className)}>{t("record")}</p>;
 
   return (
-    <div className="story" data-story-fits={fits ? "true" : "false"} style={{ ["--last-card" as string]: "203px" }}>
+    <div className="story" data-variant={variant} data-story-fits={fits ? "true" : "false"} style={{ ["--last-card" as string]: "203px" }}>
       <div data-no-abbr data-story-state={state} className="story-on">
         {/* The drawing and the cards share a box that ends with the last card,
-            so the drawing stops being pinned as the last card leaves. */}
-        <div className={cn("lg:grid lg:items-start lg:gap-x-6", long ? "lg:grid-cols-[360px_minmax(0,1fr)] xl:grid-cols-[411px_minmax(0,1fr)]" : "lg:grid-cols-[380px_minmax(0,1fr)] xl:grid-cols-[411px_minmax(0,1fr)]")}>
-          {/* The pinned drawing. Phones and tablets pin the record's id row with it, on a
-              ground that reaches the screen's edges and fades out over its last 24 px,
-              so the cards pass under it (story-pin, globals.css). */}
+            so the drawing stops being pinned as the last card leaves. NavDhan SDK
+            (331:1202): 400 px cards, 64 from the lanes; 340 and 32 below 1200, so
+            the lanes keep the room their labels need. */}
+        <div
+          className={cn(
+            "lg:grid lg:items-start",
+            sdk
+              ? "lg:grid-cols-[340px_minmax(0,1fr)] lg:gap-x-8 xl:grid-cols-[400px_minmax(0,1fr)] xl:gap-x-12 min-[1280px]:gap-x-16"
+              : long
+                ? "lg:grid-cols-[360px_minmax(0,1fr)] lg:gap-x-6 xl:grid-cols-[411px_minmax(0,1fr)]"
+                : "lg:grid-cols-[380px_minmax(0,1fr)] lg:gap-x-6 xl:grid-cols-[411px_minmax(0,1fr)]",
+          )}
+        >
+          {/* The pinned drawing. Phones and tablets pin the record's id row with it (NavDhan
+              SDK its skip link, at every width), on a ground that reaches the screen's edges
+              and fades out over its last 24 px, so the cards pass under it (story-pin, globals.css). */}
           <div
             ref={pinRef}
             className={cn(
               "story-pin @container sticky top-(--header-height) z-10 -mx-(--page-margin) bg-page px-(--page-margin) pt-4 pb-3 lg:col-start-2 lg:row-start-1 lg:top-[calc(var(--header-height)+24px)] lg:mx-0 lg:bg-transparent lg:p-0",
-              // Home on phones: the drawing lets go as the last card reaches it, not after the card
+              // Home and NavDhan SDK on phones: the drawing lets go as the last card reaches it, not after the card
               // has slid under it. A sticky box may not leave its container by its margin, so a
               // bottom margin the height of the last card releases it that much sooner; the cards'
               // column takes the same margin back, and the layout is unchanged.
               !long && "max-md:mb-(--last-card)",
             )}
           >
-            {idRow("mb-3 lg:hidden")}
+            {sdk ? (
+              // NavDhan SDK: the skip link above the lanes, pinned with them.
+              <div className="mb-3 flex lg:mb-5">
+                <TextLink href={`#${skipTo}`} kind="anchor">
+                  {t("skip")}
+                </TextLink>
+              </div>
+            ) : (
+              idRow("mb-3 lg:hidden")
+            )}
             {lanes}
           </div>
 
           <div className={cn("flex flex-col lg:col-start-1 lg:row-start-1", !long && "max-md:-mt-(--last-card)")}>
-            {idRow("mb-4 hidden border-b border-rule-strong pb-2.5 lg:block")}
-            {/* Home's link has no arrow (section 13 B3); How it works keeps the frame's. */}
-            <TextLink href={`#${skipTo}`} kind={long ? "anchor" : "plain"} className="tap-area mt-1 mb-4 self-start lg:mt-0 lg:mb-5">
-              {t("skip")}
-            </TextLink>
+            {sdk ? null : (
+              <>
+                {idRow("mb-4 hidden border-b border-rule-strong pb-2.5 lg:block")}
+                {/* Home's link has no arrow (section 13 B3); How it works keeps the frame's. */}
+                <TextLink href={`#${skipTo}`} kind={long ? "anchor" : "plain"} className="tap-area mt-1 mb-4 self-start lg:mt-0 lg:mb-5">
+                  {t("skip")}
+                </TextLink>
+              </>
+            )}
 
             <ol ref={stepsRef}>
               {states.map((step, index) => {
@@ -237,7 +279,9 @@ export function StoryView({
                     // over a third of the screen, which keeps the section short; How
                     // it works, whose cards are long, about 60svh. The last slot is
                     // just long enough for its card to reach the line before the
-                    // drawing leaves with it.
+                    // drawing leaves with it. NavDhan SDK's cards step as Home's; its
+                    // lanes are shorter than the screen, so its last slot reads their
+                    // height (--run-pin, globals.css).
                     className={cn(
                       "lg:pb-6",
                       n < states.length
@@ -246,42 +290,56 @@ export function StoryView({
                           : // Home on phones: 8 px between cards, and from the second state on a slot of
                             // at least a third of the screen, which is the scroll its state holds for.
                             cn("pb-2 md:pb-[min(96px,12svh)] lg:min-h-[36svh]", n > 1 && "max-md:min-h-[calc(100svh/3)]")
-                        : "lg:min-h-[calc(0.55*(100svh-var(--header-height))+24px)]",
+                        : sdk
+                          ? "lg:min-h-[calc(var(--run-pin)+48px-0.45*(100svh-var(--header-height)))]"
+                          : "lg:min-h-[calc(0.55*(100svh-var(--header-height))+24px)]",
                     )}
                   >
                     <div
                       aria-current={current ? "step" : undefined}
                       data-current={current ? "" : undefined}
-                      className="story-card flex flex-col gap-3 border border-rule bg-raised px-[18px] pt-3.5 pb-4 lg:px-6 lg:pt-5 lg:pb-[22px]"
+                      className={cn("story-card flex flex-col gap-3 border border-rule bg-raised", sdk ? "p-5 lg:p-6" : "px-[18px] pt-3.5 pb-4 lg:px-6 lg:pt-5 lg:pb-[22px]")}
                     >
-                      <p className="flex items-baseline justify-between gap-3">
-                        <span className={cn("t-state transition-colors duration-(--duration-disclose)", current && !planned ? "text-accent" : "text-ink-muted")}>
-                          {step.state}
-                          {planned ? marker : null}
-                        </span>
-                        <span className="t-label shrink-0 text-ink-muted">{t("counter", { n: step.no })}</span>
-                      </p>
-                      <p className={cn("transition-colors duration-(--duration-disclose)", long ? "t-body" : "t-ui-lg", tone)}>{step.what}</p>
-                      {/* Each sentence names who acts; on How it works the stack's labels carry the documents. */}
-                      {data ? (
-                        <div className="flex flex-col gap-0.5 border-t border-rule pt-2.5">
-                          <p className={cn("t-fine flex items-center gap-2 transition-colors duration-(--duration-disclose)", tone)}>
-                            <PathGlyph kind="data" />
-                            {t("dataPath")}
+                      {sdk ? (
+                        // NavDhan SDK (331:1202): "01 of 05", rani while current, and the step's sentence.
+                        <>
+                          <p className={cn("t-tag transition-colors duration-(--duration-disclose)", current ? "text-accent" : "text-ink-muted")}>
+                            {t("counter", { n: step.no })}
                           </p>
-                          <p className={cn("t-body-sm transition-colors duration-(--duration-disclose)", tone)}>{data}</p>
-                        </div>
-                      ) : null}
-                      {step.money ? (
-                        <div className="flex flex-col gap-0.5 border-t border-rule pt-2.5">
-                          <p className={cn("t-fine flex flex-wrap items-center gap-x-2 transition-colors duration-(--duration-disclose)", tone)}>
-                            <PathGlyph kind="money" />
-                            {t("moneyPath")}
-                            <span className="text-ink-muted">{t("holdsNone")}</span>
+                          <p className={cn("t-body-lg transition-colors duration-(--duration-disclose)", tone)}>{step.what}</p>
+                        </>
+                      ) : (
+                        <>
+                          <p className="flex items-baseline justify-between gap-3">
+                            <span className={cn("t-state transition-colors duration-(--duration-disclose)", current && !planned ? "text-accent" : "text-ink-muted")}>
+                              {step.state}
+                              {planned ? marker : null}
+                            </span>
+                            <span className="t-label shrink-0 text-ink-muted">{t("counter", { n: step.no })}</span>
                           </p>
-                          <p className={cn("t-body-sm transition-colors duration-(--duration-disclose)", tone)}>{step.money}</p>
-                        </div>
-                      ) : null}
+                          <p className={cn("transition-colors duration-(--duration-disclose)", long ? "t-body" : "t-ui-lg", tone)}>{step.what}</p>
+                          {/* Each sentence names who acts; on How it works the stack's labels carry the documents. */}
+                          {data ? (
+                            <div className="flex flex-col gap-0.5 border-t border-rule pt-2.5">
+                              <p className={cn("t-fine flex items-center gap-2 transition-colors duration-(--duration-disclose)", tone)}>
+                                <PathGlyph kind="data" />
+                                {t("dataPath")}
+                              </p>
+                              <p className={cn("t-body-sm transition-colors duration-(--duration-disclose)", tone)}>{data}</p>
+                            </div>
+                          ) : null}
+                          {step.money ? (
+                            <div className="flex flex-col gap-0.5 border-t border-rule pt-2.5">
+                              <p className={cn("t-fine flex flex-wrap items-center gap-x-2 transition-colors duration-(--duration-disclose)", tone)}>
+                                <PathGlyph kind="money" />
+                                {t("moneyPath")}
+                                <span className="text-ink-muted">{t("holdsNone")}</span>
+                              </p>
+                              <p className={cn("t-body-sm transition-colors duration-(--duration-disclose)", tone)}>{step.money}</p>
+                            </div>
+                          ) : null}
+                        </>
+                      )}
                     </div>
                   </li>
                 );

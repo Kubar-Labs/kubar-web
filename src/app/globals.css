@@ -1636,6 +1636,107 @@
   [data-story-state="8"] .lane-current {
     transform: translateY(calc(7 * var(--row-h)));
   }
+  /* NavDhan SDK's pinned journey (RunLanes.tsx, step 10; Figma 331:1202, and the prototype's
+     narrow lanes on phones). The sizes live on the story, so the cards' last slot can read the
+     pin's height. Phones: party boxes 36 px high across the full width, 44 px rows. From 768:
+     the laptop drawing (boxes 76 high, the rows' numbers in a 48 px gutter), at its column's
+     width; tablets take rows from 45% of the screen's height, laptops fill the height under the
+     header and the skip link, 56 to 76 px. StoryView's fit check holds the same numbers. */
+  .story[data-variant="sdk"] {
+    --run-cols: 0px;
+    --run-gutter: 22px;
+    --run-mark: 4px;
+    --run-box-h: 36px;
+    --run-box-inset: 2px;
+    --run-party-h: 44px;
+    --run-row-h: 44px;
+    --run-sq: 8px;
+    --run-label-x: 10px;
+    --run-label-dy: -19px;
+    --run-arrow-dy: 10px;
+  }
+  @media (min-width: 768px) {
+    .story[data-variant="sdk"] {
+      --run-cols: 48px;
+      --run-gutter: 48px;
+      --run-mark: 5px;
+      --run-box-h: 76px;
+      --run-box-inset: 12px;
+      --run-party-h: 92px;
+      --run-row-h: clamp(52px, (45svh - 156px) / 5, 76px);
+      --run-sq: 10px;
+      --run-label-x: 12px;
+      --run-label-dy: -24px;
+      --run-arrow-dy: 12px;
+    }
+  }
+  @media (min-width: 1024px) {
+    .story[data-variant="sdk"] {
+      --run-row-h: clamp(56px, (100svh - var(--header-height) - 184px) / 5, 76px);
+      /* The pinned block: the skip link and its 20 px, then the lanes. */
+      --run-pin: calc(44px + var(--run-party-h) + 5 * var(--run-row-h));
+    }
+  }
+  .run-lanes {
+    position: relative;
+    height: calc(var(--run-party-h) + 5 * var(--run-row-h));
+  }
+  /* A party's box: 176 wide, or its column less the inset where the column is narrower. */
+  .run-party {
+    --box-w: min(176px, (100% - var(--run-cols)) / 3 - 2 * var(--run-box-inset));
+    width: var(--box-w);
+    height: var(--run-box-h);
+  }
+  .run-current {
+    transition: transform var(--duration-write) var(--ease-standard);
+  }
+  /* A row writes in as Home's do: its words and squares fade, its lines draw from their origin. */
+  .run-row {
+    opacity: 0;
+    transition: opacity var(--duration-write) var(--ease-standard);
+  }
+  .run-row svg {
+    clip-path: inset(0 100% 0 0);
+    transition: clip-path var(--duration-write) var(--ease-standard);
+  }
+  .run-row[data-row="1"],
+  :is([data-story-state="2"], [data-story-state="3"], [data-story-state="4"], [data-story-state="5"]) .run-row[data-row="2"],
+  :is([data-story-state="3"], [data-story-state="4"], [data-story-state="5"]) .run-row[data-row="3"],
+  :is([data-story-state="4"], [data-story-state="5"]) .run-row[data-row="4"],
+  [data-story-state="5"] .run-row[data-row="5"] {
+    opacity: 1;
+  }
+  .run-row[data-row="1"] svg,
+  :is([data-story-state="2"], [data-story-state="3"], [data-story-state="4"], [data-story-state="5"]) .run-row[data-row="2"] svg,
+  :is([data-story-state="3"], [data-story-state="4"], [data-story-state="5"]) .run-row[data-row="3"] svg,
+  :is([data-story-state="4"], [data-story-state="5"]) .run-row[data-row="4"] svg,
+  [data-story-state="5"] .run-row[data-row="5"] svg {
+    clip-path: inset(0 0 0 0);
+  }
+  /* The current row's number in rani; the others in the secondary colour, as the frame draws them. */
+  .run-no {
+    color: var(--color-ink-muted);
+    transition: color var(--duration-write) var(--ease-standard);
+  }
+  [data-story-state="1"] .run-no[data-row="1"],
+  [data-story-state="2"] .run-no[data-row="2"],
+  [data-story-state="3"] .run-no[data-row="3"],
+  [data-story-state="4"] .run-no[data-row="4"],
+  [data-story-state="5"] .run-no[data-row="5"] {
+    color: var(--color-accent);
+  }
+  [data-story-state="2"] .run-current {
+    transform: translateY(calc(1 * var(--run-row-h)));
+  }
+  [data-story-state="3"] .run-current {
+    transform: translateY(calc(2 * var(--run-row-h)));
+  }
+  [data-story-state="4"] .run-current {
+    transform: translateY(calc(3 * var(--run-row-h)));
+  }
+  [data-story-state="5"] .run-current {
+    transform: translateY(calc(4 * var(--run-row-h)));
+  }
   /* How it works tells the story on its evidence stack (StoryStack; REDRAW
      section 13 A). The stack's height is what the screen leaves, its width
      follows, and the rows sit beside it at the same proportions. Desktop:
@@ -1759,6 +1860,13 @@ html[data-js] .without-script {
   display: none;
 }
 .story[data-story-fits="false"] .story-ledger {
+  display: block;
+}
+/* NavDhan SDK's journey steps only with script; without it the register shows, complete (step 10). */
+html:not([data-js]) .story[data-variant="sdk"] .story-on {
+  display: none;
+}
+html:not([data-js]) .story[data-variant="sdk"] .story-ledger {
   display: block;
 }
 @media (prefers-reduced-motion: reduce) {

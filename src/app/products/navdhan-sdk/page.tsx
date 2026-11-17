@@ -5,12 +5,12 @@ import { createPageMetadata } from "@/app/page-metadata";
 import { NextStep } from "@/components/blocks/Closing";
 import { PageHero } from "@/components/blocks/PageHero";
 import { Section, SectionHead } from "@/components/blocks/Section";
-import { FitStage } from "@/components/drawings/FitStage";
 import { WhereThisSits } from "@/components/blocks/WhereThisSits";
 import { Footnote } from "@/components/ui/Footnote";
 import { EmbedPicker, type SketchCopy } from "@/components/sdk/EmbedPicker";
 import { IsoLayers } from "@/components/sdk/IsoLayers";
-import { NumberedRows, PlatformLanes } from "@/components/sdk/PlatformLanes";
+import { NumberedRows } from "@/components/sdk/PlatformLanes";
+import { RunJourney } from "@/components/sdk/RunJourney";
 import { TextLink } from "@/components/ui/TextLink";
 
 /*
@@ -18,7 +18,8 @@ import { TextLink } from "@/components/ui/TextLink";
  * so below 1024 the page follows the existing rules). No "Where it stands",
  * no status words, no Illustrative tag. The hero carries "What you embed"
  * beside the sketch; the two audiences are one two-column block; the rules
- * have no numbers; "Behind it" is the isometric layers.
+ * have no numbers; "Behind it" is the isometric layers. "How it runs" is the
+ * page's pinned journey (step 10).
  */
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -69,23 +70,20 @@ export default function NavdhanSdk() {
         ))}
       </Section>
 
+      {/* The page's pinned journey (step 10, Figma 331:1202): the lanes pinned, the five steps as
+          cards; "Skip the five steps" goes to the rules. The link after the cards shows with the
+          register too. */}
       <Section labelledBy="runs-heading" className="flex flex-col gap-10 lg:gap-16">
         <SectionHead id="runs-heading" heading={t("runs.heading")} layout="wide" />
-        <div className="flex flex-col items-start gap-10">
-          {/* The drawing keeps its 1062 composition and is fitted to its column on narrower laptops
-              (rule 11.1): 0.89 at 1024, where its 13 px labels hold 12 px (fit-keep). */}
-          <FitStage width={1062} height={528} estimate={0.88} className="w-full">
-            <PlatformLanes
-              steps={t.raw("runs.steps") as string[]}
-              lanes={t.raw("runs.lanes") as string[]}
-              paths={t.raw("runs.paths") as { sdk: string; consent: string; evidence: string; status: string }}
-            />
-          </FitStage>
-          <TextLink href="/how-it-works" kind="arrow">{t("runs.link")}</TextLink>
+        <div className="flex flex-col gap-10">
+          <RunJourney skipTo="rules" />
+          <TextLink href="/how-it-works" kind="arrow" className="self-start">
+            {t("runs.link")}
+          </TextLink>
         </div>
       </Section>
 
-      <Section labelledBy="rules-heading" ground="inset" className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-12 xl:gap-20">
+      <Section id="rules" labelledBy="rules-heading" ground="inset" className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-12 xl:gap-20">
         <SectionHead id="rules-heading" heading={t("rules.heading")} layout="stacked" />
         {/* Not a sequence, so no numbers (REDRAW rule 7). */}
         <NumberedRows numbered={false} items={t.raw("rules.items") as string[]} className="min-w-0 flex-1" />

@@ -1196,7 +1196,8 @@
         "status": "Each step as it happens"
       },
       "link": "See how it works",
-      "skip": "Skip the five steps"
+      "skip": "Skip the five steps",
+      "counter": "{n} of 05"
     },
     "rules": {
       "heading": "Rules the SDK follows.",

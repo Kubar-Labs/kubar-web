@@ -167,7 +167,9 @@ describe("copy matches docs/rebuild/copy word for word", () => {
     const skip = new Set(["Capability", "Step"]);
     for (const line of pageFragments("03-navdhan-sdk.md")) {
       if (skip.has(line)) continue;
-      expect(flat.includes(JSON.stringify(line).slice(1, -1)), `missing: ${line}`).toBe(true);
+      // The journey's cards count "01 of 05" to "05 of 05" (step 10).
+      const expected = line.replace(/^(\d\d) of 05$/, "{n} of 05");
+      expect(flat.includes(JSON.stringify(expected).slice(1, -1)), `missing: ${line}`).toBe(true);
     }
     expect(allMessages).not.toMatch(/In build|Where it stands/);
   });
