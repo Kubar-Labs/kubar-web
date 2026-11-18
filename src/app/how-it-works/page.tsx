@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Fragment } from "react";
 import { useTranslations } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import { createPageMetadata } from "@/app/page-metadata";
@@ -134,13 +135,22 @@ export default function HowItWorks() {
 
       <Section id="terms" labelledBy="terms-heading" className="flex flex-col gap-10 lg:gap-16">
         <SectionHead id="terms-heading" heading={t("terms.heading")} layout="wide" />
+        {/* The first six terms; "Show all 19 terms" opens the rest in place (step 11, 333:2955). */}
         <Terms
           className="lg:max-w-[954px]"
+          shown={6}
+          showAll={t("terms.showAll")}
           rows={(t.raw("terms.rows") as [string, string][]).map(([term, meaning]) => {
             const [before, after] = meaning.split("<marker></marker>");
             return [
               term,
-              after === undefined ? meaning : <>{before}<FootnoteMarker n={1} target={FN_STATUS} refId="fnref-1-terms" />{after}</>,
+              after === undefined ? meaning : (
+                <Fragment key={term}>
+                  {before}
+                  <FootnoteMarker n={1} target={FN_STATUS} refId="fnref-1-terms" />
+                  {after}
+                </Fragment>
+              ),
             ];
           })}
         />

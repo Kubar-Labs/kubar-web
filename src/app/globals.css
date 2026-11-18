@@ -1312,38 +1312,12 @@
     opacity: 0.3;
   }
 
-  /* If a buyer doesn't pay (UnpaidFlow): each beat fades in at its --beat;
-     the fork's stem draws down and its bar out from the stem (transform). */
-  [data-phase="armed"] .flow-beat {
-    opacity: 0;
-  }
-  [data-phase="playing"] .flow-beat {
-    transition: opacity var(--duration-write) var(--ease-standard) var(--beat, 0ms);
-  }
-  .fork-stem {
-    transform-origin: top;
-  }
-  .fork-bar {
-    transform-origin: 720px 0; /* the stem, 870 - 150 */
-  }
-  [data-phase="armed"] .fork-stem {
-    transform: scaleY(0);
-  }
-  [data-phase="armed"] .fork-bar {
-    transform: scaleX(0);
-  }
-  [data-phase="playing"] :is(.fork-stem, .fork-bar) {
-    transition: transform var(--duration-write) var(--ease-standard) var(--beat, 0ms);
-  }
   /* Print: drawings that wait to come into view are printed in their end state. */
   @media print {
     .phase-drop,
     .phase-fade,
-    .flow-beat,
     .steps-rise,
-    .steps-petrol,
-    .fork-stem,
-    .fork-bar {
+    .steps-petrol {
       opacity: 1 !important;
       transform: none !important;
       animation: none !important;
@@ -1363,6 +1337,98 @@
   .unpaid-flow {
     container-type: inline-size;
     --flow-box: min(300px, calc((100cqw - 120px) / 3));
+  }
+  /* Each part of the path is lit unless the flow hasn't reached its beat (the rules after the
+     layers set --flow-on to 0 then, and no delays). A lit step is raised: --elevation-2 on a
+     pseudo-element that fades, as the journeys' cards are, and its words are in ink. Lines draw
+     from their start; a head shows once its line has arrived. The fork's stem draws down, then
+     its halves out from it, then the branch arrows. */
+  .flow-box::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    box-shadow: var(--elevation-2);
+    pointer-events: none;
+    opacity: var(--flow-on, 1);
+    transition: opacity var(--duration-write) var(--ease-standard);
+  }
+  .flow-box p {
+    color: var(--flow-words, var(--color-ink));
+    transition: color var(--duration-write) var(--ease-standard);
+  }
+  .flow-line {
+    stroke-dasharray: 1;
+    stroke-dashoffset: calc((1 - var(--flow-on, 1)) * 1px);
+    transition: stroke-dashoffset var(--duration-write) var(--ease-standard);
+  }
+  .flow-head {
+    opacity: var(--flow-on, 1);
+    transition: opacity var(--duration-hover) var(--ease-standard) var(--flow-delay, var(--duration-write));
+  }
+  .fork-stem {
+    transform: scaleY(var(--flow-on, 1));
+    transform-origin: top;
+    transition: transform var(--duration-hover) var(--ease-standard);
+  }
+  .fork-half {
+    transform: scaleX(var(--flow-on, 1));
+    transition:
+      transform var(--duration-write) var(--ease-standard) var(--flow-delay, var(--duration-hover)),
+      opacity var(--duration-disclose) var(--ease-standard);
+  }
+  .fork-half[data-branch="0"] {
+    transform-origin: right;
+  }
+  .fork-half[data-branch="1"] {
+    transform-origin: left;
+  }
+  .fork-arrow .flow-line {
+    transition-delay: var(--flow-delay, calc(var(--duration-hover) + var(--duration-write)));
+  }
+  .fork-arrow .flow-head {
+    transition-delay: var(--flow-delay, calc(var(--duration-hover) + 2 * var(--duration-write)));
+  }
+  :is(.flow-branch, .fork-arrow) {
+    transition: opacity var(--duration-disclose) var(--ease-standard);
+  }
+  /* The pick: by each branch's arrow on laptops, 52 px above the branch (Figma 333:2784); a row
+     between step 03 and the branch below that. A 44 px tap area on touch screens. */
+  .flow-pick {
+    display: none;
+  }
+  .flow-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+  }
+  .flow-buttons button {
+    position: relative;
+  }
+  @media (pointer: coarse) {
+    .flow-buttons button::after {
+      content: "";
+      position: absolute;
+      inset-inline: 0;
+      top: 50%;
+      height: 44px;
+      transform: translateY(-50%);
+    }
+  }
+  @media (min-width: 1024px) {
+    .flow-pick {
+      position: relative;
+      height: 0;
+    }
+    .flow-buttons button {
+      position: absolute;
+      top: -52px;
+    }
+    .flow-buttons button[data-branch="0"] {
+      left: calc(var(--flow-box) / 2 + 14px);
+    }
+    .flow-buttons button[data-branch="1"] {
+      right: calc(var(--flow-box) / 2 + 14px);
+    }
   }
 
   /* A fixed-size desktop drawing fitted to its column (FitStage): from 1024
@@ -1865,6 +1931,10 @@
 html[data-js] [data-folded] {
   display: none;
 }
+/* A list rendered on the server keeps data-folded; opened, its items take their own display back. */
+html[data-js] [data-open] [data-folded] {
+  display: revert-layer;
+}
 html:not([data-js]) :is(.fold-control, .money-controls) {
   display: none;
 }
@@ -1889,6 +1959,45 @@ html[data-js] .without-script {
 }
 .story[data-story-fits="false"] .story-ledger {
   display: block;
+}
+/* If a buyer doesn't pay (UnpaidFlow.tsx, step 11), unlayered so it wins over the utilities on its
+   words. With script and without reduced motion: the path draws with the scroll (data-on, set as
+   the flow moves up the screen), the fork's labels are buttons, the picked branch is lit and the
+   other sits at 30%; below 1024 the steps stack, the buttons sit between step 03 and the branch
+   and only the picked branch shows. Without script, with reduced motion and in print: everything
+   lit, both branches under their labels, as before. */
+@media screen and (prefers-reduced-motion: no-preference) {
+  html[data-js] .unpaid-flow .flow-pick {
+    display: flex;
+    flex-direction: column;
+  }
+  html[data-js] .unpaid-flow .flow-label {
+    display: none;
+  }
+  /* The parts whose beat hasn't come (UnpaidStage sets data-lit, the highest beat past). */
+  html[data-js] .unpaid-flow[data-lit="0"] [data-beat],
+  html[data-js] .unpaid-flow[data-lit="1"] :is([data-beat="2"], [data-beat="3"], [data-beat="4"], [data-beat="5"], [data-beat="6"]),
+  html[data-js] .unpaid-flow[data-lit="2"] :is([data-beat="3"], [data-beat="4"], [data-beat="5"], [data-beat="6"]),
+  html[data-js] .unpaid-flow[data-lit="3"] :is([data-beat="4"], [data-beat="5"], [data-beat="6"]),
+  html[data-js] .unpaid-flow[data-lit="4"] :is([data-beat="5"], [data-beat="6"]),
+  html[data-js] .unpaid-flow[data-lit="5"] [data-beat="6"] {
+    --flow-on: 0;
+    --flow-words: var(--color-ink-muted);
+    --flow-delay: 0ms;
+  }
+  html[data-js] .unpaid-flow[data-case="no"] [data-branch="1"]:not(button),
+  html[data-js] .unpaid-flow[data-case="yes"] [data-branch="0"]:not(button) {
+    opacity: 0.3;
+  }
+  @media (max-width: 1023.98px) {
+    html[data-js] .unpaid-flow[data-case="no"] .flow-branch[data-branch="1"],
+    html[data-js] .unpaid-flow[data-case="yes"] .flow-branch[data-branch="0"] {
+      display: none;
+    }
+    html[data-js] .unpaid-flow .flow-branches {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
 }
 /* NavDhan SDK's journey steps only with script; without it the register shows, complete (step 10). */
 html:not([data-js]) .story[data-variant="sdk"] .story-on {

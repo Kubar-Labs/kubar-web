@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Icon } from "@/components/icons/Icon";
-import { cx as cn } from "@/lib/cx";
+import { FoldControl } from "@/components/ui/FoldControl";
 
 /*
  * A long list shown in part (SPEC section 8, pacing): the first items show and
@@ -17,6 +16,11 @@ import { cx as cn } from "@/lib/cx";
  *   that was folded (its first visible link or button, else the item itself).
  * - A link to something inside a folded item (the address's #hash on landing,
  *   or one followed later) opens the list first, then goes there.
+ *
+ * FoldOpen (FoldOpen.tsx) does the same for a list rendered on the server
+ * (How it works' terms): its folded items carry data-folded from the start,
+ * and opening sets data-open around them, so the browser only runs the
+ * control. The two live apart, so a page loads only the one it uses.
  */
 export function useFold<T extends HTMLElement, F extends HTMLElement>() {
   const list = useRef<T>(null);
@@ -44,6 +48,8 @@ export function useFold<T extends HTMLElement, F extends HTMLElement>() {
   }, [open]);
 
   useEffect(() => {
+    // Now shown, its items' first uses of abbreviations can take their expansions (AbbreviationTips).
+    if (open) document.dispatchEvent(new Event("unfold"));
     const next = after.current;
     if (!open || !next) return;
     after.current = null;
@@ -65,16 +71,4 @@ export function useFold<T extends HTMLElement, F extends HTMLElement>() {
   return { list, first, open, show };
 }
 
-/** The control under a folded list: underlined words and a plus, like "How we estimate this". */
-export function FoldControl({ label, onShow, className }: { label: string; onShow: () => void; className?: string }) {
-  return (
-    <button
-      type="button"
-      onClick={onShow}
-      className={cn("fold-control group t-ui inline-flex min-h-11 items-center gap-2 self-start text-left text-ink lg:min-h-10", className)}
-    >
-      <span className="underline decoration-1 [text-underline-position:from-font] group-hover:decoration-2">{label}</span>
-      <Icon name="plus" className="shrink-0" />
-    </button>
-  );
-}
+export { FoldControl };

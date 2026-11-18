@@ -1194,9 +1194,12 @@ test.describe("How it works (build step 5)", () => {
     await expect(page.getByText("05 Purchased")).toHaveCount(0);
     await expect(page.getByText(/8 of 8/)).toHaveCount(0);
     await expect(page.locator(".story-on").getByText("Record RCV-0001 · Evidence package", { exact: true })).toBeVisible();
-    // The glossary has no column heads; each term is its row's header.
+    // The glossary has no column heads; each term is its row's header. Six show until
+    // "Show all 19 terms" (step 11).
     const glossary = page.locator("table").filter({ has: page.locator("#term-itfs") });
     await expect(glossary.getByRole("columnheader")).toHaveCount(0);
+    await expect(glossary.getByRole("rowheader")).toHaveCount(6);
+    await page.getByRole("button", { name: "Show all 19 terms" }).click();
     await expect(glossary.getByRole("rowheader")).toHaveCount(19);
   });
 
@@ -1235,23 +1238,23 @@ test.describe("How it works (build step 5)", () => {
     }
     await expect(page.locator(".steps-rise").first()).toHaveCSS("animation-name", "none");
     await expect(page.locator(".story-ledger .iso-evidence")).toHaveAttribute("data-phase", "done");
-    await expect(page.locator(".unpaid-flow")).toHaveAttribute("data-phase", "done");
+    // The unpaid flow stands whole (step 11): every step raised, both branches, the labels as words.
+    await expect(page.locator(".unpaid-flow .flow-pick")).toBeHidden();
+    await expect(page.locator(".unpaid-flow .flow-label")).toHaveText(["No dispute", "A dispute"]);
   });
 
   test("If a buyer doesn't pay: three steps, a fork, two branches, no rani", async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto("/how-it-works");
     const flow = page.locator(".unpaid-flow");
-    // It starts undrawn below the fold and plays once in view.
-    await expect(flow).toHaveAttribute("data-phase", "armed");
+    // Since step 11 the path draws with the scroll and the fork's labels are buttons (see that step's tests).
     await flow.scrollIntoViewIfNeeded();
-    await expect(flow).toHaveAttribute("data-phase", "playing");
     await expect(flow.locator("ol > li")).toHaveCount(6);
-    await expect(flow.getByText("No dispute", { exact: true })).toBeVisible();
-    await expect(flow.getByText("A dispute", { exact: true })).toBeVisible();
+    await expect(flow.getByRole("button", { name: "No dispute" })).toBeVisible();
+    await expect(flow.getByRole("button", { name: "A dispute" })).toBeVisible();
     await expect(flow.getByText("Kubar holds none of the risk", { exact: true })).toBeVisible();
-    // Rule 11.4: numbers and branch labels in the secondary colour, not rani.
-    for (const text of ["01", "06", "No dispute", "A dispute"]) {
+    // Rule 11.4: numbers in the secondary colour, not rani.
+    for (const text of ["01", "06"]) {
       const color = await flow.getByText(text, { exact: true }).evaluate((el) => getComputedStyle(el).color);
       expect(color, text).not.toBe("rgb(173, 36, 104)");
     }
@@ -1263,12 +1266,13 @@ test.describe("How it works (build step 5)", () => {
     expect(Math.round(s5.y)).toBe(Math.round(s4.y));
     expect(Math.round(s6.y)).toBe(Math.round(s4.y));
     expect(Math.round(s6.x + s6.width)).toBe(1360);
-    await expect(flow.locator(".fork-bar")).toBeVisible();
-    // Phone: one column, in reading order, the fork's lines gone.
+    await expect(flow.locator(".fork-half").first()).toBeVisible();
+    // Phone: one column, in reading order, the fork's lines gone; only the picked branch shows.
     await page.setViewportSize({ width: 390, height: 844 });
-    const order = await Promise.all(["01", "02", "03", "04", "05", "06"].map(at));
+    const order = await Promise.all(["01", "02", "03", "04", "05"].map(at));
     for (let i = 1; i < order.length; i++) expect(order[i].y).toBeGreaterThan(order[i - 1].y + order[i - 1].height);
-    await expect(flow.locator(".fork-bar")).toBeHidden();
+    await expect(flow.locator(".fork-half").first()).toBeHidden();
+    await expect(flow.locator("li", { hasText: /^06/ }).locator("div").first()).toBeHidden();
   });
 
   test("Each party signs: a map from 1200 up, the register below it, the table always there for screen readers", async ({ page }) => {
@@ -2026,6 +2030,10 @@ test.describe("Abbreviations (HANDOFF section 8)", () => {
     await page.getByRole("button", { name: "Menu" }).click();
     await page.getByRole("dialog").getByRole("link", { name: "How it works" }).click();
     await expect(page).toHaveURL(/\/how-it-works$/);
+    await expect(page.locator('abbr[data-abbr="ITFS"]')).toHaveCount(1);
+    // RBI's first use is in a folded term (step 11): it takes its expansion once the terms open.
+    await expect(page.locator('abbr[data-abbr="RBI"]')).toHaveCount(0);
+    await page.getByRole("button", { name: "Show all 19 terms" }).click();
     await expect(page.locator('abbr[data-abbr="RBI"]')).toHaveCount(1);
   });
 });
@@ -4263,5 +4271,259 @@ test.describe("Pinned journeys: every step lights with the drawing pinned, and t
       });
       expect(fit, `${width}`).toBe(true);
     }
+  });
+});
+
+test.describe("How it works: the unpaid flow draws with the scroll, the fork is a pick, the terms show six (step 11)", () => {
+  const HIW = "/how-it-works";
+  const INK = "rgb(2, 39, 50)";
+  const MUTED = "rgb(78, 104, 111)";
+  // Each step's beat: 01 to 03, then the fork (4), then the branches' first steps (04 and 06), then 05.
+  const BEATS: Record<string, number> = { "01": 1, "02": 2, "03": 3, "04": 5, "05": 6, "06": 5 };
+  const flow = (page: Page) => page.locator(".unpaid-flow");
+  const button = (page: Page, name: string) => flow(page).getByRole("button", { name, exact: true });
+
+  /** The flow once still: the beats drawn, and each step's look (raised, its words' colour) and each line's. */
+  const state = async (page: Page, wait = true) => {
+    // Still twice running, a frame apart (not without script: no frames are asked for there).
+    if (wait) await expect.poll(() => flow(page).evaluate((el) => el.getAnimations({ subtree: true }).filter((a) => a.playState === "running").length)).toBe(0);
+    if (wait) await page.waitForTimeout(50);
+    return flow(page).evaluate((el) => {
+      const boxes = Object.fromEntries(
+        [...el.querySelectorAll<HTMLElement>(".flow-box")].map((box) => [
+          box.querySelector("span")!.textContent,
+          { on: Number(el.getAttribute("data-lit")) >= Number(box.dataset.beat), raised: getComputedStyle(box, "::before").opacity, words: getComputedStyle(box.querySelector("p")!).color, shown: box.getClientRects().length > 0 },
+        ]),
+      );
+      const lines = [...el.querySelectorAll<SVGPathElement>(".flow-line")].filter((line) => line.getClientRects().length > 0).map((line) => getComputedStyle(line).strokeDashoffset);
+      return { lit: Number(el.getAttribute("data-lit")), boxes, lines };
+    });
+  };
+  /** Scroll so the flow's top sits at y on the screen. */
+  const flowTopAt = (page: Page, y: number) =>
+    flow(page).evaluate((el, y) => window.scrollTo({ top: el.getBoundingClientRect().top + scrollY - y, behavior: "instant" }), y);
+
+  test("at 1440 the path draws with the scroll: 01 to 03 light in order, then the fork, then the branch, and it runs back up", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(HIW);
+    // Beat n once the flow's top is n marks of 7svh (63 px) above the line at 80% of the screen (720).
+    const at = async (n: number) => {
+      await flowTopAt(page, 720 - 63 * n - 30);
+      await expect(flow(page), `beat ${n}`).toHaveAttribute("data-lit", String(n));
+      const s = await state(page);
+      for (const [no, beat] of Object.entries(BEATS)) {
+        const lit = beat <= n;
+        expect(s.boxes[no].on, `beat ${n}: ${no}`).toBe(lit);
+        // The picked branch's steps: raised with their words in ink once lit, flat in the secondary colour before.
+        if (no !== "06") expect([s.boxes[no].raised, s.boxes[no].words], `beat ${n}: ${no}`).toEqual(lit ? ["1", INK] : ["0", MUTED]);
+      }
+      return s;
+    };
+    for (const n of [0, 1, 2, 3, 4, 5, 6]) await at(n);
+    // Every line drawn at the end; on the way up the path runs back.
+    expect((await state(page)).lines.every((offset) => offset === "0px" || offset === "0")).toBe(true);
+    for (const n of [5, 3, 1, 0]) await at(n);
+    expect((await state(page)).lines.every((offset) => offset === "1px" || offset === "1")).toBe(true);
+    // Past the flow, scrolled out of the top, it stays drawn.
+    await flowTopAt(page, -1200);
+    await expect(flow(page)).toHaveAttribute("data-lit", "6");
+  });
+
+  test("at 1440 the fork's labels are buttons by their arrows, No dispute picked: its branch lit, the other at 30% and inert", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(HIW);
+    await flowTopAt(page, 100);
+    await expect(flow(page)).toHaveAttribute("data-lit", "6");
+    await expect(button(page, "No dispute")).toHaveAttribute("aria-pressed", "true");
+    await expect(button(page, "A dispute")).toHaveAttribute("aria-pressed", "false");
+    await expect(flow(page).locator(".flow-label")).toHaveCount(2);
+    for (const label of await flow(page).locator(".flow-label").all()) await expect(label).toBeHidden();
+    // As the frame places them (333:2784): 164 in and 164 down; the other's right edge 1116 in.
+    const origin = (await flow(page).locator(".flow-box").first().boundingBox())!;
+    const no = (await button(page, "No dispute").boundingBox())!;
+    const yes = (await button(page, "A dispute").boundingBox())!;
+    expect([Math.round(no.x - origin.x), Math.round(no.height)]).toEqual([164, 38]);
+    expect(Math.abs(no.y - origin.y - 164), "164 down, to a pixel").toBeLessThanOrEqual(1.5);
+    expect(Math.round(yes.x + yes.width - origin.x)).toBe(1116);
+    expect(Math.round(yes.y)).toBe(Math.round(no.y));
+    await expect(button(page, "No dispute")).toHaveCSS("background-color", INK);
+    await expect(button(page, "A dispute")).toHaveCSS("background-color", "rgb(255, 255, 255)");
+    const branch = (b: number) => flow(page).locator(`.flow-branch[data-branch="${b}"]`);
+    const dimmed = async (b: number) => {
+      await expect(branch(b)).toHaveCSS("opacity", "0.3");
+      await expect(branch(b)).toHaveAttribute("inert", "");
+      await expect(flow(page).locator(`.fork-half[data-branch="${b}"]`)).toHaveCSS("opacity", "0.3");
+      await expect(flow(page).locator(`.fork-arrow[data-branch="${b}"]`)).toHaveCSS("opacity", "0.3");
+      await expect(branch(1 - b)).toHaveCSS("opacity", "1");
+      expect(await branch(1 - b).getAttribute("inert")).toBeNull();
+    };
+    await dimmed(1);
+    await expectNoAxeViolations(page);
+    await button(page, "A dispute").click();
+    await expect(button(page, "A dispute")).toHaveAttribute("aria-pressed", "true");
+    await dimmed(0);
+    await expectNoAxeViolations(page);
+  });
+
+  for (const [width, height] of [[1440, 900], [1180, 820]] as const) {
+    test(`at ${width} hover picks a case, down, up, three rounds, and again after a reload; the pick stays when the pointer leaves`, async ({ page }) => {
+      await page.setViewportSize({ width, height });
+      await page.goto(HIW);
+      const names = ["No dispute", "A dispute"];
+      for (const pass of ["first load", "after a reload"]) {
+        if (pass === "after a reload") await page.reload();
+        await flowTopAt(page, 100);
+        for (let round = 1; round <= 3; round++) {
+          for (const order of [[0, 1], [1, 0]]) {
+            for (const i of order) {
+              await button(page, names[i]).hover();
+              const where = `${pass}, round ${round}: ${names[i]}`;
+              await expect(button(page, names[i]), where).toHaveAttribute("aria-pressed", "true");
+              await expect(button(page, names[1 - i]), where).toHaveAttribute("aria-pressed", "false");
+              await expect(flow(page), where).toHaveAttribute("data-case", i === 0 ? "no" : "yes");
+              await expect(flow(page).locator(`.flow-branch[data-branch="${1 - i}"]`), where).toHaveCSS("opacity", "0.3");
+            }
+          }
+        }
+        await page.mouse.move(5, 5);
+        await expect(button(page, "No dispute"), `${pass}: the pick stays`).toHaveAttribute("aria-pressed", "true");
+      }
+    });
+  }
+
+  test("by keyboard: Tab reaches the picked case, the arrow keys, Home and End move between the two and pick", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(HIW);
+    await flowTopAt(page, 100);
+    expect(await flow(page).locator("button[aria-pressed]").evaluateAll((els) => els.map((el) => (el as HTMLElement).tabIndex))).toEqual([0, -1]);
+    await button(page, "No dispute").focus();
+    await page.keyboard.press("Shift+Tab");
+    await page.keyboard.press("Tab");
+    await expect(button(page, "No dispute")).toBeFocused();
+    for (const [key, name] of [["ArrowRight", "A dispute"], ["ArrowLeft", "No dispute"], ["ArrowDown", "A dispute"], ["Home", "No dispute"], ["End", "A dispute"]] as const) {
+      await page.keyboard.press(key);
+      await expect(button(page, name), key).toBeFocused();
+      await expect(button(page, name), key).toHaveAttribute("aria-pressed", "true");
+    }
+    // One tab stop: Tab leaves the pair for what follows the flow.
+    await page.keyboard.press("Tab");
+    await expect(flow(page).locator("button:focus")).toHaveCount(0);
+  });
+
+  for (const [width, height] of [[390, 844], [820, 1180]] as const) {
+    test(`at ${width} the steps stack, the two buttons sit between step 03 and the branch, only the picked branch shows, and a tap picks`, async ({ browser }) => {
+      const context = await browser.newContext({ viewport: { width, height }, hasTouch: true, isMobile: width < 768 });
+      const page = await context.newPage();
+      await page.goto(HIW);
+      await flowTopAt(page, -900);
+      const box = async (no: string) => (await flow(page).locator(".flow-box", { hasText: new RegExp(`^${no}`) }).boundingBox())!;
+      const [s1, s2, s3, s4, s5] = await Promise.all(["01", "02", "03", "04", "05"].map(box));
+      for (const [a, b] of [[s1, s2], [s2, s3], [s4, s5]]) expect(b.y).toBeGreaterThan(a.y + a.height);
+      const no = (await button(page, "No dispute").boundingBox())!;
+      const yes = (await button(page, "A dispute").boundingBox())!;
+      expect(no.y, "the buttons under step 03").toBeGreaterThan(s3.y + s3.height);
+      expect(s4.y, "the branch under the buttons").toBeGreaterThan(no.y + no.height);
+      expect(Math.round(yes.y)).toBe(Math.round(no.y));
+      // Centred under the arrow from step 03.
+      expect(Math.abs((no.x + yes.x + yes.width) / 2 - (s3.x + s3.width / 2))).toBeLessThan(2);
+      // Only the picked branch shows: 04 and 05, not 06; a tap on "A dispute" shows 06 alone.
+      const shown = async () => (await state(page)).boxes;
+      expect(Object.entries(await shown()).filter(([, b]) => b.shown).map(([n]) => n)).toEqual(["01", "02", "03", "04", "05"]);
+      const before = await page.evaluate(() => document.documentElement.scrollHeight);
+      await button(page, "A dispute").tap();
+      await expect(button(page, "A dispute")).toHaveAttribute("aria-pressed", "true");
+      expect(Object.entries(await shown()).filter(([, b]) => b.shown).map(([n]) => n)).toEqual(["01", "02", "03", "06"]);
+      // Lit as the reader has scrolled: everything above the line.
+      expect((await shown())["06"].on).toBe(true);
+      await button(page, "No dispute").tap();
+      await expect(button(page, "No dispute")).toHaveAttribute("aria-pressed", "true");
+      expect(await page.evaluate(() => document.documentElement.scrollHeight)).toBe(before);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
+      await context.close();
+    });
+  }
+
+  test("at 390 each step lights as it crosses the line 80% down the screen, and the path runs back up", async ({ browser }) => {
+    const context = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+    const page = await context.newPage();
+    await page.goto(HIW);
+    const line = 844 * 0.8;
+    for (const no of ["01", "02", "03", "04", "05", "04", "02"]) {
+      const box = flow(page).locator(".flow-box", { hasText: new RegExp(`^${no}`) });
+      // Just above the line, then just below it.
+      for (const [offset, lit] of [[-20, true], [20, false]] as const) {
+        await box.evaluate((el, y) => window.scrollTo({ top: el.getBoundingClientRect().top + scrollY - y, behavior: "instant" }), line + offset);
+        await expect.poll(async () => (await state(page)).boxes[no].on, `${no} ${lit ? "past" : "before"} the line`).toBe(lit);
+      }
+    }
+    await context.close();
+  });
+
+  test("without script or with reduced motion: everything lit, both branches under their labels, as before", async ({ browser }) => {
+    for (const options of [{ javaScriptEnabled: false }, { reducedMotion: "reduce" as const }]) {
+      for (const [width, height] of [[1440, 900], [390, 844]] as const) {
+        const where = `${JSON.stringify(options)} at ${width}`;
+        const context = await browser.newContext({ ...options, viewport: { width, height } });
+        const page = await context.newPage();
+        await page.goto(HIW);
+        await flow(page).scrollIntoViewIfNeeded();
+        await expect(flow(page).locator(".flow-pick"), where).toBeHidden();
+        await expect(flow(page).locator(".flow-label"), where).toHaveText(["No dispute", "A dispute"]);
+        for (const label of await flow(page).locator(".flow-label").all()) await expect(label, where).toBeVisible();
+        const s = await state(page, options.javaScriptEnabled !== false);
+        for (const [no, look] of Object.entries(s.boxes)) expect([no, look.shown, look.raised, look.words], where).toEqual([no, true, "1", INK]);
+        expect(s.lines.every((offset) => offset === "0px" || offset === "0"), where).toBe(true);
+        for (const b of [0, 1]) await expect(flow(page).locator(`.flow-branch[data-branch="${b}"]`), where).toHaveCSS("opacity", "1");
+        await context.close();
+      }
+    }
+  });
+
+  test("the terms: six rows, then Show all 19 terms opens the rest in place and goes to the first of them", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(HIW);
+    const rows = page.locator("tr[id^=term-]");
+    await expect(rows).toHaveCount(19);
+    await expect(rows.filter({ visible: true })).toHaveCount(6);
+    await expect(rows.filter({ visible: true }).last()).toHaveAttribute("id", "term-without-recourse-for-the-buyers-credit");
+    const control = page.getByRole("button", { name: "Show all 19 terms" });
+    // 24 px under the six rows (333:2955).
+    const table = (await page.locator("table").filter({ has: page.locator("#term-itfs") }).boundingBox())!;
+    expect(Math.round((await control.boundingBox())!.y - (table.y + table.height))).toBe(24);
+    await control.click();
+    await expect(control).toHaveCount(0);
+    await expect(rows.filter({ visible: true })).toHaveCount(19);
+    await expect(page.locator("#term-purchase-price")).toBeFocused();
+    await expectNoAxeViolations(page);
+  });
+
+  test("a link to a folded term opens the list and lands on its row, on arrival and on the page", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(`${HIW}#term-itfs`);
+    await expect(page.locator("#term-itfs")).toBeVisible();
+    await expect(page.locator("#term-itfs")).toBeInViewport();
+    await expect(page.locator("tr[id^=term-]").filter({ visible: true })).toHaveCount(19);
+    // On the page: a link followed after it has loaded.
+    await page.goto(HIW);
+    await page.waitForLoadState("networkidle");
+    await expect(page.locator("#term-edpms")).toBeHidden();
+    await page.evaluate(() => {
+      const link = document.createElement("a");
+      link.href = "#term-edpms";
+      link.textContent = "EDPMS";
+      document.querySelector("main")!.insertAdjacentElement("afterbegin", link);
+      link.click();
+    });
+    await expect(page.locator("#term-edpms")).toBeVisible();
+    await expect(page.locator("#term-edpms")).toBeInViewport();
+  });
+
+  test("without script all 19 terms show and the control is hidden", async ({ browser }) => {
+    const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
+    const page = await context.newPage();
+    await page.goto(HIW);
+    await expect(page.locator("tr[id^=term-]").filter({ visible: true })).toHaveCount(19);
+    await expect(page.getByRole("button", { name: "Show all 19 terms" })).toBeHidden();
+    await context.close();
   });
 });

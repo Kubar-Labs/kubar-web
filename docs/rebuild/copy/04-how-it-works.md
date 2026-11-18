@@ -113,6 +113,7 @@ A ruled register (component "If a buyer doesn’t pay", 133:2422), no boxes or a
 05 | The insurer | Pays claims on the covered share | No dispute
 06 | The exporter | Answers only for its own side of the trade: disputes, returns, set-off, fraud and its warranties | A dispute
 (number [Label], party [Tag], step [BodyS], branch [Label] in rani, right-aligned)
+(18 Nov, next build step 11, Figma 333:2784: the path draws with the scroll, and the two branch labels, "No dispute" and "A dispute", are buttons, "No dispute" picked on load; the picked branch is lit and the other sits at 30%. Where the flow doesn't fit in one row the steps stack, the two buttons sit between step 03 and the branch, and only the picked branch shows. Without script or with reduced motion everything is lit and both branches show under their labels.)
 [Label] Kubar holds none of the risk     (a plain sentence under the register, ink; no chip)
 [BodyS] This is how a programme runs with cover in the financier’s name. Where a programme starts on exporters’ own policies, the terms are set out before any receivable is sold.
 
@@ -156,7 +157,7 @@ GIFT City | India’s international financial services centre, in Gujarat.
 IFSC Banking Unit (IBU) | A bank’s unit in GIFT City, working in foreign currency.
 ITFS | An International Trade Finance Service platform at GIFT City, on which several financiers can finance trade. Kubar’s own ITFS registration is targeted for 2027; until then Kubar acts as the financier’s origination and servicing agent.
 (term [UI], meaning [BodyS])
-(16 Nov: the first six rows show; the control below opens the rest in place.)
+(16 Nov: the first six rows show; the control below opens the rest in place. Built 18 Nov, step 11, Figma 333:2955: a link to a folded term opens the list and lands on its row; without script all 19 show.)
 [UI] Show all 19 terms
 
 ## Next step  (two routes, no heading)

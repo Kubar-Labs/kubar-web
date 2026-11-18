@@ -59,6 +59,7 @@ const picks = [
   { route: "/products/navdhan-sdk", name: "layers", item: "ol > li[tabindex='-1']", expect: "marked", sideBySide: true },
   { route: "/how-it-works", name: "evidence stack", item: ".story-stack li[data-doc]", expect: "picked" },
   { route: "/how-it-works", name: "signs map", item: ".signs-map [data-party]", expect: "picked" },
+  { route: "/how-it-works", name: "unpaid fork", item: '.flow-buttons button[aria-pressed="false"]', expect: "pressed" },
   { route: "/about", name: "foundations", item: "ol > li[data-level][tabindex]", expect: "marked", sideBySide: true },
   { route: "/about", name: "team portrait", item: "#team li[tabindex] img", expect: "colour" },
 ];
