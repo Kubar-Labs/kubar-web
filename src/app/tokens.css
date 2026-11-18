@@ -1,7 +1,7 @@
 /* Copied from docs/rebuild/tokens/tokens.css (fonts come from next/font in layout.tsx).
    kubar.tech design tokens, exported from Figma (pFO3DEpqVzWCJdPghuq8nU) on 13 Nov 2026.
    Variable names match the WEB code syntax set on each Figma variable.
-   Breakpoints are a proposal (see README.md): mobile < 768, tablet 768–1199, desktop >= 1200. */
+   Breakpoints are a proposal (see README.md): mobile < 768, tablet 768–1023, laptop and desktop >= 1024. */
 :root {
   --petrol-950: #011B23;
   --petrol-900: #022732;
@@ -122,7 +122,7 @@
   }
 }
 
-@media (min-width: 1200px) {
+@media (min-width: 1024px) {
   :root {
     --text-display: 56px; --text-display--line-height: 60px;
     --text-h2: 44px; --text-h2--line-height: 50px;
@@ -131,7 +131,7 @@
     --text-line: 48px; --text-line--line-height: 58px;
     --text-lead: 30px; --text-lead--line-height: 40px;
     --text-figure: 56px; --text-figure--line-height: 60px;
-    --text-figure-lg: 96px; --text-figure-lg--line-height: 100px; /* Mono/Figure large: desktop only, once (Home, "About $80bn") */
+    --text-figure-lg: clamp(77px, calc(77px + (100vw - 1024px) * 0.108), 96px); --text-figure-lg--line-height: clamp(81px, calc(81px + (100vw - 1024px) * 0.108), 100px); /* 77 at 1024 (80%), 96 from 1200, so it clears the second figure */ /* Mono/Figure large: desktop only, once (Home, "About $80bn") */
     --text-record: 19px; --text-record--line-height: 27px;
     --text-body-lg: 20px; --text-body-lg--line-height: 30px;
     --text-body: 17px; --text-body--line-height: 26px;
@@ -143,7 +143,7 @@
     --text-label: 13px; --text-label--line-height: 20px;
     --text-tag: 11px; --text-tag--line-height: 16px;
     --text-code: 13px; --text-code--line-height: 20px;
-    --page-margin: 80px;
+    --page-margin: clamp(40px, calc(40px + (100vw - 1024px) * 0.2273), 80px); /* 40 at 1024, 80 from 1200: the content runs 944 to 1040 without a jump */
     --grid-gutter: 24px;
     --grid-columns: 12;
     --section-space: 72px;

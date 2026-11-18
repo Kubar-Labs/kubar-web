@@ -43,7 +43,7 @@ export function PlatformLanes({
         <tbody className="border-t-2 border-rule-strong">
           {steps.map((step, i) => (
             <tr key={step} className={i === steps.length - 1 ? "border-b-2 border-rule-strong" : "border-b border-rule"}>
-              <td className="t-code w-9 py-4 align-baseline text-ink lg:w-[109px]">{String(i + 1).padStart(2, "0")}</td>
+              <td className="t-code fit-keep w-9 py-4 align-baseline text-ink lg:w-[109px]">{String(i + 1).padStart(2, "0")}</td>
               <td className="t-body py-4 align-baseline text-ink">{step}</td>
             </tr>
           ))}
@@ -61,10 +61,10 @@ export function PlatformLanes({
         ))}
         <span className="absolute top-[114px] left-[600.5px] size-2.5 bg-ink" />
         <span className="absolute top-[199px] left-[600.5px] size-2.5 bg-ink" />
-        <span className="t-fine absolute top-[196px] left-[617px] text-ink-muted">{paths.sdk}</span>
-        <span className="t-fine absolute top-[262px] left-[617px] w-[170px] text-ink-muted">{paths.consent}</span>
-        <span className="t-fine absolute top-[376px] left-[814px] text-ink-muted">{paths.evidence}</span>
-        <span className="t-fine absolute top-[461px] left-[617px] text-ink-muted">{paths.status}</span>
+        <span className="t-fine fit-keep absolute top-[196px] left-[617px] text-ink-muted">{paths.sdk}</span>
+        <span className="t-fine fit-keep absolute top-[262px] left-[617px] w-[170px] text-ink-muted">{paths.consent}</span>
+        <span className="t-fine fit-keep absolute top-[376px] left-[814px] text-ink-muted">{paths.evidence}</span>
+        <span className="t-fine fit-keep absolute top-[461px] left-[617px] text-ink-muted">{paths.status}</span>
         <span className="absolute top-[395px] left-[995.5px] size-2.5 bg-ink" />
         <span className="absolute top-[480px] left-[995.5px] size-2.5 bg-ink" />
         <svg className="absolute inset-0" width={1062} height={528} viewBox="0 0 1062 528" fill="none">

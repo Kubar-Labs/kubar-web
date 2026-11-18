@@ -2,7 +2,7 @@
   "site": {
     "name": "Kubar Labs",
     "homeTitle": "Kubar Labs · Building the institutional exchange for cross-border trade finance",
-    "homeDescription": "Starting with the asset: export receivables an international financier can buy again and again, insured in its own name.",
+    "homeDescription": "Indian export receivables, originated, insured and documented so an international financier can buy them again and again.",
     "socialTitle": "Kubar Labs",
     "socialImageAlt": "Kubar Labs: Building the institutional exchange for cross-border trade finance."
   },
@@ -50,7 +50,7 @@
   },
   "home": {
     "display": "Building the institutional exchange<marker></marker> for <nb>cross-border</nb> trade finance.",
-    "subline": "Starting with the asset: export receivables an international financier can buy again and again, insured in its own name.",
+    "subline": "Indian export receivables, originated, insured and documented so an international financier can buy them again and again.",
     "routes": [
       {
         "label": "For financial institutions",
@@ -63,7 +63,8 @@
     ],
     "followAnchor": "Follow one receivable",
     "oneReceivable": {
-      "heading": "Follow one receivable from shipment to settlement."
+      "heading": "Follow one receivable from shipment to settlement.",
+      "lead": "Kubar is in the data path of every step and in the money path of none."
     },
     "standing": {
       "heading": "Standing and memberships."
@@ -79,7 +80,7 @@
         },
         {
           "figure": "$126.92M",
-          "caption": "financed in total on GIFT City’s trade-finance platforms (ITFS): 2,857 transactions to June 2026.",
+          "caption": "financed in total on GIFT City’s trade-finance platforms (ITFS): 2,857 transactions to June 2026. The average transaction was about $44k.",
           "footnote": 3
         }
       ],
@@ -90,12 +91,12 @@
       "estimateLink": "How we estimate this"
     },
     "band": {
-      "line": "Kubar is in the data path of every step and in the money path of none.",
+      "line": "Every receivable that settles adds to a priced loss history, and that history is what brings in the next financier.",
       "link": "See how it works"
     },
     "foundations": {
       "heading": "An exchange needs more than a venue.",
-      "lead": "India already runs specialised exchanges for businesses and financial institutions, not the public. At GIFT City, cross-border trade finance has the rules for such an exchange, but not yet the asset. So Kubar builds the foundations first and the venue last.",
+      "lead": "India already runs specialised exchanges for businesses and financial institutions, not the public. At GIFT City, <nb>cross-border</nb> trade finance has the rules for such an exchange, but not yet the asset. So Kubar builds the foundations first and the venue last.",
       "exchangeHead": "Exchange",
       "exchanges": [
         "TReDS",
@@ -129,20 +130,24 @@
           "planned": true
         },
         {
+          "name": "Distribution through trade platforms",
+          "line": "Exporters rarely come to a trade-finance platform on their own. NavDhan SDK takes the programme into the trade platforms they already use, and brings the trading history between exporter and buyer with it."
+        },
+        {
           "name": "A record of performance",
           "line": "Every receivable that settles adds to a priced loss history"
         },
         {
           "name": "A clean payment path",
-          "line": "The buyer pays the financier’s account; the exporter’s bank closes the shipping bill"
+          "line": "A buyer won’t change how it pays because its supplier sold the invoice. The buyer pays a collection account in the exporter’s name; a standing sweep passes the payment to the financier, and the exporter’s bank closes the shipping bill."
         },
         {
           "name": "Standing buyers",
-          "line": "A financier underwrites a programme once and buys every receivable that fits inside its limit"
+          "line": "No international financier underwrites one invoice at a time. Here it underwrites a programme once and buys every receivable that fits inside its limit."
         },
         {
-          "name": "A common standard for what qualifies",
-          "line": "Every receivable has a shipping bill, an invoice that names the financier’s account, a buyer on an approved insurance limit and the buyer’s acknowledgement"
+          "name": "A common standard an insurer can price",
+          "line": "An insurer can’t price cover on an invoice alone. Every receivable carries one record, from shipment to settlement: its documents, the buyer’s insurance limit and how it paid."
         }
       ]
     },
@@ -150,7 +155,7 @@
       "heading": "Who takes part.",
       "lead": "Only institutional financiers buy the receivables. There is no retail access.",
       "legend": {
-        "money": "Money path: only between banks",
+        "money": "Money path: never through Kubar",
         "data": "Data path: documents and records"
       },
       "rows": [
@@ -188,7 +193,7 @@
         },
         {
           "party": "Buyers",
-          "role": "Pay the financier’s account, on the terms they already have",
+          "role": "Pay the account on the invoice, on the terms they already have; nothing new to sign",
           "link": null
         },
         {
@@ -291,15 +296,16 @@
     "footnoteMarker": "Footnote {n}",
     "backToText": "Back to text",
     "sending": "Sending…",
-    "onThisPage": "On this page"
+    "onThisPage": "On this page",
+    "whereThisSits": "Where this sits"
   },
   "footnotes": {
     "status": "Kubar’s own ITFS registration is targeted for 2027; until then Kubar acts as the financier’s origination and servicing agent."
   },
   "record": {
     "title": "Record RCV-0001",
-    "summary": "An example: a $225,000 rice invoice to a buyer in the UAE, due 75 days after shipment.",
-    "description": "An example record of one export receivable, with six documents filed.",
+    "summary": "An example: a $225,000 rice invoice to a buyer in Singapore, due 75 days after shipment.",
+    "description": "An example record of one export receivable, with eight documents filed.",
     "columns": {
       "no": "No.",
       "document": "Document",
@@ -313,7 +319,7 @@
         "document": "Commercial invoice",
         "source": "The exporter",
         "status": "Filed",
-        "proves": "What was sold, to whom, for how much and when it’s due, with the instruction to pay the financier"
+        "proves": "What was sold, to whom, for how much and when it’s due, and the collection account the buyer pays"
       },
       {
         "no": "02",
@@ -324,34 +330,50 @@
       },
       {
         "no": "03",
-        "document": "Electronic bill of lading",
+        "document": "Bill of lading",
         "source": "The carrier",
         "status": "Filed",
         "proves": "The goods were shipped on board"
       },
       {
         "no": "04",
+        "document": "Inspection report",
+        "source": "The inspection agency",
+        "status": "Filed",
+        "proves": "The goods are as contracted, where the programme requires a check"
+      },
+      {
+        "no": "05",
+        "document": "No-objection",
+        "source": "The exporter’s bank",
+        "status": "Filed",
+        "proves": "The exporter’s bank has no claim on this receivable"
+      },
+      {
+        "no": "06",
         "document": "Credit-insurance cover",
         "source": "The insurer, in the financier’s name",
         "status": "Filed",
         "proves": "The buyer’s credit is covered, in the financier’s name"
       },
       {
-        "no": "05",
-        "document": "Assignment notice, acknowledged",
-        "source": "The buyer",
+        "no": "07",
+        "document": "Sweep instruction",
+        "source": "The payment provider",
         "status": "Filed",
-        "proves": "The buyer will pay the financier’s account"
+        "proves": "Each payment into the collection account passes to the financier; the exporter can’t redirect it"
       },
       {
-        "no": "06",
+        "no": "08",
         "document": "Purchase confirmation",
         "source": "The financier",
         "status": "Filed",
         "proves": "The financier bought the receivable, without recourse for the buyer’s credit"
       }
     ],
-    "provesLabel": "Proves"
+    "provesLabel": "Proves",
+    "fromLabel": "From",
+    "link": "See how it works"
   },
   "ledger": {
     "columns": {
@@ -369,7 +391,7 @@
       {
         "no": "01",
         "state": "Shipped",
-        "what": "The exporter ships the rice and invoices the buyer, with the instruction to pay the financier’s account.",
+        "what": "The exporter ships the rice and invoices the buyer, with its collection account on the invoice.",
         "party": "Exporter",
         "data": "Shipment and invoice data received",
         "money": null
@@ -392,10 +414,10 @@
       },
       {
         "no": "04",
-        "state": "Acknowledged",
-        "what": "The buyer acknowledges that it will pay the financier.",
-        "party": "Buyer",
-        "data": "Acknowledgement filed",
+        "state": "No-objection",
+        "what": "The exporter’s bank confirms it has no objection to the sale.",
+        "party": "Exporter’s bank",
+        "data": "No-objection filed",
         "money": null
       },
       {
@@ -409,10 +431,10 @@
       {
         "no": "06",
         "state": "Settled",
-        "what": "On the due date the buyer pays, and the exporter’s bank closes the shipping bill.",
+        "what": "On the due date the buyer pays the collection account on its invoice, and the exporter’s bank closes the shipping bill.",
         "party": "Buyer, financier, exporter’s bank",
         "data": "Payment matched; closure tracked",
-        "money": "The buyer pays the financier’s collection account; the financier pays the exporter the balance, less its discount and charges"
+        "money": "The buyer pays the exporter’s collection account; the sweep passes it to the financier, which pays the exporter the balance, less its discount and charges"
       },
       {
         "no": "07",
@@ -549,7 +571,7 @@
       "Exporter",
       "Kubar",
       "Insurer",
-      "Buyer, UAE",
+      "Buyer, Singapore",
       "Financier",
       "Exporter’s bank"
     ],
@@ -557,7 +579,7 @@
       "s1": "Shipment, invoice",
       "s2": "Evidence package checked",
       "s3": "Limit and headroom",
-      "s4": "Acknowledgement",
+      "s4": "No-objection",
       "s5data": "Evidence package",
       "s5money": "90% of face",
       "s6": "Payment matched",
@@ -593,7 +615,7 @@
         ],
         [
           "Buyer",
-          "An importer in the UAE, on an approved insurance limit"
+          "An importer in Singapore, on an approved insurance limit"
         ],
         [
           "Terms",
@@ -617,7 +639,7 @@
         ],
         [
           "Payment",
-          "The buyer pays your collection account"
+          "The buyer pays the exporter’s collection account; the sweep passes it to you"
         ],
         [
           "Evidence",
@@ -630,14 +652,14 @@
       "holdsNone": "Kubar holds none",
       "received": "Received",
       "paidOut": "Paid out",
-      "receivedText": "$225,000 · face value, from the buyer, into your collection account",
+      "receivedText": "$225,000 · face value, from the buyer, swept to you from the exporter’s collection account",
       "paidText": "$202,500 · the purchase price, 90% of face, to the exporter’s bank",
       "meanwhile": "Meanwhile you carry the buyer’s credit, insured in your name",
       "deferred": "The deferred purchase price: the balance (10% of face), less your discount and charges, to the exporter. Its amount depends on pricing, so it has no figure.",
       "shipment": "Shipment · day 0",
       "purchase": "Purchase",
       "due": "Due date · day 75",
-      "note": "Days after shipment. The purchase date is illustrative: it follows the documents, the insurer’s limit check and the buyer’s acknowledgement.",
+      "note": "Days after shipment. The purchase date is illustrative: it follows the documents, the insurer’s limit check and the exporter’s bank’s no-objection.",
       "dayZero": "Day 0",
       "dayDue": "Day 75",
       "stacked": {
@@ -670,11 +692,11 @@
         },
         {
           "no": "05",
-          "text": "Exporters join: identity checks, their bank’s no-objection, a notice on their invoices"
+          "text": "Exporters join: identity checks, their bank’s no-objection, their collection account on their invoices"
         },
         {
           "no": "06",
-          "text": "Buyers are told to pay your account, and acknowledge it"
+          "text": "Buyers pay the account on the invoice, in the exporter’s name; a standing sweep passes each payment to you, and the exporter can’t redirect it"
         }
       ],
       "link": "See every step in detail",
@@ -694,7 +716,7 @@
         },
         {
           "no": "04",
-          "text": "You pay the purchase price; the buyer pays you on the due date; you pay the exporter the balance"
+          "text": "You pay the purchase price; on the due date the buyer’s payment reaches you through the sweep; you pay the exporter the balance"
         },
         {
           "no": "05",
@@ -728,7 +750,7 @@
           "Kubar’s checks, kept on file"
         ],
         [
-          "Commercial invoice, with the instruction to pay you",
+          "Commercial invoice, naming the exporter’s collection account",
           "The exporter",
           "The shipping bill; the e-invoice reference where one applies"
         ],
@@ -753,9 +775,9 @@
           "Headroom on the buyer’s limit"
         ],
         [
-          "Buyer’s acknowledgement",
-          "The buyer",
-          "Signatory, date and channel"
+          "Sweep instruction",
+          "The payment provider",
+          "The instruction on the exporter’s collection account"
         ],
         [
           "No-objection",
@@ -788,10 +810,10 @@
       ]
     },
     "payment": {
-      "heading": "The money moves only between banks.",
+      "heading": "The money never passes through Kubar.",
       "parties": [
         "Kubar",
-        "Buyer, UAE",
+        "Buyer, Singapore",
         "Financier",
         "Exporter’s bank"
       ],
@@ -807,7 +829,7 @@
         ],
         [
           "Buyer",
-          "Financier’s collection account"
+          "Collection account, in the exporter’s name"
         ],
         [
           "Financier",
@@ -821,7 +843,14 @@
         "from": "From",
         "to": "To"
       },
-      "alt": "Three payments move between the buyer, the financier and the exporter’s bank. None touches Kubar."
+      "alt": "Three payments move between the buyer, the financier and the exporter’s bank. The buyer’s payment passes through a collection account in the exporter’s name. None touches Kubar.",
+      "controls": [
+        "Purchase price",
+        "Face value",
+        "Deferred purchase price",
+        "All three"
+      ],
+      "sweep": "swept to the financier"
     },
     "lossHistory": {
       "heading": "Every receivable that settles adds to a priced loss history.",
@@ -837,7 +866,7 @@
       }
     },
     "holds": {
-      "heading": "You hold the receivable, the policy and the account.",
+      "heading": "You hold the receivable, its proceeds and the policy.",
       "columns": [
         "Party",
         "Holds",
@@ -846,7 +875,7 @@
       "rows": [
         [
           "You, the financier",
-          "The receivable, the collection account, the insurance policy and the buyer’s credit risk",
+          "The receivable and its proceeds, the insurance policy and the buyer’s credit risk",
           "Recourse to the exporter for the buyer’s credit"
         ],
         [
@@ -869,6 +898,16 @@
           "Origination, the evidence package, servicing and reporting",
           "Money or credit risk"
         ]
+      ],
+      "things": [
+        "The receivable",
+        "The proceeds",
+        "The insurance policy",
+        "The buyer’s credit risk",
+        "Disputes, returns, set-off and fraud",
+        "The relationship with the exporter",
+        "Origination, the evidence package, servicing and reporting",
+        "Recourse to the exporter for the buyer’s credit"
       ]
     },
     "questions": {
@@ -877,6 +916,10 @@
         {
           "q": "What am I buying?",
           "a": "An export receivable: the amount an overseas buyer owes an Indian exporter under a shipped invoice. You buy it outright, inside your programme limit, without recourse for the buyer’s credit."
+        },
+        {
+          "q": "Why isn’t the exporter’s own bank financing this?",
+          "a": "An exporter’s bank finances the exporter: its limit is sized on turnover, and it stops there. A shipment past the limit has no bank product, however strong the buyer. You look at it the other way round: the buyer’s credit, on a limit the insurer approves, with the cover in your name. The exporter keeps its bank and its limit."
         },
         {
           "q": "Who carries the buyer’s credit, and who carries disputes?",
@@ -888,11 +931,11 @@
         },
         {
           "q": "Who holds the money?",
-          "a": "You do. The buyer pays your collection account, and you pay the exporter’s account at its own bank. Kubar never holds an account, receives a payment or releases funds."
+          "a": "The buyer pays a collection account in the exporter’s name, and a standing sweep passes each payment to you; the exporter can’t redirect it. You pay the exporter’s account at its own bank. Kubar never holds an account, receives a payment or releases funds."
         },
         {
           "q": "How do I know the shipment and the invoice are real?",
-          "a": "Each element of the evidence package comes from a system the exporter doesn’t control: Indian Customs for the shipping bill, the carrier for the bill of lading, the insurer for the limit, the buyer for its acknowledgement and the exporter’s bank for its no-objection. Kubar checks them against each other before anything is offered to you."
+          "a": "Each element of the evidence package comes from a system the exporter doesn’t control: Indian Customs for the shipping bill, the carrier for the bill of lading, the insurer for the limit and the exporter’s bank for its no-objection. Kubar checks them against each other before anything is offered to you."
         },
         {
           "q": "Who is Kubar, and under what mandate does it act?",
@@ -914,7 +957,8 @@
           "q": "Can individuals invest?",
           "a": "No. Only institutional financiers buy the receivables. There is no retail access, and nothing on this site is an offer to the public."
         }
-      ]
+      ],
+      "showAll": "Show all 11 questions"
     },
     "fit": {
       "heading": "Where each institution fits.",
@@ -946,15 +990,15 @@
       ]
     },
     "programme1": {
-      "heading": "Programme 1: rice to buyers in the UAE and the Gulf.",
+      "heading": "Programme 1: agricultural commodities to buyers in the UAE, Singapore and the wider Gulf.",
       "rows": [
         [
           "Exporters",
-          "Indian rice exporters"
+          "Indian agri-commodity exporters"
         ],
         [
           "Buyers",
-          "Importers in the UAE and the wider Gulf, on approved insurance limits"
+          "Importers in the UAE, Singapore and the wider Gulf, on approved insurance limits"
         ],
         [
           "Terms",
@@ -1041,7 +1085,11 @@
         "id": "venue-heading",
         "label": "The venue"
       }
-    ]
+    ],
+    "sits": {
+      "line": "Part of the institutional exchange Kubar is building. Kubar Protocol gives export receivables their standing buyers.",
+      "link": "Follow one receivable through all six"
+    }
   },
   "navdhanSdk": {
     "meta": {
@@ -1134,7 +1182,7 @@
         "NavDhan SDK checks the shipment against the programme’s rules and shows an indicative offer.",
         "With the exporter’s consent, the shipment data and documents go to Kubar Protocol, which assembles the evidence package.",
         "A financier buys the receivable and pays the exporter’s own bank.",
-        "The buyer pays the financier on the due date. Your platform shows each step as it happens."
+        "On the due date the buyer pays the account on its invoice, and the payment reaches the financier. Your platform shows each step as it happens."
       ],
       "lanes": [
         "Your platform",
@@ -1147,7 +1195,9 @@
         "evidence": "The evidence package",
         "status": "Each step as it happens"
       },
-      "link": "See how it works"
+      "link": "See how it works",
+      "skip": "Skip the five steps",
+      "counter": "{n} of 05"
     },
     "rules": {
       "heading": "Rules the SDK follows.",
@@ -1173,6 +1223,10 @@
       "heading": "Tell us about your platform and your exporters.",
       "body": "We’ll take you through what an integration involves.",
       "button": "Talk about an integration"
+    },
+    "sits": {
+      "line": "Part of the institutional exchange Kubar is building. NavDhan SDK is its distribution: exporters reach the programme from the platforms they already use, and those platforms’ shipment data is one source for each receivable’s record.",
+      "link": "Follow one receivable through all six"
     }
   },
   "howItWorks": {
@@ -1182,7 +1236,7 @@
     },
     "hero": {
       "headline": "From the port to the record.",
-      "sub": "One illustrative receivable, followed step by step: who does what, the documents behind it and where the money moves. A $225k rice invoice to a buyer in the UAE, due 75 days after shipment.",
+      "sub": "One illustrative receivable, followed step by step: who does what, the documents behind it and where the money moves. A $225k rice invoice to a buyer in Singapore, due 75 days after shipment.",
       "institutions": "For financial institutions",
       "platforms": "For trade platforms"
     },
@@ -1193,7 +1247,7 @@
         {
           "no": "01",
           "state": "Shipped",
-          "what": "The exporter ships the rice and issues its invoice. The invoice carries the assignment notice: the instruction to pay the financier’s account.",
+          "what": "The exporter ships the rice and issues its invoice, with its collection account on it: the account the buyer pays.",
           "party": "The exporter, and its trade platform if it uses one",
           "data": "Shipment and invoice data received",
           "money": null
@@ -1201,7 +1255,7 @@
         {
           "no": "02",
           "state": "Documented",
-          "what": "Kubar checks the shipping bill against the invoice (goods, quantity, value and buyer), checks who the exporter and the buyer are, runs the programme’s rules and files everything in one evidence package. The exporter’s bank’s no-objection is on file.",
+          "what": "Kubar checks the shipping bill against the invoice (goods, quantity, value and buyer), checks who the exporter and the buyer are, runs the programme’s rules and files everything in one evidence package.",
           "party": "Kubar",
           "data": "Evidence package assembled and checked",
           "money": null
@@ -1216,16 +1270,16 @@
         },
         {
           "no": "04",
-          "state": "Acknowledged",
-          "what": "The buyer acknowledges the notice: it will pay the financier’s account.",
-          "party": "The buyer",
-          "data": "Acknowledgement filed",
+          "state": "No-objection",
+          "what": "The exporter’s bank confirms it has no objection to the sale.",
+          "party": "The exporter’s bank",
+          "data": "No-objection filed",
           "money": null
         },
         {
           "no": "05",
           "state": "Purchased",
-          "what": "The financier accepts the receivable under its programme limit, without recourse for the buyer’s credit, and pays the purchase price. The credit decision is the financier’s own.",
+          "what": "The financier accepts the receivable under its programme limit, without recourse for the buyer’s credit, and pays the purchase price. From then on, the collection account’s standing sweep passes each payment to the financier. The credit decision is the financier’s own.",
           "party": "The financier",
           "data": "Package delivered; purchase recorded",
           "money": "The financier pays 90% of face to the exporter’s own bank"
@@ -1233,10 +1287,10 @@
         {
           "no": "06",
           "state": "Settled",
-          "what": "On the due date the buyer pays the financier’s collection account, quoting the receivable’s reference. Kubar matches the payment. The financier pays the exporter the balance, less its discount and charges, and the exporter’s bank closes the shipping bill. Where the exporter qualifies, the government’s interest subvention on export factoring is filed on the financier’s data and paid to the exporter.",
+          "what": "On the due date the buyer pays the collection account in the exporter’s name, quoting the receivable’s reference, and a standing sweep passes the payment to the financier. Kubar matches the payment. The financier pays the exporter the balance, less its discount and charges, and the exporter’s bank closes the shipping bill. Where the exporter qualifies, the government’s interest subvention on export factoring is filed on the financier’s data and paid to the exporter.",
           "party": "The buyer, the financier and the exporter’s bank",
           "data": "Payment matched; closure tracked",
-          "money": "The buyer pays $225,000 to the financier; the financier pays the exporter the balance, less its discount and charges"
+          "money": "The buyer pays $225,000 into the exporter’s collection account, swept to the financier; the financier pays the exporter the balance, less its discount and charges"
         },
         {
           "no": "07",
@@ -1285,7 +1339,7 @@
         },
         {
           "no": "07",
-          "name": "Buyer’s acknowledgement"
+          "name": "Sweep instruction"
         },
         {
           "no": "08",
@@ -1310,7 +1364,7 @@
       "heading": "Where the money moves.",
       "parties": [
         "Kubar",
-        "Buyer, UAE",
+        "Buyer, Singapore",
         "Financier",
         "Exporter’s bank"
       ],
@@ -1326,7 +1380,7 @@
         ],
         [
           "Buyer",
-          "Financier’s collection account"
+          "Collection account, in the exporter’s name"
         ],
         [
           "Financier",
@@ -1340,7 +1394,14 @@
         "from": "From",
         "to": "To"
       },
-      "alt": "Three payments move between the buyer, the financier and the exporter’s bank. None touches Kubar."
+      "alt": "Three payments move between the buyer, the financier and the exporter’s bank. The buyer’s payment passes through a collection account in the exporter’s name. None touches Kubar.",
+      "controls": [
+        "Purchase price",
+        "Face value",
+        "Deferred purchase price",
+        "All three"
+      ],
+      "sweep": "swept to the financier"
     },
     "unpaid": {
       "heading": "If a buyer doesn’t pay.",
@@ -1395,7 +1456,7 @@
       "rows": [
         [
           "Financier",
-          "Sets the programme limit, decides credit, buys each receivable, holds the policy and the collection account",
+          "Sets the programme limit, decides credit, buys each receivable, holds the policy and receives the swept payments",
           "Programme terms; the mandate to Kubar; a purchase agreement with each exporter; the insurance policy"
         ],
         [
@@ -1405,7 +1466,7 @@
         ],
         [
           "Exporter",
-          "Ships, invoices with the assignment notice, keeps its own bank",
+          "Ships, invoices with its collection account on the invoice, keeps its own bank",
           "The purchase agreement; Kubar’s services agreement"
         ],
         [
@@ -1415,8 +1476,8 @@
         ],
         [
           "Buyer",
-          "Acknowledges the notice; pays the financier’s account",
-          "Its acknowledgement"
+          "Pays the account on the invoice, on its usual terms",
+          "Nothing new to sign"
         ],
         [
           "Trade platform",
@@ -1440,8 +1501,7 @@
         },
         "tags": {
           "financier": "Programme terms",
-          "bank": "Its no-objection",
-          "buyer": "Its acknowledgement"
+          "bank": "Its no-objection"
         },
         "key": [
           "A line is an agreement between the two parties it joins.",
@@ -1485,12 +1545,12 @@
           "The balance, less the financier’s discount and charges, paid when the buyer pays."
         ],
         [
-          "Assignment notice",
-          "The instruction on the invoice telling the buyer to pay the financier’s account."
+          "Collection account",
+          "A dollar account in the exporter’s name, shown on the invoice, into which the buyer pays; a standing sweep passes each payment to the financier."
         ],
         [
-          "Collection account",
-          "The financier’s own account, into which the buyer pays."
+          "Standing sweep",
+          "An instruction on the exporter’s collection account that passes each payment to the financier as it arrives; the exporter can’t redirect it."
         ],
         [
           "Evidence package",
@@ -1528,7 +1588,8 @@
           "ITFS",
           "An International Trade Finance Service platform at GIFT City, on which several financiers can finance trade. Kubar’s own ITFS registration is targeted for 2027; until then Kubar acts as the financier’s origination and servicing agent."
         ]
-      ]
+      ],
+      "showAll": "Show all 19 terms"
     },
     "next": {
       "label": "Next step",
@@ -1575,7 +1636,7 @@
     },
     "hero": {
       "headline": "Foundations first.",
-      "sub": "Kubar Labs is building the institutional exchange<marker></marker> for cross-border trade finance, from GIFT City. We started with the asset: export receivables an international financier can buy again and again, insured in its own name. A venue needs something financiers will bid on, so we build that first: receivables with cover, documents, a clean payment path and a history."
+      "sub": "Kubar Labs is building the institutional exchange<marker></marker> for <nb>cross-border</nb> trade finance, from GIFT City. We started with the asset: export receivables an international financier can buy again and again, insured in its own name. A venue needs something financiers will bid on, so we build that first: receivables with cover, documents, a clean payment path and a history."
     },
     "order": {
       "heading": "What we’re building.",
@@ -1587,23 +1648,28 @@
           "planned": true
         },
         {
+          "name": "Distribution through trade platforms",
+          "line": "NavDhan SDK, inside the platforms exporters already use"
+        },
+        {
           "name": "A record of performance",
           "line": "The loss history, receivable by receivable"
         },
         {
           "name": "A clean payment path",
-          "line": "Payment matching, with the money moving only between banks"
+          "line": "Payment matching, with the money never passing through Kubar"
         },
         {
           "name": "Standing buyers",
           "line": "Programmes: a financier underwrites once and buys every receivable that fits"
         },
         {
-          "name": "A common standard for what qualifies",
+          "name": "A common standard an insurer can price",
           "line": "The programme rules and the evidence package"
         }
       ],
-      "link": "Follow one receivable through all five"
+      "link": "Follow one receivable through all six",
+      "note": "India is where we start: Indian exports, financed from GIFT City. The same foundations are built for trade across Asia’s other emerging markets."
     },
     "team": {
       "heading": "The team.",
@@ -1698,7 +1764,7 @@
           },
           {
             "title": "Abroad",
-            "line": "The buyer pays the financier’s account"
+            "line": "The buyer pays the account on its invoice; the payment reaches the financier"
           }
         ],
         "arrows": [

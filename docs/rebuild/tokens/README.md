@@ -10,7 +10,7 @@ Two modes. **Paper** is the default for every page. **Petrol** is only the band 
 
 Rules that come with the palette:
 - Rani (`--color-accent`) marks what a reader must not miss: footnote markers, the current state, "Illustrative", errors, the current-row marker. Never a button, never decoration, never the logo.
-- Every corner is square (`--radius-none`). Three elevation shadows (`--elevation-1` resting, `--elevation-2` raised, `--elevation-3` lifted), only where REDRAW-2026-11-14.md names an object: a shadow means an object, never a way to group text.
+- Every corner is square (`--radius-none`). Three elevation shadows (`--elevation-1` resting, `--elevation-2` raised, `--elevation-3` lifted), only where SPEC.md names an object: a shadow means an object, never a way to group text.
 - Hairlines (`--color-rule`) are decorative; a control's boundary is always `--color-rule-control`.
 
 ## Type
@@ -18,7 +18,7 @@ Rules that come with the palette:
 Three families, self-hosted as woff2 (production builds use local font files; see AGENTS.md):
 - **Newsreader** (serif): only the sentence inside a record (`Serif/Record`). Regular only. Since 14 Nov the display headline and the band's line are Schibsted Grotesk Medium.
 - **Schibsted Grotesk** (sans): headings (Medium 500), body (Regular 400), UI (Medium 500).
-- **Geist Mono** (mono): only where it carries a reference: identifiers, numbers in a sequence, states and counters, figures, the "Drawn to scale" caption and the timeline's day labels (REDRAW-2026-11-14.md, section 9.1). Every other small label is `Sans/Fine`. Regular and Medium.
+- **Geist Mono** (mono): only where it carries a reference: identifiers, numbers in a sequence, states and counters, figures, the "Drawn to scale" caption and the timeline's day labels (SPEC.md, section 5, rule 6). Every other small label is `Sans/Fine`. Regular and Medium.
 
 Budget: fonts 300 KB or less in total, two preloaded (Schibsted Grotesk and Geist Mono since 14 Nov; Newsreader loads on demand for the record). Subset to Latin.
 
@@ -51,7 +51,7 @@ Text styles, and the short tags used in `../copy/*.md`:
 
 No italics anywhere. Mono capitals only for State (status words in the record and ledger). Labels never carry section numbers and never sit above a heading.
 
-**Display sizes: decided.** Phone 40/44 from 14 Nov (REDRAW-2026-11-14.md). Vaibhav chose 48/52 at tablet on 13 Nov 2026 (the Figma variable still says 64/68). tokens.css carries 48/52.
+**Display sizes: decided.** Phone 40/44 from 14 Nov (SPEC.md, section 6). Vaibhav chose 48/52 at tablet on 13 Nov 2026 (the Figma variable still says 64/68). tokens.css carries 48/52.
 
 ## Layout
 
@@ -67,7 +67,7 @@ No italics anywhere. Mono capitals only for State (status words in the record an
 
 `--section-space` is the padding above and below every section after option B; sections are joined by one hairline (`--rule-hairline` in `--color-rule-strong`). In Figma the variable `layout/section-space` still holds the old 128/96/72, which now applies only to the band; tokens.css splits them into two names.
 
-Breakpoints are not in Figma (the frames are 1440, 768 and 390). Proposed: mobile below 768, tablet 768 to 1199 (the mobile structure at eight columns), desktop from 1200 (twelve columns, content up to 1280, centred). Check the layouts at 1200, 1280 and 1440, and at 360 and 414 on the small side.
+Breakpoints are not in Figma (the frames are 1440, 768 and 390): mobile below 768, tablet 768 to 1023 (the mobile structure at eight columns), laptop and desktop from 1024 (twelve columns, content up to 1280, centred). Since 16 Nov 2026 the laptop layout starts at 1024, not 1200, so every iPad in landscape gets it; `--page-margin` runs from 40 at 1024 to 80 at 1200, and `Mono/Figure large` from 77 to 96 over the same span. Check at the sizes in SPEC.md, section 15.
 
 ## Motion
 

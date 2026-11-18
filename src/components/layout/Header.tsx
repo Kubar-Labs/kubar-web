@@ -11,15 +11,15 @@ import { cx as cn } from "@/lib/cx";
 
 /*
  * Header (Figma C3 87:142). Fixed on scroll on every page (option B).
- * Desktop (≥ 1200): lock-up, Products (menu on click), How it works, About,
+ * Laptop and desktop (≥ 1024): lock-up, Products (menu on click), How it works, About,
  * Contact; "Talk to us" on the right; a double rule under it. LinkedIn is
  * not in the header or the menu sheet (15 Nov); it stays in the footer.
- * Below 1200 the links collapse into "Menu", which opens a full-screen sheet
+ * Below 1024 the links collapse into "Menu", which opens a full-screen sheet
  * (a modal <dialog>: focus stays inside, Escape closes, the page behind
  * doesn't scroll, focus returns to Menu).
  */
 
-const DESKTOP = "(min-width: 1200px)";
+const DESKTOP = "(min-width: 1024px)";
 
 const navItem =
   "t-ui inline-flex items-center gap-1 py-3 text-ink decoration-1 " +

@@ -16,7 +16,10 @@
   --drop-shadow-*: initial;
   --breakpoint-*: initial;
   --breakpoint-md: 768px;
-  --breakpoint-lg: 1200px;
+  /* The laptop layout starts at 1024, so every iPad in landscape gets it (SPEC section 7).
+     xl is where the content reaches 1040 px and a 1440 composition holds unchanged. */
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1200px;
 }
 
 @theme inline reference {
@@ -284,7 +287,7 @@
     --font-mono: var(--font-geist-mono), ui-monospace, monospace;
     --header-height: 65px;
   }
-  @media (min-width: 1200px) {
+  @media (min-width: 1024px) {
     :root {
       --header-height: 81px;
     }
@@ -330,7 +333,7 @@
 
   /* Tablet: running text keeps to the measure (REDRAW-2026-11-14.md, 9.10).
      At desktop each block sets its own width; on phones the column is narrower. */
-  @media (min-width: 768px) and (max-width: 1199.98px) {
+  @media (min-width: 768px) and (max-width: 1023.98px) {
     main p,
     main dd,
     main li.t-body {
@@ -399,7 +402,7 @@
      as extra cells), so at desktop, where registers are real table rows, the
      ground's margin extension and the marker hang off the first cell. Below
      desktop the rows are blocks or grids and keep them on the row itself. */
-  @media (min-width: 1200px) {
+  @media (min-width: 1024px) {
     tr.is-current::before,
     tr.is-current::after {
       content: none;
@@ -475,9 +478,10 @@
      style with a dotted underline in muted ink; the tooltip opens below. */
   /* A footnote marker is one small figure: its target reaches 24 px with
      padding that the negative margin takes back out of the line. */
+  /* The marker's target: at least 24 px wide even beside 13 px text (the glyph is about 3 px). */
   .footnote-marker {
-    padding: 6px 10px;
-    margin-inline: -10px;
+    padding: 6px 11px;
+    margin-inline: -11px;
   }
 
   .abbr {
@@ -564,19 +568,132 @@
   .iso-leader.is-current {
     border-color: var(--color-accent);
   }
+  /* Home's record (RecordView). --s is the sheets' scale and --step their
+     spacing: phones draw the compact record (0.53, or 0.43 under 390 wide so
+     the longest name keeps its line; 18.9 px apart), tablets and laptops the
+     full one. A sheet draws 320 x 185 before --s; 20 px is kept above the top
+     sheet for its lift and --foot below the last for its edge and ground shadow. */
   .iso-record {
-    --iso-record-gap: 74px;
+    --s: 0.43;
+    --step: 18.9px;
+    --record-gap: 12px;
+    --foot: 30px;
+  }
+  /* Under 360 wide (a 320 px reflow) the sheets shrink again, so the names still clear the edge. */
+  @media (max-width: 359.98px) {
+    .iso-record {
+      --s: 0.32;
+    }
+  }
+  @media (min-width: 390px) {
+    .iso-record {
+      --s: 0.53;
+    }
   }
   @media (min-width: 768px) {
     .iso-record {
-      --iso-record-gap: 50px;
+      --s: 1;
+      --step: 35px;
+      --record-gap: 12px;
+      --foot: 54px;
     }
   }
-  @media (min-width: 1200px) {
+  @media (min-width: 1328px) {
     .iso-record {
-      --iso-record-gap: 78px;
+      --record-gap: 36px;
     }
   }
+  .record-stage {
+    margin-top: var(--record-gap);
+  }
+  .record-art {
+    width: calc(336px * var(--s));
+    height: calc((20px + 185px + var(--foot)) * var(--s) + (var(--count) - 1) * var(--step));
+  }
+  .record-place {
+    transform: translateY(calc(20px * var(--s) + var(--n) * var(--step)));
+  }
+  .record-scale {
+    transform: scale(var(--s));
+  }
+  /* The rows: each level with its sheet's right corner (115 px down a sheet). */
+  .record-rows {
+    top: calc(135px * var(--s) - var(--step) / 2);
+    left: calc(327px * var(--s) + 8px);
+    right: 0;
+  }
+  .iso-record .iso-leader {
+    top: 50%;
+    left: -8px;
+    width: 6px;
+  }
+  @media (min-width: 768px) {
+    .record-rows {
+      left: 356px;
+    }
+    .iso-record .iso-leader {
+      left: -24px;
+      width: 16px;
+    }
+  }
+  /* "Where this sits" (WhereThisSits): the small stack and its names. --k is
+     the art's scale. The art is 206 wide to its ruler's ticks and 274 tall;
+     the names start 212 across and take the width that is left. Phones draw
+     the art at 0.55 and show only the page's own name, which may take two
+     lines; from 768 the art is at full size and every name keeps its line
+     but distribution's, which takes two where the names are 150 wide (its
+     neighbours leave room), and the last. */
+  .sits-stack {
+    --k: 0.55;
+    width: 100%;
+    height: calc(274px * var(--k));
+  }
+  .sits-names li:not(:nth-child(2), :last-child) {
+    white-space: nowrap;
+  }
+  @media (min-width: 768px) {
+    .sits-stack {
+      --k: 1;
+      --names: 150px;
+      width: calc(212px * var(--k) + var(--names));
+      max-width: 100%;
+    }
+  }
+  @media (min-width: 1024px) {
+    .sits-stack {
+      --names: 258px;
+    }
+  }
+  .sits-art {
+    width: calc(206px * var(--k));
+    height: calc(274px * var(--k));
+  }
+  .sits-scale {
+    transform: scale(var(--k));
+  }
+  .sits-names {
+    left: calc(212px * var(--k));
+  }
+
+  /* Page to page (SPEC section 12): the foundations stack carries across. React names the
+     stack on the old page and the new one (share="stack") when both are on screen; the rest
+     of the page changes at once, as before. The morph takes a write's time on the standard
+     ease; with reduced motion nothing animates. */
+  ::view-transition-group(.stack) {
+    animation-duration: var(--duration-write);
+    animation-timing-function: var(--ease-standard);
+  }
+  ::view-transition {
+    pointer-events: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    ::view-transition-group(*),
+    ::view-transition-old(*),
+    ::view-transition-new(*) {
+      animation: none !important;
+    }
+  }
+
   /* Blocks (foundations, layers, steps): a resting shadow under each, in
      screen space; the top face takes accent-soft when its label is picked. */
   .iso-block {
@@ -597,7 +714,7 @@
     opacity: 0;
     transition: opacity var(--duration-hover) var(--ease-standard);
   }
-  @media (min-width: 1200px) {
+  @media (min-width: 1024px) {
     .iso-foundations li:is(:hover, :focus) .iso-top-edge {
       opacity: 1;
     }
@@ -622,6 +739,7 @@
     vector-effect: non-scaling-stroke;
   }
   .iso-leader-line {
+    fill: none;
     stroke: var(--color-rule);
     stroke-width: 1;
   }
@@ -655,15 +773,21 @@
   [data-phase="armed"] .iso-outline-mask {
     stroke-dashoffset: 1;
   }
+  /* --after: the last solid block's level, so the outline draws once it has risen. */
   [data-phase="playing"] .iso-outline-mask {
-    transition: stroke-dashoffset 480ms var(--ease-standard) calc(3 * 80ms + var(--duration-write));
+    transition: stroke-dashoffset 480ms var(--ease-standard) calc(var(--after) * 80ms + var(--duration-write));
+  }
+  /* Home's foundations from 1024: where the panel is narrow the drawing gives up to 80 px, so
+     the labels' column keeps 360. */
+  .iso-stacked {
+    --iso-w: clamp(480px, calc(100% - 400px), 560px);
   }
 
   /* Arrivals on page load: a sheet drops in from 24 px above; a row fades in. */
-  .iso-drop {
+  :where(html[data-frames]) .iso-drop {
     animation: iso-drop var(--duration-write) var(--ease-standard) both;
   }
-  .iso-fade {
+  :where(html[data-frames]) .iso-fade {
     animation: iso-fade var(--duration-disclose) var(--ease-standard) both;
   }
   @keyframes iso-drop {
@@ -719,10 +843,312 @@
     opacity: 0;
   }
   [data-phase="playing"] :is(.draw-solid, .draw-mask) {
-    transition: stroke-dashoffset var(--duration-write) var(--ease-standard) var(--draw-delay, 0ms);
+    transition: stroke-dashoffset var(--draw-duration, var(--duration-write)) var(--ease-standard) var(--draw-delay, 0ms);
   }
   [data-phase="playing"] .draw-head {
-    transition: opacity var(--duration-hover) var(--ease-standard) calc(var(--draw-delay, 0ms) + var(--duration-write));
+    transition: opacity var(--duration-hover) var(--ease-standard) calc(var(--draw-delay, 0ms) + var(--draw-duration, var(--duration-write)));
+  }
+  /* Arrows that take the scene's time, one after another (Programme 1's corridor, About's three
+     zones; step 9). */
+  .draw-scene {
+    --draw-duration: var(--duration-scene);
+  }
+
+  /* The money path (MoneyPath.tsx, step 8), with the order, timing and easing of
+     docs/rebuild/prototypes/motion-pieces.html. Still (the server's render, no script,
+     reduced motion or already in view): every arrow drawn and every mark filled.
+     Armed (below the fold): the arrows undrawn, their words at 35%, the marks empty.
+     A payment that plays (.money-run, --at after the start) draws its line in 700 ms,
+     shows its head as the line arrives, runs a rani dot along it, brings its words to
+     full and fills its mark on Kubar's path. The face value's stop (.money-stop, a ring)
+     shows with its head. A replay remounts the payment, so its movement starts again
+     from the beginning. Once played it is .money-lit: drawn, with no movement left to
+     restart when the other layout shows (a tablet turned). */
+  .money-line {
+    fill: none;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+  }
+  .money-dot {
+    opacity: 0;
+  }
+  .money-mark {
+    fill: var(--color-ink);
+    stroke: var(--color-ink);
+  }
+  .money-ground {
+    fill: rgb(2 39 50 / 0.18);
+    filter: blur(6px);
+  }
+  /* Narrower than a 360 px phone (the 320 px reflow check): the narrow drawing at 0.875, so it fits. */
+  @media (max-width: 359.98px) {
+    .money-narrow {
+      zoom: 0.875;
+    }
+  }
+  [data-phase="armed"] .money-still .money-line {
+    stroke-dashoffset: 1;
+  }
+  [data-phase="armed"] .money-still :is(.money-head, .money-stop) {
+    opacity: 0;
+  }
+  [data-phase="armed"] .money-words.money-still {
+    opacity: 0.35;
+  }
+  [data-phase="armed"] .money-mark.money-still {
+    fill: var(--color-page);
+    stroke: var(--color-ink-muted);
+  }
+  .money-run .money-line {
+    animation: money-draw 700ms ease var(--at) both;
+  }
+  .money-run :is(.money-head, .money-stop) {
+    animation: money-show 200ms ease calc(var(--at) + 600ms) both;
+  }
+  .money-run .money-dot {
+    animation: money-go 750ms ease var(--at) forwards;
+  }
+  .money-words.money-run {
+    animation: money-words 300ms ease var(--at) both;
+  }
+  .money-mark.money-run {
+    animation: money-mark 300ms ease calc(var(--at) + 700ms) both;
+  }
+  @keyframes money-draw {
+    from {
+      stroke-dashoffset: 1;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  @keyframes money-show {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes money-words {
+    from {
+      opacity: 0.35;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes money-go {
+    0% {
+      opacity: 1;
+      transform: translate(0, 0);
+    }
+    90% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      transform: translate(var(--dx), var(--dy));
+    }
+  }
+  @keyframes money-mark {
+    from {
+      fill: var(--color-page);
+      stroke: var(--color-ink-muted);
+    }
+    to {
+      fill: var(--color-ink);
+      stroke: var(--color-ink);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .money-run :is(.money-line, .money-head, .money-stop, .money-dot),
+    :is(.money-words, .money-mark).money-run {
+      animation: none;
+    }
+  }
+
+  /* Cover in your name (BuyerLimit, step 9) plays once in three phases. The limit box draws
+     over the scene's time (its dashed edges revealed through a mask whose solid copies draw, then
+     the floor) with its label; then the headroom bracket and its label show at the whole
+     limit's height; RCV-0001 and RCV-0002 settle inside the box, from 24 px up, one after the
+     other, and the bracket shortens with each (its post scales from the top, its foot rises);
+     RCV-0003 comes to rest above the rim from 40 px up. --at: when a part starts. */
+  .limit-draw-mask {
+    fill: none;
+    stroke: white;
+    stroke-width: 6;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+  }
+  .limit-post {
+    transform-box: fill-box;
+    transform-origin: top;
+  }
+  [data-phase="armed"] .limit-draw-mask {
+    stroke-dashoffset: 1;
+  }
+  [data-phase="armed"] :is(.limit-floor, .limit-part) {
+    opacity: 0;
+  }
+  [data-phase="armed"] .limit-sheet {
+    opacity: 0;
+    transform: translateY(-24px);
+  }
+  [data-phase="armed"] .limit-next {
+    opacity: 0;
+    transform: translateY(-40px);
+  }
+  [data-phase="armed"] .limit-post {
+    transform: scaleY(1.2743);
+  }
+  [data-phase="armed"] .limit-foot {
+    transform: translateY(19.2px);
+  }
+  [data-phase="playing"] .limit-draw-mask {
+    transition: stroke-dashoffset var(--duration-scene) var(--ease-standard);
+  }
+  /* The floor shows once the edges have drawn, so it never cuts the ground shadow along an edge
+     that isn't there yet. */
+  [data-phase="playing"] .limit-floor {
+    transition: opacity var(--duration-write) var(--ease-standard) var(--duration-scene);
+  }
+  [data-phase="playing"] .limit-part {
+    transition: opacity var(--duration-write) var(--ease-standard) var(--at, 0ms);
+  }
+  [data-phase="playing"] .limit-sheet {
+    transition:
+      opacity var(--duration-write) var(--ease-standard) var(--at, 0ms),
+      transform var(--duration-write) var(--ease-standard) var(--at, 0ms);
+  }
+  [data-phase="playing"] .limit-next {
+    transition:
+      opacity var(--duration-write) var(--ease-standard) var(--at, 0ms),
+      transform var(--duration-scene) var(--ease-standard) var(--at, 0ms);
+  }
+  /* Two steps, each with its receivable: 600 to 920 ms and 920 to 1240 ms. */
+  [data-phase="playing"] .limit-post {
+    animation: limit-post 640ms var(--ease-standard) 600ms both;
+  }
+  [data-phase="playing"] .limit-foot {
+    animation: limit-foot 640ms var(--ease-standard) 600ms both;
+  }
+  @keyframes limit-post {
+    0% {
+      transform: scaleY(1.2743);
+    }
+    50% {
+      transform: scaleY(1.1371);
+    }
+    100% {
+      transform: scaleY(1);
+    }
+  }
+  @keyframes limit-foot {
+    0% {
+      transform: translateY(19.2px);
+    }
+    50% {
+      transform: translateY(9.6px);
+    }
+    100% {
+      transform: translateY(0);
+    }
+  }
+  /* The labels are beside the box on laptops; under it they are a plain list and don't wait. */
+  @media (min-width: 1024px) {
+    [data-phase="armed"] .limit-label {
+      opacity: 0;
+    }
+    [data-phase="playing"] .limit-label {
+      transition: opacity var(--duration-write) var(--ease-standard) var(--at, 0ms);
+    }
+  }
+
+  /* What you buy (MoneyTimeline, step 9) plays once: the paid-out bar grows down at purchase,
+     the "meanwhile" bracket draws across, the received bar grows up at the due date, then the
+     deferred purchase price; each over the scene's time, one after the other (--at), and each
+     label fades in with its bar. */
+  .tl-down {
+    transform-origin: top;
+  }
+  .tl-up {
+    transform-origin: bottom;
+  }
+  .tl-across {
+    transform-origin: left;
+  }
+  [data-phase="armed"] :is(.tl-down, .tl-up) {
+    transform: scaleY(0);
+  }
+  [data-phase="armed"] .tl-across {
+    transform: scaleX(0);
+  }
+  [data-phase="armed"] .tl-label {
+    opacity: 0;
+  }
+  [data-phase="playing"] :is(.tl-down, .tl-up, .tl-across) {
+    transition: transform var(--duration-scene) var(--ease-standard) var(--at, 0ms);
+  }
+  [data-phase="playing"] .tl-label {
+    transition: opacity var(--duration-scene) var(--ease-standard) var(--at, 0ms);
+  }
+
+  /* Who holds what (HoldsPick, step 9): a chip for each thing that can be held. Every chip
+     keeps its box from pick to pick, so the board never reflows: room for its dot always, and
+     the same 1 px border (the rani outline's other half pixel is an outline just inside it,
+     which takes no room; a border's width would round differently from one state to the next,
+     and a shadow is only ever an elevation). Held:
+     petrol with a white dot. Not held: a 1.5 px rani outline and a hollow rani dot. Held by
+     another party: a rule outline and muted words. The colours change over 250 ms (the
+     prototype's). */
+  .hold-chip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 15px;
+    border: 1px solid var(--color-rule);
+    outline: 0.5px solid transparent;
+    outline-offset: -1.5px;
+    color: var(--color-ink-muted);
+    transition:
+      background-color 250ms ease,
+      border-color 250ms ease,
+      color 250ms ease,
+      outline-color 250ms ease;
+  }
+  .hold-chip[data-state="held"] {
+    border-color: var(--color-action);
+    background-color: var(--color-action);
+    color: var(--color-on-action);
+  }
+  .hold-chip[data-state="not"] {
+    border-color: var(--color-accent);
+    background-color: var(--color-raised);
+    outline-color: var(--color-accent);
+    color: var(--color-ink);
+  }
+  /* The dot: a circle drawn in SVG (corners stay square), 8 px with its 1.5 px edge. */
+  .hold-dot {
+    flex: none;
+    fill: transparent;
+    stroke: transparent;
+    transition:
+      fill 250ms ease,
+      stroke 250ms ease;
+  }
+  .hold-chip[data-state="held"] .hold-dot {
+    fill: var(--color-on-action);
+    stroke: var(--color-on-action);
+  }
+  .hold-chip[data-state="not"] .hold-dot {
+    stroke: var(--color-accent);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hold-chip,
+    .hold-dot {
+      transition: none;
+    }
   }
 
   /* The who-takes-part map: a card under the pointer or focus, or the last
@@ -750,7 +1176,7 @@
     stroke-dasharray: 4 4;
     vector-effect: non-scaling-stroke;
   }
-  .limit-settle {
+  :where(html[data-frames]) .limit-settle {
     animation: limit-settle var(--duration-scene) var(--ease-standard) both;
   }
   @keyframes limit-settle {
@@ -785,7 +1211,7 @@
       opacity var(--duration-write) var(--ease-standard) calc(3 * 80ms + var(--duration-write)),
       transform var(--duration-write) var(--ease-standard) calc(3 * 80ms + var(--duration-write));
   }
-  @media (min-width: 1200px) {
+  @media (min-width: 1024px) {
     .iso-layers li:is(:hover, :focus) .iso-top-edge {
       opacity: 1;
     }
@@ -793,11 +1219,11 @@
 
   /* How it works hero (IsoSteps): on page load the blocks rise in order, 01
      to 08, 60 ms apart; 08's petrol top fades in over its white one last. */
-  .steps-rise {
+  :where(html[data-frames]) .steps-rise {
     animation: steps-rise var(--duration-write) var(--ease-standard) both;
     animation-delay: calc(var(--i) * 60ms);
   }
-  .steps-petrol {
+  :where(html[data-frames]) .steps-petrol {
     animation: iso-fade var(--duration-disclose) var(--ease-standard) both;
     animation-delay: calc(7 * 60ms + var(--duration-write));
   }
@@ -886,38 +1312,12 @@
     opacity: 0.3;
   }
 
-  /* If a buyer doesn't pay (UnpaidFlow): each beat fades in at its --beat;
-     the fork's stem draws down and its bar out from the stem (transform). */
-  [data-phase="armed"] .flow-beat {
-    opacity: 0;
-  }
-  [data-phase="playing"] .flow-beat {
-    transition: opacity var(--duration-write) var(--ease-standard) var(--beat, 0ms);
-  }
-  .fork-stem {
-    transform-origin: top;
-  }
-  .fork-bar {
-    transform-origin: 720px 0; /* the stem, 870 - 150 */
-  }
-  [data-phase="armed"] .fork-stem {
-    transform: scaleY(0);
-  }
-  [data-phase="armed"] .fork-bar {
-    transform: scaleX(0);
-  }
-  [data-phase="playing"] :is(.fork-stem, .fork-bar) {
-    transition: transform var(--duration-write) var(--ease-standard) var(--beat, 0ms);
-  }
   /* Print: drawings that wait to come into view are printed in their end state. */
   @media print {
     .phase-drop,
     .phase-fade,
-    .flow-beat,
     .steps-rise,
-    .steps-petrol,
-    .fork-stem,
-    .fork-bar {
+    .steps-petrol {
       opacity: 1 !important;
       transform: none !important;
       animation: none !important;
@@ -932,10 +1332,109 @@
     }
   }
 
-  /* A fixed-size desktop drawing fitted to its column (FitStage): from 1200
+  /* If a buyer doesn't pay (UnpaidFlow): three boxes and two 60 px arrows in a
+     row. A box is 300 wide where that fits and shares the width below that. */
+  .unpaid-flow {
+    container-type: inline-size;
+    --flow-box: min(300px, calc((100cqw - 120px) / 3));
+  }
+  /* Each part of the path is lit unless the flow hasn't reached its beat (the rules after the
+     layers set --flow-on to 0 then, and no delays). A lit step is raised: --elevation-2 on a
+     pseudo-element that fades, as the journeys' cards are, and its words are in ink. Lines draw
+     from their start; a head shows once its line has arrived. The fork's stem draws down, then
+     its halves out from it, then the branch arrows. */
+  .flow-box::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    box-shadow: var(--elevation-2);
+    pointer-events: none;
+    opacity: var(--flow-on, 1);
+    transition: opacity var(--duration-write) var(--ease-standard);
+  }
+  .flow-box p {
+    color: var(--flow-words, var(--color-ink));
+    transition: color var(--duration-write) var(--ease-standard);
+  }
+  .flow-line {
+    stroke-dasharray: 1;
+    stroke-dashoffset: calc((1 - var(--flow-on, 1)) * 1px);
+    transition: stroke-dashoffset var(--duration-write) var(--ease-standard);
+  }
+  .flow-head {
+    opacity: var(--flow-on, 1);
+    transition: opacity var(--duration-hover) var(--ease-standard) var(--flow-delay, var(--duration-write));
+  }
+  .fork-stem {
+    transform: scaleY(var(--flow-on, 1));
+    transform-origin: top;
+    transition: transform var(--duration-hover) var(--ease-standard);
+  }
+  .fork-half {
+    transform: scaleX(var(--flow-on, 1));
+    transition:
+      transform var(--duration-write) var(--ease-standard) var(--flow-delay, var(--duration-hover)),
+      opacity var(--duration-disclose) var(--ease-standard);
+  }
+  .fork-half[data-branch="0"] {
+    transform-origin: right;
+  }
+  .fork-half[data-branch="1"] {
+    transform-origin: left;
+  }
+  .fork-arrow .flow-line {
+    transition-delay: var(--flow-delay, calc(var(--duration-hover) + var(--duration-write)));
+  }
+  .fork-arrow .flow-head {
+    transition-delay: var(--flow-delay, calc(var(--duration-hover) + 2 * var(--duration-write)));
+  }
+  :is(.flow-branch, .fork-arrow) {
+    transition: opacity var(--duration-disclose) var(--ease-standard);
+  }
+  /* The pick: by each branch's arrow on laptops, 52 px above the branch (Figma 333:2784); a row
+     between step 03 and the branch below that. A 44 px tap area on touch screens. */
+  .flow-pick {
+    display: none;
+  }
+  .flow-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+  }
+  .flow-buttons button {
+    position: relative;
+  }
+  @media (pointer: coarse) {
+    .flow-buttons button::after {
+      content: "";
+      position: absolute;
+      inset-inline: 0;
+      top: 50%;
+      height: 44px;
+      transform: translateY(-50%);
+    }
+  }
+  @media (min-width: 1024px) {
+    .flow-pick {
+      position: relative;
+      height: 0;
+    }
+    .flow-buttons button {
+      position: absolute;
+      top: -52px;
+    }
+    .flow-buttons button[data-branch="0"] {
+      left: calc(var(--flow-box) / 2 + 14px);
+    }
+    .flow-buttons button[data-branch="1"] {
+      right: calc(var(--flow-box) / 2 + 14px);
+    }
+  }
+
+  /* A fixed-size desktop drawing fitted to its column (FitStage): from 1024
      up it keeps its composition and scales down only when the column is
-     narrower. The script measures --fit; 1200 to 1279 start from an estimate. */
-  @media (min-width: 1200px) {
+     narrower. The script measures --fit; until then a stage may give an estimate. */
+  @media (min-width: 1024px) {
     .fit-stage {
       --fit: 1;
       height: calc(var(--stage-h) * var(--fit));
@@ -946,10 +1445,10 @@
       transform: scale(var(--fit));
       transform-origin: top left;
     }
-  }
-  @media (min-width: 1200px) and (max-width: 1279.98px) {
-    .fit-stage {
-      --fit: 0.91;
+    /* A 13 px label in a fitted drawing never reads smaller than 12 px. */
+    .fit-stage .fit-keep {
+      /* Over the label's own text utility, which sits in a later layer. */
+      font-size: max(13px, calc(12px / var(--fit))) !important;
     }
   }
 
@@ -1002,7 +1501,7 @@
     offset-rotate: 0deg;
     offset-distance: 72%;
   }
-  @media (min-width: 1200px) {
+  @media (min-width: 1024px) {
     [data-phase="armed"] .loop-line {
       stroke-dashoffset: 1;
     }
@@ -1049,27 +1548,52 @@
   /* The pinned story, option B (StoryView.tsx, Lanes.tsx; REDRAW section
      3a). The lanes drawing is sized here: rows from the viewport in svh,
      columns from the drawing's own width. Phones and tablets: party boxes
-     40 px high, rows of 22 to 40 px, the drawing at most 45% of 100svh.
-     Desktop: party boxes 56 px, rows of 44 to 74 px, the drawing filling the
-     height under the header less 48 px. */
+     40 px high, rows of 22 to 40 px, the drawing at most 45% of 100svh; the
+     columns take the full width (--cols) and the rows' band and hairlines
+     start 22 px in (--gutter), after their numbers. Desktop: party boxes
+     56 px, rows of 44 to 74 px, the drawing filling the height under the
+     header less 48 px, and the columns after a 36 px gutter. */
   .lanes {
     --party-h: 50px;
     --box-h: 40px;
     --box-inset: 2px;
-    --gutter: 0px;
+    --gutter: 22px;
+    --cols: 0px;
     --row-h: clamp(22px, (45svh - 40px - 24px) / 8, 40px);
     --dy: 6px;
     position: relative;
     height: calc(var(--party-h) + 8 * var(--row-h));
   }
-  @media (min-width: 1200px) {
+  /* Phones: the lanes at their smallest rows, which leaves the cards the room to hold a third
+     of the screen each without the current one sliding under the drawing (SPEC section 9). */
+  @media (max-width: 767.98px) {
+    .lanes {
+      --row-h: 22px;
+    }
+  }
+  /* Narrow phones: the party boxes sit closer, so "Singapore" fits its box on
+     one line at 10 px from 360 up. The type is never shrunk for it. */
+  @media (max-width: 429.98px) {
+    .lanes {
+      --box-inset: 1px;
+    }
+  }
+  @media (min-width: 1024px) {
     .lanes {
       --party-h: 64px;
       --box-h: 56px;
       --box-inset: 4px;
       --gutter: 36px;
+      --cols: 36px;
       --row-h: clamp(44px, (100svh - var(--header-height) - 64px - 48px) / 8, 74px);
       --dy: 7px;
+    }
+  }
+  /* 1024 to 1199: the lanes sit beside 380 px cards, and the party boxes sit closer so
+     "Singapore" keeps its line at 15 px. */
+  @media (min-width: 1024px) and (max-width: 1199.98px) {
+    .lanes {
+      --box-inset: 2px;
     }
   }
   .lane-current {
@@ -1077,7 +1601,7 @@
   }
   /* Below desktop the pin's ground fades out over 24 px under the drawing,
      so the cards aren't sliced as they pass under it. */
-  @media (width < 1200px) {
+  @media (width < 1024px) {
     .story-pin::after {
       content: "";
       position: absolute;
@@ -1182,6 +1706,131 @@
   [data-story-state="8"] .lane-current {
     transform: translateY(calc(7 * var(--row-h)));
   }
+  /* NavDhan SDK's pinned journey (RunLanes.tsx, step 10; Figma 331:1202, and the prototype's
+     narrow lanes on phones). The sizes live on the story, so the cards' last slot can read the
+     pin's height. Phones: party boxes 36 px high across the full width, 44 px rows. From 768:
+     the laptop drawing (boxes 76 high, the rows' numbers in a 48 px gutter), at its column's
+     width; tablets take rows from 45% of the screen's height, laptops fill the height under the
+     header and the skip link, 56 to 76 px. StoryView's fit check holds the same numbers. */
+  .story[data-variant="sdk"] {
+    --run-cols: 0px;
+    --run-gutter: 22px;
+    --run-mark: 4px;
+    --run-box-h: 36px;
+    --run-box-inset: 2px;
+    --run-party-h: 44px;
+    --run-row-h: 44px;
+    --run-sq: 8px;
+    --run-label-x: 10px;
+    --run-label-dy: -19px;
+    --run-arrow-dy: 10px;
+  }
+  @media (min-width: 768px) {
+    .story[data-variant="sdk"] {
+      --run-cols: 48px;
+      --run-gutter: 48px;
+      --run-mark: 5px;
+      --run-box-h: 76px;
+      --run-box-inset: 12px;
+      --run-party-h: 92px;
+      --run-row-h: clamp(52px, (45svh - 156px) / 5, 76px);
+      --run-sq: 10px;
+      --run-label-x: 12px;
+      --run-label-dy: -24px;
+      --run-arrow-dy: 12px;
+    }
+  }
+  @media (min-width: 1024px) {
+    .story[data-variant="sdk"] {
+      --run-row-h: clamp(56px, (100svh - var(--header-height) - 184px) / 5, 76px);
+      /* The pinned block: the skip link and its 20 px, then the lanes. */
+      --run-pin: calc(44px + var(--run-party-h) + 5 * var(--run-row-h));
+    }
+  }
+  .run-lanes {
+    position: relative;
+    height: calc(var(--run-party-h) + 5 * var(--run-row-h));
+  }
+  /* The last card's slot (StoryView, 18 Nov): long enough that the last state holds for 200 px of
+     scroll with the drawing still pinned. StoryView measures it (--last-room). Before it does, and
+     without script, a floor stands in on laptops, reckoned the same way: 240 px, and the drawing's
+     pinned height and the 24 px over it, less the 45% of the screen under the header where a card
+     turns current. How it works' relying lines are taken at their 1440 height (162 px). */
+  .story-last {
+    min-height: max(var(--last-floor, 0px), var(--last-room, 0px));
+  }
+  @media (min-width: 1024px) {
+    .story[data-variant="home"] {
+      --last-floor: calc(328px + clamp(352px, 100svh - var(--header-height) - 112px, 592px) - 0.45 * (100svh - var(--header-height)));
+    }
+    .story[data-variant="sdk"] {
+      --last-floor: calc(264px + var(--run-pin) - 0.45 * (100svh - var(--header-height)));
+    }
+    .story[data-variant="howItWorks"] {
+      --last-floor: calc(288px + clamp(346px, 100svh - var(--header-height) - 110px, 418px) - 0.45 * (100svh - var(--header-height)));
+    }
+  }
+  @media (min-width: 1200px) {
+    .story[data-variant="howItWorks"] {
+      --last-floor: calc(450px + clamp(250px, 100svh - var(--header-height) - 256px, 526px) - 0.45 * (100svh - var(--header-height)));
+    }
+  }
+  /* A party's box: 176 wide, or its column less the inset where the column is narrower. */
+  .run-party {
+    --box-w: min(176px, (100% - var(--run-cols)) / 3 - 2 * var(--run-box-inset));
+    width: var(--box-w);
+    height: var(--run-box-h);
+  }
+  .run-current {
+    transition: transform var(--duration-write) var(--ease-standard);
+  }
+  /* A row writes in as Home's do: its words and squares fade, its lines draw from their origin. */
+  .run-row {
+    opacity: 0;
+    transition: opacity var(--duration-write) var(--ease-standard);
+  }
+  .run-row svg {
+    clip-path: inset(0 100% 0 0);
+    transition: clip-path var(--duration-write) var(--ease-standard);
+  }
+  .run-row[data-row="1"],
+  :is([data-story-state="2"], [data-story-state="3"], [data-story-state="4"], [data-story-state="5"]) .run-row[data-row="2"],
+  :is([data-story-state="3"], [data-story-state="4"], [data-story-state="5"]) .run-row[data-row="3"],
+  :is([data-story-state="4"], [data-story-state="5"]) .run-row[data-row="4"],
+  [data-story-state="5"] .run-row[data-row="5"] {
+    opacity: 1;
+  }
+  .run-row[data-row="1"] svg,
+  :is([data-story-state="2"], [data-story-state="3"], [data-story-state="4"], [data-story-state="5"]) .run-row[data-row="2"] svg,
+  :is([data-story-state="3"], [data-story-state="4"], [data-story-state="5"]) .run-row[data-row="3"] svg,
+  :is([data-story-state="4"], [data-story-state="5"]) .run-row[data-row="4"] svg,
+  [data-story-state="5"] .run-row[data-row="5"] svg {
+    clip-path: inset(0 0 0 0);
+  }
+  /* The current row's number in rani; the others in the secondary colour, as the frame draws them. */
+  .run-no {
+    color: var(--color-ink-muted);
+    transition: color var(--duration-write) var(--ease-standard);
+  }
+  [data-story-state="1"] .run-no[data-row="1"],
+  [data-story-state="2"] .run-no[data-row="2"],
+  [data-story-state="3"] .run-no[data-row="3"],
+  [data-story-state="4"] .run-no[data-row="4"],
+  [data-story-state="5"] .run-no[data-row="5"] {
+    color: var(--color-accent);
+  }
+  [data-story-state="2"] .run-current {
+    transform: translateY(calc(1 * var(--run-row-h)));
+  }
+  [data-story-state="3"] .run-current {
+    transform: translateY(calc(2 * var(--run-row-h)));
+  }
+  [data-story-state="4"] .run-current {
+    transform: translateY(calc(3 * var(--run-row-h)));
+  }
+  [data-story-state="5"] .run-current {
+    transform: translateY(calc(4 * var(--run-row-h)));
+  }
   /* How it works tells the story on its evidence stack (StoryStack; REDRAW
      section 13 A). The stack's height is what the screen leaves, its width
      follows, and the rows sit beside it at the same proportions. Desktop:
@@ -1208,7 +1857,7 @@
       top: 50%;
     }
   }
-  @media (min-width: 1200px) {
+  @media (min-width: 1024px) {
     .story-stack {
       --stack-h: clamp(250px, 100svh - var(--header-height) - 256px, 526px);
     }
@@ -1222,7 +1871,14 @@
       max-width: calc(100cqw - 100% - 23px);
     }
   }
-  /* Tablets: the rows share the height evenly, so a name on two lines keeps its distance. */
+  /* 1024 to 1199: the stack sits beside 360 px cards without the relying lines, so it may be
+     taller for its screen but no wider than leaves its rows 250 px. */
+  @media (min-width: 1024px) and (max-width: 1199.98px) {
+    .story-stack {
+      --stack-h: clamp(346px, 100svh - var(--header-height) - 110px, 418px);
+    }
+  }
+  /* Tablets and narrow laptops: the rows share the height evenly, so a name on two lines keeps its distance. */
   @media (min-width: 768px) and (max-width: 1199.98px) {
     .story-stack .stack-rows {
       justify-content: space-between;
@@ -1268,6 +1924,29 @@
   }
 }
 
+/* A list shown in part (Fold.tsx). Unlayered, so it wins over the items' own
+   layout utilities. With script (data-js, set before the first paint) the
+   folded items wait for the control; without, every item shows and the
+   control is hidden. The money path's replays need script too. */
+html[data-js] [data-folded] {
+  display: none;
+}
+/* A list rendered on the server keeps data-folded; opened, its items take their own display back. */
+html[data-js] [data-open] [data-folded] {
+  display: revert-layer;
+}
+html:not([data-js]) :is(.fold-control, .money-controls) {
+  display: none;
+}
+/* A pick that needs script (Kubar Protocol's HoldsPick and FitPick), and the cards or the register
+   that stand in for it without. */
+html:not([data-js]) .with-script {
+  display: none;
+}
+html[data-js] .without-script {
+  display: none;
+}
+
 /* The pinned story or its ledger (StoryView.tsx). Unlayered, so it wins over
    the layout utilities on the story. The ledger shows with reduced motion
    (decided here, so it holds without script) or when even the smallest rows
@@ -1279,6 +1958,52 @@
   display: none;
 }
 .story[data-story-fits="false"] .story-ledger {
+  display: block;
+}
+/* If a buyer doesn't pay (UnpaidFlow.tsx, step 11), unlayered so it wins over the utilities on its
+   words. With script and without reduced motion: the path draws with the scroll (data-on, set as
+   the flow moves up the screen), the fork's labels are buttons, the picked branch is lit and the
+   other sits at 30%; below 1024 the steps stack, the buttons sit between step 03 and the branch
+   and only the picked branch shows. Without script, with reduced motion and in print: everything
+   lit, both branches under their labels, as before. */
+@media screen and (prefers-reduced-motion: no-preference) {
+  html[data-js] .unpaid-flow .flow-pick {
+    display: flex;
+    flex-direction: column;
+  }
+  html[data-js] .unpaid-flow .flow-label {
+    display: none;
+  }
+  /* The parts whose beat hasn't come (UnpaidStage sets data-lit, the highest beat past). */
+  html[data-js] .unpaid-flow[data-lit="0"] [data-beat],
+  html[data-js] .unpaid-flow[data-lit="1"] :is([data-beat="2"], [data-beat="3"], [data-beat="4"], [data-beat="5"], [data-beat="6"]),
+  html[data-js] .unpaid-flow[data-lit="2"] :is([data-beat="3"], [data-beat="4"], [data-beat="5"], [data-beat="6"]),
+  html[data-js] .unpaid-flow[data-lit="3"] :is([data-beat="4"], [data-beat="5"], [data-beat="6"]),
+  html[data-js] .unpaid-flow[data-lit="4"] :is([data-beat="5"], [data-beat="6"]),
+  html[data-js] .unpaid-flow[data-lit="5"] [data-beat="6"] {
+    --flow-on: 0;
+    --flow-words: var(--color-ink-muted);
+    --flow-delay: 0ms;
+  }
+  html[data-js] .unpaid-flow[data-case="no"] [data-branch="1"]:not(button),
+  html[data-js] .unpaid-flow[data-case="yes"] [data-branch="0"]:not(button) {
+    opacity: 0.3;
+  }
+  @media (max-width: 1023.98px) {
+    html[data-js] .unpaid-flow[data-case="no"] .flow-branch[data-branch="1"],
+    html[data-js] .unpaid-flow[data-case="yes"] .flow-branch[data-branch="0"] {
+      display: none;
+    }
+    html[data-js] .unpaid-flow .flow-branches {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+}
+/* NavDhan SDK's journey steps only with script; without it the register shows, complete (step 10). */
+html:not([data-js]) .story[data-variant="sdk"] .story-on {
+  display: none;
+}
+html:not([data-js]) .story[data-variant="sdk"] .story-ledger {
   display: block;
 }
 @media (prefers-reduced-motion: reduce) {

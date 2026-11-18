@@ -14,7 +14,9 @@ import { abbreviationPattern, nextAbbreviation } from "@/lib/abbreviations";
  *
  * The approved copy stays untouched in the messages: after the page has
  * hydrated, this walks the visible text of <main> and marks the first use of
- * each abbreviation. It leaves alone links, buttons, form controls, headings,
+ * each abbreviation, and again when a list shown in part opens (Fold,
+ * FoldOpen: the "unfold" event), so a first use in its folded items gets
+ * its expansion. It leaves alone links, buttons, form controls, headings,
  * row and column headers, and anything inside [data-no-abbr] (text React
  * rewrites: the story panel, the record's Proves line, the form).
  */
@@ -74,7 +76,7 @@ export function AbbreviationTips({ expansions }: { expansions: Record<string, st
   useEffect(() => {
     const root = document.getElementById("main-content");
     if (!root) return;
-    const desktop = window.matchMedia("(min-width: 1200px)");
+    const desktop = window.matchMedia("(min-width: 1024px)");
     let frame = 0;
     const run = () => {
       unmark(root);
@@ -87,6 +89,7 @@ export function AbbreviationTips({ expansions }: { expansions: Record<string, st
       frame = requestAnimationFrame(run);
     };
     desktop.addEventListener("change", rerun);
+    document.addEventListener("unfold", rerun);
 
     const open = (event: Event) => {
       const abbr = (event.target as Element).closest?.("abbr[data-abbr]") as HTMLElement | null;
@@ -119,6 +122,7 @@ export function AbbreviationTips({ expansions }: { expansions: Record<string, st
       window.clearTimeout(start);
       cancelAnimationFrame(frame);
       desktop.removeEventListener("change", rerun);
+      document.removeEventListener("unfold", rerun);
       root.removeEventListener("mouseover", open);
       root.removeEventListener("focusin", open);
       root.removeEventListener("click", open);

@@ -7,9 +7,17 @@ Extracted from Figma, NavDhan SDK · 1440 (frame 170:6), 13 Nov 2026, in reading
 [Display] Trade finance inside the software your exporters already use.
 [BodyL] Embed NavDhan SDK and your exporters can check eligibility, apply and be paid for their export receivables without leaving your platform. Financiers buy; Kubar runs the programme; you keep the relationship.
 [UI] Talk about an integration                     (filled button → /contact?intent=platform)
+(16 Nov: directly under the hero, a strip on the inset ground, "Where this sits": the foundations drawn small with the page's own level in petrol, the sentence and the link, which goes to /#one-receivable. 17 Nov: six foundations, and the level in petrol is Distribution through trade platforms, Figma 310:1331.)
+[Fine] Where this sits
+[Body] Part of the institutional exchange Kubar is building. NavDhan SDK is its distribution: exporters reach the programme from the platforms they already use, and those platforms’ shipment data is one source for each receivable’s record.
+[UI] Follow one receivable through all six         (→ /#one-receivable)
+(16 Nov: the names are Home's, the venue's with the marker ¹; no "Planned" in the strip. Phones name only the page's own level. Footnote ¹ shows once on the page, under the strip:)
+[Fine] ¹
+[Fine] Kubar’s own ITFS registration is targeted for 2027; until then Kubar acts as the financier’s origination and servicing agent.
+[Fine] Back to text
 
-(Build step 6, REDRAW-2026-11-14.md section 12 item 3: the hero carries "What you embed" (see that section below): the H3 and the six capabilities in the left column under the button, beside the sketch. Picking a row outlines its part of the sketch; "Eligibility check" is picked from the start.)
-The embed sketch (component "Embed sketch", 140:2523): a schematic, not a screenshot. From 1000 to 1199 the sketch sits beside the list; from 768 to 999 the sketch comes first, then the six rows. On phones (below 768) there is no full sketch: the six rows are an accordion, and an open row shows its own piece of the sketch under its sentence.
+(Build step 6, REDRAW-2026-11-14.md section 12 item 3: the hero carries "What you embed" (see that section below): the H3 and the six capabilities in the left column under the button, beside the sketch; "Eligibility check" is picked from the start.)
+(17 Nov, next build step 7: the embed sketch is drawn like the product, Figma 318:1274, the six states on board 316:1377, tablet 320:1661, phone 320:1536. A square platform with the shipment's own records, and inside it the NavDhan SDK widget, which shows the picked row's own screen: its name as the title, its fields with a tick, and a button naming the next part. From 1000 the sketch sits beside the list. Below 1000 the six rows are an accordion, and an open row shows its screen under its sentence: from 768 the whole sketch, on phones the widget alone. The words are the ones below and the rows' own names.)
 [Tag] Your platform
 (15 Nov, REDRAW-2026-11-14.md section 10: no Illustrative tag on the sketch.)
 [Tag] Shipment
@@ -24,22 +32,22 @@ The embed sketch (component "Embed sketch", 140:2523): a schematic, not a screen
 [BodyS] Size
 [BodyS] Goods
 [UIS] Indicative offer
-[BodyS] All-in price                       (empty dotted box: no figure)
-[BodyS] The exporter’s own alternative     (empty dotted box: no figure)
+[BodyS] All-in price                       (empty dotted box: no figure; 17 Nov: muted Sans/Fine, in two columns)
+[BodyS] The exporter’s own alternative     (empty dotted box: no figure; 17 Nov: muted Sans/Fine, in two columns)
 [UIS] Application and status
 [BodyS] Submission
 [BodyS] Documents outstanding
-[BodyS] Purchase                           (current: rani square)
-[BodyS] Settlement                         (open square)
-(Build step 6, new strings, Vaibhav, 15 Nov. While "Consented onboarding" is picked, the SDK panel shows three filled marks in place of its content:)
+[BodyS] Purchase                           (current: rani square; 17 Nov: a rani ring on a connected timeline)
+[BodyS] Settlement                         (open square; 17 Nov: an open ring, in the secondary colour)
+(Build step 6, new strings, Vaibhav, 15 Nov. While "Consented onboarding" is picked, the SDK panel shows three filled marks in place of its content; 17 Nov: the widget's three fields, each with a tick:)
 [BodyS] Identity check
 [BodyS] Business check
 [BodyS] Consent recorded
-(While "Events for your product" is picked, a small status shows beside "Invoice" in the Shipment list:)
+(While "Events for your product" is picked, a small status shows beside "Invoice" in the Shipment list; 17 Nov: a chip beside "Shipment" in the platform, a rani dot and the word in Sans/UI small:)
 [State] Purchased
 
 ## For your exporters
-(Build step 6, section 13 C1: this and "For your platform" sit side by side as one two-column block from 1200 up, and stacked below that. The words don't change.)
+(Build step 6, section 13 C1: this and "For your platform" sit side by side as one two-column block from 1024 up (1200 at the release; the laptop layout starts at 1024 since 16 Nov), and stacked below that. The words don't change.)
 [H2] Dollar finance beyond their bank limit.
 [BodyL] Your exporters can sell their export receivables to institutional financiers, beyond the limits their own banks set, without recourse for the buyer’s credit. They keep their own bank, and their buyers keep their terms.
 
@@ -60,13 +68,17 @@ Events for your product | Status updates you can show your users
 
 ## From your side
 [H2] How it runs on your platform.
-Desktop: a five-step register beside three lanes (Your platform, Kubar Protocol filled, The financier; component "Platform lanes", 138:2455). At 768 and 390: the register only.
+(16 Nov: the page's pinned journey; this link sits above the lanes and goes to the next section.)
+[UI] Skip the five steps
+(17 Nov, next build step 10: the page's pinned journey, Figma 331:1202. The three lanes pin and the five steps are cards that scroll past them, each with its counter and its sentence; row n of the lanes lights with card n, the lane labels below on the rows. Side by side from 1024; below, the lanes pin above the cards, redrawn narrow on phones. With reduced motion, on a short screen or without script, the register below shows as today.)
+[Tag] 01 of 05                                           (the cards' counters, 01 of 05 to 05 of 05)
+The register: desktop, a five-step register beside three lanes (Your platform, Kubar Protocol filled, The financier; component "Platform lanes", 138:2455). At 768 and 390: the register only.
 (After step 3, REDRAW-2026-11-14.md section 10: the column heads "Step" and "What happens" are cut; they name nothing.)
 [Code] 01  [Body] Your exporter books and documents a shipment in your platform, as it does today.
 [Code] 02  [Body] NavDhan SDK checks the shipment against the programme’s rules and shows an indicative offer.
 [Code] 03  [Body] With the exporter’s consent, the shipment data and documents go to Kubar Protocol, which assembles the evidence package.
 [Code] 04  [Body] A financier buys the receivable and pays the exporter’s own bank.
-[Code] 05  [Body] The buyer pays the financier on the due date. Your platform shows each step as it happens.
+[Code] 05  [Body] On the due date the buyer pays the account on its invoice, and the payment reaches the financier. Your platform shows each step as it happens.
 Lane labels (desktop): [UI] Your platform, [UI] Kubar Protocol, [UI] The financier; path labels [Tag] NavDhan SDK, With the exporter’s consent, The evidence package, Each step as it happens.
 [UI] See how it works                                    (→ /how-it-works)
 

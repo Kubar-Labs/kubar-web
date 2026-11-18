@@ -5,18 +5,21 @@ import { createPageMetadata } from "@/app/page-metadata";
 import { NextStep } from "@/components/blocks/Closing";
 import { PageHero } from "@/components/blocks/PageHero";
 import { Section, SectionHead } from "@/components/blocks/Section";
-import { FitStage } from "@/components/drawings/FitStage";
+import { WhereThisSits } from "@/components/blocks/WhereThisSits";
+import { Footnote } from "@/components/ui/Footnote";
 import { EmbedPicker, type SketchCopy } from "@/components/sdk/EmbedPicker";
 import { IsoLayers } from "@/components/sdk/IsoLayers";
-import { NumberedRows, PlatformLanes } from "@/components/sdk/PlatformLanes";
+import { NumberedRows } from "@/components/sdk/PlatformLanes";
+import { RunJourney } from "@/components/sdk/RunJourney";
 import { TextLink } from "@/components/ui/TextLink";
 
 /*
  * NavDhan SDK (Figma 170:6 at 1440; the 768 and 390 frames are not updated,
- * so below 1200 the page follows the existing rules). No "Where it stands",
+ * so below 1024 the page follows the existing rules). No "Where it stands",
  * no status words, no Illustrative tag. The hero carries "What you embed"
  * beside the sketch; the two audiences are one two-column block; the rules
- * have no numbers; "Behind it" is the isometric layers.
+ * have no numbers; "Behind it" is the isometric layers. "How it runs" is the
+ * page's pinned journey (step 10).
  */
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -28,6 +31,9 @@ const CONTACT = "/contact?intent=platform";
 
 export default function NavdhanSdk() {
   const t = useTranslations("navdhanSdk");
+  const common = useTranslations("common");
+  const footnotes = useTranslations("footnotes");
+  const foundationNames = (useTranslations("home").raw("foundations.slabs") as { name: string }[]).map((slab) => slab.name);
   return (
     <>
       {/* The hero carries "What you embed": the six capabilities beside the sketch (section 12, item 3). */}
@@ -38,8 +44,24 @@ export default function NavdhanSdk() {
         below={<EmbedPicker heading={t("does.heading")} rows={t.raw("does.rows") as string[][]} copy={t.raw("sketch") as SketchCopy} />}
       />
 
-      {/* The two audiences as one two-column block from 1200 up (Figma 296:9538; section 13 C1). */}
-      <Section className="grid gap-(--section-space) lg:grid-cols-2 lg:gap-20">
+      {/* Where this sits: the six foundations small, distribution through trade platforms in petrol. */}
+      <WhereThisSits
+        label={common("whereThisSits")}
+        line={t("sits.line")}
+        link={{ label: t("sits.link"), href: "/#one-receivable" }}
+        foundations={foundationNames}
+        current={1}
+        footnote={{ target: "fn-1", refId: "fnref-1-sits" }}
+      />
+      {/* Footnote ¹, once on the page, for the venue's name in the strip. */}
+      <div className="page-container pt-6">
+        <Footnote n={1} id="fn-1" backTo="fnref-1-sits" className="lg:max-w-[628px]">
+          {footnotes("status")}
+        </Footnote>
+      </div>
+
+      {/* The two audiences as one two-column block from 1024 up (Figma 296:9538; section 13 C1). */}
+      <Section className="grid gap-(--section-space) lg:grid-cols-2 lg:gap-12 xl:gap-20">
         {(["exporters", "platform"] as const).map((key) => (
           <div key={key} className="flex flex-col gap-5 lg:gap-6">
             <h2 className="t-h2 text-ink">{t(`${key}.heading`)}</h2>
@@ -48,22 +70,20 @@ export default function NavdhanSdk() {
         ))}
       </Section>
 
+      {/* The page's pinned journey (step 10, Figma 331:1202): the lanes pinned, the five steps as
+          cards; "Skip the five steps" goes to the rules. The link after the cards shows with the
+          register too. */}
       <Section labelledBy="runs-heading" className="flex flex-col gap-10 lg:gap-16">
         <SectionHead id="runs-heading" heading={t("runs.heading")} layout="wide" />
-        <div className="flex flex-col items-start gap-10">
-          {/* The drawing keeps its 1062 composition and is fitted to its column on narrower laptops (rule 11.1). */}
-          <FitStage width={1062} height={528} className="w-full">
-            <PlatformLanes
-              steps={t.raw("runs.steps") as string[]}
-              lanes={t.raw("runs.lanes") as string[]}
-              paths={t.raw("runs.paths") as { sdk: string; consent: string; evidence: string; status: string }}
-            />
-          </FitStage>
-          <TextLink href="/how-it-works" kind="arrow">{t("runs.link")}</TextLink>
+        <div className="flex flex-col gap-10">
+          <RunJourney skipTo="rules" />
+          <TextLink href="/how-it-works" kind="arrow" className="self-start">
+            {t("runs.link")}
+          </TextLink>
         </div>
       </Section>
 
-      <Section labelledBy="rules-heading" className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-20">
+      <Section id="rules" labelledBy="rules-heading" ground="inset" className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-12 xl:gap-20">
         <SectionHead id="rules-heading" heading={t("rules.heading")} layout="stacked" />
         {/* Not a sequence, so no numbers (REDRAW rule 7). */}
         <NumberedRows numbered={false} items={t.raw("rules.items") as string[]} className="min-w-0 flex-1" />

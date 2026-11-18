@@ -1,5 +1,7 @@
 # Handover for the next session (15 Nov 2026)
 
+> 16 Nov 2026: written before the release. The site is live from `main`; the spec is `SPEC.md` (the two files this note cites are in `archive/`); the check scripts are back, in `scripts/checks/`, with `npm run check:safari`, `check:lighthouse` and `check:js` (SPEC.md, section 15). The notes on this machine and on flaky checks still hold.
+
 State: branch `rebuild-2026`, steps 1 to 8 built, last code commit `92e17bf`. 74 unit and 159 e2e tests pass. Nothing is deployed; `main` and Cloudflare are untouched. Spec: `REDRAW-2026-11-14.md` (sections 1 to 17), copy in `copy/`, budget in `HANDOFF.md` section 11. No further build step is authorised; wait for Vaibhav.
 
 ## Commands
@@ -70,6 +72,12 @@ They lived in the session scratchpad under `/tmp/claude-1000/`, which a reboot c
 - **Tests with fixed waits:** same cause. Fix: wait for state (`data-phase`, an attribute, `expect.poll`), never a timeout. Vaibhav's rule: fix the cause, do not rerun.
 - **Home's map tap in WebKit below 768:** not a flake. `:has(…:hover)` is not restyled reliably in Safari; the map now uses `PickStage` (`data-picked`), as the evidence stack and signs map do. Do not write new `:has(:hover)` rules.
 - **An empty workflow result:** once every agent had failed on a usage limit. Check failures before trusting "no findings".
+
+## Brave on this laptop: hover (16 Nov 2026)
+
+- **Reported:** in Brave, after hovering every record row once, hover goes dead on Home (record and foundations) and the hero stays still after a refresh. **Not reproduced** in Brave 157 through Playwright (headed; X11, native Wayland and a virtual display; about 264 hovers a run, down, up, down, up, with two reloads). Reduced motion was off, `hover: hover` and `pointer: fine` matched, the GPU stayed on, the site stores nothing. Vaibhav's own profile was not opened. Nothing was changed.
+- **Seen instead, and explained:** now and then a hovered row lost its hover with the pointer still. At that moment the element under the pointer was still the row, nothing in the page had moved or re-rendered, and the page had just received trusted mouse events at coordinates the test never sent, then `mouseleave` on the document. A second pointer stream reaches the window when Playwright drives a headed browser: the display's own pointer. It is the harness, not the site; a visitor has one pointer. A 1 px move brings the hover back.
+- So a repeated-hover test must run headless, or expect this. The scripts were scratch (`repro2.mjs`, `drop.mjs`); the note above is enough to rewrite them.
 
 ## This machine
 

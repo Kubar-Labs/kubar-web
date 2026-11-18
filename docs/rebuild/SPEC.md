@@ -1,0 +1,446 @@
+# kubar.tech: the spec, as built and released
+
+This is the one current description of kubar.tech, the public site of Kubar Labs, in `Kubar-Labs/kubar-web`. It describes the site as it was released to production on 15 November 2026 (`main`) and, dated 16 to 18 Nov, the build that follows it on the branch `next-build` (steps 0 to 12 and 8.5, accepted by Vaibhav), merged into `main` for release after the release sweep of 18 Nov.
+
+It replaces two files, which are kept unchanged in `archive/`:
+
+- `archive/HANDOFF.md`, the original brief of 13 Nov 2026;
+- `archive/REDRAW-2026-11-14.md`, the redraw of 14 Nov and every review after it.
+
+Where the two disagreed, the later decision won, and this file states only the result. The appendix shows where each old section went. Comments in the code that cite "HANDOFF section N" or "REDRAW-2026-11-14.md, section N" point at the archived files; rule numbers that are cited often (11.1 to 11.5) keep their numbers here.
+
+Owner: Vaibhav Sharma, vaibhav@kubar.tech.
+
+| File | What it is |
+|---|---|
+| SPEC.md | This file |
+| copy/*.md | The signed-off words of every page, in reading order, with each line's text style and link target |
+| tokens/tokens.css, tokens/tokens.json, tokens/README.md | Colour, type, layout, shape and motion tokens |
+| components.md | Every component with its Figma node id, variants and behaviour |
+| prototypes/ | Working prototypes that are the reference for motion |
+| HANDOVER-SESSION.md | Notes on this machine and on checks that flaked |
+| archive/ | The two superseded files |
+
+## 1 · Ground rules
+
+1. **Work on a branch, never on main.** Commit as you go. Do not merge, deploy or change Cloudflare settings. Production releases are run locally by the team (`docs/deployment.md`), and only when Vaibhav says so.
+2. **The copy is signed off.** Use the words in `copy/` exactly, including curly quotes, the non-breaking hyphen in "set‑off" and the superscript footnote markers. If something reads wrong, or a line doesn't fit, tell Vaibhav; don't rewrite it and don't cut it.
+3. **Figures only as written.** $80bn, $126.92M, 2,857, $441.78bn and the rest come from the model of record and the sources register; never round, restate or add a figure.
+4. **Nothing that expires.** The site is updated about once a quarter. No status words ("In build", "In preparation" and the like), no "as at" dates, no progress sections. The one exception is the venue's "Planned" with its footnote ¹.
+5. **Never** use the State Emblem or the national flag; never name a financier or partner beyond what the copy names; never suggest retail access.
+6. **The site's vocabulary.** A financier buys a receivable. Never loan, lend, lender, borrower or repayment. "ITFS registration", never "licence". This holds for words nobody reads on the page too (alt text, aria labels).
+7. **kubar.tech only.** navdhan.app is a separate site and stays untouched.
+8. **Read the Next.js docs in `node_modules/next/dist/docs` first** (AGENTS.md: this Next.js has breaking changes).
+9. **Never type, ask for or store a password, key or token.** If something needs a sign-in, stop; Vaibhav does it.
+
+## 2 · Sources of truth, in order
+
+1. This file.
+2. `copy/` for words, `tokens/` for values, `components.md` for behaviour.
+3. The Figma page frames (section 3): layout, spacing, proportions. Build only visible layers: hidden layers are removed content, not alternatives. Frames named "before 14 Nov" are archive.
+4. Figma component descriptions: useful for intent, but many predate the redraw. Where they disagree with this file, this file wins.
+
+Where the tablet and phone frames disagree with the build on something this file doesn't settle, the build wins; list the difference, don't change it. If two sources disagree and this order doesn't settle it, ask Vaibhav.
+
+## 3 · Figma
+
+File: https://www.figma.com/design/pFO3DEpqVzWCJdPghuq8nU. Use the Figma connector with these node ids; in a URL, write the id with a hyphen (`?node-id=160-6`).
+
+| Page | Route | 1440 | 768 | 390 |
+|---|---|---|---|---|
+| Home | / | 160:6 | 166:3363 | 162:1295 |
+| Kubar Protocol | /products/kubar-protocol | 167:6 | 169:1931 | 168:684 |
+| NavDhan SDK | /products/navdhan-sdk | 170:6 | 170:698 | 170:250 |
+| How it works | /how-it-works | 172:6 | 172:1770 | 172:760 |
+| About | /about | 173:6 | 173:1118 | 173:566 |
+| Contact | /contact | 174:6 | 174:616 | 174:291 |
+| 404 | (not found) | 176:6 | 176:265 | 176:151 |
+| Error | (error boundary) | 176:347 | 176:485 | 176:424 |
+| Privacy notice | /legal/privacy | 176:546 | 176:916 | 176:740 |
+| Terms of use | /legal/terms | 176:1059 | 176:1486 | 176:1281 |
+
+Other pages in the file: C1 to C6 (components, see `components.md`), 01 · Foundations (token boards), 02 · Mark and lock-up, 03 · Idiom (diagram rules), 07 · Motion.
+
+Home at 1440 is the reference page. After 14 Nov most frames were updated at 1440 only; section 8 names the node of each drawing.
+
+## 4 · Routes, redirects and metadata
+
+| Page | Route | Title | Meta description |
+|---|---|---|---|
+| Home | / | Kubar Labs · Building the institutional exchange for cross-border trade finance | Indian export receivables, originated, insured and documented so an international financier can buy them again and again. |
+| Kubar Protocol | /products/kubar-protocol | Kubar Protocol · Kubar Labs | Underwrite once, then buy every export receivable that fits: without recourse for the buyer's credit, insured in your name, with the evidence behind each one. |
+| NavDhan SDK | /products/navdhan-sdk | NavDhan SDK · Kubar Labs | Embed NavDhan SDK so your exporters can finance their export receivables inside your platform. Financiers buy; Kubar runs the programme. |
+| How it works | /how-it-works | How it works · Kubar Labs | Follow one illustrative export receivable from shipment to settlement: who does what, the documents behind each step and where the money moves. |
+| About | /about | About · Kubar Labs | Kubar Labs is building the institutional exchange for cross-border trade finance, foundations first. The team and our standing. |
+| Contact | /contact | Contact · Kubar Labs | Talk to Kubar Labs about a programme, an integration or anything else. Tell us who you are and your message reaches the right people. |
+| Privacy notice | /legal/privacy | Privacy notice · Kubar Labs | How Kubar Labs handles personal data collected through kubar.tech. |
+| Terms of use | /legal/terms | Terms of use · Kubar Labs | The terms on which kubar.tech is offered. |
+
+`src/site-contract.test.ts` holds the site to this table.
+
+- **Social card** (Open Graph and Twitter, every page): title "Kubar Labs"; description the Home subline; image `public/media/kubar-labs-social-86333cc0.png`, drawn by `scripts/social-image.mjs` in the site's type and colours (redrawn 16 Nov 2026 in the current look): on the white ground, "Building the institutional exchange for cross-border trade finance." in Schibsted Grotesk Medium with the lock-up under it on the left, and the eight-document record from Home's hero on the right, 08 on top with its rani edge and "FILED"; alt "Kubar Labs: Building the institutional exchange for cross-border trade finance."
+- **Organisation JSON-LD:** email partnerships@kubar.tech, LinkedIn https://www.linkedin.com/company/kubarlabs/ and the logo `public/media/kubar-mark-970208af.png`. No Substack link.
+- **Redirects (permanent):** /products/navdhan → /products/navdhan-sdk · /for-platforms → /products/navdhan-sdk · /team → /about#team · /privacy → /legal/privacy · /opengraph-image → the social image · www → apex.
+- **Sitemap:** the eight routes (`src/app/sitemap.ts`).
+- **Footer copyright:** "© [current year] Kubar Protocol Private Limited".
+
+## 5 · The rules behind the drawings
+
+1. **Depth where something stacks or builds.** Documents stack into a record, foundations build into a venue, layers sit behind a product. Those are drawn in isometric projection.
+2. **Flat where the reader compares or reads.** The to-scale bar, the who-takes-part map, glossaries, registers a credit committee looks things up in, forms and legal text stay flat.
+3. **A shadow means an object.** Sheets, parties on the map, routes you can take, the one item picked out of a set. Never a shadow or a card only to group text.
+4. **No set of identical cards.** Where three or four things are compared, one is raised and the rest are quiet columns.
+5. **No hairline between sections.** Sections are separated by space. The header keeps its bottom rule.
+6. **Monospace only where it carries a reference.** Identifiers (Record RCV-0001, Receivable RCV-0001, the "RCV-0001 · RCV-0002 · …" line, Doc 01 to 08); numbers in a sequence (lane rows, steps, the numbers on the staircase blocks); states and counters (Filed, Purchased, Planned, 05 of 08); figures; the money timeline's day labels. Every other small label is `Sans/Fine` in the secondary text colour.
+7. **Numbers only on real sequences.** The venue's three points and the SDK's four rules have none.
+
+Also: no italics anywhere; no pictograms in rows, party boxes or diagram boxes; no chips; no "Illustrative" tag (rule 11.10); no section numbers and no label above a heading; no kicker above a page's headline. The Kubar mark appears in the header, the footer and the Kubar column of the lanes drawings (Home's, and NavDhan SDK's journey and register) only.
+
+## 6 · Tokens
+
+Values live in `tokens/tokens.css` (copied to `src/app/tokens.css`; a test holds the two equal) and are described in `tokens/README.md`. Use the tokens, not raw values.
+
+- **Colour.** The page ground is white (`#FFFFFF`); the inset ground is `#ECECE8`. Petrol is the band's ground and the picked item in a set (the Petrol colour mode, `data-ground="petrol"`). Rani (`--color-accent`) follows rule 11.4. There is no dark theme.
+- **Type.** Schibsted Grotesk for the display headline (Medium, −2% tracking), the band's line (Medium, −1%), headings H2 to H4 (Medium), body and UI. Geist Mono per rule 6 of section 5; mono capitals only for state words. Newsreader in one place: `Serif/Record`, the sentence inside a record. Display is 56/60 at desktop, 48/52 at tablet, 40/44 on phones. `Mono/Figure large` (96/100) is used once, on Home's "About $80bn".
+- **Type floor.** Rule 11.6.
+- **Corners** are square. **Elevation** has three levels, in petrol/900, used only where section 8 names an object:
+
+```css
+--elevation-1: 0 1px 2px rgb(2 39 50 / .08), 0 6px 16px rgb(2 39 50 / .08);   /* resting */
+--elevation-2: 0 2px 4px rgb(2 39 50 / .08), 0 14px 36px rgb(2 39 50 / .12);  /* raised */
+--elevation-3: 0 4px 8px rgb(2 39 50 / .08), 0 24px 56px rgb(2 39 50 / .16);  /* lifted: the current sheet, the picked card */
+```
+
+Raised surfaces are white with a 1 px `rule/default` border.
+
+- **Motion tokens:** 120 ms hover, 200 ms openings, 320 ms arrivals with an 80 ms stagger, 600 ms scenes; `--ease-standard` and `--ease-exit`. With `prefers-reduced-motion: reduce` every duration is 0.
+
+## 7 · Layout and page anatomy
+
+- **Grid:** 12 columns at desktop, 8 at tablet, 4 on phones; margins 80/40/20; gutters 24/24/16; content up to 1280 px, centred. Running text stays within `--measure` (640).
+- **Breakpoints:** phone below 768; tablet 768 to 1023; laptop and desktop from 1024 (`--breakpoint-lg`), so every iPad in landscape gets the laptop layout (16 Nov 2026; it was 1200 at the release). The value also lives in media queries in `globals.css` and `tokens.css` and in script constants that mirror them (`Header.tsx`, `AbbreviationTips.tsx`, `StoryView.tsx`, `UnpaidStage.tsx`). `--breakpoint-xl` is 1200, where the content reaches 1040 px.
+- **Page margin at laptop width** runs from 40 px at 1024 to 80 px at 1200, so the content runs from 944 to 1040 px without a jump.
+- **Tablet** is the phone structure at eight columns with tablet type sizes, full width, with running text kept to `--measure`. An upright iPad shows the 768 layout. Exceptions are named in section 8 (the SDK hero from 1000; the two-column blocks from 768).
+- **Laptops get the desktop composition** (rule 11.1). Section 7a says how each section behaves from 1024 to 1199.
+- **The header** is fixed on scroll on every page, with its bottom rule. It shows the full nav from 1024. Below 1024 the links collapse into a "Menu" button (64 × 44) that opens a full-screen sheet of ruled rows with "Talk to us" (48 px) at the foot. No LinkedIn link in the header or the sheet. The Products menu opens on click only.
+- **Sections** are separated by `--section-space` (72/56/48) and no rule. The band keeps the larger `--band-space`.
+- **Pacing (16 Nov 2026).** The sections a reader studies sit on the inset ground (`--color-inset`, #ECECE8), the full width of the screen at every width, as the frames draw them: `<Section ground="inset">`. Kubar Protocol: The evidence package, Cover in your name, The payment path and The loss history (four in a row, one ground) and The venue with its footnote; NavDhan SDK: Rules; How it works: If a buyer doesn't pay; About: Why GIFT City. The strips ("Where this sits") are inset too. Every other section is on the page's white. Raised cards stay white on the inset ground; the money path's "Kubar holds none" sits on a white chip (section 8).
+- **A long list shown in part** (`Fold.tsx`; `FoldOpen.tsx` for a list rendered on the server): the first items show and a control under the list ("Show all 11 questions" on Kubar Protocol, 40/64 under the list as the section's own gap; "Show all 19 terms" on How it works, 24 under the six rows; underlined words and a plus, 40 px tall at desktop and 44 below) opens the rest in place. One press: the control goes and focus moves to the first item that was folded. A link to something inside a folded item opens the list first. The layout's first script marks `<html data-js>` before anything is painted, and the folded items are hidden only under it: without script every item shows and the control is hidden, and with script nothing moves as the page loads.
+- **A section head** at desktop is the heading (400 wide; 320 with a 48 px gap from 1024 to 1199) with its lead beside it (680). Several sections put their whole body beside the head instead (400 + 800): Home "The gap", "Standing", "Contact"; Kubar Protocol "The payment path", "The venue"; NavDhan SDK "Rules"; About "Why GIFT City". Small sizes stack.
+- **Tables.** Every register that is still a table is a real `<table>` with header cells; on phones a table becomes stacked rows, each row a block with its first cell as the heading. Where a drawing replaced a visible table, the table stays in the page for screen readers unless the drawing's own list serves everyone (section 8 says which).
+- **"On this page"** (Kubar Protocol and How it works): a ruled row under the hero, "On this page" in muted Sans/Fine, then each section's name as an anchor link, wrapping. Once the row has scrolled away a small fixed "On this page" button shows at the bottom right; it opens the same list in a sheet, marks the section the reader is in, and closes on Escape, a pick or a click outside. It steps aside while a link, a button, a field or the footer is under it. It doesn't change the header's height or the pinned journey's measurements. Its names are the words a visitor sees (rule 11.9).
+- **Footnote ¹** (the ITFS registration line) shows once on each page that discusses the venue, and every marker ¹ on that page links to it (rule 11.11).
+- **Anchor targets** have `scroll-margin-top` equal to the header's height.
+
+## 7a · From 1024 to 1199 (16 Nov 2026)
+
+The rules for this band: a drawing may scale down to 80% and no lower; no label in a drawing under 12 px (mono tags are 11 px by token at every width; the rule governs scaling); no sentence under 15 px; no row leaves more than a third of the content width empty; an iPad is a touch screen at laptop width, so whatever answers a hover answers a tap. Scaling a drawing scales its type, so most sections fit their geometry and keep their type; only a drawing whose words survive it is scaled.
+
+| Section | From 1024 to 1199 |
+|---|---|
+| Home · hero | Re-flowed, up to 1327: headline and subline across the top, routes left, record right. Two columns need 1,164 px of content. |
+| Home · the gap | Laptop layout; the large figure runs from 77 px at 1024 to 96 px at 1200 and the second column is 300. |
+| Home · story | Laptop layout: 380 px cards beside the pinned lanes, the party boxes 2 px closer so "Singapore" keeps its line. |
+| Foundations drawing (About) | Laptop layout at full size, in its own build: the blocks are 35% thicker, so the levels are 92 to 98 px apart and the six labels, each on its level and two lines at most, keep 20 px or more between them. The panel's padding is 24, the leaders 40 shorter and the labels' column 360. |
+| Foundations drawing (Home, 1024 to 1439; 17 Nov) | The labels stand beside the drawing in the page's flow, 14 px apart from the top, without leaders: in a column narrower than the frame's 584 the sentences run to four to six lines, further from their blocks than a 45° leader can reach. Where the panel is narrow the drawing gives up to 80 px, so the labels' column keeps 360 (the drawing is 496 wide at 1024). A label still marks its block. |
+| Kubar Protocol · What you buy | Re-flowed, up to 1279: the sheet with the tablets' small timeline and its list beside it. The day-axis timeline shows from 1280. |
+| Kubar Protocol · How a programme runs | Re-flowed, up to 1279: "Set up once" in two columns of three across the top, the loop under it at its full 760, centred. Side by side from 1280. |
+| Kubar Protocol · Cover in your name | Laptop layout; the box moves left so its labels stay inside the content. |
+| Kubar Protocol · The loss history | Re-flowed: the heading across the top, the drawing and its labels under it at full size, centred. |
+| Kubar Protocol · The payment path | Re-flowed, up to 1399: the heading across the top, the money path under it at its full 760, centred, as on How it works. Beside the heading from 1400, where it fits at full size (it would need 1,240 px of content; scaled, its 13 px words would drop under 12). |
+| NavDhan SDK · hero | From 1000 the sketch keeps its 580 px beside the list and the list takes the rest (308 at 1000, 316 at 1024, 412 at 1200; its sentences take two or three lines). Nothing is scaled: the sketch's 11 px window label and 13 px labels can't shrink. |
+| NavDhan SDK · How it runs | The pinned journey side by side: 340 px cards, 32 from the lanes, which take the rest (572 at 1024; 400 and 48 from 1200, 64 from 1280). Its register, the fallback, keeps the fitted drawing (0.89 at 1024; its 13 px labels hold 12 px, `fit-keep`). |
+| How it works · story | Side by side with 360 px cards. The pinned column holds the stack and its eight rows, names on two lines where needed; the financier's line and the relying lines follow the cards, as on tablets. Needs about 540 px of height. |
+| How it works · If a buyer doesn’t pay | Laptop layout; the three boxes share the width (275 at 1024, 300 from 1200). |
+| How it works · signs map | Laptop layout, columns share the width; the key sits under the map. |
+| Registers (the ledger) | The state column takes a little from the last. |
+| Contact | The form is 560; each address sits under its label. |
+| Everything else | Laptop layout, unchanged. |
+
+## 8 · The site, page by page
+
+Node ids are the 1440 frames unless marked. The words are in `copy/`.
+
+### Home (`160:6`, 768 `166:3363`, 390 `162:1295`)
+
+| Section | As built |
+|---|---|
+| Hero `160:52` | The headline, then the subline directly under it at every width, the two route rows, and the record: `Record · isometric` `245:3225` (768 `248:3239`; phones the compact record `353:3704`). Eight sheets, 08 on top and current, with "FILED" on the top sheet only. Eight rows beside them, one line each, the number and the name, each tied to its sheet by a hairline; no source and no status in the rows. Under the sheets, for the picked document, "From" and "Proves", then "See how it works". 08 is picked until a row is: hover, focus or tap. The hero's rule (Vaibhav, 16 Nov): from 1328, two columns, headline, subline and routes left (578), the record right, because the one-line rows need 1,164 px of content; from 1024 to 1327, headline and subline across the top, routes left and the record right under them, so the headline never takes five lines and the top sheet and first rows are on an iPad's first screen. Below 1024: headline, subline, record, routes, then the "Follow one receivable" anchor. Phones: the sheets at 0.53 (0.43 under 390 wide) and 18.9 px apart, the names alone beside them, "From" and "Proves" each under its label; the hero is at most 1,150 px tall at 390×844. No footnote in the hero: marker ¹ on "exchange" links to the one under the foundations. |
+| The gap `160:63` | Heading and lead across the top. One raised card `241:3412`: "About $80bn" at 96 px, "$126.92M" in rani at 56 px, each with its caption in Sans/Body; a full-width petrol bar 64 px high and under it a rani sliver at 0.16% of the bar's width, with the "Drawn to scale" caption in Sans/Fine. Footnote ² opens from the disclosure link "How we estimate this"; following marker ² opens it and moves focus to the footnote (without script, landing on the closed disclosure is accepted). Footnote ³ stays visible. |
+| One receivable `160:71` | The heading with its lead beside it ("Kubar is in the data path of every step and in the money path of none."), then the pinned journey on the lanes drawing (section 9). Eight cards; "Skip the story" with no arrow; no legend, no tag, no "Party ·" line, no link of its own. In the lanes (`118:1470`), step 04's dashed arrow, "No-objection", runs from the Exporter’s bank lane to Kubar's (17 Nov; `118:1085`). |
+| Band | "Every receivable that settles adds to a priced loss history, and that history is what brings in the next financier." with "See how it works". |
+| An exchange needs more than a venue `160:104` | `242:3390`: TReDS and Indian Energy Exchange as two quiet columns, GIFT City · ITFS as one raised petrol card (480 wide); "Today" stays, "On the exchange" is cut. Then an inset panel `242:3433` holding `Foundations · isometric` `246:3160`: five solid blocks, widest at the bottom, the venue dashed on top, each tied to its title and sentence; "Planned¹" on the venue in the secondary colour with a rani marker. Footnote ¹ is under it. **17 Nov:** a sixth foundation, "Distribution through trade platforms", a solid block on the footprint the venue had (242 wide; the record's block at 0.776, 31 thick); the venue's dashed outline shrinks to 173 wide (28.6 thick) and sits one rise (58) above it; the drawing is 58 taller (560 × 698). The new block rises and is marked like the others. At 1440 the labels run to three lines in the frame's 584 px column, so they stand in the page's flow, each 14 px under the one above from 26 px down, the last level with its block; each leader runs along its block's level, takes a short 45° dogleg up and ends 6 px into its title's line, 14 px under the label's top (the venue's is dashed, 1 px, dash 6 5, like its outline; step 9, after the frame was corrected). From 1024 to 1439 see section 7a. About keeps its labels on their levels with straight leaders (`262:1578`; the venue's dashed). Tablet and phone: the drawing scales as one, 310 × 386 at 390 (the 390 frame `248:3912` redraws the slabs thicker, 415 tall); the labels are listed under it. |
+| Who takes part `160:127` | A map on an inset panel `243:3330`. Top row: Exporters, Financiers, Buyers. Bottom row: Trade platforms, Kubar (petrol), Credit insurers. Solid 2 px arrows for money (financiers to exporters, buyers to financiers); dashed 1.5 px arrows for data (exporters to trade platforms, trade platforms to Kubar, Kubar to financiers, Kubar to credit insurers). No solid line touches Kubar. The legend is under the cards. Tablet and phone: one column of cards in the order Buyers, Financiers, Exporters, Trade platforms, Kubar, Credit insurers, joined by the same two arrow styles, with a dashed return arrow from Kubar up to Financiers on the right, inside the panel (cards inset 28 px on that side). A card picked by hover or tap dims the arrows that don't touch it to 30% (`PickStage`). |
+| Standing `160:844` | Four plain statements, no kind labels, no lead, no cards. Six programme marks in one row with names (T-Hub, RubriX Cohort 5 among them; its mark centred in its 176 × 64 box). |
+| People | Six portraits (`public/people/`, 800 × 1000 PNGs on transparent ground), greyscale at rest and in colour on hover and keyboard focus of the card, over 200 ms. The row has `scroll-padding-inline` equal to the page margin. |
+| Contact `160:1022` | Two route cards (the financial-institution one in petrol), then investor and press as two small link rows. |
+
+The technology programmes are not on Home; they are on About only.
+
+### Kubar Protocol (`167:6`, 768 `169:1931`, 390 `168:684`)
+
+| Section | As built |
+|---|---|
+| Hero `167:52` | Text at 720 beside `Limit and receivables · isometric`: a dashed box for the programme limit, RCV-0001 and RCV-0002 inside, RCV-0003 above it with a rani edge. The headline is the display face; the button is 48 px. Phone and tablet: the drawing under the text. Then the "On this page" row `291:3962`. |
+| Where this sits `309:2495` (768 `314:3130`, 390 `314:2805`) | A strip on the inset ground, the full width of the screen, directly under the hero and before the "On this page" row: the six foundations drawn small with Standing buyers in petrol, "Where this sits", the sentence and the link "Follow one receivable through all six" to `/#one-receivable`. See "The strip" under NavDhan SDK. |
+| What you buy `167:101` | `Receivable sheet` `255:1955`: face value at 56 px, the other nine attributes in two columns, two sheets behind; "An example" as plain muted Sans/Fine on its top row. The money timeline `167:127` beside it from 1280, drawn to scale on a day axis that follows its column; from 1024 to 1279 the sheet keeps the small timeline and its list beside it (section 7a). At 768 and 390 the small drawing sits above the words as a list, under the sheet. The timeline plays once (step 9; section 12); still, as drawn. |
+| How a programme runs `167:128` | `251:2015`: "Set up once" as six numbered dots on a vertical line; "Then, for every receivable" as five raised cards round an ellipse with five direction arrows, the RCV line in the middle; no party tags. The loop keeps 760 from 1280 up and is fitted to its column below that (`FitStage`). "The credit decision is yours; Kubar can’t override it." is 15 px. Phone and tablet: the five cards in a column with a return arrow up the left side. Stepper: a click, a tap or focus on a card moves the travelling sheet to rest just before that card and raises the card; a click elsewhere returns the sheet to 05. |
+| The evidence package | The ten elements show once, as a list of buttons: each row shows the element and its source with a small plus at its right; a click, a tap or Enter/Space opens its "Checked against" line under it, one at a time (`aria-expanded`). At desktop dashed stubs join the elements to one spine and one arrow into the record. There is no separate table. On the inset ground (section 7, pacing). |
+| Cover in your name `167:319` | Under the lead, the hero's limit box at 0.8 scale with three labels (`289:2664`): "An approved buyer limit", "Headroom" (a bracket on the right post) and "Receivables bought". From 1440 it sits in the lead's column; narrower laptops move it left so its labels fit. It plays once in three phases (step 9; section 12); still, as drawn. On laptops the labels show with their parts; under 1024 they are a plain list. On the inset ground (section 7, pacing). |
+| The payment path `325:2486` | **The money path** (17 Nov, step 8; one component, `MoneyPath.tsx`, on Kubar Protocol and How it works). From 900 px a drawing 760 × 424, never scaled: three isometric plates in a row (184 wide, 22 thick, white tops on the light faces, a blurred ground shadow), "Buyer, Singapore", "Financier" (a petrol top with a white opening, the receivable it holds) and "Exporter’s bank" under them in Sans/UI large. The three payments are arrows above them, 1.5 px ink with a filled head, 200 long: 1 "Purchase price, at purchase (90% of face)" and 3 "Deferred purchase price: the balance, less discount and charges" from the financier to the exporter's bank, 2 "Face value, on the due date" from the buyer to the financier; each numbered in mono (Mono/State, secondary colour), its words centred above it in Sans/Fine. **The face value's stop** (17 Nov, step 8.5): a 9 px ring (white, 1.5 px ink edge) at the midpoint of its line, the collection account in the exporter's name, with its caption centred under it in Sans/Fine, ink, on two lines: "Collection account, in the exporter’s name," and "swept to the financier" (`payment.routes[1][1]` and `payment.sweep`). Kubar sits below in a petrol box on a dashed data path in the secondary colour, labelled "Data path · Kubar", with a mark for each payment (8 px, numbered 1 to 3) and "Kubar holds none" on a white chip at its end (rule 11.4). Then four controls, and the line under it in muted Body small, both at the drawing's inner edge (28 px). Below 900 px the prototype's narrow drawing (`docs/rebuild/prototypes/motion-pieces.html`), 320 × 652, centred: the plates stacked top to bottom, the face value running down from the buyer to the financier and the two other payments down from the financier to the exporter's bank, their words beside them; the stop's ring at the midpoint of the face value's arrow, and its words from the top of that arrow, "Face value, on the due date" with the caption's three lines under it ("Collection account, in the", "exporter’s name, swept to", "the financier"); the controls and the line centred under it. **It plays once** when 45% of it is in view: payment 1, then 2, then 3, 1.1 s apart; for each the arrow draws in 700 ms (`ease`), its head appears as it arrives, a rani dot runs along it (750 ms), its words go from 35% to full (300 ms) and its mark on Kubar's path fills (300 ms, 700 ms in). The stop's ring appears with the face value's head and its caption with the payment's words; the dot runs through it without pausing. **The controls** ("1 Purchase price", "2 Face value", "3 Deferred purchase price", each number in mono, and "All three"; 44 px tall on touch sizes, 40 from 1024) replay one payment, or all three in the same order. Still (no script, reduced motion, or the drawing on screen as the page loads): all three arrows drawn, the stop shown and every mark filled; the controls need script and motion and are hidden then. The drawing is `aria-hidden`; a visually hidden table (caption `payment.alt`: Payment, From, To, each payment's route as the frames give it; the face value's "to" is the stop's whole caption) and "Kubar holds none" stay in the markup for assistive technology. Beside the heading from 1400, where its 760 fits (`325:2486`: at 560); below that the heading runs across the top and the drawing sits under it, centred, as on How it works. On the inset ground (section 7, pacing). |
+| The loss history `167:387` | `288:2663` beside the heading: four stacked settled sheets with RCV-0003 hovering above on two dashed drop lines; labels "Settled" and "The loss history" (with "Recorded by buyer, exporter and commodity" under it); two dashed arrows out to "It lets an insurer price the pool" and "It brings in the next financier". The lead is not shown; it is the drawing's description for screen readers. Laptops from 1200 narrow the heading's column to 340. On the inset ground (section 7, pacing). |
+| Who holds what `326:2432` | **A pick** (17 Nov, step 9; `HoldsPick.tsx`). Left, the five parties in a 380 px list under a 2 px ink rule, each row Sans/UI large with 16 px padding and a rule under it; the picked one is petrol with an arrow, "You, the financier" on load. Right, 64 px over, the eight things that can be held as chips (Sans/UI, 12 px apart, wrapping): what the picked party holds is petrol with a white dot, what it doesn't hold has a rani outline and a hollow rani dot (rule 11.4: the brief names it), the rest a rule outline and muted words. Under them, after a rule, its two sentences, "Holds" and "Doesn’t hold" (Sans/Fine labels, Sans/Body), from `holds.rows`. The map: the financier holds the receivable, the proceeds, the policy and the buyer’s credit risk, not recourse; the insurer the buyer’s credit risk, not disputes, returns, set-off and fraud; the exporter disputes, returns, set-off and fraud, not the receivable; the exporter’s bank its relationship with the exporter, not the receivable; Kubar origination, the evidence package, servicing and reporting, not the proceeds or the buyer’s credit risk. Hover (a mouse), a click or a tap picks; Tab reaches the picked party, the arrow keys, Home and End move within the five and pick (`aria-pressed`). Every chip keeps its box from pick to pick (room for its dot always), so the board never reflows, and the five parties' sentences share one cell, so nothing under them moves. The chips are decoration for assistive technology; the sentences say it. Below 900 the board sits under the list (the prototype). Without script today's cards show: "You, the financier" as one raised petrol card (420), the other four as plain blocks, a filled dot for "Holds", a hollow rani dot for "Doesn’t hold". |
+| Questions `167:423` | Eleven questions. The first four show at every width, then "Show all 11 questions" (`312:2495`) opens the other seven in place (section 7, a long list shown in part). From 768 up the answers are always open; below 768 the questions are an accordion with the first one open (the frames draw the four open; the accordion is kept). Without script all eleven show, open. |
+| Where each institution fits `332:2432` | **A pick** (17 Nov, step 9; `FitPick.tsx`). Left, the five institutions in a 480 px list (380 from 900 to 1023), as Who holds what's; the first is picked on load. Right, 64 px over and 18 px down, "Role" (Sans/Fine, muted) and the picked institution's role in H3, at most 720 wide, with footnote ¹ on the role abroad. The five roles share one cell, so the block keeps the height of the longest. Same pick by hover, click, tap and keyboard. Below 900 the role sits under the list. Without script today's register shows every institution (Institution and Role). |
+| Programme 1 `167:561` | The corridor: Exporters and Buyers as two raised cards joined by a 2 px arrow labelled "Terms / Open account" (200 long from 1024, 100 on tablets, pointing down on phones), which draws once in view (step 9); Financier and Cover as plain text; "Next" in a dashed box. Labels in Sans/Fine, secondary colour. |
+| The venue `167:591` | "Planned" with footnote ¹, three unnumbered points and the closing line. On the inset ground (section 7, pacing). |
+| Next step | Heading, lead, button, "Or email". |
+
+### NavDhan SDK (`170:6`; the 768 and 390 frames were not updated)
+
+| Section | As built |
+|---|---|
+| Hero `170:53` | The headline, lead and button; then "What you embed." (H3) and the six capabilities (list `291:1349`) beside the embed sketch, drawn like the product (17 Nov, step 7: `318:1274`; the six states on board `316:1377`; tablet `320:1661`; phone `320:1536`). **The sketch:** a square platform, 580 × 489, with a 1 px ink border: a top bar ("Your platform" beside a square, three grey nav marks, a rule), the shipment's own records ("Shipment", then Booking, Invoice, Inspection report, Bill of lading on hairlines, each with a small ink square once captured), and the NavDhan SDK widget 252 in and 58 down: a card 310 × 413 with 12 px corners, a 1 px rule border and the raised shadow (`--elevation-2`); a window strip on the inset ground (three grey dots and "NavDhan SDK" in Mono/Tag), a back arrow and a grey mark, a five-part progress line (done in ink, the current part in rani, the rest in the rule colour), the part's name as the screen's title (Sans/UI large) over a rule, field rows 38 px tall with 8 px corners and a round ink tick, and an ink button with 8 px corners naming the next part with an arrow. No figures anywhere. **One state per row:** Consented onboarding (part 1: Identity check, Business check, Consent recorded; the records not yet captured; "Shipment and document capture →"); Shipment and document capture (part 2: the four records as fields, a dashed path from the platform's list into the widget; "Eligibility check →"); Eligibility check (part 3: Buyer country, Terms, Size, Goods; "Indicative offer →"); Indicative offer (part 4: a card with 12 px corners, two columns, "All-in price" and "The exporter’s own alternative" in muted Sans/Fine over empty dotted boxes, and "Application and status →" inside the card); Application and status (part 5: a card with a connected timeline, Submission and Documents outstanding done in ink, Purchase current with a rani ring, Settlement to come in the secondary colour); Events for your product (the same screen, and a "Purchased" chip with a rani dot beside "Shipment" in the platform). **The pick, from 1000:** the sketch at 580 beside the list (640 at 1440, 60 apart), top-aligned. "Eligibility check" is picked from the start; hover (a mouse), a click or a tap picks a row (`aria-pressed`) and the sketch shows its state at once; the picked row has a 2 px ink rule on its left. Keyboard: Tab reaches the picked row only (one tab stop for the six); the arrow keys, Home and End move within them and pick as they go. The sketch is one image for assistive technology (`navdhanSdk.sketch.alt`); the rows carry the words. **Below 1000** the rows are an accordion (`aria-expanded`), one open at a time, "Eligibility check" open from the start, and an open row shows its state under its sentence: from 768 the whole sketch at 580, on phones the widget card alone (at most 310 px, narrower on 360 px phones), its words read as text. Phones don't draw the platform, so Events for your product shows the widget's timeline without the chip. Without script the rows and the Eligibility check state show, complete; the other five states need script. |
+| Where this sits `310:1331` (768 `320:1567`, 390 `320:1440`) | The same strip directly under the hero, with Distribution through trade platforms in petrol (17 Nov; it was the common standard). **The strip:** the stack is Home's at a quarter of its size, five solid blocks and the venue dashed (the top two scaled like Home's; 274 tall, 34 more than with five), beside a ruler with a tick at each level; the six names sit on their levels, 34 apart, in muted Sans/Fine. The page's level has a petrol top face, an ink leader, a rani tick (rule 11.4: the one element the drawing is about) and its name in ink; it is `aria-current` in the list. Side by side from 768 with all six names, each on one line but distribution's, which takes two where the names are 150 wide (768 to 1023), and the last. Phones (below 768) draw the stack at 0.55 and name only the page's level; the other five names stay in the list for screen readers, and the venue's shows while its marker has keyboard focus. At 390×844 the strip is 382 px tall on Kubar Protocol and 457 on NavDhan SDK, whose sentence takes six lines since 17 Nov; its sentence is Sans/Body on phones and Body large from 768, as the frames set it. The venue's name carries the marker ¹ and no "Planned". On Kubar Protocol the marker links to the footnote under The venue; NavDhan SDK has footnote ¹ once, directly under the strip. Server-rendered, no script, nothing moves. |
+| For your exporters, For your platform | One two-column block from 1024 up (`296:9538`), stacked below. |
+| How it runs on your platform `331:1202` | **The page's pinned journey** (17 Nov, step 10; `RunJourney.tsx`, `RunLanes.tsx`, on `StoryView` as "sdk"; section 9). Pinned: three lanes, Your platform, Kubar Protocol (petrol, with the mark) and The financier, drawn like Home's lanes: party boxes 176 × 76 (an ink hairline edge; Kubar's petrol with the mark over its name), lifelines, five rows numbered in Mono/Tag in a 48 px gutter with hairlines between them. "Skip the five steps" (anchor, to the rules) sits 44 px above the lanes and pins with them. The five steps are cards that scroll past (400 wide at 1440, 64 from the lanes; 340 and 32 from 1024 to 1199; on laptops the first starts beside the lanes' first row, 18 Nov): "01 of 05" in Mono/Tag and the step's sentence in Body large; the current card is raised (`--elevation-2`) with its counter in rani and its sentence in ink, the others flat in the secondary colour. Row n lights with card n: the inset band and a 5 px rani mark at its left move to it and its number turns rani; rows before it stay drawn, rows after it are empty. Row 1: an ink square on Your platform. Row 2: a square and "NavDhan SDK". Row 3: "With the exporter’s consent" over a dashed arrow (1.5 px, secondary colour, dash 6 4, an open head) to Kubar Protocol. Row 4: "The evidence package" over a solid 1.5 px ink line to a square on The financier. Row 5: "Each step as it happens" over a dashed arrow back to Your platform, and a square on The financier. Labels in Sans/UI small, secondary colour, 12 px right of the lifeline, over the row's line; on narrow columns they may cross the next lifeline, as Home's do. At 1440 the lanes are 816 × 472 (rows of 76; they shrink to 56 on shorter screens). Side by side from 1024. Tablets (768 to 1023): the lanes pin above the cards at the column's full width, laptop proportions, rows from 45% of the screen's height. Phones: the prototype's narrow lanes, the three boxes 36 px high across the full width with the names at 12 px on one line, no mark, a 22 px gutter, rows of 44, 8 px squares, the labels at 13 px. "See how it works" follows the cards, and the register. **Fallback:** with reduced motion, on a short screen (section 9) or without script, the register shows as today: the five steps beside three static lanes, fitted to its column on narrower laptops (0.89 at 1024, labels held at 12 px); the lanes from 1024, the register only below. No column heads. |
+| Rules `170:134` | Four rules, no numbers, on the inset ground. |
+| Behind it `170:152` | `Layers · isometric` `261:843`: from the top, your platform (white) with a small rani-edged NavDhan SDK tile on it, Kubar Protocol (petrol), banks, insurers and funds (white). Labels on leaders to the right at desktop, under the drawing below that; a label marks its layer at desktop. No layer descriptions. |
+| Next step | Heading, lead, button. |
+
+### How it works (`172:6`, 768 `172:1770`, 390 `172:760`)
+
+| Section | As built |
+|---|---|
+| Hero `172:52` | Text at 660 beside `Eight states · isometric steps` `258:1829`: eight blocks rising left to right, numbered 01 to 08 on their top faces, 08 in petrol. Then the "On this page" row. |
+| What happens to a receivable `172:95` | The pinned journey on the evidence stack `258:1864` (section 9). The documents are numbered so they land in order (Doc 01 to 08, in `copy/04-how-it-works.md`). Each state's documents land as its card passes, bottom up, with no empty slots: state 01, Doc 01 to 03; 02, Doc 04 and 05; 03, Doc 06; 04, Doc 07; 05, Doc 08. The relying lines appear with their states and stay: 05 "The financier buys on it."; 06 the exporter's bank and the subvention lines; 07 "The insurer prices on it." Each card keeps its sentence, its data path and its money path; no Documents block and no legend on the card. The two notes stay under the stack. Tapping a row lifts its sheet. |
+| Where the money moves `333:2736` | The same money path as Kubar Protocol's, with the face value's stop, centred in the section under the heading at every width. |
+| If a buyer doesn’t pay `172:528` | `333:2784` (18 Nov, step 11; `UnpaidFlow.tsx` draws it on the server, `UnpaidStage.tsx` runs the beats and the pick): steps 01 to 03 (Kubar) in a row, a fork under step 03 to "No dispute" (steps 04 and 05) and "A dispute" (step 06), then "Kubar holds none of the risk" and the note. No lead; the heading runs 800 wide at desktop. On the inset ground (section 7, pacing). **The path draws with the scroll:** as the flow moves up the screen, steps 01 to 03 and their arrows light in order, then the fork, then the branch, and it runs back if the reader scrolls up (section 12). A lit step is raised (`--elevation-2`, as the frame draws the boxes) with its words in ink; before, it sits flat with its words in the secondary colour, so they keep their contrast (the prototype dims them to 30%). **The fork is a pick:** its two labels are buttons (Sans/UI, 8 × 14 padding, an ink edge; the picked one petrol), placed as the frame places them, 14 px beside each branch's arrow and 52 px above the branch; "No dispute" is picked on load. Hover (a mouse), a click or a tap picks; Tab reaches the picked one, the arrow keys, Home and End move between the two and pick (`aria-pressed`). The picked branch is lit; the other, its half of the bar and its arrow sit at 30%, and the branch is inert. **Below 1024** the steps stack with an arrow between each, then an arrow from step 03 to the two buttons, centred, then only the picked branch (the prototype). **Without script or with reduced motion,** and in print: everything lit and both branches, each under its label, as before (tablets side by side, phones stacked). Step numbers stay in the secondary colour (rule 11.4; the frame draws them in rani). |
+| Each party signs for its own part `172:541` | From 1024 up a map `287:2806` (from 1024 to 1199 its columns share the width and the key sits under it; section 7a): seven cards (304 × 204, three columns with 184 px gaps, 160 below 1280, and 100 px between rows). Row 1: Insurer, Financier. Row 2: Trade platform, Kubar (petrol), Exporter. Row 3: Exporter’s bank and Buyer, under Kubar and Exporter. Five agreements as 1.5 px ink lines with a label on each and no arrowheads; two papers a party signs alone as a tag in its card, "Programme terms" (Financier) and "Its no-objection" (Exporter’s bank); the buyer signs nothing new, so its card has no tag (17 Nov); a two-line key at the bottom left, at 15 px. A card picked by hover or tap keeps its lines and dims the others; no tab stops for the highlight; a tap outside clears it. Below 1024 the stacked register shows. The table stays in the page for screen readers at every width. |
+| The terms `333:2955` | Nineteen terms, no column heads. The first six show and "Show all 19 terms" (the fold control, 24 px under them) opens the rest in place and moves focus to the first of them (18 Nov, step 11). Each row keeps its id (`term-…`): a link to a folded term, on arrival or on the page, opens the list and lands on its row. A first use of an abbreviation in a folded term (RBI, EDPMS, AD, IBU) takes its expansion once the list opens (the fold's "unfold" event; `AbbreviationTips`). The table is rendered on the server; only the control runs in the browser (`FoldOpen`). Without script all 19 show and the control is hidden. The frame's "Find a term" field is hidden in Figma and not built. |
+| Next step | Two routes, no heading. |
+
+### About (`173:6`, 768 `173:1118`, 390 `173:566`)
+
+| Section | As built |
+|---|---|
+| Hero `334:2634` | From 1024 two columns: the headline on the left (520 at 1440), the lead with footnote ¹ 32 under it on the right (680), 80 apart (48 below 1200). Below 1024 the headline, lead and footnote stack. |
+| What we’re building `173:86` | The isometric foundations from Home with About's own, shorter sentences and "Planned" as the venue's state word; no H3 over them. Then the link. |
+| The team | Six full person cards and the four advisers; "Advisers serve in a personal capacity." at 15 px. LinkedIn links have a 44 px tap area. |
+| Standing and memberships `173:355` | As on Home: four statements beside the heading, no lead, no kind labels; the programme marks; then the technology programmes. |
+| Why GIFT City `173:417` | Beside the text, `290:2574`: three isometric platforms in a row, each with a title and a line (Onshore India; GIFT City, with a petrol top and a small receivable sheet; Abroad), a dashed arrow "The receivable" and a solid arrow "Purchase price" between the first two, and a solid arrow "Payment on the due date" from Abroad to GIFT City. A schematic, not a map. From 768 the drawing takes its column's width with its words on it. Below 768 the three zones stack down the page, each a platform about 120 px wide with its title and line beside it, and the arrows run vertically between the rows with their labels beside them. The arrows draw once in view, in reading order, 600 ms each (step 9; section 12). The marker ¹ here links to the hero's footnote. On the inset ground (section 7, pacing). |
+| Band | "Kubar connects Indian trade flows to global institutional capital through GIFT City." |
+| The company | A register with no visible column heads (the table keeps them for screen readers). |
+| Next step | Three links. |
+
+### Contact (`174:6`)
+
+- The routes table has two columns ("If you are", "Next step"). Choosing a route that leads to the form pre-fills "I’m writing as" and moves focus to that field; arriving from another page with `?intent=` pre-fills it and leaves focus alone.
+- The form: section 16.
+- The direct addresses sit beside the form from 1024 up (each under its label until 1200, a table row from there) and under it below that. No separate Direct section.
+
+### 404, error, privacy, terms
+
+No drawings and no section hairlines. Legal pages: title and date; contents in the left three columns, sticky at desktop and under the date on phones; numbered H4 headings; body at 628. Contents links are 44 px tall on touch screens; the 404 page's links are spaced so their tap areas don't overlap. Terms of use, section 4, is "4. Plans and examples". Counsel's review of both legal pages is done.
+
+## 9 · The pinned journeys
+
+One pinned journey a page. Home pins the lanes drawing; How it works pins the evidence stack; NavDhan SDK pins its three lanes (step 10). All three run on `src/components/story/StoryView.tsx`. Prototype: `prototypes/pinned-story-options.html`, option B; for NavDhan SDK's narrow lanes, `prototypes/motion-pieces.html`, section C.
+
+- **What is pinned.** Only the drawing is sticky (`position: sticky`). The states are cards in normal flow: beside the drawing at desktop, below it on tablets and phones. Nothing traps or drives the scroll. The cards are real content in reading order; the drawing is `aria-hidden`. The skip link is first ("Skip the story"; NavDhan SDK's "Skip the five steps", in the pin above its lanes).
+- **Which state is current.** A state becomes current when its card crosses a line 45% of the way down the space left for the text. An IntersectionObserver watches that line; there is no scroll handler. The current card is raised (`--elevation-2`); the others sit flat, in the secondary text colour; the change takes 200 ms. At laptop width each state holds for its slot: 36svh on Home, a little over a third of the screen (the section is 3,239 px at 1440×900; it was 4,649), and about 60svh on How it works.
+- **Row heights come from the viewport, in `svh`,** so a phone's address bar does not make the drawing jump. Desktop: rows of `clamp(44px, (100svh − header − party row − 48px) / 8, 74px)`. Below desktop the drawing takes at most 45% of `100svh`, with rows of `clamp(22px, (45svh − party row − 24px) / 8, 40px)`.
+- **The compact lanes** (below desktop; `266:4120`): six equal columns across the full width, party boxes 40 px high with labels on two lines where needed (Kubar's box filled petrol), the current row tinted with the rani marker at its left edge, arrows without labels, dashed 1.5 px for data and solid 2 px for money. Earlier rows stay drawn; later rows are empty. Since 18 Nov the rows carry their numbers in Mono/Tag (11 px), as NavDhan SDK's narrow lanes do: the numbers sit at the left, and the rows' band, its rani marker and the hairlines start 22 px in.
+- **Home on phones** (below 768; 16 Nov 2026). The target is 2,750 px for the section at 390×844 (it was 3,129), with all eight cards and every word, inside two limits: each state holds for at least a third of the screen's height of scroll, and the current card is never under the pinned lanes. So the lanes are at their smallest rows (22 px; 226 px tall), cards sit 8 px apart, and from the second state on a slot is at least a third of the screen. A card turns current one slot's height below the lanes (never lower than 48 px above the foot of the screen), so the card before it is still clear of them when it hands over, and the lanes let go as the last card reaches them. As built the section is 2,807 px, accepted by Vaibhav on 16 Nov: the two tallest cards (292 and 314 px) are taller than a third of the screen, and the heading block is not trimmed to make up the 57 px. Since the payment model's words of 17 Nov it is 2,853 px: state 06's card is two lines longer (360 px). Known limit at 375×667: there the two tallest cards are taller than the space under the lanes and pass under them by up to 47 px; accepted. Since 17 Nov state 06's card passes under them by up to about 80 px there. Tablets keep the 45% line and the taller lanes.
+- **NavDhan SDK** (step 10; section 8). Its cards step as Home's: the 45% line on laptops and tablets, and on phones Home's rule (each state holds for at least a third of the screen; the current card is never under the pinned lanes). Its lanes are no taller than the screen needs: on laptops the skip link and the lanes pin 24 px under the header, rows of `clamp(56px, (100svh − header − 184px) / 5, 76px)`, and the first card starts beside the lanes' first row (136 px down), so the first state too holds with the lanes pinned, as Home's does under its record row and skip link. Tablets: rows of `clamp(52px, (45svh − 156px) / 5, 76px)`. Phones: rows of 44; the pinned link and lanes are 328 px tall. The skip link is in the pin, above the lanes, at every width; there is no record row.
+- **The last state holds** (18 Nov). In every journey, at every size where it pins, the last state is current with the drawing still pinned for at least 200 px of scroll. StoryView measures the last card's slot to be long enough (`--last-room`: 240 px, and the drawing's pinned height and its sticky top, less where the line falls on 100svh; `.story-last` in `globals.css` holds the same sum as a floor on laptops before script runs). On Home's and NavDhan SDK's phones, where the drawing lets go as the last card reaches it, it lets go later only where that would come under 200 px (`--release`; on a 375 × 548 phone Home's last card passes under the lanes by up to about 50 px). How the other states turn current is unchanged. Measured in Chromium and WebKit: 240 to 248 px on laptops and iPads in landscape, 224 px or more on phones, 208 px at the shortest (Home at 375 × 548, NavDhan SDK at 360 × 640). The first state lights with the drawing pinned on laptops; on Home's and NavDhan SDK's phones, and NavDhan SDK's tablets, it lights as the drawing arrives (the phones' design of 16 Nov). A browser test walks each journey at 1440 × 900, 1180 × 820 and 390 × 844.
+- **The pin's edge.** On phones and tablets the pinned drawing's ground fades out over its bottom 24 px, so cards aren't sliced as they pass under it. The drawing stays pinned only while the cards pass it.
+- **How it works.** The stack's height comes from the viewport as the lanes' rows do. Desktop pins the stack, the financier's line and the four relying lines. Tablets pin the stack with its rows beside it, evenly spaced, at most 45% of the screen's height. Phones pin a small stack, with no numbers on its sheets, beside the eight rows. Below desktop the financier's line and the relying lines follow the cards.
+- **Fallback.** The ledger register shows instead of the journey with `prefers-reduced-motion: reduce` (decided in CSS, so it holds without script), and when the drawing doesn't fit: Home under about 545 px of height; How it works on laptops under about 590 px and on phones under about 620 px (375 × 667 pins); NavDhan SDK on laptops under 545 px, on tablets when the lanes at their smallest would leave the cards less than 240 px (under 721 px of height), and on phones the same (under 633 px; 375 × 667 and 390 × 664 pin, 375 × 548 shows the register). On How it works the complete stack shows with the ledger. NavDhan SDK also shows its register without script, so its drawing is complete; Home and How it works show their cards at state 1.
+- **Viewports that must pin, on both pages, in Chromium and WebKit:** 1440×790, 1366×650, 1536×730, 1280×590, 820×1050, 390×664, 375×548 (the browser tests hold these; How it works shows its ledger where the fallback above says so). NavDhan SDK: 1440×790, 1366×650, 1536×730, 1280×590, 1024×768, 1180×820, 820×1050, 768×1024, 390×664, 375×667, 360×800.
+- If sticky proves unreliable on iOS Safari, stop and tell Vaibhav; never fall back to scroll-jacking.
+
+## 10 · How the drawings are built
+
+All isometric drawings use one projection. A flat rectangle becomes a sheet with a 2D matrix, so no 3D context is needed:
+
+```css
+.iso { transform-origin: 0 0; transform: matrix(0.866, 0.5, -0.866, 0.5, 0, 0); }
+```
+
+- **Sheets** (documents, receivables): a white rectangle with the matrix above, a 1 px border, an elevation shadow, and a copy of itself 4 px lower in `rule/default` (rani for the current sheet) for thickness.
+- **Blocks** (foundations, layers, steps): three SVG polygons, top face white, left face `petrol/100`, right face `petrol/50`. Kubar Protocol's layer is petrol/900 with `petrol/850` and `petrol/800` sides. A planned item is the same outline dashed `6 5` with no fill.
+- **Ground shadow:** one blurred ellipse under each drawing, petrol at 20%. Its svg is `overflow-visible`, or the blur is cut off in a hard line; a browser test holds this on every route.
+- **Labels are real text.** Each drawing is a list in the DOM whose items sit beside the art at desktop and under it, in the same order, below that. The art is `aria-hidden`.
+- Inline SVG or positioned HTML only. No canvas, no WebGL, no image files.
+- **Below desktop** a drawing scales to its column's width and its labels sit under it as a list, unless section 8 says otherwise.
+- **Drawing a line on** uses `stroke-dashoffset`. A dashed line can't be drawn with its own dashoffset: reveal it through a mask whose solid copy animates. Show each arrowhead only when its line arrives.
+
+## 11 · Standing rules from the reviews
+
+1. **Laptops get the desktop composition.** From 1024 up a page keeps its 1440 composition: drawings take their column's width instead of a fixed one, or are fitted to it (`src/components/drawings/FitStage.tsx`), so nothing stacks into the tablet layout. Section 7a lists what is re-flowed below 1200, and the two re-flows that run up to 1279.
+2. **Tablets and phones keep their drawings.** Where the 768 and 390 frames draw something, it is built as drawn.
+3. **References stay whole.** An identifier such as RCV-0003 never breaks at its hyphen; a list of them breaks only between them.
+4. **Rani is kept for footnote markers, the current state and errors.** It also marks the one element a drawing is about: the current sheet, the current state, the SDK tile on the layers. Labels are Sans/Fine in the secondary colour at every width. Nothing else gets it; in particular "Kubar holds none", "Planned" and step numbers are in the secondary colour. *Addition, approved by Vaibhav on 16 Nov 2026 for the build after the release:* in a pick, rani may outline what the picked item does not hold, at most two at once.
+5. **Home's JavaScript budget is measured without prefetches:** the scripts its own HTML names, compressed and with headers, at 390 and at 1440. Next's prefetches of linked routes are reported separately.
+6. **Type floor.** Any sentence is at least 15 px (Sans/Body small). 13 px is for short labels, footnotes and the footer's fine print.
+7. **Tap areas.** Every standalone text link has a tap area at least 44 px tall on touch screens, with no change to how it looks.
+8. **A hover that shows information has a keyboard and a tap equivalent; a hover that only highlights needs a tap equivalent, not a tab stop.** The record's rows stay in the tab order (they show what each document proves); highlight-only items take `tabindex="-1"`, so a tap focuses them at any width (an iPad is a touch screen at laptop width; About's team cards colour their portrait this way). Do not write `:has(…:hover)` rules: Safari does not restyle them on hover reliably. A script marks the picked item instead (`PickStage`, `data-picked`), and answers hover only for a mouse.
+9. **"On this page" names** are the words a visitor sees, never an internal section name.
+10. **No "Illustrative" tag anywhere.** The example is marked in plain words: Home's record line starts "An example:", the receivable sheet carries "An example", and How it works' lead says "One illustrative receivable". The timeline's caption keeps "The purchase date is illustrative".
+11. **Footnote ¹ once per page** that discusses the venue; every marker ¹ on the page links to it. On Home it is under the foundations; on About under the hero.
+
+## 12 · Motion
+
+Motion shows a change of state and nothing else. The site has three kinds of interaction: the pinned journey (section 9), play once on scroll (`src/components/drawings/PlayOnce.tsx`, `data-phase`) and pick (`src/components/how/PickStage.tsx`, `src/components/sdk/EmbedPicker.tsx`; Kubar Protocol's `HoldsPick.tsx` and `FitPick.tsx`, step 9, and How it works' fork, `UnpaidStage.tsx`, step 11, pick as EmbedPicker does). One drawing is drawn with the scroll instead of playing once, as Vaibhav's brief for step 11 asks: If a buyer doesn't pay, which runs back when the reader scrolls up (the table below).
+
+- Each drawing has one authored movement. It plays once, when 40% of the drawing is in view, and stays in its end state (If a buyer doesn't pay excepted: it follows the scroll). A drawing already on screen when the page loads stays drawn.
+- The end state is what the server renders: with reduced motion or without script the reader sees the finished drawing, with every word. Nothing on a first screen starts hidden.
+- Movements that play as a page loads (the hero drawings) run only where frames are being drawn: an inline script marks `<html data-frames>` on the first frame, and their CSS waits for that mark. In a background tab or a hidden pane the mark never comes and the drawings stay complete. A browser test holds this.
+- No fade-up applied to sections in general. No parallax, looping, pulsing or spinning. No count-up numbers.
+- Animate `transform` and `opacity` only (and `stroke-dashoffset` for the lines named below).
+- No animation library: CSS transitions and keyframes on the tokens, CSS sticky and IntersectionObserver.
+
+| Drawing | On entering view | On hover, focus or tap |
+|---|---|---|
+| Home hero stack | On page load. Sheets drop in from 24 px above, 01 first and 06 last, 320 ms each, 80 ms apart; each row's hairline and text fade in as its sheet lands. | A row lifts its sheet 14 px to `--elevation-3`. 200 ms. |
+| Home scale bar | The big bar grows from the left over 600 ms; the sliver and its caption appear 200 ms after. | None. |
+| Foundations (Home, About) | Blocks rise into place from the bottom, 80 ms apart, five of them since 17 Nov; the dashed venue draws its outline once the fifth has risen (480 ms). | At desktop a label draws its block's top edges in rani at 2 px. Below desktop there is no highlight. |
+| Who-takes-part map | The two money arrows draw first, then the data arrows, 320 ms each; the return arrow last. | A card dims the arrows that don't touch it to 30%. |
+| Kubar Protocol hero | RCV-0003 starts 40 px higher and settles above the box. | None. |
+| Programme loop | The ellipse draws once clockwise from step 01 (900 ms); each card fades in as the line reaches it; one small sheet travels the loop once and stops at 05. | The stepper (section 8). With reduced motion the sheet jumps. |
+| Loss history | RCV-0003 starts 40 px higher and comes down to its place above the stack over 600 ms. | None. |
+| Buyer limit (Cover in your name) | Step 9, three phases: the limit box's dashed edges draw (600 ms, through a mask), then the floor shows, with the limit's label; the headroom bracket shows at the whole limit's height with its label; RCV-0001 then RCV-0002 settle inside the box from 24 px up (320 ms each, at 600 and 920 ms) and the bracket shortens with each; RCV-0003 comes to rest above the rim from 40 px up (600 ms, at 1240 ms). | None. |
+| Money timeline (What you buy) | Step 9: the paid-out bar grows down at purchase, the "meanwhile" bracket draws across, the received bar grows up at the due date, then the deferred purchase price; 600 ms each, one after the other, each label fading in with its bar. The small drawing (below 1280) has no bracket, so its bars follow straight on. | None. |
+| Programme 1 corridor | Step 9: the arrow draws once, 600 ms. | None. |
+| How it works hero steps | Blocks rise in order 01 to 08, 60 ms apart; 08 turns petrol last. | None. |
+| If a buyer doesn’t pay | Step 11: drawn with the scroll, and back. An IntersectionObserver watches a line 80% down the screen (no scroll handler): on laptops six marks inside the flow, 7svh apart, cross it one after another, so 01, the arrow and 02, the arrow and 03, the fork (stem, then the two halves of its bar, then the branch arrows), the first steps of both branches, then the arrow and 05 light in turn, a beat every 7% of the screen's height (63 px of scroll at 900 tall); below 1024 each step lights as it crosses the line itself. A step's rise and colour 320 ms; a line draws in 320 ms and its head shows as it arrives. | The pick: the picked branch at full, the other at 30% over 200 ms. |
+| Signs map | None. | A card keeps its lines and dims the others. |
+| NavDhan layers | Layers settle from 20 px apart to their drawn spacing, bottom first; the SDK tile lands last. | At desktop a label marks its layer. |
+| NavDhan SDK embed sketch | None. | The picked row's screen shows in the widget at once (section 8). |
+| NavDhan SDK journey (How it runs) | Step 10, the pinned journey (section 9): as card n crosses the line, row n writes in as Home's rows do (its words and squares fade, its lines draw from their origin, 320 ms), the band and mark move to it (320 ms) and the card is raised (200 ms). Scrolling back takes the rows away the same way. | None. |
+| Money path (Kubar Protocol, How it works) | At 45% in view: payment 1, then 2, then 3, 1.1 s apart; each arrow draws in 700 ms (`ease`), its head appears as it arrives, a rani dot runs along it in 750 ms, its words go from 35% to full in 300 ms and its mark on Kubar's path fills 700 ms in; the face value's stop shows with its head (section 8). | Its four controls replay one payment or all three. |
+| Three zones (About) | Step 9: the arrows draw once in reading order, 600 ms each: the receivable, the purchase price, the payment on the due date (the same on phones' vertical arrows). | None. |
+| Who holds what, Where each institution fits (Kubar Protocol) | None. | Picks (section 8): the picked party or institution shows at once; the chips change colour over 250 ms (`ease`, the prototype's). |
+| Raised cards generally | No entrance. | Linked cards rise from `--elevation-2` to `--elevation-3` and move up 2 px, 120 ms. |
+| Buttons, links, nav items, rows | — | Colour, ground or underline (1 px → 2 px) only. The focus ring appears at once. |
+| Menus, the sheet, tips, answers | Fade in over 200 ms (the menu settles from 8 px above); leave on the exit ease; Escape closes; focus moves in and returns. | — |
+| Footnote, arrived at from its marker | Takes the inset ground and rani marker, fading after 2 s; "Back to text" returns focus to the marker. | — |
+| Form errors and the error summary | Appear with no transition; the summary takes focus. | — |
+
+**Page to page (16 Nov 2026).** The foundations stack carries from page to page. Home's section 04 drawing, About's drawing and the strips on Kubar Protocol and NavDhan SDK share one view-transition name, `foundations`, through React's `<ViewTransition name="foundations" share="stack" default="none">` (the App Router runs every route change as a transition). When a page change leaves one stack on screen and arrives with the other on screen, the stack morphs from one to the other over `--duration-write` on `--ease-standard`; the rest of the page changes at once, as before (React cancels the root's crossfade). React names a stack only while it is on screen, so where either end is off screen nothing moves and nothing lingers: for example the strip's own link, which opens Home at the story, far above its drawing. A destination that is not yet prefetched arrives in two steps and does not morph either. With reduced motion nothing animates. It adds no client JavaScript. `<html data-scroll-behavior="smooth">` makes Next turn smooth scrolling off for a route change, so the new page opens at its top at once; in-page links still scroll smoothly. Without it (Next 16's default) every page change from a scrolled page opened at the old scroll position and glided to the top, and the morph landed in the wrong place.
+
+With `prefers-reduced-motion: reduce`: every drawing is in its end state, the three journeys show their registers, hover lifts become a colour change, portraits change colour with no transition, smooth scroll is off.
+
+## 13 · Accessibility
+
+Target WCAG 2.2 AA. The browser tests run axe (WCAG 2.0 to 2.2, A and AA) on every route and must stay green; the helper waits until nothing is animating before it measures.
+
+- "Skip to content" is the first focusable element; `#main-content` takes focus.
+- One `h1` per page.
+- External links add "(opens in a new tab)" to their accessible name and show the up-right arrow.
+- Footnote markers are links named "Footnote 1" and so on; each footnote ends with "Back to text".
+- Portraits: alt "[Name], [role]". Programme logos: alt is the programme name as written.
+- Abbreviations: the first use on each page carries its expansion as a tip that is also available to screen readers (AD bank, DPIIT, EDPMS, FACE, GFTN, GIFT City, GIFT IFIH, IBU, IFSC, IFSCA, ITFS, MeitY, MSME, NIBM, RBI, SME, STPI).
+- Colour never carries meaning alone.
+- Focus ring: 2 px `--color-focus`, offset 2 px, on every interactive element, never removed.
+- Targets: 44 px for primary controls, 24 px minimum for inline links; rule 11.7 for standalone links on touch screens.
+- Menus and the sheet: Escape closes, focus is trapped in the sheet while open, the page behind doesn't scroll.
+- Text at 200% zoom and at 320 px wide reflows with no sideways scroll.
+- Contrast on petrol cards meets AA for the small labels.
+
+## 14 · Performance budget
+
+Mobile, p75: LCP ≤ 2.0 s, INP ≤ 200 ms, CLS ≤ 0.05. Fonts ≤ 300 KB in total with two preloaded (Schibsted Grotesk and Geist Mono; Newsreader loads on demand), `font-display: swap` with metric-matched fallbacks, self-hosted and subset to Latin. Home's own JavaScript ≤ 170 KB compressed, measured as rule 11.5 says. Cloudflare Web Analytics only; no other trackers, no cookies. Images through the Cloudflare Images binding, with explicit width and height.
+
+At release: Lighthouse mobile LCP 0.9 to 1.1 s and CLS 0 on all eight routes; own JavaScript 153.8 to 162.7 KB a route (Home 162.7 KB, accepted by Vaibhav on 15 Nov).
+
+The browser tests hold Home, Kubar Protocol and How it works to the same 170 KB (`e2e/acceptance.spec.ts`). After step 11 (18 Nov): Home 163.5 KB, Kubar Protocol 169.8, How it works 169.8, NavDhan SDK 166.6. Lighthouse at the release sweep (18 Nov, on mains): 100 on all eight routes, LCP 1.21 to 1.36 s, CLS 0. LCP is 0.3 s more than at step 10 on every route, the legal pages included: with step 11 the site's CSS passed Next's 100 KB chunk size, so the font faces load as a second stylesheet of 1.3 KB, and Lighthouse's simulation of the local http server charges it a connection of its own. To keep How it works inside it, the unpaid flow and the terms are drawn on the server and only their controls run in the browser (`UnpaidStage`, `FoldOpen`, both left out of the React Compiler with "use no memo"; nothing in them relies on memoization).
+
+## 15 · Checks
+
+Before each report:
+
+```bash
+npm run lint && npm run typecheck && npm test
+npm run build && npm run test:e2e      # the browser tests start their own server on 3100
+npm run check:js                       # Home's own JavaScript against 170 KB (needs the build)
+npm run check:lighthouse               # Lighthouse mobile on all eight routes (needs the build)
+npm run check:safari                   # every route at every size, in WebKit
+```
+
+The three `check:` scripts live in `scripts/checks/`.
+
+- **`check:safari`** makes a `LOCAL_PREVIEW=1` build in `.next-preview` (no `upgrade-insecure-requests`, so WebKit can load the site over plain http; `.next` is left alone), serves it on 3302 and runs `pass.mjs` in Playwright's own image under podman. Playwright's WebKit build does not start on Fedora, and nothing is installed with `dnf`. The image tag is taken from the installed `@playwright/test`; the repo is mounted with `:Z` for SELinux; the container uses `--network=host`. `ENGINE=chromium` runs the same pass in Chromium. The pass checks, for every route at every size: no script error; no sideways scroll at the top, on the way down and at the bottom; each pinned journey holds from state 3 to state 6 (to 5, NavDhan SDK's last) or shows its register; no ground shadow is clipped; every pick in its table answers a tap on touch sizes and a hover or click on the others. It prints one line per size and `ALL CLEAR`. Add a row to its table for every new pick.
+- **`check:lighthouse`** runs Lighthouse 13.6.0, mobile, performance only, in the same image, with a full Chrome on a virtual display (headless Chrome on this machine does not tick animation frames and reports `NO_FCP`). `RUNS=5` for five runs a route; the default is three. It fails if a route's median is over LCP 2.0 s or CLS 0.05. Its last column is Lighthouse's benchmark index, a measure of the machine's speed during the run: blocking time scales with it, so a run under about 1500 (this laptop on battery runs near 1000, against about 3000 on mains) is not comparable with a fast one, and the summary says so.
+- **`scripts/checks/capture.mjs <base> <dir>`** takes a full-page picture and measurements of every route at every size; `--compare <before> <after>` lists what changed.
+- **`scripts/checks/heights.mjs <base>`** gives each page's total height at 390×844 against main (the live site); every report carries it. `scripts/checks/shot.mjs` takes a report's pictures.
+- **`check:js`** loads each route in Chromium at 390 and 1440 and applies rule 11.5. It fails if Home is over 170 KB. `e2e/acceptance.spec.ts` applies the same rule.
+
+**The sizes** (`scripts/checks/sizes.mjs`), used for every check: 360×800, 375×667, 390×844, 430×932; 744×1133, 768×1024, 820×1180, 834×1194; 1024×768, 1080×810, 1133×744, 1180×820, 1194×834, 1366×1024, 1376×1032; 1200×800, 1280×800, 1366×768, 1440×900, 1920×1080. The first fifteen are touch screens: phones, tablets upright, and iPads in landscape. Phones first, then tablets, then laptops. The pinned journeys also keep their own viewports (section 9).
+
+Also held by the tests: every word on every page matches `copy/`; no status words except the venue's "Planned"; no "as at" dates, section numbers, labels above headings, italics, rounded corners or stray shadows; no section has a border; redirects; the sitemap; the form's states.
+
+Checked by eye, not by a test: no headline wraps to five lines or more at 1440 or 768 (Home's hero at 390 is five short lines and is accepted).
+
+Tests wait for state (`data-phase`, an attribute, `expect.poll`), never a fixed time. When a check flakes, fix the cause; do not rerun.
+
+A phone on the same Wi-Fi can open the preview build (`LOCAL_PREVIEW=1 npx next start --hostname :: --port 3300`); the firewall port is Vaibhav's to open and close.
+
+## 16 · The contact form, API and Worker
+
+- **Fields** (`copy/06-contact.md`): intent (institution, platform, exporter, investor, press, other), name, email, organisation, role (optional), message (≤ 2,000 characters), website (honeypot). No phone. Server-side limits mirror the client's. `?intent=` preselects.
+- **Pipeline:** `src/app/api/contact/route.ts`, `src/lib/contact-queue.ts` and `workers/contact-email/`: the queue, the email Worker, the rate limiter, the honeypot (silently dropped), the origin check and the request-size limit.
+- **Routing:** institution, platform and investor messages go to partnerships@kubar.tech; exporter, press and other to outreach@kubar.tech. If the routed address can't be reached the Worker falls back to outreach@.
+- **The internal email:** subject "kubar.tech · [intent] · [organisation]"; plain, readable HTML in the site's palette plus a text part; everything escaped.
+- **States:** rest, hover, focus, filled, error (a message under the field, and an error summary at the top that takes focus and links to each field), sending ("Sending…", the button keeps its width and is never disabled), sent, server error, rate limit, offline. Native select; no placeholders. No reply-time promise anywhere.
+- `next.config.ts` carries the security headers and the content security policy (Cloudflare Web Analytics allowed), cache headers and the redirects. Deployment is `wrangler.jsonc`, `open-next.config.ts`, `worker.mjs` and `docs/deployment.md`.
+
+## 17 · Assets
+
+- **Mark and lock-up:** the master SVGs (Figma components 7:5 and 7:10), colour from `--color-mark`, never rani. Favicon and app icon from the mark.
+- **Portraits:** `public/people/`, six 800 × 1000 PNGs on transparent ground.
+- **Programme logos:** single ink in a 176 × 64 box (`components.md` lists the nodes). The T-Hub mark is a raster used as a mask.
+- **Icons:** the nine Figma icons as inline SVG in currentColor (`src/components/icons/Icon.tsx`). No icon library.
+- No shadcn, no animation library. The dev-only Agentation toolbar stays out of production.
+
+## 18 · Release record and open items
+
+- 15 Nov 2026: Vaibhav checked the build on his iPhone and iPad; nothing to change. Released to production from `main`.
+- After the release, on `main`: the contact Worker logs the send binding's error; the content security policy allows Cloudflare Web Analytics; partnerships@ is allowed as a destination.
+- 16 to 18 Nov 2026, on `next-build`: steps 0 to 12 of the next build and step 8.5 (the payment model's words), each accepted by Vaibhav. 18 Nov: the release sweep passed, and on Vaibhav's word the branch was merged into `main` for release.
+- Open: a vector of the T-Hub mark.
+
+## Appendix · Where the old sections went
+
+| Old file and section | Here |
+|---|---|
+| HANDOFF 1 Ground rules | 1 |
+| HANDOFF 2 Sources of truth | 2 |
+| HANDOFF 3 Figma | 3 |
+| HANDOFF 4 What changed after the sign-offs | 5, 6, 7, 8 |
+| HANDOFF 5 Routes, redirects and metadata | 4 |
+| HANDOFF 6 Layout and responsive behaviour | 7 |
+| HANDOFF 7 Motion | 12 |
+| HANDOFF 8 Accessibility | 13 |
+| HANDOFF 9 What carries over, the form's contract | 16 |
+| HANDOFF 10 Assets | 17 |
+| HANDOFF 11 Performance budget | 14 |
+| HANDOFF 12 Build order, 13 Acceptance checks | 15 |
+| HANDOFF 14 Open items | 18 (all but one closed) |
+| REDRAW 1 The rules behind the redraw | 5 |
+| REDRAW 2 Tokens | 6 |
+| REDRAW 3 Fixes, 3a The pinned story | 8, 9 |
+| REDRAW 4 How to build the isometric drawings | 10 |
+| REDRAW 5 Page by page | 8 |
+| REDRAW 6 Copy cut or moved, 10 Copy changes | `copy/` (already applied), 8, rules 11.10 and 11.11 |
+| REDRAW 7 Motion | 12 |
+| REDRAW 8 Checks | 15 |
+| REDRAW 9 Answers of 14 Nov | 5 (rule 6), 9, 10, 11.11, 15 |
+| REDRAW 11 Review of build step 4 | 11.1 to 11.5, same numbers |
+| REDRAW 12 More drawn moments | 7 ("On this page"), 8 |
+| REDRAW 13 Audit changes | 8, 11.6, 11.7 |
+| REDRAW 14 Review of 95868f5 | 8, 9, 15 |
+| REDRAW 15 NavDhan SDK, 16 About and Contact | 8, 11.9 |
+| REDRAW 17 Final pass | 8, 14, 15 |
+| REDRAW 18 Device check and release | 18 |

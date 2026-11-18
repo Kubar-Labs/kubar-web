@@ -38,10 +38,11 @@ export default function Contact() {
         </div>
       </section>
 
-      {/* The form, with the direct addresses beside it from 1200 up and under it below that
+      {/* The form, with the direct addresses beside it from 1024 up and under it below that; from 1024 to
+          1199 the form is 560 wide and each address sits under its label, so none overruns its column
           (Figma 296:12889; REDRAW section 13 C2). No separate Direct section or label. */}
-      <Section id="form" className="flex flex-col gap-(--section-space) lg:flex-row lg:items-start lg:gap-20">
-        <div className="min-w-0 lg:w-[628px] lg:shrink">
+      <Section id="form" className="flex flex-col gap-(--section-space) lg:flex-row lg:items-start lg:gap-12 xl:gap-20">
+        <div className="min-w-0 lg:w-[560px] lg:shrink xl:w-[628px]">
           {/* useSearchParams (the ?intent= preset) needs a Suspense boundary on a static page. */}
           <Suspense>
             <ContactForm copy={t.raw("form") as ContactFormCopy} />
@@ -50,6 +51,7 @@ export default function Contact() {
         <Register
           className="min-w-0 lg:flex-1"
           first="label"
+          tableFrom="xl"
           columns={t.raw("direct.columns") as string[]}
           widths={[217, 355]}
           rows={(t.raw("direct.rows") as string[][]).map(([label, entry]) => [label, <WithEmails key={label} text={entry} />])}

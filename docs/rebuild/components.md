@@ -2,7 +2,7 @@
 
 From the Figma file (pFO3DEpqVzWCJdPghuq8nU), pages C1 to C6, 13 Nov 2026. Node IDs work with the Figma MCP tools (get_design_context, get_screenshot) and as `?node-id=` in links (replace ":" with "-").
 
-**Read this first.** Many component descriptions in Figma were written before option B (4–12 Nov) and still mention caps labels, italics, greyscale portraits, pictograms, the square state meter or status labels. Where a description disagrees with HANDOFF.md ("What changed after sign-off"), HANDOFF.md wins. Variant names are still accurate.
+**Read this first.** Many component descriptions in Figma were written before option B (4–12 Nov) and still mention caps labels, italics, greyscale portraits, pictograms, the square state meter or status labels. Where a description disagrees with SPEC.md, SPEC.md wins. Variant names are still accurate.
 
 Each component has a Desktop variant and a Mobile variant. Tablet (768) uses the Mobile structure at eight columns with Tablet type sizes; nothing has a separate tablet variant.
 

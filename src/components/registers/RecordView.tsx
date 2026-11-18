@@ -2,41 +2,44 @@
 
 import { useId, useState } from "react";
 import { GroundShadow, IsoSheetShape } from "@/components/drawings/iso";
+import { TextLink } from "@/components/ui/TextLink";
 import { reader } from "@/lib/copy";
 import { cx as cn } from "@/lib/cx";
 
 /*
  * Record RCV-0001 · isometric (Figma 245:3225 at 1440, 248:3239 at 768,
- * 248:3731 at 390; REDRAW-2026-11-14.md, Home hero).
+ * 353:3704 at 390; SPEC section 8, Home hero).
  *
- * The head (the identifier; no Illustrative tag since 15 Nov: the summary
- * says "An example" in words), the summary in Serif/Record, then
- * the six documents as sheets stacked 46 px apart, 06 on top and current
- * (rani edge, lifted shadow). Each sheet is tied by a hairline to its row:
- * number, document, source, FILED. Under them the Proves line ("05
- * Purchased" was cut after step 3, REDRAW section 10). Tablet and desktop keep the rows beside the stack; phones
- * list them under it.
+ * The head (the identifier and the summary, which says "An example" in
+ * words), then the eight documents as sheets, 08 on top and current (rani
+ * edge, lifted shadow, "FILED"). Beside them eight rows, one line each: the
+ * number and the name, tied to its sheet by a hairline. Under the sheets,
+ * for the picked document, where it is from and what it proves, then the
+ * link to How it works. 08 is picked until a row is: hover, focus or tap.
+ *
+ * Tablets and laptops draw the sheets at full size, 35 px apart. Phones draw
+ * the compact record: the sheets at 0.53 (0.43 under 390 wide, so the longest
+ * name keeps its line), 18.9 px apart, with the names alone beside them. One
+ * drawing serves both: the sheets' scale and their spacing are the custom
+ * properties --s and --step (globals.css, .iso-record), so the rows keep
+ * their type size whatever the sheets do.
  *
  * The rows are the real content, an ordered list read top to bottom; the
- * drawing is aria-hidden. Each row carries what its document proves for
- * screen readers; the visible Proves line follows the row under the pointer
- * or focus, otherwise the current document's.
+ * drawing is aria-hidden. Each row carries its document's status, source and
+ * what it proves for screen readers; the visible lines under the sheets
+ * follow the picked row.
  *
- * Motion (section 7), on page load and once: sheets drop in from 24 px above,
- * 01 first and 06 last, 320 ms each, 80 ms apart; each row's hairline and
- * text fade in as its sheet lands. Hover, focus or tap on a row lifts its
- * sheet 14 px to --elevation-3 over 200 ms. With reduced motion nothing
- * moves and the lift becomes a colour change (globals.css).
+ * Motion (SPEC section 12), on page load and once: sheets drop in from 24 px
+ * above, 01 first and 08 last, 320 ms each, 80 ms apart; each row fades in
+ * as its sheet lands. A picked row lifts its sheet 14 px to --elevation-3
+ * over 200 ms. With reduced motion nothing moves and the lift becomes a
+ * colour change (globals.css).
  */
 type Document = { no: string; document: string; source: string; status: string; proves: string };
 
-// Geometry in the drawing's own pixels, from the Figma frames.
-const SHEET = { w: 230, h: 140 }; // draws 320 × 185
-const ORIGIN_X = 128; // the top vertex; the drawn sheet spans 7 to 327
-const STEP = 46; // between sheets, up the screen
-const WIDTH = 336;
-const TOP = 20; // room above sheet 06 for the lift and the drop
-const HEIGHT = TOP + 5 * STEP + 185 + 4 + 50; // to the foot of the ground shadow
+// A sheet in its own pixels, before --s: it draws 320 × 185, from 7 to 327 across.
+const SHEET = { w: 230, h: 140 };
+const ORIGIN_X = 128; // the top vertex
 
 function SheetContent({ no, current }: { no: string; current: boolean }) {
   return (
@@ -72,45 +75,43 @@ export function RecordView({
   const current = documents.length - 1;
   const [lifted, setLifted] = useState<number | null>(null);
   const descriptionId = useId();
-  const shown = lifted ?? current;
-  // Top to bottom: 06 first.
+  const shown = documents[lifted ?? current];
+  // Top to bottom: 08 first.
   const order = documents.map((doc, index) => ({ doc, index })).reverse();
+  /** How many sheets lie above this one: its place down the stack, in steps. */
+  const place = (index: number) => ({ ["--n" as string]: current - index }) as React.CSSProperties;
 
   return (
-    <div data-no-abbr className={cn("iso-record flex flex-col", className)}>
+    <div data-no-abbr className={cn("iso-record flex flex-col", className)} style={{ ["--count" as string]: documents.length }}>
       <p className="t-tag text-ink">{t("title")}</p>
       <p className="t-record pt-2 text-ink">{t("summary")}</p>
       <p id={descriptionId} className="sr-only">
         {t("description")}
       </p>
 
-      <div className="relative mt-[calc(var(--iso-record-gap)-20px)]">
-        <svg
-          aria-hidden="true"
-          viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
-          width={WIDTH}
-          height={HEIGHT}
-          className="mx-auto block h-auto w-full max-w-[336px] overflow-visible md:mx-0"
-        >
-          <GroundShadow cx={ORIGIN_X + 39} cy={TOP + 5 * STEP + 135 + 35} rx={150} ry={35} />
-          {documents.map((doc, index) => {
-            const y = TOP + (current - index) * STEP;
-            return (
-              <g key={doc.no} className="iso-drop" style={{ animationDelay: `${index * 80}ms` }}>
+      <div className="record-stage relative">
+        <svg aria-hidden="true" className="record-art block overflow-visible">
+          <g className="record-place" style={place(0)}>
+            <g className="record-scale">
+              <GroundShadow cx={ORIGIN_X + 39} cy={170} rx={150} ry={35} />
+            </g>
+          </g>
+          {documents.map((doc, index) => (
+            <g key={doc.no} className="record-place" style={place(index)}>
+              <g className="iso-drop" style={{ animationDelay: `${index * 80}ms` }}>
                 <g className={cn("iso-lift", lifted === index && "is-lifted")}>
-                  <IsoSheetShape x={ORIGIN_X} y={y} w={SHEET.w} h={SHEET.h} current={index === current}>
-                    <SheetContent no={doc.no} current={index === current} />
-                  </IsoSheetShape>
+                  <g className="record-scale">
+                    <IsoSheetShape x={ORIGIN_X} y={0} w={SHEET.w} h={SHEET.h} current={index === current}>
+                      <SheetContent no={doc.no} current={index === current} />
+                    </IsoSheetShape>
+                  </g>
                 </g>
               </g>
-            );
-          })}
+            </g>
+          ))}
         </svg>
 
-        <ol
-          aria-describedby={descriptionId}
-          className="mt-5 border-b border-rule md:absolute md:top-[124px] md:right-0 md:left-[356px] md:mt-0 md:border-0"
-        >
+        <ol aria-describedby={descriptionId} className="record-rows absolute">
           {order.map(({ doc, index }) => {
             const isCurrent = index === current;
             return (
@@ -124,20 +125,14 @@ export function RecordView({
                 onBlur={() => setLifted(null)}
                 onClick={() => setLifted(index)}
                 style={{ animationDelay: `${index * 80 + 320}ms` }}
-                className={cn(
-                  "iso-fade relative flex cursor-default items-start gap-3 border-t border-rule py-[11px] outline-offset-2",
-                  "md:h-[46px] md:border-0 md:py-0",
-                )}
+                className="iso-fade relative flex h-(--step) cursor-default items-center gap-3 outline-offset-2"
               >
-                <span aria-hidden="true" className={cn("iso-leader hidden md:block", isCurrent && "is-current")} />
-                <span className={cn("t-code w-4 shrink-0 pt-px", isCurrent ? "text-accent" : "text-ink-muted")}>{doc.no}</span>
-                <span className="flex min-w-0 flex-1 flex-col">
-                  <span className="t-ui-sm text-ink">{doc.document}</span>
-                  <span className="t-fine text-ink-muted">{doc.source}</span>
-                </span>
-                <span className={cn("t-state shrink-0", isCurrent ? "text-accent" : "text-ink")}>{doc.status}</span>
+                <span aria-hidden="true" className={cn("iso-leader", isCurrent && "is-current")} />
+                {/* Phones show the names alone (the compact record); the number stays for screen readers. */}
+                <span className={cn("t-code w-4 shrink-0 max-md:sr-only", isCurrent ? "text-accent" : "text-ink-muted")}>{doc.no}</span>
+                <span className="t-ui-sm whitespace-nowrap text-ink">{doc.document}</span>
                 <span className="sr-only">
-                  {t("provesLabel")}: {doc.proves}
+                  {doc.status}. {t("fromLabel")}: {doc.source}. {t("provesLabel")}: {doc.proves}
                 </span>
               </li>
             );
@@ -145,10 +140,20 @@ export function RecordView({
         </ol>
       </div>
 
-      <div aria-hidden="true" className="flex flex-col gap-1 pt-6 md:flex-row md:items-baseline md:gap-4 md:pt-1">
-        <span className="t-fine shrink-0 text-ink-muted">{t("provesLabel")}</span>
-        <span className="t-body min-h-[50px] text-ink md:t-body-sm md:min-h-[22px]">{documents[shown].proves}</span>
-      </div>
+      {/* The picked document's source and what it proves. Phones set each under its label. */}
+      <dl aria-hidden="true" className="flex flex-col gap-2 pt-3 md:gap-1 md:pt-2">
+        <div className="flex flex-col gap-0.5 md:flex-row md:items-baseline md:gap-4">
+          <dt className="t-fine shrink-0 text-ink-muted md:w-11">{t("fromLabel")}</dt>
+          <dd className="t-body-sm text-ink">{shown.source}</dd>
+        </div>
+        <div className="flex flex-col gap-0.5 md:flex-row md:items-baseline md:gap-4">
+          <dt className="t-fine shrink-0 text-ink-muted md:w-11">{t("provesLabel")}</dt>
+          <dd className="t-body-sm text-ink md:min-h-[44px]">{shown.proves}</dd>
+        </div>
+      </dl>
+      <TextLink href="/how-it-works" kind="arrow" className="tap-area mt-2 self-start md:mt-1">
+        {t("link")}
+      </TextLink>
     </div>
   );
 }

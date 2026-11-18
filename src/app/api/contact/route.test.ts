@@ -19,7 +19,7 @@ const validSubmission = {
   email: "ada@bank.example",
   organisation: "Analytical Engines Bank",
   role: "Head of trade finance",
-  message: "We finance rice exporters and would like to understand how a programme would run for us.",
+  message: "We finance agri-commodity exporters and would like to understand how a programme would run for us.",
 };
 
 type RequestOptions = {

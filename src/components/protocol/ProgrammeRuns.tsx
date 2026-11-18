@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
  * on a vertical line; "Then, for every receivable" as five raised cards round
  * an ellipse with five direction arrows and the RCV line in the middle.
  * Below desktop the five cards run in a column with an arrow between each and
- * a return arrow up the left side. From 1200 up the two sit side by side as
+ * a return arrow up the left side. From 1280 up the two sit side by side (from 1024 to 1279 the set-up list runs across the top and the loop sits under it) as
  * at 1440: the set-up list narrows first (440 down to 300), and only below
  * 1280 does the loop scale down to its column (FitStage). The party tags were cut after step 3 (section 10): each
  * sentence names who acts.
@@ -57,9 +57,11 @@ function headOnEllipse(deg: number) {
 
 function SetUpOnce({ heading, steps, link }: { heading: string; steps: ProgrammeStep[]; link: { label: string; href: string } }) {
   return (
-    <div className="flex flex-col gap-6 lg:w-[clamp(300px,calc(100%-808px),440px)] lg:shrink-0">
+    <div className="flex flex-col gap-6 min-[1280px]:w-[clamp(300px,calc(100%-808px),440px)] min-[1280px]:shrink-0">
       <h3 className="t-h4 text-ink">{heading}</h3>
-      <ol>
+      {/* From 1024 to 1279 the six steps run in two columns of three across the top, so the loop
+          below keeps its full size and its sentences their 15 px. */}
+      <ol className="lg:max-[1279.98px]:grid lg:max-[1279.98px]:grid-flow-col lg:max-[1279.98px]:grid-cols-2 lg:max-[1279.98px]:grid-rows-3 lg:max-[1279.98px]:gap-x-12">
         {steps.map((step, i) => (
           <li key={step.no} className="flex gap-3.5 lg:gap-4">
             <span className="flex flex-col items-center">
@@ -69,7 +71,9 @@ function SetUpOnce({ heading, steps, link }: { heading: string; steps: Programme
                 </svg>
                 <span className="t-tag relative text-ink">{step.no}</span>
               </span>
-              {i < steps.length - 1 ? <span aria-hidden="true" className="w-px flex-1 bg-rule" /> : null}
+              {i < steps.length - 1 ? (
+                <span aria-hidden="true" className={cn("w-px flex-1 bg-rule", i === steps.length / 2 - 1 && "lg:max-[1279.98px]:hidden")} />
+              ) : null}
             </span>
             <span className="t-body-sm flex-1 pt-1 pb-5 text-ink lg:pb-[22px]">{step.text}</span>
           </li>
@@ -104,10 +108,10 @@ export function ProgrammeRuns({
 }) {
   const last = each.steps.length - 1;
   return (
-    <div className={cn("flex flex-col gap-12 lg:flex-row lg:items-start lg:justify-between lg:gap-12", className)}>
+    <div className={cn("flex flex-col gap-12 min-[1280px]:flex-row min-[1280px]:items-start min-[1280px]:justify-between", className)}>
       <SetUpOnce heading={setUp.heading} steps={setUp.steps} link={link} />
 
-      <FitStage width={760} height={660} className="lg:max-w-[760px] lg:min-w-0 lg:flex-1">
+      <FitStage width={760} height={660} className="lg:mx-auto lg:w-full lg:max-w-[760px] min-[1280px]:mx-0 min-[1280px]:min-w-0 min-[1280px]:flex-1">
       {/* The stage plays the loop once; after that a click, a tap or focus on a card moves the
           travelling sheet to it and raises the card (section 12, item 6). */}
       <PickStage item=".loop-card[data-step]" from="data-step" hover={false} className="programme-loop relative flex flex-col gap-5 lg:block lg:h-[660px] lg:w-[760px] lg:shrink-0">

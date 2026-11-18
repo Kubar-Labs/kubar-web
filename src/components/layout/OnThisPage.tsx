@@ -32,17 +32,30 @@ export function OnThisPage({ label, items, className }: { label: string; items: 
   const [covering, setCovering] = useState(false);
   const floatRef = useRef<HTMLDivElement>(null);
 
-  // The button shows once the row has gone above the screen.
+  // The button shows once the row has gone above the screen. Measured on scroll, not with an
+  // IntersectionObserver: a jump from below the row to past it (an anchor, a restored scroll
+  // position, End) never crosses an intersection threshold, so an observer would not answer it.
   useEffect(() => {
     const row = rowRef.current;
     if (!row) return;
-    const observer = new IntersectionObserver(([entry]) => {
-      const gone = !entry.isIntersecting && entry.boundingClientRect.bottom < 80;
+    let frame = 0;
+    const check = () => {
+      frame = 0;
+      const gone = row.getBoundingClientRect().bottom < 80;
       setPast(gone);
       if (!gone) setOpen(false);
-    });
-    observer.observe(row);
-    return () => observer.disconnect();
+    };
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(check);
+    };
+    schedule();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    return () => {
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+      if (frame) cancelAnimationFrame(frame);
+    };
   }, []);
 
   // The button never sits over a link, a button or a field, and stays clear of the footer:

@@ -40,8 +40,13 @@ test.describe("what the site never shows", () => {
       }
       const italic = await page.evaluate(() => [...document.querySelectorAll("body *")].filter((el) => getComputedStyle(el).fontStyle !== "normal").length);
       expect(italic).toBe(0);
+      // Corners stay square. The one exception is what NavDhan SDK's embed sketch draws inside its square
+      // platform: the widget, drawn like the product (step 7: 12 px corners, 8 px fields, round dots).
       const rounded = await page.evaluate(
-        () => [...document.querySelectorAll("main *, header *, footer *")].filter((el) => parseFloat(getComputedStyle(el).borderTopLeftRadius) > 0).length,
+        () =>
+          [...document.querySelectorAll("main *, header *, footer *")].filter(
+            (el) => parseFloat(getComputedStyle(el).borderTopLeftRadius) > 0 && !el.closest(".embed-sketch [data-platform]"),
+          ).length,
       );
       expect(rounded).toBe(0);
       // REDRAW-2026-11-14.md rule 5: no hairline between sections; the header keeps its own rule.
@@ -117,7 +122,21 @@ test.describe("keyboard", () => {
       await page.emulateMedia({ reducedMotion: "reduce" });
       await page.setViewportSize({ width: 1440, height: 900 });
       await page.goto(path);
-      await page.waitForTimeout(500); // abbreviations are marked after hydration
+      // Abbreviations are marked (and become stops) 300 ms after hydration, later on a busy machine:
+      // wait until the number of stops has held still for four polls, not for a fixed time.
+      let last = -1;
+      let steady = 0;
+      await expect
+        .poll(
+          async () => {
+            const count = await page.locator("a[href], button, input, select, textarea, summary, [tabindex='0']").count();
+            steady = count === last ? steady + 1 : 0;
+            last = count;
+            return steady;
+          },
+          { intervals: [200], timeout: 15_000 },
+        )
+        .toBeGreaterThanOrEqual(4);
       const expected = await page.evaluate(
         () =>
           [...document.querySelectorAll<HTMLElement>("a[href], button, input, select, textarea, summary, [tabindex='0']")].filter(
@@ -273,11 +292,11 @@ test.describe("rendered words match docs/rebuild/copy", () => {
   }
 
   const pages: [string, string, RegExp][] = [
-    ["/", "01-home.md", /^(Kubar is in the data path|State 08 · Planned|05 of 08|01 … 08|Purchased|Back to text)/],
+    ["/", "01-home.md", /^(State 08 · Planned|05 of 08|01 … 08|Purchased|Back to text)/],
     ["/products/kubar-protocol", "02-kubar-protocol.md", /^(Back to text)/],
-    // Nothing to skip: the copy has no Illustrative tag since 15 Nov.
+    // Nothing to skip: the copy has no Illustrative tag since 15 Nov, and the journey is built (step 10).
     ["/products/navdhan-sdk", "03-navdhan-sdk.md", /^$/],
-    ["/how-it-works", "04-how-it-works.md", /^(06 of 08|Settled|Skip the story|Payment reference; closure|The buyer pays \$225,000|Doc \d\d|Purchased|Kubar · Buyer, UAE|Commercial invoice · Shipping bill|Record RCV-0001$|Data path · Kubar|Kubar holds none$|State$|Documents$)/],
+    ["/how-it-works", "04-how-it-works.md", /^(06 of 08|Settled|Skip the story|Payment reference; closure|The buyer pays \$225,000|Doc \d\d|Purchased|Kubar · Buyer, Singapore|Commercial invoice · Shipping bill|Record RCV-0001$|Data path · Kubar|Kubar holds none$|State$|Documents$)/],
     ["/about", "05-about.md", /^(Technology programmes, grants and credits, then|Planned|Email us \()/],
     ["/contact", "06-contact.md", /^(\d+ of 2,000|Sending|Privacy notice)/],
     ["/legal/privacy", "07-system-and-legal.md", /./],
@@ -292,14 +311,21 @@ test.describe("rendered words match docs/rebuild/copy", () => {
       await page.waitForTimeout(400);
       // textContent, so words kept for screen readers or for other widths count too;
       // abbreviation tooltips are taken out first.
-      const rendered = norm(
-        await page.evaluate(() => {
+      const read = () =>
+        page.evaluate(() => {
           const clone = document.body.cloneNode(true) as HTMLElement;
           clone.querySelectorAll("[role='tooltip'], .footnote-marker, script, style").forEach((el) => el.remove());
           clone.querySelectorAll("td, th, p, li, h1, h2, h3, h4, dt, dd, option, label, button, div").forEach((el) => el.append(" "));
           return clone.textContent ?? "";
-        }),
-      );
+        });
+      let text = await read();
+      // NavDhan SDK's embed sketch draws one row's state at a time (step 7): pick each row and read it too.
+      for (const row of path === "/products/navdhan-sdk" ? await page.locator("main [aria-pressed]").all() : []) {
+        await row.click();
+        await expect(row).toHaveAttribute("aria-pressed", "true");
+        text += ` ${await read()}`;
+      }
+      const rendered = norm(text);
       const missing: string[] = [];
       if (path.startsWith("/legal")) {
         const text = readFileSync(join(copyDir, file), "utf8");

@@ -14,8 +14,11 @@ import { cx as cn } from "@/lib/cx";
  * Positioned HTML sized by CSS (globals.css, .lanes): the columns divide the
  * drawing's own width, so it fits its column at any width, and the rows come
  * from the viewport in svh, so the phone's address bar doesn't make it jump.
- * Desktop adds the row numbers, the Kubar mark and the path labels; tablets
- * and phones get the compact drawing, where the cards carry the words.
+ * Desktop adds the Kubar mark and the path labels; tablets and phones get the
+ * compact drawing, where the cards carry the words. The row numbers show at
+ * every width: Mono/Code in a 36 px gutter at desktop, Mono/Tag (11 px) on
+ * tablets and phones, where the columns take the full width and the rows'
+ * band and hairlines start 22 px in, as in NavDhan SDK's narrow lanes (18 Nov).
  * Decorative for assistive technology: the cards (or the ledger) carry the
  * same eight states.
  *
@@ -36,7 +39,8 @@ const ROWS: (Arrow | Mark)[][] = [
   [{ kind: "data", from: 0, to: 1, label: "s1" }],
   [{ kind: "mark", at: 1, label: "s2" }],
   [{ kind: "data", from: 2, to: 1, label: "s3" }],
-  [{ kind: "data", from: 3, to: 1, label: "s4" }],
+  // 17 Nov: the exporter's bank's no-objection, from its lane to Kubar's (118:1085); it ran from the Buyer's.
+  [{ kind: "data", from: 5, to: 1, label: "s4" }],
   [
     { kind: "data", from: 1, to: 4, label: "s5data", dy: -1 },
     { kind: "money", from: 4, to: 5, label: "s5money", dy: 1 },
@@ -50,8 +54,8 @@ const ROWS: (Arrow | Mark)[][] = [
   [{ kind: "mark", at: 1, label: "s8", planned: true }],
 ];
 
-const col = (c: number) => `calc(var(--gutter) + (100% - var(--gutter)) * ${2 * c + 1} / 12)`;
-const span = (n: number) => `calc((100% - var(--gutter)) * ${n} / 6)`;
+const col = (c: number) => `calc(var(--cols) + (100% - var(--cols)) * ${2 * c + 1} / 12)`;
+const span = (n: number) => `calc((100% - var(--cols)) * ${n} / 6)`;
 const rowTop = (n: number) => `calc(var(--party-h) + ${n - 1} * var(--row-h))`;
 const rowMid = (n: number, dy = 0) => `calc(var(--party-h) + ${n - 0.5} * var(--row-h) + ${dy} * var(--dy))`;
 
@@ -129,7 +133,7 @@ export function Lanes({
     <div aria-hidden="true" className={cn("lanes select-none", className)}>
       {/* The current row's ground and marker, moved to the current state. */}
       <span className="lane-current absolute right-0 bg-inset" style={{ left: "var(--gutter)", top: rowTop(1), height: "var(--row-h)" }}>
-        <span className="absolute inset-y-0 -left-2 w-1 bg-accent" />
+        <span className="absolute inset-y-0 -left-1 w-1 bg-accent lg:-left-2" />
       </span>
 
       {parties.map((party, c) => (
@@ -143,13 +147,13 @@ export function Lanes({
         <span
           key={party}
           className={cn(
-            "absolute top-0 flex flex-col items-center justify-center gap-1 border border-rule-strong px-0.5 text-center",
+            "absolute top-0 flex flex-col items-center justify-center gap-1 border border-rule-strong px-0 text-center min-[430px]:px-0.5",
             "text-[10px] leading-3 md:t-fine md:leading-4 lg:t-ui",
             c === 1 ? "bg-action text-on-action" : "bg-raised text-ink",
           )}
           style={{
-            left: `calc(var(--gutter) + (100% - var(--gutter)) * ${c} / 6 + var(--box-inset))`,
-            width: `calc((100% - var(--gutter)) / 6 - 2 * var(--box-inset))`,
+            left: `calc(var(--cols) + (100% - var(--cols)) * ${c} / 6 + var(--box-inset))`,
+            width: `calc((100% - var(--cols)) / 6 - 2 * var(--box-inset))`,
             height: "var(--box-h)",
           }}
         >
@@ -162,7 +166,7 @@ export function Lanes({
         <span
           key={`no-${n}`}
           data-row={n}
-          className="lane-no t-code absolute left-0 hidden -translate-y-1/2 lg:block"
+          className="lane-no t-tag absolute left-0 -translate-y-1/2 lg:t-code"
           style={{ top: rowMid(n) }}
         >
           {String(n).padStart(2, "0")}

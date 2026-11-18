@@ -12,11 +12,12 @@ import { FinanceProgrammes, TechnologyProgrammes } from "@/components/registers/
 import { Register } from "@/components/registers/Register";
 import { Standing } from "@/components/registers/Standing";
 import { Footnote, FootnoteMarker } from "@/components/ui/Footnote";
+import { noBreak } from "@/components/ui/NoBreak";
 import { TextLink } from "@/components/ui/TextLink";
 
 /*
  * About (Figma 173:6 at 1440; the 768 and 390 frames are not updated, so
- * below 1200 the page follows the existing rules). The team lives here
+ * below 1024 the page follows the existing rules). The team lives here
  * (#team). The "Where we are" section is removed and is not built.
  * "What we're building" is the isometric foundations from Home with
  * About's own sentences; "Why GIFT City" has the three-zones drawing beside
@@ -38,11 +39,13 @@ export default function About() {
 
   return (
     <>
+      {/* From 1024 the headline on the left, the sub and its footnote on the right (Figma 334:2634). */}
       <PageHero
+        layout="split"
         headline={t("hero.headline")}
-        sub={t.rich("hero.sub", { marker: () => <FootnoteMarker n={1} target="fn-1" refId="fnref-1" /> })}
+        sub={t.rich("hero.sub", { marker: () => <FootnoteMarker n={1} target="fn-1" refId="fnref-1" />, nb: noBreak })}
       >
-        <Footnote n={1} id="fn-1" backTo="fnref-1" className="mt-10 lg:mt-16 lg:max-w-[628px]">
+        <Footnote n={1} id="fn-1" backTo="fnref-1" className="mt-10 lg:mt-8">
           {footnotes("status")}
         </Footnote>
       </PageHero>
@@ -57,7 +60,10 @@ export default function About() {
           foundations={t.raw("order.slabs") as Foundation[]}
           footnote={(suffix) => ({ target: "fn-1", refId: `fnref-1-${suffix}` })}
         />
-        <TextLink href="/how-it-works" kind="arrow">{t("order.link")}</TextLink>
+        <div className="flex flex-col items-start gap-4">
+          <p className="t-body max-w-(--measure) text-ink-muted">{t("order.note")}</p>
+          <TextLink href="/how-it-works" kind="arrow">{t("order.link")}</TextLink>
+        </div>
       </Section>
 
       <Section id="team" labelledBy="team-heading" className="flex flex-col gap-10 lg:gap-16">
@@ -85,7 +91,7 @@ export default function About() {
 
       <Section labelledBy="standing-heading" className="flex flex-col gap-10 lg:gap-16">
         {/* As on Home: four statements beside the heading, no lead and no kind labels (section 10). */}
-        <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-20">
+        <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-12 xl:gap-20">
           <SectionHead id="standing-heading" heading={t("standing.heading")} layout="stacked" />
           <Standing className="min-w-0 flex-1" />
         </div>
@@ -94,11 +100,11 @@ export default function About() {
       </Section>
 
       {/* Why GIFT City: the words beside the three zones. Its marker links to the footnote under the hero. */}
-      <Section labelledBy="gift-heading" className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-10 min-[1366px]:gap-20">
+      <Section labelledBy="gift-heading" ground="inset" className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-10 min-[1366px]:gap-20">
         <SectionHead
           id="gift-heading"
           layout="stacked"
-          className="lg:w-[clamp(340px,calc(100%-760px),400px)]"
+          className="lg:w-[clamp(340px,calc(100%-760px),400px)] xl:w-[clamp(340px,calc(100%-760px),400px)]"
           heading={t("gift.heading")}
           lead={t.rich("gift.lead", { marker: () => <FootnoteMarker n={1} target="fn-1" refId="fnref-1-gift" /> })}
         />

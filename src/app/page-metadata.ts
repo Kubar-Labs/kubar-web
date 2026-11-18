@@ -8,13 +8,15 @@ type PageMetadataOptions = {
 };
 
 /*
- * The social card (HANDOFF section 5): title "Kubar Labs", the Home subline,
+ * The social card (SPEC section 4): title "Kubar Labs", the Home subline,
  * and the image, drawn in the site's type and colours by
  * scripts/social-image.mjs (the file name carries a hash of its contents,
- * because /media is cached for a year).
+ * because /media is cached for a year). Redrawn 16 Nov 2026 in the current
+ * look: white ground, the headline in Schibsted Grotesk, the eight-document
+ * record from Home's hero and the lock-up.
  */
 export const socialImage = {
-  url: "/media/kubar-labs-social-bd9a99c9.png",
+  url: "/media/kubar-labs-social-86333cc0.png",
   width: 1200,
   height: 630,
   alt: "Kubar Labs: Building the institutional exchange for cross-border trade finance.",
@@ -27,7 +29,7 @@ export const organisationLogo = "/media/kubar-mark-970208af.png";
 export const socialCard = {
   title: "Kubar Labs",
   description:
-    "Starting with the asset: export receivables an international financier can buy again and again, insured in its own name.",
+    "Indian export receivables, originated, insured and documented so an international financier can buy them again and again.",
 };
 
 /*

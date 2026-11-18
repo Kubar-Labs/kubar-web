@@ -7,7 +7,7 @@ import { expect, test, type Page } from "@playwright/test";
  * legal pages in step 5).
  */
 const publicRoutes = ["/", "/products/kubar-protocol", "/products/navdhan-sdk", "/how-it-works", "/about", "/contact", "/legal/privacy", "/legal/terms"] as const;
-const OG_IMAGE = /^https:\/\/kubar\.tech\/media\/kubar-labs-social-bd9a99c9\.png(?:\?.*)?$/;
+const OG_IMAGE = /^https:\/\/kubar\.tech\/media\/kubar-labs-social-86333cc0\.png(?:\?.*)?$/;
 
 /**
  * The pinned story (REDRAW-2026-11-14.md, section 3a): wait until its observer
@@ -22,7 +22,7 @@ async function scrollToState(page: Page, n: number) {
     // The cards' own slots (How it works has a second list in the pinned stack).
     const slot = story.querySelectorAll(".story-card")[n - 1].parentElement!;
     const header = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--header-height"));
-    const pin = matchMedia("(min-width: 1200px)").matches ? 0 : story.querySelector<HTMLElement>(".story-pin")!.offsetHeight;
+    const pin = matchMedia("(min-width: 1024px)").matches ? 0 : story.querySelector<HTMLElement>(".story-pin")!.offsetHeight;
     const line = header + pin + 0.45 * (innerHeight - header - pin);
     window.scrollTo({ top: slot.getBoundingClientRect().top + scrollY - line + 20, behavior: "instant" });
   }, n);
@@ -31,9 +31,26 @@ async function scrollToState(page: Page, n: number) {
 async function expectNoAxeViolations(page: Page) {
   // Measure only once nothing is moving: a drawing that is still fading in reads as low contrast.
   // (A fixed wait isn't enough: headless frames only advance when something asks for one.)
+  // Still means still twice running: no animation or transition in flight and the page not
+  // scrolling, on two polls in a row, since a smooth scroll brings drawings into view that then
+  // start to play.
+  let calm = 0;
   await expect
-    .poll(() => page.evaluate(() => document.getAnimations().filter((a) => a.playState === "running" && (a.effect?.getComputedTiming().iterations ?? 1) !== Infinity).length), { timeout: 10_000 })
-    .toBe(0);
+    .poll(
+      async () => {
+        const moving = await page.evaluate(() => {
+          const w = window as unknown as { __axeY?: number };
+          const scrolled = w.__axeY !== undefined && w.__axeY !== scrollY;
+          w.__axeY = scrollY;
+          const running = document.getAnimations().filter((a) => a.playState === "running" && (a.effect?.getComputedTiming().iterations ?? 1) !== Infinity).length;
+          return running + (scrolled ? 1 : 0);
+        });
+        calm = moving === 0 ? calm + 1 : 0;
+        return calm;
+      },
+      { timeout: 15_000, intervals: [100] },
+    )
+    .toBeGreaterThanOrEqual(2);
   const results = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
     .analyze();
@@ -67,7 +84,7 @@ test("Home carries its metadata from the handoff", async ({ page }) => {
   await expect(page).toHaveTitle("Kubar Labs · Building the institutional exchange for cross-border trade finance");
   await expect(page.locator('meta[name="description"]')).toHaveAttribute(
     "content",
-    "Starting with the asset: export receivables an international financier can buy again and again, insured in its own name.",
+    "Indian export receivables, originated, insured and documented so an international financier can buy them again and again.",
   );
   await expect(page.locator('meta[property="og:title"]')).toHaveAttribute("content", "Kubar Labs");
 });
@@ -181,38 +198,47 @@ test.describe("primitives and registers (build step 2), on Home", () => {
   test.use({ viewport: { width: 1440, height: 900 } });
 
   // The record is now the isometric stack (REDRAW-2026-11-14.md, Home hero):
-  // an ordered list of six rows, 06 first, beside an aria-hidden drawing.
+  // an ordered list of eight rows, 08 first, beside an aria-hidden drawing.
   test("the record lifts a sheet and shows what its document proves on hover and focus, then returns to the current one", async ({ page }) => {
     await page.goto("/");
     const record = page.locator("ol[aria-describedby]").filter({ hasText: "Commercial invoice" });
     const rows = record.locator("li");
-    await expect(rows).toHaveCount(6);
+    await expect(rows).toHaveCount(8);
     await expect(rows.first()).toContainText("Purchase confirmation");
     await expect(rows.first()).toHaveAttribute("aria-current", "true");
     // Every row tells assistive technology what its document proves.
-    await expect(rows.nth(4)).toContainText("Proves: The goods were cleared for export, as invoiced");
+    await expect(rows.nth(6)).toContainText("Filed. From: Indian Customs. Proves: The goods were cleared for export, as invoiced");
+    // One line each: the number and the name. No source and no status in the rows.
+    const seen = (row: typeof rows) => row.evaluate((li) => [...li.querySelectorAll("span")].filter((span) => span.offsetWidth > 1 && span.textContent).map((span) => span.textContent));
+    expect(await seen(rows.nth(6))).toEqual(["02", "Shipping bill"]);
+    const from = page.locator('.iso-record dl[aria-hidden="true"]');
+    await expect(from).toContainText("FromThe financier");
     const shown = page.locator('[aria-hidden="true"]').getByText("The financier bought the receivable, without recourse for the buyer’s credit");
     await expect(shown).toBeVisible();
     await expect(page.locator(".iso-lift.is-lifted")).toHaveCount(0);
     await rows.filter({ hasText: "Shipping bill" }).hover();
     await expect(page.locator('[aria-hidden="true"]').getByText("The goods were cleared for export, as invoiced")).toBeVisible();
+    await expect(from).toContainText("FromIndian Customs");
     await expect(page.locator(".iso-lift.is-lifted")).toHaveCount(1);
     await page.mouse.move(0, 0);
     await expect(shown).toBeVisible();
     await expect(page.locator(".iso-lift.is-lifted")).toHaveCount(0);
-    await rows.filter({ hasText: "Electronic bill of lading" }).focus();
+    await rows.filter({ hasText: "Bill of lading" }).focus();
     await expect(page.locator('[aria-hidden="true"]').getByText("The goods were shipped on board")).toBeVisible();
-    await expect(page.locator(".iso-record svg")).toHaveAttribute("aria-hidden", "true");
+    await expect(page.locator(".iso-record svg.record-art")).toHaveAttribute("aria-hidden", "true");
+    // "FILED" on the top sheet only; the link leads into How it works.
+    await expect(page.locator(".iso-record svg.record-art text", { hasText: "FILED" })).toHaveCount(1);
+    await expect(page.locator(".iso-record").getByRole("link", { name: "See how it works" })).toHaveAttribute("href", "/how-it-works");
   });
 
   test("Home marks its example in words, with no Illustrative tag", async ({ page }) => {
     await page.goto("/");
     await expect(page.getByRole("button", { name: "Illustrative" })).toHaveCount(0);
     await expect(
-      page.getByText("An example: a $225,000 rice invoice to a buyer in the UAE, due 75 days after shipment.", { exact: true }),
+      page.getByText("An example: a $225,000 rice invoice to a buyer in Singapore, due 75 days after shipment.", { exact: true }),
     ).toBeVisible();
     await expect(page.locator(".iso-record ol").first()).toHaveAccessibleDescription(
-      "An example record of one export receivable, with six documents filed.",
+      "An example record of one export receivable, with eight documents filed.",
     );
   });
 
@@ -374,7 +400,7 @@ test.describe("Home, complete (build step 3)", () => {
     ]) {
       await expect(page.getByRole("heading", { level: 2, name, exact: true })).toHaveCount(1);
     }
-    await expect(page.getByText("Kubar is in the data path of every step and in the money path of none.")).toBeVisible();
+    await expect(page.getByText("Every receivable that settles adds to a priced loss history, and that history is what brings in the next financier.")).toBeVisible();
     await expectNoAxeViolations(page);
   });
 
@@ -416,6 +442,30 @@ test.describe("Home, complete (build step 3)", () => {
     await expectNoAxeViolations(page);
   });
 
+  test("the lanes: step 04's no-objection runs from the exporter's bank's lane to Kubar's (17 Nov)", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/");
+    const lanes = page.locator(".story-on .lanes");
+    await expect(lanes).toHaveCount(1);
+    const row = await lanes.evaluate((el) => {
+      const lifelines = [...el.querySelectorAll(":scope > span.w-px")].map((line) => line.getBoundingClientRect().left);
+      const four = el.querySelector('.lane-row[data-row="4"]')!;
+      const arrows = [...four.querySelectorAll(":scope > span.h-3")].map((arrow) => {
+        const box = arrow.getBoundingClientRect();
+        return { left: box.left, right: box.right, toKubar: arrow.classList.contains("-scale-x-100"), dashed: arrow.querySelector("line")!.getAttribute("stroke-dasharray") };
+      });
+      return { lifelines, arrows, labels: [...four.querySelectorAll(":scope > span.t-fine")].map((label) => label.textContent) };
+    });
+    expect(row.labels).toEqual(["No-objection"]);
+    expect(row.arrows).toHaveLength(1);
+    const [arrow] = row.arrows;
+    // Columns: Exporter, Kubar, Insurer, Buyer, Financier, Exporter's bank.
+    expect(Math.abs(arrow.left - row.lifelines[1]), "from Kubar's lifeline").toBeLessThanOrEqual(1);
+    expect(Math.abs(arrow.right - row.lifelines[5]), "to the exporter's bank's").toBeLessThanOrEqual(1);
+    expect(arrow.toKubar, "its head at Kubar").toBe(true);
+    expect(arrow.dashed, "a data arrow").toBe("5 3");
+  });
+
   test("contact routes carry their intents and people link out", async ({ page }) => {
     await page.goto("/");
     // The first two routes are cards, each one link; the financial-institution card is petrol.
@@ -447,7 +497,7 @@ test.describe("Home drawings (redraw step 2)", () => {
     await page.goto("/");
     const map = page.locator(".party-map");
     await expect(map.getByRole("heading", { level: 3 })).toHaveText(["Buyers", "Financiers", "Exporters", "Trade platforms", "Kubar", "Credit insurers"]);
-    await expect(map.getByText("Money path: only between banks")).toBeVisible();
+    await expect(map.getByText("Money path: never through Kubar")).toBeVisible();
     await expect(map.getByText("Data path: documents and records")).toBeVisible();
     // Six arrows between the cards at desktop: two solid (money), four dashed (data); none of money touches Kubar.
     const arrows = map.locator("svg:visible .draw-arrow");
@@ -503,8 +553,9 @@ test.describe("Home drawings (redraw step 2)", () => {
     await page.goto("/");
     // Computed values, not whether :has() matches (a fill utility once beat the rule).
     const label = page.locator('.iso-foundations li[data-level="2"]');
-    const edge = page.locator('.iso-top-edge[data-level="2"]');
-    const face = page.locator(".iso-top").nth(2);
+    // The drawing has a second build for 1024 to 1199; this is the one on screen.
+    const edge = page.locator('svg:visible > .iso-top-edge[data-level="2"]');
+    const face = page.locator("svg:visible .iso-top").nth(2);
     const opacity = () => edge.evaluate((el) => getComputedStyle(el).opacity);
     const white = await face.evaluate((el) => getComputedStyle(el).fill);
     await expect(label).toHaveAttribute("tabindex", "-1");
@@ -527,7 +578,7 @@ test.describe("Home drawings (redraw step 2)", () => {
     await page.setViewportSize({ width: 390, height: 844 });
     await label.click();
     await expect(label).toBeFocused();
-    expect(await opacity()).toBe("0");
+    for (const hidden of await page.locator('.iso-top-edge[data-level="2"]').all()) expect(await hidden.evaluate((el) => getComputedStyle(el).opacity)).toBe("0");
   });
 
   test("standing is four plain statements, and the programmes sit in one row at desktop", async ({ page }) => {
@@ -547,36 +598,84 @@ test.describe("Home drawings (redraw step 2)", () => {
 });
 
 test.describe("Home hero order", () => {
-  test("below 1200 the record follows the headline in the page and on screen; from 1200 the desktop grid", async ({ page }) => {
-    const top = (selector: string) => page.locator(selector).first().evaluate((el) => el.getBoundingClientRect().top);
-    // Phones, tablets and iPads (portrait and landscape).
-    for (const [width, height] of [[390, 844], [375, 667], [744, 1133], [820, 1180], [1180, 820]] as const) {
+  const top = (page: Page, selector: string) => page.locator(selector).first().evaluate((el) => el.getBoundingClientRect().top);
+  const bottom = (page: Page, selector: string) => page.locator(selector).first().evaluate((el) => el.getBoundingClientRect().bottom);
+
+  test("below 1024: headline, subline, record, routes, anchor, in the page and on screen", async ({ page }) => {
+    for (const [width, height] of [[390, 844], [375, 667], [744, 1133], [820, 1180]] as const) {
       await page.setViewportSize({ width, height });
       await page.goto("/");
-      const h1Bottom = await page.locator("main h1").evaluate((el) => el.getBoundingClientRect().bottom);
-      const record = await top(".iso-record");
-      expect(Math.round(record - h1Bottom), `${width}: 24 px under the headline`).toBe(24);
-      // On the first screen.
-      expect(record, `${width}: the record starts on the first screen`).toBeLessThan(height);
-      expect(await top("main h1 ~ p"), `${width}: subline after the record`).toBeGreaterThan(record);
-      expect(await top('a[href="#one-receivable"]')).toBeGreaterThan(await top("main h1 ~ p"));
+      const order = [await top(page, "main h1"), await top(page, "main h1 + p"), await top(page, ".iso-record"), await top(page, "main section ul"), await top(page, 'a[href="#one-receivable"]')];
+      expect([...order].sort((a, b) => a - b), `${width}`).toEqual(order);
+      expect(Math.round(order[1] - (await bottom(page, "main h1"))), `${width}: the subline 24 px under the headline`).toBe(24);
+      await expect(page.locator("main h1 + p")).toHaveText("Indian export receivables, originated, insured and documented so an international financier can buy them again and again.");
     }
-    // The page order is the screen order: headline, record, subline, routes, anchor.
     const inOrder = await page.evaluate(() => {
-      const nodes = [
-        document.querySelector("main h1"),
-        document.querySelector(".iso-record"),
-        document.querySelector("main h1 ~ p:not(.iso-record *)"),
-        document.querySelector('a[href="#one-receivable"]'),
-      ];
+      const nodes = [document.querySelector("main h1"), document.querySelector("main h1 + p"), document.querySelector(".iso-record"), document.querySelector("main section ul"), document.querySelector('a[href="#one-receivable"]')];
       return nodes.every((node, i) => i === 0 || Boolean(nodes[i - 1]!.compareDocumentPosition(node!) & Node.DOCUMENT_POSITION_FOLLOWING));
     });
     expect(inOrder).toBe(true);
-    // From 1200: the record beside the headline, the routes under the headline.
-    await page.setViewportSize({ width: 1376, height: 1032 });
+  });
+
+  test("the phone hero is the compact record and no taller than 1,150 px at 390 x 844", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/");
-    expect(Math.round(await top(".iso-record"))).toBe(Math.round(await top("main h1")));
-    await expect(page.locator("main h1 ~ p").first()).toBeHidden();
+    expect(await page.locator("main > section").first().evaluate((el) => el.getBoundingClientRect().height)).toBeLessThanOrEqual(1150);
+    // The names alone beside a small stack, each on one line and inside the page.
+    const rows = page.locator(".iso-record ol li");
+    expect(await rows.first().evaluate((li) => [...li.querySelectorAll("span")].filter((span) => span.offsetWidth > 1 && span.textContent).map((span) => span.textContent))).toEqual(["Purchase confirmation"]);
+    for (const width of [360, 375, 390, 430]) {
+      await page.setViewportSize({ width, height: 844 });
+      const fits = await rows.evaluateAll((els) =>
+        els.every((li) => {
+          const name = li.querySelector(".t-ui-sm")!;
+          const range = document.createRange();
+          range.selectNodeContents(name);
+          return range.getClientRects().length === 1 && range.getBoundingClientRect().right <= innerWidth - 20 && getComputedStyle(name).fontSize === "13px";
+        }),
+      );
+      expect(fits, `${width}: every name on one line, inside the margin, at 13 px`).toBe(true);
+    }
+  });
+
+  test("from 1024 to 1327: headline and subline across the top, routes left, record right, the top sheet on the first screen", async ({ page }) => {
+    // Still, and with its fonts: the load movement shifts the sheets and a fallback font the lines.
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    for (const [width, height] of [[1024, 768], [1080, 810], [1133, 744], [1180, 820], [1194, 834], [1280, 800]] as const) {
+      await page.setViewportSize({ width, height });
+      await page.goto("/");
+      await page.evaluate(() => document.fonts.ready);
+      // The headline is two lines once its own font is in (the fallback is wider).
+      await expect.poll(async () => (await page.locator("main h1").boundingBox())!.height, { message: `${width}: the headline in two lines` }).toBeLessThanOrEqual(120);
+      const h1 = (await page.locator("main h1").boundingBox())!;
+      const subline = (await page.locator("main h1 + p").boundingBox())!;
+      const routes = (await page.locator("main section ul").first().boundingBox())!;
+      const record = (await page.locator(".iso-record").boundingBox())!;
+      expect(h1.height, `${width}: the headline in two lines`).toBeLessThanOrEqual(120);
+      expect(subline.y, `${width}`).toBeGreaterThan(h1.y + h1.height);
+      expect(record.x, `${width}: record right of the routes`).toBeGreaterThan(routes.x + routes.width);
+      expect(Math.round(record.y), `${width}: level with the routes`).toBe(Math.round(routes.y));
+      // The sheet's own outline: a bounding box from the browser's quads takes in its shadow.
+      const sheetBottom = await page.locator(".iso-record .iso-sheet-current rect").first().evaluate((el) => el.getBoundingClientRect().bottom);
+      expect(sheetBottom, `${width}: the top sheet on the first screen`).toBeLessThanOrEqual(height);
+      const firstRows = await page.locator(".iso-record ol li").evaluateAll((els, h) => els.filter((el) => el.getBoundingClientRect().bottom <= h).length, height);
+      expect(firstRows, `${width}: the first rows on the first screen`).toBeGreaterThanOrEqual(3);
+      await expect(page.locator('main a[href="#one-receivable"]').first()).toBeHidden();
+    }
+  });
+
+  test("from 1328: the headline, the subline and the routes left, the record beside all three", async ({ page }) => {
+    for (const width of [1328, 1376, 1440, 1920]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto("/");
+      expect(Math.round(await top(page, ".iso-record")), `${width}`).toBe(Math.round(await top(page, "main h1")));
+      const h1 = (await page.locator("main h1").boundingBox())!;
+      expect(Math.round(h1.width)).toBe(578);
+      expect(h1.height, `${width}: four lines`).toBe(240);
+      expect(await top(page, "main h1 + p")).toBeGreaterThan(h1.y + h1.height);
+      expect(await top(page, "main section ul")).toBeGreaterThan(await bottom(page, "main h1 + p"));
+      expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth), `${width}`).toBe(0);
+    }
   });
 });
 
@@ -659,8 +758,12 @@ test.describe("Kubar Protocol (redraw step 4)", () => {
     await expect(page.getByRole("link", { name: "partnerships@kubar.tech" })).toHaveAttribute("href", "mailto:partnerships@kubar.tech");
     await expect(page.locator("#fn-1")).toHaveCount(1);
     await expect(page.getByText("Planned", { exact: true })).toHaveCount(1);
-    // Ten questions, the two halves of "How a programme runs" and the five parties of "Who holds what".
-    await expect(page.getByRole("heading", { level: 3 })).toHaveCount(17);
+    // Eleven questions (four shown until "Show all 11 questions"), the two halves of "How a
+    // programme runs" and the picked institution's role (step 9: Who holds what is a pick, whose
+    // party names are buttons; the other roles wait out of sight).
+    await expect(page.getByRole("heading", { level: 3 })).toHaveCount(7);
+    await page.getByRole("button", { name: "Show all 11 questions" }).click();
+    await expect(page.getByRole("heading", { level: 3 })).toHaveCount(14);
   });
 
   test("redraw: the limit drawing, the sheet marked An example, the loop, the holders and the corridor", async ({ page }) => {
@@ -691,33 +794,45 @@ test.describe("Kubar Protocol (redraw step 4)", () => {
     // A card only raises: a tap or click focuses it, Tab skips it.
     const card = loop.locator(".loop-card").nth(2);
     await expect(card).toHaveAttribute("tabindex", "-1");
-    // Who holds what: the financier is the petrol card.
-    await expect(page.locator('[data-ground="petrol"]').filter({ hasText: "You, the financier" })).toHaveCount(1);
+    // Who holds what: a pick since step 9, the financier picked on load (its cards stand in without script).
+    await expect(page.locator('[data-pick="holds"] [aria-pressed="true"]')).toHaveText("You, the financier");
     // Programme 1: Next in a dashed box; the venue has no numbers.
     await expect(page.locator("dl.border-dashed")).toContainText("Chemicals and pharmaceutical formulations");
     await expect(page.locator("section", { has: page.getByRole("heading", { name: "The venue comes last." }) }).locator(".t-code")).toHaveCount(0);
   });
 
-  test("laptops keep the 1440 composition from 1200 up", async ({ page }) => {
+  test("laptops keep the 1440 composition from 1280 up; from 1024 to 1279 two sections are re-flowed", async ({ page }) => {
     const box = async (selector: string) => (await page.locator(selector).first().boundingBox())!;
-    for (const width of [1200, 1280, 1366, 1440]) {
+    for (const width of [1024, 1180, 1200, 1279, 1280, 1366, 1440]) {
       await page.setViewportSize({ width, height: 900 });
       await page.goto("/products/kubar-protocol");
-      // What you buy: the timeline beside the sheet from 1280, under it at full width below that.
+      // What you buy: the day-axis timeline beside the sheet from 1280; below that the tablets'
+      // small timeline and its list sit beside the sheet, so the sheet is never alone in its row.
       const sheet = await box("dl:has(> dt:text-is('Face value'))");
-      const timeline = await box("[role='img'][aria-label^='A timeline']");
-      if (width >= 1280) expect(timeline.x, `${width}: timeline beside the sheet`).toBeGreaterThan(sheet.x + sheet.width);
-      else expect(timeline.y, `${width}: timeline under the sheet`).toBeGreaterThan(sheet.y + sheet.height);
-      // How a programme runs: the loop beside the set-up list, its cards inside the page.
+      const timeline = page.locator("[role='img'][aria-label^='A timeline']");
+      const small = page.locator("section[aria-labelledby='buy-heading'] dl").last();
+      if (width >= 1280) {
+        expect((await timeline.boundingBox())!.x, `${width}: timeline beside the sheet`).toBeGreaterThan(sheet.x + sheet.width);
+      } else {
+        await expect(timeline, `${width}: no day-axis timeline`).toBeHidden();
+        const list = (await small.boundingBox())!;
+        expect(list.x, `${width}: small timeline beside the sheet`).toBeGreaterThan(sheet.x + sheet.width);
+        expect(list.x + list.width, `${width}: small timeline inside the page`).toBeLessThanOrEqual(width);
+      }
+      // How a programme runs: the loop beside the set-up list from 1280; below that the list runs
+      // across the top in two columns and the loop sits under it at its full 760, so no sentence shrinks.
       const setUp = await box(".programme-loop >> xpath=ancestor::div[contains(@class,'fit-stage')]/preceding-sibling::div[1]");
       const loop = await box(".programme-loop");
-      expect(loop.x, `${width}: loop beside the list`).toBeGreaterThan(setUp.x + setUp.width - 1);
+      if (width >= 1280) expect(loop.x, `${width}: loop beside the list`).toBeGreaterThan(setUp.x + setUp.width - 1);
+      else expect(loop.y, `${width}: loop under the list`).toBeGreaterThan(setUp.y + setUp.height - 1);
+      expect(Math.round(loop.width), `${width}: loop at full size`).toBe(760);
       expect(loop.x + loop.width, `${width}: loop inside the page`).toBeLessThanOrEqual(width);
-      // The payment lanes beside the heading.
+      await expect(page.locator(".programme-loop .loop-card .t-body-sm").first()).toHaveCSS("font-size", "15px");
+      // The money path beside the heading from 1400, where it has its full 760; below that under it (step 8).
       const heading = await box("#payment-heading");
-      const lanes = await box("[role='img'][aria-label^='Three payments']");
-      expect(lanes.x, `${width}: lanes beside the heading`).toBeGreaterThan(heading.x + heading.width);
-      expect(lanes.y, `${width}: lanes level with the heading`).toBeLessThan(heading.y + heading.height);
+      const money = await box("[data-money] .money-art");
+      if (width >= 1400) expect(money.x, `${width}: money path beside the heading`).toBeGreaterThan(heading.x + heading.width);
+      else expect(money.y, `${width}: money path under the heading`).toBeGreaterThan(heading.y + heading.height);
     }
   });
 
@@ -738,15 +853,12 @@ test.describe("Kubar Protocol (redraw step 4)", () => {
     for (const label of ["Exporters", "Buyers", "Financier", "Cover", "Next"]) {
       await expect(page.locator("dt", { hasText: new RegExp(`^${label}$`) }).last()).toHaveCSS("color", muted);
     }
-    // At 1440 the note sits on its grey chip.
-    await expect(page.locator("[role='img'][aria-label^='Three payments'] p", { hasText: "Kubar holds none" })).toHaveClass(/bg-accent-soft/);
-    // Below 1200: "Kubar" with the chip, and "Buyer → Financier’s collection account".
+    // The money path's note sits on Kubar's path, on a white chip; the table that assistive technology
+    // reads gives each payment its from and to (step 8).
+    await expect(page.locator("[data-money] .money-art p:visible", { hasText: "Kubar holds none" })).toHaveCSS("background-color", "rgb(255, 255, 255)");
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/products/kubar-protocol");
-    const kubarRow = page.locator("p", { has: page.locator("span", { hasText: "Kubar holds none" }) }).filter({ hasText: /^Kubar/ });
-    await expect(kubarRow.first()).toBeVisible();
-    await expect(kubarRow.first()).not.toContainText("Kubar:");
-    await expect(page.getByRole("row", { name: /Face value, on the due date/ })).toContainText("Financier’s collection account");
+    await expect(page.getByRole("row", { name: /Face value, on the due date/ })).toContainText("Collection account, in the exporter’s name, swept to the financier");
     await expect(page.getByRole("row", { name: /Face value, on the due date/ })).toContainText("Buyer");
   });
 
@@ -805,7 +917,8 @@ test.describe("Kubar Protocol (redraw step 4)", () => {
     await loss.scrollIntoViewIfNeeded();
     await expect(loss).toHaveAttribute("data-phase", "playing");
     await expect(loss.locator(".loss-settle")).toHaveCSS("transform", "none");
-    // Insurance: the lead stays, the box sits under it with three labels and no movement.
+    // Insurance: the lead stays, the box sits under it with three labels; it plays once in view (step 9),
+    // without the hero's settle on load.
     const insurance = page.locator("section", { has: page.locator("#insurance-heading") });
     await expect(insurance.getByText(/^The credit-insurance policy is yours/)).toBeVisible();
     await expect(insurance.locator("ul > li")).toHaveText(["An approved buyer limit", "Headroom", "Receivables bought"]);
@@ -845,8 +958,9 @@ test.describe("Kubar Protocol (redraw step 4)", () => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/products/kubar-protocol");
     const questions = page.locator("section", { has: page.locator("#questions-heading") });
-    const buttons = questions.getByRole("button");
-    await expect(buttons).toHaveCount(10);
+    await questions.getByRole("button", { name: "Show all 11 questions" }).click();
+    const buttons = questions.locator("h3").getByRole("button");
+    await expect(buttons).toHaveCount(11);
     await expect(buttons.first()).toHaveAttribute("aria-expanded", "true");
     await expect(buttons.nth(1)).toHaveAttribute("aria-expanded", "false");
     await expect(questions.locator("p:visible")).toHaveCount(1);
@@ -857,7 +971,7 @@ test.describe("Kubar Protocol (redraw step 4)", () => {
     expect((await buttons.nth(1).boundingBox())!.height).toBeGreaterThanOrEqual(44);
     await page.setViewportSize({ width: 768, height: 1024 });
     await expect(questions.getByRole("button")).toHaveCount(0);
-    await expect(questions.locator("p:visible")).toHaveCount(10);
+    await expect(questions.locator("p:visible")).toHaveCount(11);
   });
 
   test("tablets and phones keep the small money timeline and the evidence drawing", async ({ page }) => {
@@ -913,104 +1027,7 @@ test.describe("NavDhan SDK (build step 4)", () => {
 });
 
 test.describe("NavDhan SDK (build step 6)", () => {
-  test("the hero carries What you embed: picking a row marks it and outlines its part of the sketch", async ({ page, browser }) => {
-    await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto("/products/navdhan-sdk");
-    const hero = page.locator("main section").first();
-    await expect(hero.getByRole("heading", { name: "What you embed." })).toBeVisible();
-    const rows = hero.getByRole("button", { pressed: undefined }).filter({ hasNot: page.locator("svg") });
-    const row = (name: string) => hero.getByRole("button", { name: new RegExp(`^${name}`) });
-    const sketch = hero.getByRole("img");
-    await expect(hero.locator("ul > li > button:visible")).toHaveCount(6);
-    expect(await rows.count()).toBeGreaterThanOrEqual(6);
-    // Eligibility check is picked from the start.
-    await expect(row("Eligibility check")).toHaveAttribute("aria-pressed", "true");
-    const outlined = () => sketch.locator(".outline-2:visible");
-    await expect(outlined()).toHaveCount(1);
-    await expect(outlined()).toContainText("Buyer country");
-    await expect(row("Eligibility check")).toHaveCSS("border-left-color", "rgb(2, 39, 50)");
-    // Hover picks; the pick stays when the pointer leaves.
-    await row("Indicative offer").hover();
-    await expect(row("Indicative offer")).toHaveAttribute("aria-pressed", "true");
-    await expect(outlined()).toContainText("All-in price");
-    await page.mouse.move(5, 5);
-    await expect(row("Indicative offer")).toHaveAttribute("aria-pressed", "true");
-    // Shipment and document capture outlines the Shipment list.
-    await row("Shipment and document capture").click();
-    await expect(outlined()).toContainText("Bill of lading");
-    // The two rows with no part in the sketch swap the panel's content.
-    await expect(sketch.getByText("Identity check", { exact: true })).toBeHidden();
-    await row("Consented onboarding").focus();
-    await expect(sketch.getByText("Identity check", { exact: true })).toBeVisible();
-    await expect(sketch.getByText("Consent recorded", { exact: true })).toBeVisible();
-    await expect(sketch.getByText("Indicative offer", { exact: true })).toBeHidden();
-    await expect(sketch.getByText("Purchased", { exact: true })).toBeHidden();
-    await page.keyboard.press("Tab");
-    await page.keyboard.press("Tab");
-    await page.keyboard.press("Tab");
-    await page.keyboard.press("Tab");
-    await page.keyboard.press("Tab");
-    await expect(row("Events for your product")).toHaveAttribute("aria-pressed", "true");
-    await expect(sketch.getByText("Purchased", { exact: true })).toBeVisible();
-    await expect(sketch.getByText("Indicative offer", { exact: true })).toBeVisible();
-    // The sketch sits beside the list.
-    const list = (await hero.locator("ul").first().boundingBox())!;
-    const art = (await sketch.boundingBox())!;
-    expect(art.x).toBeGreaterThan(list.x + list.width);
-    await expectNoAxeViolations(page);
-    // 1000 to 1199: the sketch beside the list, the list about 45% wide. Below 1000: the accordion, no full sketch.
-    await page.setViewportSize({ width: 1024, height: 900 });
-    const l2 = (await hero.locator("ul").first().boundingBox())!;
-    const a2 = (await sketch.boundingBox())!;
-    expect(a2.x).toBeGreaterThan(l2.x + l2.width - 1);
-    expect(l2.width / 944).toBeGreaterThan(0.4);
-    expect(l2.width / 944).toBeLessThan(0.5);
-    for (const width of [999, 820, 768]) {
-      await page.setViewportSize({ width, height: 1180 });
-      await expect(sketch, `${width}`).toBeHidden();
-      await expect(hero.getByRole("button", { expanded: true }), `${width}`).toHaveCount(1);
-    }
-    // Phones: no full sketch; the rows are an accordion, each opening its own piece of the sketch.
-    const phone = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
-    const tab = await phone.newPage();
-    await tab.goto("/products/navdhan-sdk");
-    const phoneHero = tab.locator("main section").first();
-    await expect(phoneHero.getByRole("img")).toBeHidden();
-    const accordion = phoneHero.locator("ul > li > button:visible");
-    await expect(accordion).toHaveCount(6);
-    const open = (name: string) => phoneHero.getByRole("button", { name: new RegExp(`^${name}`), expanded: true });
-    await expect(phoneHero.getByRole("button", { expanded: true })).toHaveCount(1);
-    await expect(open("Eligibility check")).toBeVisible();
-    const piece = (name: string) => phoneHero.locator("li", { has: tab.getByRole("button", { name: new RegExp(`^${name}`) }) }).locator("div[id]:visible");
-    await expect(piece("Eligibility check")).toContainText("Buyer country");
-    const pieces: [string, string][] = [
-      ["Consented onboarding", "Identity checkBusiness checkConsent recorded"],
-      ["Shipment and document capture", "Bill of lading"],
-      ["Indicative offer", "All-in price"],
-      ["Application and status", "Settlement"],
-      ["Events for your product", "InvoicePurchased"],
-    ];
-    for (const [name, text] of pieces) {
-      const button = phoneHero.locator("ul > li > button:visible", { hasText: name });
-      await button.scrollIntoViewIfNeeded();
-      await button.tap();
-      await expect(button).toHaveAttribute("aria-expanded", "true");
-      await expect(phoneHero.getByRole("button", { expanded: true })).toHaveCount(1);
-      await expect(piece(name)).toContainText(text);
-      const box = (await piece(name).boundingBox())!;
-      const rowBox = (await button.boundingBox())!;
-      expect(box.y).toBeGreaterThanOrEqual(rowBox.y + rowBox.height - 1);
-      expect(box.x + box.width).toBeLessThanOrEqual(390 - 20 + 1);
-    }
-    expect(await tab.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
-    // A row closed on a phone, then a wider screen: Eligibility check is picked again.
-    await phoneHero.getByRole("button", { expanded: true }).tap();
-    await expect(phoneHero.getByRole("button", { expanded: true })).toHaveCount(0);
-    await tab.setViewportSize({ width: 1024, height: 768 });
-    await expect(phoneHero.getByRole("button", { name: /^Eligibility check/, pressed: true })).toBeVisible();
-    await expect(phoneHero.getByRole("img").locator(".outline-2:visible")).toContainText("Buyer country");
-    await phone.close();
-  });
+  // What you embed and its sketch: see "The embed sketch, drawn like the product (step 7)".
 
   test("two audiences side by side, no numbers on the rules, no column heads, the layers drawn", async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
@@ -1093,7 +1110,7 @@ test.describe("How it works (build step 4)", () => {
     // The documents in their new order, top down.
     await expect(stack.locator("ol > li")).toHaveText([
       "Doc 08Purchase confirmation",
-      "Doc 07Buyer’s acknowledgement",
+      "Doc 07Sweep instruction",
       "Doc 06Credit-insurance cover",
       "Doc 05No-objection",
       "Doc 04Inspection report, where the programme requires one",
@@ -1177,9 +1194,12 @@ test.describe("How it works (build step 5)", () => {
     await expect(page.getByText("05 Purchased")).toHaveCount(0);
     await expect(page.getByText(/8 of 8/)).toHaveCount(0);
     await expect(page.locator(".story-on").getByText("Record RCV-0001 · Evidence package", { exact: true })).toBeVisible();
-    // The glossary has no column heads; each term is its row's header.
+    // The glossary has no column heads; each term is its row's header. Six show until
+    // "Show all 19 terms" (step 11).
     const glossary = page.locator("table").filter({ has: page.locator("#term-itfs") });
     await expect(glossary.getByRole("columnheader")).toHaveCount(0);
+    await expect(glossary.getByRole("rowheader")).toHaveCount(6);
+    await page.getByRole("button", { name: "Show all 19 terms" }).click();
     await expect(glossary.getByRole("rowheader")).toHaveCount(19);
   });
 
@@ -1212,29 +1232,29 @@ test.describe("How it works (build step 5)", () => {
       const row = page.locator(`${scope} li`).nth(2);
       await row.scrollIntoViewIfNeeded();
       await row.hover();
-      const lifted = page.locator(`${scope} svg:visible .iso-lift`).nth(path === "/" ? 3 : 5);
+      const lifted = page.locator(`${scope} svg:visible .iso-lift`).nth(5);
       await expect(lifted, path).toHaveCSS("transform", "none");
       await expect(lifted.locator("rect").nth(2), path).not.toHaveCSS("fill", "rgb(255, 255, 255)");
     }
     await expect(page.locator(".steps-rise").first()).toHaveCSS("animation-name", "none");
     await expect(page.locator(".story-ledger .iso-evidence")).toHaveAttribute("data-phase", "done");
-    await expect(page.locator(".unpaid-flow")).toHaveAttribute("data-phase", "done");
+    // The unpaid flow stands whole (step 11): every step raised, both branches, the labels as words.
+    await expect(page.locator(".unpaid-flow .flow-pick")).toBeHidden();
+    await expect(page.locator(".unpaid-flow .flow-label")).toHaveText(["No dispute", "A dispute"]);
   });
 
   test("If a buyer doesn't pay: three steps, a fork, two branches, no rani", async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto("/how-it-works");
     const flow = page.locator(".unpaid-flow");
-    // It starts undrawn below the fold and plays once in view.
-    await expect(flow).toHaveAttribute("data-phase", "armed");
+    // Since step 11 the path draws with the scroll and the fork's labels are buttons (see that step's tests).
     await flow.scrollIntoViewIfNeeded();
-    await expect(flow).toHaveAttribute("data-phase", "playing");
     await expect(flow.locator("ol > li")).toHaveCount(6);
-    await expect(flow.getByText("No dispute", { exact: true })).toBeVisible();
-    await expect(flow.getByText("A dispute", { exact: true })).toBeVisible();
+    await expect(flow.getByRole("button", { name: "No dispute" })).toBeVisible();
+    await expect(flow.getByRole("button", { name: "A dispute" })).toBeVisible();
     await expect(flow.getByText("Kubar holds none of the risk", { exact: true })).toBeVisible();
-    // Rule 11.4: numbers and branch labels in the secondary colour, not rani.
-    for (const text of ["01", "06", "No dispute", "A dispute"]) {
+    // Rule 11.4: numbers in the secondary colour, not rani.
+    for (const text of ["01", "06"]) {
       const color = await flow.getByText(text, { exact: true }).evaluate((el) => getComputedStyle(el).color);
       expect(color, text).not.toBe("rgb(173, 36, 104)");
     }
@@ -1246,12 +1266,13 @@ test.describe("How it works (build step 5)", () => {
     expect(Math.round(s5.y)).toBe(Math.round(s4.y));
     expect(Math.round(s6.y)).toBe(Math.round(s4.y));
     expect(Math.round(s6.x + s6.width)).toBe(1360);
-    await expect(flow.locator(".fork-bar")).toBeVisible();
-    // Phone: one column, in reading order, the fork's lines gone.
+    await expect(flow.locator(".fork-half").first()).toBeVisible();
+    // Phone: one column, in reading order, the fork's lines gone; only the picked branch shows.
     await page.setViewportSize({ width: 390, height: 844 });
-    const order = await Promise.all(["01", "02", "03", "04", "05", "06"].map(at));
+    const order = await Promise.all(["01", "02", "03", "04", "05"].map(at));
     for (let i = 1; i < order.length; i++) expect(order[i].y).toBeGreaterThan(order[i - 1].y + order[i - 1].height);
-    await expect(flow.locator(".fork-bar")).toBeHidden();
+    await expect(flow.locator(".fork-half").first()).toBeHidden();
+    await expect(flow.locator("li", { hasText: /^06/ }).locator("div").first()).toBeHidden();
   });
 
   test("Each party signs: a map from 1200 up, the register below it, the table always there for screen readers", async ({ page }) => {
@@ -1262,7 +1283,7 @@ test.describe("How it works (build step 5)", () => {
     await expect(map.locator("> div")).toHaveAttribute("aria-hidden", "true");
     await expect(map.locator("[data-party]")).toHaveCount(7);
     await expect(map.locator("[tabindex]")).toHaveCount(0);
-    for (const text of ["The policy", "The mandate", "Purchase agreement", "Agreement with Kubar", "Services agreement", "Programme terms", "Its no-objection", "Its acknowledgement", "A line is an agreement between the two parties it joins.", "A tag is a paper one party signs on its own."]) {
+    for (const text of ["The policy", "The mandate", "Purchase agreement", "Agreement with Kubar", "Services agreement", "Programme terms", "Its no-objection", "A line is an agreement between the two parties it joins.", "A tag is a paper one party signs on its own."]) {
       await expect(map.getByText(text, { exact: true }), text).toBeVisible();
     }
     // 304 × 204 cards, 184 between columns, 100 between rows; Kubar under the Financier, in petrol.
@@ -1384,6 +1405,8 @@ test.describe("rule 11.4: rani only for footnote markers, the current state, err
   });
 
   test("NavDhan SDK's lanes drawing is fitted to its column on laptops", async ({ page }) => {
+    // Since step 10 this is the journey's register, shown with reduced motion.
+    await page.emulateMedia({ reducedMotion: "reduce" });
     for (const width of [1200, 1280, 1440]) {
       await page.setViewportSize({ width, height: 900 });
       await page.goto("/products/navdhan-sdk");
@@ -1447,10 +1470,18 @@ test.describe("On this page index (section 12, item 5)", () => {
       }
       // Past the row: the button; it opens the list with the current section marked.
       const target = await row.getByRole("link").nth(2).getAttribute("href");
-      await page.locator(target!).scrollIntoViewIfNeeded();
-      await page.evaluate(() => window.scrollBy(0, 300));
+      // Instant scrolls: the page scrolls smoothly, and a second smooth scroll cuts the first short.
+      await page.evaluate((selector) => {
+        document.querySelector(selector)!.scrollIntoView({ block: "center", behavior: "instant" });
+        window.scrollBy({ top: 300, behavior: "instant" });
+      }, target!);
       await expect(button).toBeVisible();
       expect(await header()).toBe(before);
+      // A jump from the top of the page straight past the row (it starts below the fold) shows it too.
+      await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+      await expect(button).toHaveCount(0);
+      await page.evaluate((selector) => document.querySelector(selector)!.scrollIntoView({ block: "start", behavior: "instant" }), target!);
+      await expect(button).toBeVisible();
       // The button steps aside over anything pressable, so move on until it is clear.
       const clear = () => button.evaluate((el) => getComputedStyle(el.parentElement!).opacity === "1" && getComputedStyle(el.parentElement!).pointerEvents !== "none");
       for (let i = 0; i < 40 && !(await clear()); i++) {
@@ -1481,7 +1512,9 @@ test.describe("On this page index (section 12, item 5)", () => {
       // comparing rectangles all the way down the page.
       const total = await page.evaluate(() => document.documentElement.scrollHeight);
       let shownSomewhere = 0;
-      for (let top = 1200; top < total; top += 500) {
+      // From just past the row (the button only exists once the row has gone).
+      const start = await page.evaluate(() => Math.ceil(document.querySelector('nav[aria-label="On this page"]')!.getBoundingClientRect().bottom + scrollY));
+      for (let top = start; top < total; top += 500) {
         await page.evaluate((y) => window.scrollTo(0, y), top);
         await page.waitForTimeout(200);
         const state = await button.evaluate((el) => {
@@ -1522,7 +1555,7 @@ test.describe("About (build step 4)", () => {
     await expect(page.getByText("Planned", { exact: true })).toHaveCount(1);
     await expect(page.getByText("Where we are")).toHaveCount(0);
     await expect(page.getByRole("link", { name: "Email us (partnerships@kubar.tech)" })).toHaveAttribute("href", "mailto:partnerships@kubar.tech");
-    await expect(page.getByRole("link", { name: "Follow one receivable through all five" })).toHaveAttribute("href", "/how-it-works");
+    await expect(page.getByRole("link", { name: "Follow one receivable through all six" })).toHaveAttribute("href", "/how-it-works");
   });
 
   test("build step 7: the foundations are drawn, the cuts are in, and Why GIFT City has its three zones", async ({ page }) => {
@@ -1536,8 +1569,9 @@ test.describe("About (build step 4)", () => {
     }
     const blocks = page.locator(".iso-foundations");
     await expect(blocks.locator("svg").first()).toHaveAttribute("aria-hidden", "true");
-    await expect(blocks.locator("ol > li")).toHaveCount(5);
+    await expect(blocks.locator("ol > li")).toHaveCount(6);
     await expect(blocks.locator("ol > li").first()).toContainText("The venue");
+    await expect(blocks.locator("ol > li").nth(1)).toContainText("Distribution through trade platformsNavDhan SDK, inside the platforms exporters already use");
     await expect(blocks.locator("ol > li").first()).toContainText("Planned");
     // Standing as on Home: the statements beside the heading.
     const heading = (await page.locator("#standing-heading").boundingBox())!;
@@ -1548,7 +1582,7 @@ test.describe("About (build step 4)", () => {
     const art = gift.locator("svg[aria-hidden='true']").first();
     const words = (await gift.getByText(/^GIFT City is India’s international financial services centre/).boundingBox())!;
     expect((await art.boundingBox())!.x).toBeGreaterThan(words.x + words.width);
-    for (const text of ["Onshore India", "The exporter and its own bank", "GIFT City", "A bank’s unit buys the receivable, in foreign currency", "Abroad", "The buyer pays the financier’s account", "The receivable", "Purchase price", "Payment on the due date"]) {
+    for (const text of ["Onshore India", "The exporter and its own bank", "GIFT City", "A bank’s unit buys the receivable, in foreign currency", "Abroad", "The buyer pays the account on its invoice; the payment reaches the financier", "The receivable", "Purchase price", "Payment on the due date"]) {
       await expect(gift.getByText(text, { exact: true }).locator("visible=true"), text).toHaveCount(1);
     }
     for (const width of [1200, 1280, 1366, 768, 390, 375]) {
@@ -1604,7 +1638,7 @@ test.describe("Contact (build step 5)", () => {
     await page.getByLabel("Full name").fill("Arjun Mehta");
     await page.getByLabel("Work email").fill("arjun.mehta@bank.example");
     await page.getByLabel("Organisation").fill("A bank’s IFSC Banking Unit");
-    await page.getByLabel("What would you like to discuss?").fill("We finance rice exporters and would like to understand how a programme would run for us.");
+    await page.getByLabel("What would you like to discuss?").fill("We finance agri-commodity exporters and would like to understand how a programme would run for us.");
   };
   const send = (page: import("@playwright/test").Page) => page.getByRole("button", { name: "Send message" }).click();
 
@@ -1740,9 +1774,12 @@ test.describe("Contact (build step 5)", () => {
 
   test("a sent message posts the new contract and is replaced by the thanks", async ({ page }) => {
     let body: Record<string, unknown> = {};
+    // The reply is held until the test has seen "Sending…": a fixed delay raced the check on a busy machine.
+    let release!: () => void;
+    const held = new Promise<void>((resolve) => (release = resolve));
     await page.route("**/api/contact", async (route) => {
       body = route.request().postDataJSON();
-      await new Promise((resolve) => setTimeout(resolve, 400));
+      await held;
       await route.fulfill({ status: 200, contentType: "application/json", body: '{"success":true}' });
     });
     await page.goto("/contact?intent=institution");
@@ -1755,6 +1792,7 @@ test.describe("Contact (build step 5)", () => {
     await expect(sending).toBeVisible();
     await expect(sending).not.toHaveAttribute("disabled");
     expect((await sending.boundingBox())!.width).toBe(width);
+    release();
     const heading = page.getByRole("heading", { name: "Message sent." });
     await expect(heading).toBeFocused();
     await expect(page.getByText("Thank you, Arjun. Your message is with the team, and we’ll reply from a kubar.tech address.")).toBeVisible();
@@ -1766,7 +1804,7 @@ test.describe("Contact (build step 5)", () => {
       email: "arjun.mehta@bank.example",
       organisation: "A bank’s IFSC Banking Unit",
       role: "Head of trade finance",
-      message: "We finance rice exporters and would like to understand how a programme would run for us.",
+      message: "We finance agri-commodity exporters and would like to understand how a programme would run for us.",
       website: "",
     });
     await expectNoAxeViolations(page);
@@ -1857,7 +1895,7 @@ test.describe("Legal pages (build step 5)", () => {
 test.describe("Metadata, social card and structured data (build step 6)", () => {
   // HANDOFF section 5, word for word.
   const pages: [string, string, string][] = [
-    ["/", "Kubar Labs · Building the institutional exchange for cross-border trade finance", "Starting with the asset: export receivables an international financier can buy again and again, insured in its own name."],
+    ["/", "Kubar Labs · Building the institutional exchange for cross-border trade finance", "Indian export receivables, originated, insured and documented so an international financier can buy them again and again."],
     ["/products/kubar-protocol", "Kubar Protocol · Kubar Labs", "Underwrite once, then buy every export receivable that fits: without recourse for the buyer’s credit, insured in your name, with the evidence behind each one."],
     ["/products/navdhan-sdk", "NavDhan SDK · Kubar Labs", "Embed NavDhan SDK so your exporters can finance their export receivables inside your platform. Financiers buy; Kubar runs the programme."],
     ["/how-it-works", "How it works · Kubar Labs", "Follow one illustrative export receivable from shipment to settlement: who does what, the documents behind each step and where the money moves."],
@@ -1883,7 +1921,7 @@ test.describe("Metadata, social card and structured data (build step 6)", () => 
   }
 
   test("the social image is a 1200 by 630 PNG, cached for a year, and /opengraph-image points at it", async ({ page, request }) => {
-    const image = await request.get("/media/kubar-labs-social-bd9a99c9.png");
+    const image = await request.get("/media/kubar-labs-social-86333cc0.png");
     expect(image.status()).toBe(200);
     expect(image.headers()["content-type"]).toBe("image/png");
     expect(image.headers()["cache-control"]).toContain("immutable");
@@ -1894,8 +1932,9 @@ test.describe("Metadata, social card and structured data (build step 6)", () => 
     await expect(page.locator('meta[property="og:image:width"]')).toHaveAttribute("content", "1200");
     const redirect = await request.get("/opengraph-image", { maxRedirects: 0 });
     expect(redirect.status()).toBe(308);
-    expect(redirect.headers().location).toBe("/media/kubar-labs-social-bd9a99c9.png");
-    expect((await request.get("/media/kubar-labs-og-b2add55b.png")).status()).toBe(404);
+    expect(redirect.headers().location).toBe("/media/kubar-labs-social-86333cc0.png");
+    // Earlier cards are gone.
+    for (const old of ["/media/kubar-labs-og-b2add55b.png", "/media/kubar-labs-social-bd9a99c9.png"]) expect((await request.get(old)).status(), old).toBe(404);
   });
 
   test("the Organisation JSON-LD names the entity, the new logo, partnerships@ and LinkedIn only", async ({ page, request }) => {
@@ -1991,6 +2030,2500 @@ test.describe("Abbreviations (HANDOFF section 8)", () => {
     await page.getByRole("button", { name: "Menu" }).click();
     await page.getByRole("dialog").getByRole("link", { name: "How it works" }).click();
     await expect(page).toHaveURL(/\/how-it-works$/);
+    await expect(page.locator('abbr[data-abbr="ITFS"]')).toHaveCount(1);
+    // RBI's first use is in a folded term (step 11): it takes its expansion once the terms open.
+    await expect(page.locator('abbr[data-abbr="RBI"]')).toHaveCount(0);
+    await page.getByRole("button", { name: "Show all 19 terms" }).click();
     await expect(page.locator('abbr[data-abbr="RBI"]')).toHaveCount(1);
+  });
+});
+
+test.describe("Ground shadows", () => {
+  // A drawing's ground shadow is a blurred ellipse that reaches past the svg's own box, and an
+  // svg clips to that box unless it is overflow-visible: the shadow then ends in a hard line.
+  for (const path of publicRoutes) {
+    test(`${path}: no blurred ground shadow is clipped by its svg or a clipping ancestor`, async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      for (const size of [{ width: 1440, height: 900 }, { width: 390, height: 844 }]) {
+        await page.setViewportSize(size);
+        await page.goto(path);
+        const clipped = await page.evaluate(() => {
+          const found: string[] = [];
+          for (const shadow of document.querySelectorAll<SVGEllipseElement>(".iso-ground")) {
+            const box = shadow.getBoundingClientRect();
+            if (box.width === 0) continue; // a drawing this width doesn't show
+            // The blur's radius is in the drawing's own units; two radii is where it has faded out.
+            const reach = 2 * parseFloat(getComputedStyle(shadow).filter.replace(/[^\d.]/g, "") || "0") * (box.width / (2 * shadow.rx.baseVal.value));
+            for (let el = shadow.parentElement; el && el !== document.body; el = el.parentElement) {
+              const style = getComputedStyle(el);
+              if (style.overflowX === "visible" && style.overflowY === "visible") continue;
+              const frame = el.getBoundingClientRect();
+              if (box.bottom + reach > frame.bottom + 1 || box.left - reach < frame.left - 1 || box.right + reach > frame.right + 1) {
+                found.push(`${el.tagName.toLowerCase()}.${String(el.getAttribute("class")).slice(0, 60)}`);
+              }
+            }
+          }
+          return found;
+        });
+        expect(clipped, `${path} at ${size.width}`).toEqual([]);
+      }
+    });
+  }
+});
+
+test.describe("Drawings that move as the page loads", () => {
+  // A background tab or a hidden pane draws no frames. The hero drawings must be complete
+  // there, not waiting at the start of a movement that never runs (How it works showed only
+  // its ground shadow). Frames are stopped here the way such a pane stops them.
+  const moving = ".steps-rise, .steps-petrol, .iso-drop, .iso-fade, .limit-settle";
+  for (const path of ["/", "/products/kubar-protocol", "/how-it-works"]) {
+    test(`${path}: complete where no frame is drawn`, async ({ page }) => {
+      await page.addInitScript(() => {
+        window.requestAnimationFrame = () => 0;
+      });
+      await page.goto(path);
+      await expect(page.locator("html")).not.toHaveAttribute("data-frames");
+      const waiting = await page.evaluate(
+        (moving) =>
+          [...document.querySelectorAll(moving)].filter((el) => {
+            const style = getComputedStyle(el);
+            return style.animationName !== "none" || style.opacity !== "1" || style.transform !== "none";
+          }).length,
+        moving,
+      );
+      expect(await page.locator(moving).count()).toBeGreaterThan(0);
+      expect(waiting).toBe(0);
+    });
+
+    test(`${path}: the movement still plays where frames are drawn, and ends complete`, async ({ page }) => {
+      await page.goto(path);
+      await expect(page.locator("html")).toHaveAttribute("data-frames", "");
+      expect(await page.evaluate((moving) => getComputedStyle(document.querySelector(moving)!).animationName, moving)).not.toBe("none");
+      await expect
+        .poll(() => page.evaluate((moving) => [...document.querySelectorAll(moving)].every((el) => getComputedStyle(el).opacity === "1"), moving))
+        .toBe(true);
+    });
+  }
+});
+
+test.describe("Lane heads", () => {
+  // "Buyer, Singapore" takes two lines where its lane is narrow; the word is never cut and
+  // the type never shrunk (10 px on phones, 13 px on tablets, 15 px on laptops).
+  for (const [width, height, size] of [[360, 800, "10px"], [375, 667, "10px"], [390, 844, "10px"], [430, 932, "10px"], [768, 1024, "13px"], [1024, 768, "15px"], [1200, 800, "15px"], [1440, 900, "15px"]] as const) {
+    test(`every party's name fits its box at ${width}`, async ({ page }) => {
+      await page.setViewportSize({ width, height });
+      await page.goto("/");
+      await storyLive(page);
+      const heads = await page.evaluate(() =>
+        [...document.querySelectorAll<HTMLElement>(".story-on .lanes > span.border")].map((box) => {
+          const range = document.createRange();
+          range.selectNodeContents(box);
+          const text = [...range.getClientRects()].filter((r) => r.width > 0 && r.height < 30);
+          const frame = box.getBoundingClientRect();
+          return {
+            name: box.textContent,
+            size: getComputedStyle(box).fontSize,
+            fits: text.every((r) => r.left >= frame.left + 0.5 && r.right <= frame.right - 0.5 && r.top >= frame.top && r.bottom <= frame.bottom),
+          };
+        }),
+      );
+      expect(heads.map((h) => h.name)).toEqual(["Exporter", "Kubar", "Insurer", "Buyer, Singapore", "Financier", "Exporter’s bank"]);
+      for (const head of heads) expect(head, head.name ?? "").toMatchObject({ size, fits: true });
+    });
+  }
+});
+
+test.describe("The laptop layout starts at 1024 (SPEC section 7)", () => {
+  test("the header shows the full nav from 1024 and Menu below it", async ({ page }) => {
+    await page.setViewportSize({ width: 1024, height: 768 });
+    await page.goto("/");
+    const header = page.locator("header");
+    for (const name of ["How it works", "About", "Contact"]) await expect(header.getByRole("link", { name, exact: true })).toBeVisible();
+    await expect(header.getByRole("button", { name: "Products" })).toBeVisible();
+    await expect(header.getByRole("button", { name: "Menu" })).toBeHidden();
+    // One line: every item sits on the same row.
+    const tops = await header.locator("nav a:visible, nav button:visible").evaluateAll((els) => els.map((el) => Math.round(el.getBoundingClientRect().top + el.getBoundingClientRect().height / 2)));
+    expect(new Set(tops).size).toBe(1);
+    await page.setViewportSize({ width: 1023, height: 768 });
+    await expect(header.getByRole("button", { name: "Menu" })).toBeVisible();
+    await expect(header.getByRole("link", { name: "About", exact: true })).toBeHidden();
+  });
+
+  test("the page margin runs from 40 at 1024 to 80 at 1200, and tablets keep 40", async ({ page }) => {
+    const margin = () => page.evaluate(() => Math.round(document.querySelector("main .page-container")!.getBoundingClientRect().left + parseFloat(getComputedStyle(document.querySelector("main .page-container")!).paddingLeft)));
+    for (const [width, expected] of [[820, 40], [1023, 40], [1024, 40], [1112, 60], [1200, 80], [1440, 80]] as const) {
+      await page.setViewportSize({ width, height: 800 });
+      await page.goto("/about");
+      expect(await margin(), `${width}`).toBe(expected);
+    }
+  });
+
+  for (const path of publicRoutes) {
+    test(`${path}: from 1024 to 1199 nothing scrolls sideways, no sentence is under 15 px and no fitted label under 12`, async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      for (const [width, height] of [[1024, 768], [1080, 810], [1133, 744], [1180, 820], [1194, 834]] as const) {
+        await page.setViewportSize({ width, height });
+        await page.goto(path);
+        // FitStage measures its column after hydration.
+        await page.waitForFunction(() => [...document.querySelectorAll<HTMLElement>(".fit-stage")].every((el) => el.style.getPropertyValue("--fit") !== "" || el.clientWidth === 0));
+        expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth), `${path} at ${width}`).toBe(0);
+        const small = await page.evaluate(() => {
+          const found: string[] = [];
+          for (const stage of document.querySelectorAll<HTMLElement>(".fit-stage")) {
+            const fit = parseFloat(getComputedStyle(stage).getPropertyValue("--fit")) || 1;
+            if (fit < 0.8) found.push(`a drawing is scaled to ${fit.toFixed(2)}`);
+            const walker = document.createTreeWalker(stage, NodeFilter.SHOW_TEXT);
+            for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+              const text = node.nodeValue!.trim();
+              const el = node.parentElement!;
+              if (text.length < 2 || el.getClientRects().length === 0 || el.closest(".sr-only")) continue;
+              const size = parseFloat(getComputedStyle(el).fontSize) * fit;
+              // A sentence: seven words or more. Mono tags are 11 px by token and are not scaled text.
+              const floor = text.split(/\s+/).length >= 7 ? 14.95 : el.matches(".t-tag") ? 0 : 11.95;
+              if (size < floor) found.push(`${size.toFixed(1)} px: ${text.slice(0, 40)}`);
+            }
+          }
+          return found;
+        });
+        expect(small, `${path} at ${width}`).toEqual([]);
+      }
+    });
+  }
+});
+
+test.describe("Home's story on phones (SPEC section 9)", () => {
+  // The section is about 2,750 px at 390 x 844 with all eight cards (2,853 as built since the
+  // payment model's words of 17 Nov); each state holds for a third of the screen; the current card
+  // is never under the pinned lanes.
+  test("it is short, every state holds for a third of the screen, and the current card stays clear of the lanes", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/");
+    await storyLive(page);
+    const story = await page.evaluate(() => {
+      const section = document.querySelector("#one-receivable")!.getBoundingClientRect();
+      const on = document.querySelector(".story-on")!;
+      return {
+        top: section.top + scrollY,
+        height: section.height,
+        cards: on.querySelectorAll(".story-card").length,
+        rows: getComputedStyle(on.querySelector(".lanes")!).getPropertyValue("--row-h").trim(),
+        slots: [...on.querySelectorAll(".story-card")].map((card) => card.parentElement!.getBoundingClientRect().height),
+      };
+    });
+    expect(story.cards).toBe(8);
+    expect(story.rows).toBe("22px");
+    expect(story.height).toBeLessThanOrEqual(2870);
+    // States 2 to 7 hold for their slot; the first and the last hold while the lanes arrive and leave.
+    for (const slot of story.slots.slice(1, 7)) expect(slot).toBeGreaterThanOrEqual(844 / 3 - 0.5);
+    // Walk the whole story: wherever the lanes are pinned, the current card's top is below them.
+    let worst = 0;
+    const seen = new Set<string>();
+    for (let y = story.top - 400; y < story.top + story.height; y += 40) {
+      await page.evaluate((y) => window.scrollTo({ top: y, behavior: "instant" }), y);
+      const at = await page.evaluate(
+        () =>
+          new Promise<{ state: string; under: number; stuck: boolean; shown: boolean }>((resolve) =>
+            // Two frames: the observer answers the scroll on the next one.
+            requestAnimationFrame(() =>
+              requestAnimationFrame(() => {
+                const on = document.querySelector(".story-on")!;
+                const pin = on.querySelector(".story-pin")!.getBoundingClientRect();
+                const card = on.querySelector(".story-card[data-current]")!.getBoundingClientRect();
+                resolve({ state: on.getAttribute("data-story-state")!, under: pin.bottom - card.top, stuck: Math.abs(pin.top - 65) < 1.5, shown: pin.top >= 65 && pin.bottom <= innerHeight });
+              }),
+            ),
+          ),
+      );
+      // The first state shows as the lanes scroll in; the rest while they are pinned.
+      if (at.shown) seen.add(at.state);
+      if (at.stuck) worst = Math.max(worst, at.under);
+    }
+    expect([...seen].sort()).toEqual(["1", "2", "3", "4", "5", "6", "7", "8"]);
+    expect(worst, "the current card's top is never under the lanes").toBeLessThanOrEqual(1);
+  });
+});
+
+test.describe("Picks answer every time (repeated hover, and again after a reload)", () => {
+  // Every pick and play-once built from step 3 on gets this: each item hovered in order, in
+  // reverse, three rounds, then the same after a reload. Headless, so one pointer reaches the page.
+  // 96 hovers, each waiting out a 200 ms lift: more than the default 30 s when the suite runs in parallel.
+  test.describe.configure({ timeout: 120_000 });
+  test("Home's record: every row lifts its sheet and shows its From and Proves, every round", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/");
+    const rows = page.locator(".iso-record ol li");
+    const shown = page.locator('.iso-record dl[aria-hidden="true"]');
+    const sources = ["The financier", "The payment provider", "The insurer, in the financier’s name", "The exporter’s bank", "The inspection agency", "The carrier", "Indian Customs", "The exporter"];
+    for (const pass of ["first load", "after a reload"]) {
+      if (pass === "after a reload") await page.reload();
+      await expect(rows).toHaveCount(8);
+      for (let round = 1; round <= 3; round++) {
+        for (const reverse of [false, true]) {
+          for (let k = 0; k < 8; k++) {
+            const i = reverse ? 7 - k : k;
+            await rows.nth(i).hover();
+            const where = `${pass}, round ${round}, ${reverse ? "up" : "down"}, row ${i}`;
+            await expect(page.locator(".iso-record .iso-lift.is-lifted"), where).toHaveCount(1);
+            await expect(page.locator(".iso-record .iso-lift.is-lifted"), where).toHaveCSS("transform", "matrix(1, 0, 0, 1, 0, -14)");
+            await expect(shown.locator("dd").first(), where).toHaveText(sources[i]);
+          }
+        }
+      }
+      // Off the record: back to 08, nothing lifted.
+      await page.mouse.move(5, 5);
+      await expect(page.locator(".iso-record .iso-lift.is-lifted")).toHaveCount(0);
+      await expect(shown.locator("dd").first()).toHaveText("The financier");
+    }
+  });
+
+  // Home's labels stand in the page's flow beside the drawing (step 8.5), About's on their levels;
+  // either way a label's rani edges must land on its own block's top face, the new slab's too.
+  for (const [path, width, build] of [
+    ["/", 1440, "the frame's, with the doglegs"],
+    ["/", 1180, "labels beside it, no leaders"],
+    ["/about", 1440, "the frame's"],
+    ["/about", 1180, "the 1024 to 1199"],
+  ] as const) {
+    test(`${path} foundations at ${width} (${build}): every label marks its own block, the new slab too, every round`, async ({ page }) => {
+      test.setTimeout(60_000);
+      await page.setViewportSize({ width, height: 900 });
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await page.goto(path);
+      const labels = page.locator(".iso-foundations ol > li[tabindex]");
+      // Each label's edge, and the top face of the block on its level, as boxes on the page.
+      const boxes = (i: number) =>
+        labels.nth(i).evaluate((li) => {
+          const level = li.getAttribute("data-level");
+          const edge = [...li.querySelectorAll("svg > .iso-top-edge")].find((e) => e.getClientRects().length > 0)!.getBoundingClientRect();
+          const face = [...document.querySelectorAll(`.iso-foundations .iso-rise[data-level="${level}"] .iso-top`)].find((e) => e.getClientRects().length > 0)!.getBoundingClientRect();
+          return [edge.x, edge.y, edge.width, edge.height, face.x, face.y, face.width, face.height].map(Math.round);
+        });
+      for (const pass of ["first load", "after a reload"]) {
+        if (pass === "after a reload") await page.reload();
+        await expect(labels).toHaveCount(5);
+        await expect(labels.nth(0)).toContainText("Distribution through trade platforms");
+        for (let round = 1; round <= 3; round++) {
+          for (const reverse of [false, true]) {
+            for (let k = 0; k < 5; k++) {
+              const i = reverse ? 4 - k : k;
+              const where = `${pass}, round ${round}, ${reverse ? "up" : "down"}, label ${i}`;
+              await labels.nth(i).hover();
+              await expect(labels.nth(i).locator("svg:visible > .iso-top-edge"), where).toHaveCSS("opacity", "1");
+              // Only its own block is marked.
+              await expect(page.locator(".iso-foundations svg:visible > .iso-top-edge").filter({ visible: true }), where).toHaveCount(5);
+              const marked = await page.locator(".iso-foundations svg:visible > .iso-top-edge").evaluateAll((els) => els.filter((e) => getComputedStyle(e).opacity !== "0").length);
+              expect(marked, where).toBe(1);
+              if (round === 1 && !reverse) {
+                const [ex, ey, ew, eh, fx, fy, fw, fh] = await boxes(i);
+                for (const [a, b] of [[ex, fx], [ey, fy], [ew, fw], [eh, fh]]) expect(Math.abs(a - b), `${where}: the edge on its block`).toBeLessThanOrEqual(2);
+              }
+            }
+          }
+        }
+        await page.mouse.move(5, 5);
+        for (const edge of await page.locator(".iso-foundations svg:visible > .iso-top-edge").all()) await expect(edge).toHaveCSS("opacity", "0");
+      }
+    });
+  }
+
+  test("the sixth slab is drawn without script and with reduced motion, and Home's doglegs end on their titles at 1440", async ({ browser }) => {
+    for (const [path, width, height] of [["/", 1440, 900], ["/", 1180, 820], ["/", 390, 844], ["/about", 1440, 900], ["/about", 1180, 820], ["/about", 390, 844]] as const) {
+      for (const options of [{ javaScriptEnabled: false }, { reducedMotion: "reduce" as const }]) {
+        const context = await browser.newContext({ ...options, viewport: { width, height } });
+        const page = await context.newPage();
+        await page.goto(path);
+        const where = `${path} ${width} ${JSON.stringify(options)}`;
+        const stack = page.locator(".iso-foundations");
+        await stack.evaluate((el) => el.scrollIntoView({ block: "center", behavior: "instant" }));
+        await expect(stack, where).toHaveAttribute("data-phase", "done");
+        // Six labels, top of the stack first; five solid blocks, risen, and the venue's outline drawn.
+        const names = await stack.locator("ol > li > span:not(.t-tag) > span.t-ui-lg").allTextContents();
+        expect(names, where).toEqual([path === "/" ? "The venue, last" : "The venue", "Distribution through trade platforms", "A record of performance", "A clean payment path", "Standing buyers", "A common standard an insurer can price"]);
+        const blocks = stack.locator(".iso-rise").filter({ visible: true });
+        await expect(blocks, where).toHaveCount(5);
+        for (const block of await blocks.all()) {
+          await expect(block, where).toHaveCSS("opacity", "1");
+          await expect(block, where).toHaveCSS("transform", "none");
+        }
+        const slab = stack.locator('.iso-rise[data-level="4"]').filter({ visible: true });
+        const record = stack.locator('.iso-rise[data-level="3"]').filter({ visible: true });
+        // The new slab on the venue's old footprint: 242 wide at full size, one rise above the record.
+        const [s, r] = [(await slab.locator(".iso-top").boundingBox())!, (await record.locator(".iso-top").boundingBox())!];
+        const scale = (await stack.locator("svg[viewBox]").filter({ visible: true }).first().boundingBox())!.width / 560;
+        expect(Math.abs(s.width / scale - 241.8), where).toBeLessThanOrEqual(1.5);
+        expect(s.y, where).toBeLessThan(r.y);
+        for (const mask of await stack.locator(".iso-outline-mask").all()) expect(await mask.evaluate((el) => getComputedStyle(el).strokeDashoffset), where).toBe("0px");
+        if (path === "/" && width === 1440) {
+          // Each leader ends 16 px short of its label, 14 px under the label's top.
+          const ends = await stack.evaluate((el) => {
+            const svg = [...el.querySelectorAll("svg[viewBox]")].find((s) => s.getClientRects().length > 0 && !s.closest("li"))!;
+            const paths = [...svg.querySelectorAll<SVGPathElement>(".iso-leader-line")].filter((p) => getComputedStyle(p).display !== "none");
+            const tops = [...el.querySelectorAll("ol > li")].map((li) => li.getBoundingClientRect());
+            const frame = svg.getBoundingClientRect();
+            return paths.map((p) => {
+              const end = p.getPointAtLength(p.getTotalLength());
+              return { x: frame.left + end.x, y: frame.top + end.y };
+            }).reverse().map((end, i) => [Math.round(tops[i].left - end.x), Math.round(end.y - tops[i].top)]);
+          });
+          expect(ends, where).toEqual(Array(6).fill([16, 14]));
+          // The venue's leader is dashed, 1 px, dash 6 5, in ink, like its outline (step 9; 246:3160 corrected).
+          const venue = stack.locator("svg:visible .iso-leader-line.is-dashed");
+          await expect(venue, where).toHaveCount(1);
+          await expect(venue, where).toHaveCSS("stroke-dasharray", "6px, 5px");
+          await expect(venue, where).toHaveCSS("stroke", "rgb(2, 39, 50)");
+          await expect(venue, where).toHaveCSS("stroke-width", "1px");
+        }
+        await context.close();
+      }
+    }
+  });
+});
+
+test.describe("Home's hero without script", () => {
+  for (const [width, height] of [[390, 844], [1180, 820], [1440, 900]] as const) {
+    test(`at ${width} the record is complete: eight rows, From and Proves for document 08, the link`, async ({ browser }) => {
+      const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width, height } });
+      const page = await context.newPage();
+      await page.goto("/");
+      const record = page.locator(".iso-record");
+      // Nothing waits on a movement: no mark for frames, so every sheet and row is in place.
+      await expect(page.locator("html")).not.toHaveAttribute("data-frames");
+      const rows = record.locator("ol li");
+      await expect(rows).toHaveCount(8);
+      for (const [i, name] of ["Purchase confirmation", "Sweep instruction", "Credit-insurance cover", "No-objection", "Inspection report", "Bill of lading", "Shipping bill", "Commercial invoice"].entries()) {
+        await expect(rows.nth(i).getByText(name, { exact: true })).toBeVisible();
+        await expect(rows.nth(i)).toHaveCSS("opacity", "1");
+      }
+      const sheets = record.locator("svg.record-art .iso-drop");
+      await expect(sheets).toHaveCount(8);
+      for (const sheet of await sheets.all()) {
+        await expect(sheet).toHaveCSS("opacity", "1");
+        await expect(sheet).toHaveCSS("transform", "none");
+      }
+      await expect(record.locator("svg.record-art text", { hasText: "FILED" })).toBeVisible();
+      const shown = record.locator("dl");
+      await expect(shown.locator("dt")).toHaveText(["From", "Proves"]);
+      await expect(shown.locator("dd")).toHaveText(["The financier", "The financier bought the receivable, without recourse for the buyer’s credit"]);
+      const link = record.getByRole("link", { name: "See how it works" });
+      await expect(link).toBeVisible();
+      await expect(link).toHaveAttribute("href", "/how-it-works");
+      // The words around it are there too.
+      await expect(page.locator("main h1 + p")).toBeVisible();
+      await expect(page.getByRole("link", { name: "For financial institutions" }).first()).toBeVisible();
+      await page.screenshot({ path: `test-results/hero-no-script-${width}.png` });
+      await context.close();
+    });
+  }
+});
+
+test.describe("Where this sits (SPEC section 8)", () => {
+  const pages = [
+    { path: "/products/kubar-protocol", level: "Standing buyers", line: "Part of the institutional exchange Kubar is building. Kubar Protocol gives export receivables their standing buyers." },
+    { path: "/products/navdhan-sdk", level: "Distribution through trade platforms", line: "Part of the institutional exchange Kubar is building. NavDhan SDK is its distribution: exporters reach the programme from the platforms they already use, and those platforms’ shipment data is one source for each receivable’s record." },
+  ] as const;
+  const names = ["The venue, last", "Distribution through trade platforms", "A record of performance", "A clean payment path", "Standing buyers", "A common standard an insurer can price"];
+  // At 390 × 844: NavDhan SDK's sentence takes six lines since 17 Nov.
+  const tallest = { "/products/kubar-protocol": 400, "/products/navdhan-sdk": 460 } as const;
+
+  for (const { path, level, line } of pages) {
+    test(`${path}: the strip sits under the hero on the inset ground, with the page's level marked`, async ({ page }) => {
+      await page.setViewportSize({ width: 1440, height: 900 });
+      await page.goto(path);
+      const strip = page.getByRole("region", { name: "Where this sits" });
+      await expect(strip).toHaveCount(1);
+      // Directly under the hero: the element before it holds the h1. On Kubar Protocol the
+      // "On this page" row follows it.
+      const order = await page.evaluate(() => {
+        const s = document.querySelector('section[aria-label="Where this sits"]')!;
+        return { hero: s.previousElementSibling?.querySelector("h1") !== null, next: s.nextElementSibling?.textContent ?? "" };
+      });
+      expect(order.hero).toBe(true);
+      if (path === "/products/kubar-protocol") expect(order.next).toMatch(/^On this page/);
+      const inset = await page.evaluate(() => {
+        const probe = document.createElement("div");
+        probe.style.background = "var(--color-inset)";
+        document.body.appendChild(probe);
+        const colour = getComputedStyle(probe).backgroundColor;
+        probe.remove();
+        return colour;
+      });
+      await expect(strip).toHaveCSS("background-color", inset);
+      // Full width: the ground reaches both edges of the screen.
+      const box = (await strip.boundingBox())!;
+      expect(box.x).toBe(0);
+      expect(box.width).toBe(1440);
+      // The words, exactly.
+      await expect(strip.getByText("Where this sits", { exact: true })).toBeVisible();
+      await expect(strip.getByText(line, { exact: true })).toBeVisible();
+      const link = strip.getByRole("link", { name: "Follow one receivable through all six" });
+      await expect(link).toHaveAttribute("href", "/#one-receivable");
+      // The six names, top of the stack first; the page's level is the current one, in ink.
+      // The venue's carries footnote 1 and no "Planned".
+      const items = strip.locator("ol li");
+      await expect(items).toHaveText([`${names[0]}¹`, ...names.slice(1)]);
+      await expect(strip.getByText("Planned")).toHaveCount(0);
+      const marker = items.first().getByRole("link", { name: "Footnote 1" });
+      await expect(marker).toHaveAttribute("href", "#fn-1");
+      const footnote = page.locator("#fn-1");
+      // Its words, without an abbreviation's tip (on NavDhan SDK this is the page's first ITFS).
+      await expect
+        .poll(() => footnote.evaluate((el) => { const copy = el.cloneNode(true) as HTMLElement; copy.querySelectorAll("[role='tooltip']").forEach((tip) => tip.remove()); return copy.textContent; }))
+        .toContain("Kubar’s own ITFS registration is targeted for 2027; until then Kubar acts as the financier’s origination and servicing agent.");
+      await expect(page.locator(".footnote")).toHaveCount(1);
+      await marker.click();
+      await expect(footnote).toBeFocused();
+      await footnote.getByRole("link", { name: "Back to text" }).click();
+      await expect(marker).toBeFocused();
+      await expect(strip.locator('ol li[aria-current="true"]')).toHaveText(level);
+      const muted = await items.first().evaluate((el) => getComputedStyle(el).color);
+      expect(await strip.locator('ol li[aria-current="true"]').evaluate((el) => getComputedStyle(el).color)).not.toBe(muted);
+      // The art: one petrol top face and one rani tick, both for that level; five solid blocks and a dashed venue.
+      const art = strip.locator("svg[aria-hidden='true']").first();
+      const colours = await page.evaluate(() => {
+        const probe = document.createElement("div");
+        document.body.appendChild(probe);
+        const of = (value: string) => ((probe.style.color = value), getComputedStyle(probe).color);
+        const out = { petrol: of("var(--petrol-900)"), rani: of("var(--color-accent)") };
+        probe.remove();
+        return out;
+      });
+      const fills = await art.locator("polygon").evaluateAll((els) => els.map((el) => getComputedStyle(el).fill));
+      expect(fills.filter((fill) => fill === colours.petrol)).toHaveLength(1);
+      const strokes = await art.locator("line").evaluateAll((els) => els.map((el) => getComputedStyle(el).stroke));
+      expect(strokes.filter((stroke) => stroke === colours.rani)).toHaveLength(1);
+      await expect(art.locator("polygon")).toHaveCount(15);
+      await expect(art.locator("path")).toHaveCount(1);
+      // The marked level's tick is level with its name (both measured at once: the page may be scrolling).
+      const offset = await strip.evaluate((el, rani) => {
+        const tick = [...el.querySelectorAll("svg line")].find((line) => getComputedStyle(line).stroke === rani)!.getBoundingClientRect();
+        const name = el.querySelector('ol li[aria-current="true"]')!.getBoundingClientRect();
+        return Math.abs(tick.top + tick.height / 2 - (name.top + name.height / 2));
+      }, colours.rani);
+      expect(offset).toBeLessThanOrEqual(2);
+      // The link leads to Home's story.
+      await link.click();
+      await expect(page).toHaveURL(/\/#one-receivable$/);
+      await expect(page.locator("#one-receivable")).toBeInViewport();
+    });
+
+    test(`${path}: side by side from 768 with every name; stacked on phones, short, naming only its own level`, async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      for (const [width, height] of [[360, 800], [375, 667], [390, 844], [430, 932], [744, 1133], [768, 1024], [820, 1180], [1024, 768], [1180, 820], [1440, 900]] as const) {
+        await page.setViewportSize({ width, height });
+        await page.goto(path);
+        const strip = page.getByRole("region", { name: "Where this sits" });
+        const stack = (await strip.locator(".sits-stack").boundingBox())!;
+        const words = (await strip.getByText("Where this sits", { exact: true }).boundingBox())!;
+        if (width >= 768) expect(words.x, `${width}: words beside the stack`).toBeGreaterThanOrEqual(stack.x + stack.width);
+        else expect(words.y, `${width}: words under the stack`).toBeGreaterThanOrEqual(stack.y + stack.height);
+        const report = await strip.locator("ol li").evaluateAll((els) => {
+          const margin = parseFloat(getComputedStyle(document.querySelector("main .page-container")!).paddingRight);
+          return els.map((el) => {
+            const range = document.createRange();
+            range.selectNodeContents(el);
+            const box = range.getBoundingClientRect();
+            return { shown: el.getBoundingClientRect().width > 1, inside: box.right <= innerWidth - margin + 0.5, top: box.top, bottom: box.bottom, size: parseFloat(getComputedStyle(el).fontSize), current: el.getAttribute("aria-current") === "true" };
+          });
+        });
+        // Every name is in the list at 13 px, for screen readers at every width.
+        expect(report.map((r) => r.size), `${width}`).toEqual([13, 13, 13, 13, 13, 13]);
+        const shown = report.filter((r) => r.shown);
+        if (width >= 768) {
+          expect(shown, `${width}: all six names shown`).toHaveLength(6);
+          expect(shown.every((r, i) => i === 0 || r.top >= shown[i - 1].bottom - 0.5), `${width}: no name touches the next`).toBe(true);
+        } else {
+          expect(shown.map((r) => r.current), `${width}: only the page's own level is named`).toEqual([true]);
+          if (width === 390) expect((await strip.boundingBox())!.height, `390 x 844: the strip is at most ${tallest[path]} px tall`).toBeLessThanOrEqual(tallest[path]);
+        }
+        expect(shown.every((r) => r.inside), `${width}: names inside the margin`).toBe(true);
+        expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth), `${width}`).toBe(0);
+        expect((await strip.getByRole("link", { name: "Follow one receivable through all six" }).boundingBox())!.height, `${width}: the link on one line`).toBeLessThanOrEqual(26);
+      }
+      // On a phone the venue's name shows while its marker has keyboard focus.
+      await page.setViewportSize({ width: 390, height: 844 });
+      await page.goto(path);
+      const venue = page.getByRole("region", { name: "Where this sits" }).locator("ol li").first();
+      expect((await venue.boundingBox())!.width).toBeLessThanOrEqual(1);
+      await venue.getByRole("link", { name: "Footnote 1" }).focus();
+      expect((await venue.boundingBox())!.width).toBeGreaterThan(40);
+    });
+
+    test(`${path}: the strip is complete without script and reads cleanly`, async ({ browser, page }) => {
+      const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
+      const plain = await context.newPage();
+      await plain.goto(path);
+      const strip = plain.locator('section[aria-label="Where this sits"]');
+      await expect(strip.locator("ol li")).toHaveText([`${names[0]}¹`, ...names.slice(1)]);
+      await expect(strip.getByText(line, { exact: true })).toBeVisible();
+      await expect(strip.getByRole("link", { name: "Follow one receivable through all six" })).toBeVisible();
+      await expect(strip.locator("svg polygon").first()).toBeVisible();
+      await context.close();
+      await page.setViewportSize({ width: 390, height: 844 });
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await page.goto(path);
+      await expectNoAxeViolations(page);
+    });
+  }
+});
+
+test.describe("The foundations stack carries from page to page (SPEC section 12)", () => {
+  // Records each view transition: the page's headline and the elements named before the change
+  // and after it, and the stack's morph (its group's animation) once the transition is ready.
+  // React runs a view transition for other transitions too (a router update after a prefetch, for
+  // one), so a test picks the one in which the headline changed: the page change.
+  const record = () => {
+    const w = window as unknown as { __vt: { page: string[]; before: string[]; after: string[] | null; morph: number[] | null }[] };
+    w.__vt = [];
+    const start = document.startViewTransition?.bind(document);
+    if (!start) return;
+    const named = () =>
+      [...document.querySelectorAll<HTMLElement | SVGElement>("*")]
+        .filter((el) => el.style?.viewTransitionName && el.style.viewTransitionName !== "none")
+        .map((el) => `${el.style.viewTransitionName} ${el.closest("section[aria-label='Where this sits']") ? "strip" : "drawing"}`);
+    document.startViewTransition = ((arg: ViewTransitionUpdateCallback | { update?: ViewTransitionUpdateCallback; types?: string[] }) => {
+      const update = typeof arg === "function" ? arg : arg?.update;
+      const headline = () => document.querySelector("h1")?.textContent ?? "";
+      const entry = { page: [headline()], before: named(), after: null as string[] | null, morph: null as number[] | null };
+      w.__vt.push(entry);
+      const wrapped = async () => {
+        const result = await update?.();
+        entry.after = named();
+        entry.page.push(headline());
+        return result;
+      };
+      const transition = start(typeof arg === "function" ? wrapped : { ...arg, update: wrapped });
+      transition.ready
+        .then(() => {
+          entry.morph = document
+            .getAnimations()
+            .filter((a) => (a.effect as KeyframeEffect | null)?.pseudoElement === "::view-transition-group(foundations)")
+            .map((a) => Number(a.effect!.getTiming().duration));
+        })
+        .catch(() => (entry.morph = []));
+      return transition;
+    }) as typeof document.startViewTransition;
+  };
+  type Recorded = { page: string[]; before: string[]; after: string[] | null; morph: number[] | null };
+  const allTransitions = (page: Page) => page.evaluate(() => (window as unknown as { __vt: Recorded[] }).__vt);
+  /** The page changes: transitions in which the headline changed. */
+  const transitions = async (page: Page) => (await allTransitions(page)).filter((t) => t.page.length === 2 && t.page[0] !== t.page[1]);
+  const clear = (page: Page) => page.evaluate(() => ((window as unknown as { __vt: unknown[] }).__vt.length = 0));
+
+  // A destination is prefetched first, as it is once a reader's link has been on screen for a
+  // moment; a page that is not yet prefetched arrives in two steps and no pair forms. Next
+  // prefetches a route in two parts, its tree and then its page segment: the page segment is
+  // the one that matters. Watched from before the first load.
+  const prefetched = new WeakMap<Page, Set<string>>();
+  function watchPrefetches(page: Page) {
+    const done = new Set<string>();
+    prefetched.set(page, done);
+    page.on("requestfinished", (request) => {
+      const segment = request.headers()["next-router-segment-prefetch"];
+      if (segment?.endsWith("/__PAGE__")) done.add(new URL(request.url()).pathname);
+    });
+  }
+  async function whenPrefetched(page: Page, path: string) {
+    await expect.poll(() => prefetched.get(page)!.has(path), { message: `${path} prefetched`, timeout: 15_000 }).toBe(true);
+  }
+
+  // About and Kubar Protocol at the top of the page: About's drawing and the strip are both on
+  // the first screen at 1440 x 900, so React names both and the stack morphs.
+  async function toKubarProtocol(page: Page) {
+    // The menu's own link, not the footer's of the same name (following that one scrolls the page away).
+    const products = page.locator("header").getByRole("button", { name: "Products" });
+    if ((await products.getAttribute("aria-expanded")) !== "true") await products.click();
+    const link = page.locator("header").getByRole("link", { name: /^Kubar Protocol/ });
+    await expect(link).toBeVisible();
+    await whenPrefetched(page, "/products/kubar-protocol");
+    await link.click();
+    await expect(page).toHaveURL(/\/products\/kubar-protocol$/);
+  }
+  async function toAbout(page: Page) {
+    await whenPrefetched(page, "/about");
+    await page.locator("header").getByRole("link", { name: "About", exact: true }).click();
+    await expect(page).toHaveURL(/\/about$/);
+  }
+
+  test("About and Kubar Protocol hand the stack over, every time: three rounds, and again after a reload", async ({ page }) => {
+    test.setTimeout(90_000);
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.addInitScript(record);
+    watchPrefetches(page);
+    await page.goto("/about");
+    for (const pass of ["first load", "after a reload"]) {
+      if (pass === "after a reload") {
+        await page.reload();
+      }
+      for (let round = 1; round <= 3; round++) {
+        for (const [go, from, to] of [
+          [toKubarProtocol, "drawing", "strip"],
+          [toAbout, "strip", "drawing"],
+        ] as const) {
+          // The page the reader leaves is at its top, and the link it uses is prefetched.
+          await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+          await page.waitForLoadState("networkidle");
+          await clear(page);
+          await go(page);
+          const where = `${pass}, round ${round}, ${from} to ${to}`;
+          await expect
+            .poll(async () => (await transitions(page)).find((t) => t.morph !== null)?.morph ?? null, { message: where })
+            .toEqual([320])
+            .catch(async (error) => {
+              throw new Error(`${where}: ${JSON.stringify(await allTransitions(page))} ${String(error).slice(0, 200)}`);
+            });
+          const [transition] = (await transitions(page)).filter((t) => t.morph !== null);
+          expect(transition.before, where).toEqual([`foundations ${from}`]);
+          expect(transition.after, where).toEqual([`foundations ${to}`]);
+        }
+      }
+    }
+  });
+
+  test("with reduced motion the pages change at once: nothing animates", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.addInitScript(record);
+    watchPrefetches(page);
+    await page.goto("/about");
+    await toKubarProtocol(page);
+    await expect.poll(async () => (await transitions(page)).find((t) => t.morph !== null)?.morph ?? null).toEqual([]);
+    // React's own zero-length animations (hiding the root's group) may still be there; nothing that moves.
+    expect(await page.evaluate(() => document.getAnimations().filter((a) => (a.effect as KeyframeEffect | null)?.pseudoElement?.startsWith("::view-transition") && Number(a.effect!.getTiming().duration) > 0).length)).toBe(0);
+  });
+
+  test("on an iPad in landscape, Home's drawing in view hands the stack to Kubar Protocol's strip", async ({ page }) => {
+    await page.setViewportSize({ width: 1180, height: 820 });
+    await page.addInitScript(record);
+    watchPrefetches(page);
+    await page.goto("/");
+    await page.evaluate(() => document.querySelector("section[aria-labelledby='foundations-heading'] .iso-foundations")!.scrollIntoView({ block: "center", behavior: "instant" }));
+    await clear(page);
+    await toKubarProtocol(page);
+    await expect.poll(async () => (await transitions(page)).find((t) => t.morph !== null)?.morph ?? null).toEqual([320]);
+    const [transition] = (await transitions(page)).filter((t) => t.morph !== null);
+    expect(transition.before).toEqual(["foundations drawing"]);
+    expect(transition.after).toEqual(["foundations strip"]);
+  });
+
+  test("a page whose stack is off screen hands nothing over, and leaves no ghost", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.addInitScript(record);
+    // The strip's own link: Home opens at the story, far above its foundations drawing.
+    await page.goto("/products/kubar-protocol");
+    await page.waitForLoadState("networkidle");
+    await clear(page);
+    await page.getByRole("region", { name: "Where this sits" }).getByRole("link", { name: "Follow one receivable through all six" }).click();
+    await expect(page).toHaveURL(/\/#one-receivable$/);
+    await expect.poll(async () => (await transitions(page)).length).toBeGreaterThan(0);
+    await expect.poll(async () => (await transitions(page))[0].after).toEqual([]);
+    // React hides the old stack's group at once, so its picture never lingers over Home.
+    expect(await page.evaluate(() => document.getAnimations().filter((a) => (a.effect as KeyframeEffect | null)?.pseudoElement === "::view-transition-group(foundations)" && Number(a.effect!.getTiming().duration) > 0).length)).toBe(0);
+  });
+});
+
+test.describe("A page change opens the new page at its top", () => {
+  // Next 16 keeps the page's smooth scrolling for a route change unless <html> carries
+  // data-scroll-behavior="smooth"; without it the new page opened at the old scroll position and
+  // glided to the top (SPEC section 12). In-page links still scroll smoothly.
+  test("the first frame of the new page is at its top, and an in-page link still glides", async ({ page }) => {
+    await page.setViewportSize({ width: 1180, height: 820 });
+    await page.goto("/how-it-works");
+    await page.waitForLoadState("networkidle");
+    await page.evaluate(() => window.scrollTo({ top: 5000, behavior: "instant" }));
+    await page.evaluate(() => {
+      const w = window as unknown as { __frames: string[]; __framesDone: boolean };
+      w.__frames = [];
+      w.__framesDone = false;
+      const start = performance.now();
+      const tick = () => {
+        w.__frames.push(`${location.pathname} ${Math.round(scrollY)}`);
+        if (performance.now() - start < 700) requestAnimationFrame(tick);
+        else w.__framesDone = true;
+      };
+      requestAnimationFrame(tick);
+    });
+    await page.locator("header").getByRole("link", { name: "Contact", exact: true }).click();
+    await expect(page).toHaveURL(/\/contact$/);
+    // The 700 ms of frames recorded, however many the machine drew (a busy run draws fewer).
+    await expect.poll(() => page.evaluate(() => (window as unknown as { __framesDone: boolean }).__framesDone), { timeout: 5000 }).toBe(true);
+    const frames = await page.evaluate(() => (window as unknown as { __frames: string[] }).__frames);
+    const onContact = frames.filter((f) => f.startsWith("/contact "));
+    expect(onContact.length).toBeGreaterThan(0);
+    expect(onContact[0], "the first frame of the new page").toBe("/contact 0");
+    // An in-page link: the scroll takes several frames.
+    await page.goto("/products/kubar-protocol");
+    await page.waitForLoadState("networkidle");
+    const positions = await page.evaluate(
+      () =>
+        new Promise<number[]>((resolve) => {
+          const seen: number[] = [];
+          document.querySelector<HTMLAnchorElement>('nav[aria-label="On this page"] a[href="#questions-heading"]')!.click();
+          const start = performance.now();
+          const tick = () => {
+            seen.push(Math.round(scrollY));
+            if (performance.now() - start < 400) requestAnimationFrame(tick);
+            else resolve(seen);
+          };
+          requestAnimationFrame(tick);
+        }),
+    );
+    expect(new Set(positions).size, "an in-page link scrolls over several frames").toBeGreaterThan(3);
+  });
+});
+
+test.describe("Pacing (SPEC sections 7 and 8, 16 Nov)", () => {
+  const INSET = "rgb(236, 236, 232)";
+  const inset: [string, string][] = [
+    ["/products/kubar-protocol", "evidence-heading"],
+    ["/products/kubar-protocol", "insurance-heading"],
+    ["/products/kubar-protocol", "payment-heading"],
+    ["/products/kubar-protocol", "loss-heading"],
+    ["/products/kubar-protocol", "venue-heading"],
+    ["/products/navdhan-sdk", "rules-heading"],
+    ["/how-it-works", "unpaid-heading"],
+    ["/about", "gift-heading"],
+  ];
+
+  test("the sections a reader studies sit on the inset ground, edge to edge; the others stay white", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    for (const [width, height] of [[390, 844], [768, 1024], [1180, 820], [1440, 900]] as const) {
+      await page.setViewportSize({ width, height });
+      for (const path of [...new Set(inset.map(([path]) => path))]) {
+        await page.goto(path);
+        const grounds = await page.evaluate(() =>
+          [...document.querySelectorAll<HTMLElement>("main > section[aria-labelledby]")].map((section) => {
+            const box = section.getBoundingClientRect();
+            return { id: section.getAttribute("aria-labelledby")!, ground: getComputedStyle(section).backgroundColor, left: box.left, width: box.width };
+          }),
+        );
+        const wanted = inset.filter(([p]) => p === path).map(([, id]) => id);
+        for (const id of wanted) {
+          const section = grounds.find((g) => g.id === id);
+          expect(section, `${path} ${id} at ${width}`).toBeDefined();
+          expect(section!.ground, `${path} ${id} at ${width}`).toBe(INSET);
+          expect(section!.left, `${path} ${id} at ${width}: from the left edge`).toBe(0);
+          expect(section!.width, `${path} ${id} at ${width}: the full width`).toBe(width);
+        }
+        for (const other of grounds.filter((g) => !wanted.includes(g.id))) {
+          expect(other.ground, `${path} ${other.id} at ${width}`).toBe("rgba(0, 0, 0, 0)");
+        }
+        // The venue's footnote is inside its ground.
+        if (path === "/products/kubar-protocol") {
+          await expect(page.locator("section[aria-labelledby='venue-heading'] #fn-1")).toHaveCount(1);
+        }
+      }
+    }
+  });
+
+  test("the inset sections read cleanly", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    for (const path of ["/products/kubar-protocol", "/products/navdhan-sdk", "/how-it-works", "/about"]) {
+      await page.goto(path);
+      for (const [, id] of inset.filter(([p]) => p === path)) {
+        await page.locator(`#${id}`).scrollIntoViewIfNeeded();
+      }
+      await expectNoAxeViolations(page);
+    }
+  });
+
+  test.describe("Questions: four, then all eleven (Fold)", () => {
+    const first = ["What am I buying?", "Why isn’t the exporter’s own bank financing this?", "Who carries the buyer’s credit, and who carries disputes?", "Is the cover in my name?"];
+    const fifth = "Who holds the money?";
+    const section = (page: Page) => page.locator("section", { has: page.locator("#questions-heading") });
+    // The questions shown, by the words a reader sees (each h3 holds its words twice: the phone's
+    // button and the wider screens' text, one of them hidden).
+    const shownQuestions = (page: Page) => section(page).getByRole("heading", { level: 3 });
+
+    for (const [width, height] of [[390, 844], [768, 1024], [1180, 820], [1440, 900]] as const) {
+      test(`at ${width}: four questions and the control; one press opens the other seven, moves focus to the fifth and takes the control away`, async ({ page }) => {
+        await page.setViewportSize({ width, height });
+        await page.goto("/products/kubar-protocol");
+        const questions = section(page);
+        const control = questions.getByRole("button", { name: "Show all 11 questions" });
+        await expect.poll(() => shownQuestions(page).allInnerTexts()).toEqual(first);
+        await expect(control).toBeVisible();
+        // The control: underlined words and a plus, under the list at the section's gap, tall enough to press.
+        const list = (await questions.locator("h3").first().locator("xpath=../..").boundingBox())!;
+        const box = (await control.boundingBox())!;
+        expect(Math.round(box.y - (list.y + list.height)), "under the list at the section's gap").toBe(width >= 1024 ? 64 : 40);
+        expect(box.height).toBeGreaterThanOrEqual(width >= 1024 ? 40 : 44);
+        await expect(control.locator("span")).toHaveCSS("text-decoration-line", "underline");
+        await expect(control.locator("svg")).toHaveCount(1);
+        // The folded list closes with a hairline, not the register's closing rule.
+        await expect(questions.locator("h3").nth(3).locator("xpath=..")).toHaveCSS("border-bottom-width", "1px");
+        await control.click();
+        await expect(shownQuestions(page)).toHaveCount(11);
+        expect(await shownQuestions(page).nth(4).innerText()).toBe(fifth);
+        await expect(control).toHaveCount(0);
+        const focused = await page.evaluate(() => {
+          const el = document.activeElement!;
+          return { tag: el.tagName, text: el.textContent ?? "" };
+        });
+        expect(focused.text.startsWith(fifth), `focus on the fifth question, not ${focused.tag}`).toBe(true);
+        // Below 768 the fifth question's own button takes the focus; from 768 the question itself.
+        expect(focused.tag).toBe(width < 768 ? "BUTTON" : "DIV");
+        await expect(questions.locator("h3").last().locator("xpath=..")).toHaveCSS("border-bottom-width", "2px");
+        if (width >= 768) await expect(questions.locator("p:visible")).toHaveCount(11);
+        await expectNoAxeViolations(page);
+      });
+    }
+
+    test("by keyboard: Tab reaches the control, Enter opens the rest, and the next Tab goes on from the fifth question", async ({ page }) => {
+      await page.setViewportSize({ width: 390, height: 844 });
+      await page.goto("/products/kubar-protocol");
+      const questions = section(page);
+      const control = questions.getByRole("button", { name: "Show all 11 questions" });
+      // From the fourth question's button, the next stop is the control.
+      await questions.locator("h3").nth(3).getByRole("button").focus();
+      await page.keyboard.press("Tab");
+      await expect(control).toBeFocused();
+      await page.keyboard.press("Enter");
+      const fifth = questions.locator("h3").nth(4).getByRole("button");
+      await expect(fifth).toBeFocused();
+      await page.keyboard.press("Tab");
+      await expect(questions.locator("h3").nth(5).getByRole("button")).toBeFocused();
+      // The accordion works on the opened questions too.
+      await page.keyboard.press("Enter");
+      await expect(questions.locator("h3").nth(5).getByRole("button")).toHaveAttribute("aria-expanded", "true");
+      await expect(questions.locator("p:visible")).toHaveCount(1);
+    });
+
+    test("it holds: shown, reloaded, shown again, three rounds", async ({ page }) => {
+      await page.setViewportSize({ width: 1440, height: 900 });
+      for (let round = 1; round <= 3; round++) {
+        if (round === 1) await page.goto("/products/kubar-protocol");
+        else await page.reload();
+        const questions = section(page);
+        await expect(shownQuestions(page), `round ${round}`).toHaveCount(4);
+        await questions.getByRole("button", { name: "Show all 11 questions" }).click();
+        await expect(shownQuestions(page), `round ${round}`).toHaveCount(11);
+        await expect(questions.getByRole("button", { name: "Show all 11 questions" }), `round ${round}`).toHaveCount(0);
+      }
+    });
+
+    test("nothing moves as the page loads: before the page's script runs, the same four show with the control", async ({ page }) => {
+      await page.setViewportSize({ width: 1440, height: 900 });
+      // The page's own script never arrives; the layout's first script (inline) still marks the document.
+      await page.route("**/_next/static/chunks/**", (route) => route.abort());
+      await page.goto("/products/kubar-protocol");
+      await expect(page.locator("html")).toHaveAttribute("data-js", "");
+      const questions = section(page);
+      await expect.poll(() => shownQuestions(page).allInnerTexts()).toEqual(first);
+      await expect(questions.getByRole("button", { name: "Show all 11 questions" })).toBeVisible();
+    });
+
+    test("a link to a folded question opens the list and goes there", async ({ page }) => {
+      await page.setViewportSize({ width: 1440, height: 900 });
+      await page.goto("/products/kubar-protocol#question-8");
+      const answer = page.locator("#question-8");
+      await expect(answer).toBeVisible();
+      await expect(answer).toBeInViewport();
+      await expect(page.getByRole("button", { name: "Show all 11 questions" })).toHaveCount(0);
+      // And one followed after the page has loaded. Once it has hydrated: until then Next's router
+      // replaces the address with the one the page loaded at, dropping a hash set in between.
+      await page.goto("/products/kubar-protocol");
+      await expect(page.locator("[data-money] .money-art")).toHaveAttribute("data-phase", "armed");
+      await expect(page.locator("#question-6")).toBeHidden();
+      await page.evaluate(() => (location.hash = "#question-6"));
+      await expect(page.locator("#question-6")).toBeVisible();
+      await expect(page.locator("#question-6")).toBeInViewport();
+    });
+
+    for (const [width, height] of [[390, 844], [1440, 900]] as const) {
+      test(`without script at ${width}: all eleven show, open, and the control is hidden`, async ({ browser }) => {
+        const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width, height } });
+        const page = await context.newPage();
+        await page.goto("/products/kubar-protocol");
+        await expect(page.locator("html")).not.toHaveAttribute("data-js");
+        const questions = section(page);
+        await expect(shownQuestions(page)).toHaveCount(11);
+        await expect(questions.locator("p:visible")).toHaveCount(11);
+        await expect(questions.getByRole("button", { name: "Show all 11 questions" })).toBeHidden();
+        await context.close();
+      });
+    }
+  });
+
+  test.describe("About's hero (Figma 334:2634)", () => {
+    for (const [width, height] of [[390, 844], [768, 1024], [1024, 768], [1180, 820], [1440, 900], [1920, 1080]] as const) {
+      test(`at ${width}: ${width >= 1024 ? "the headline on the left, the lead and its footnote on the right" : "the headline, lead and footnote stacked"}`, async ({ page }) => {
+        await page.setViewportSize({ width, height });
+        await page.goto("/about");
+        const h1 = (await page.locator("main h1").boundingBox())!;
+        const lead = (await page.locator("main h1 + div > p").first().boundingBox())!;
+        const footnote = (await page.locator("#fn-1").boundingBox())!;
+        if (width >= 1024) {
+          expect(lead.x, "the lead beside the headline").toBeGreaterThan(h1.x + h1.width);
+          expect(Math.abs(lead.y - h1.y), "the lead's top level with the headline's").toBeLessThanOrEqual(2);
+          expect(Math.round(footnote.y - (lead.y + lead.height)), "the footnote 32 under the lead").toBe(32);
+          expect(Math.abs(footnote.x - lead.x)).toBeLessThanOrEqual(1);
+          if (width === 1440) {
+            expect(Math.round(h1.width)).toBe(520);
+            expect(Math.round(lead.x)).toBe(680);
+            expect(Math.round(lead.width)).toBe(680);
+          }
+        } else {
+          expect(lead.y, "the lead under the headline").toBeGreaterThanOrEqual(h1.y + h1.height - 0.5);
+          expect(footnote.y).toBeGreaterThanOrEqual(lead.y + lead.height - 0.5);
+        }
+        expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
+      });
+    }
+  });
+});
+
+test.describe("The embed sketch, drawn like the product (step 7)", () => {
+  const names = ["Consented onboarding", "Shipment and document capture", "Eligibility check", "Indicative offer", "Application and status", "Events for your product"];
+  const keys = ["onboarding", "shipment", "eligibility", "offer", "application", "events"];
+  const hero = (page: Page) => page.locator("main section").first();
+  const sketch = (page: Page) => page.locator(".embed-sketch[role='img']");
+  const pickRow = (page: Page, name: string) => hero(page).getByRole("button", { name: new RegExp(`^${name}`), pressed: undefined }).and(page.locator("[aria-pressed]"));
+  const colours = { ink: "rgb(2, 39, 50)", rani: "rgb(173, 36, 104)", rule: "rgb(204, 212, 214)" };
+
+  // What one state of the sketch shows (the whole sketch, or a phone's widget).
+  async function expectState(scope: import("@playwright/test").Locator, key: string, platform: boolean) {
+    const i = keys.indexOf(key);
+    const part = Math.min(i, 4);
+    const widget = scope.locator("[data-widget]");
+    await expect(widget).toBeVisible();
+    // The five-part progress line: done in ink, the current part in rani, the rest in the rule colour.
+    const parts = widget.locator("[data-part] > span");
+    await expect(parts).toHaveCount(5);
+    for (let p = 0; p < 5; p++) await expect(parts.nth(p), `${key}: part ${p + 1}`).toHaveCSS("background-color", p < part ? colours.ink : p === part ? colours.rani : colours.rule);
+    // The part's name as the screen's title.
+    await expect(widget.locator("p.t-ui-lg")).toHaveText(names[part]);
+    // Field rows with a round ink tick, and a button naming the next part.
+    const fields = { onboarding: ["Identity check", "Business check", "Consent recorded"], shipment: ["Booking", "Invoice", "Inspection report", "Bill of lading"], eligibility: ["Buyer country", "Terms", "Size", "Goods"] }[key];
+    await expect(widget.locator("[data-field]")).toHaveText(fields ?? []);
+    if (fields) for (const field of await widget.locator("[data-field]").all()) await expect(field).toHaveCSS("border-radius", "8px");
+    await expect(widget.locator("[data-next]")).toHaveText(i < 4 ? [names[i + 1]] : []);
+    // The offer: two columns and two empty dotted boxes. The application: a connected timeline.
+    await expect(widget.locator("[data-empty]")).toHaveCount(key === "offer" ? 2 : 0);
+    if (key === "offer") {
+      await expect(widget.getByText("All-in price", { exact: true })).toBeVisible();
+      await expect(widget.getByText("The exporter’s own alternative", { exact: true })).toBeVisible();
+      for (const box of await widget.locator("[data-empty]").all()) await expect(box).toHaveCSS("border-top-style", "dashed");
+    }
+    const timeline = key === "application" || key === "events";
+    await expect(widget.locator("ol > li")).toHaveText(timeline ? ["Submission", "Documents outstanding", "Purchase", "Settlement"] : []);
+    if (timeline) {
+      expect(await widget.locator("[data-dot]").evaluateAll((els) => els.map((el) => el.getAttribute("data-dot")))).toEqual(["done", "done", "current", "open"]);
+      await expect(widget.locator("[data-dot='current'] circle")).toHaveCSS("stroke", colours.rani);
+    }
+    // The platform: square, its records captured after onboarding, the dashed path for the records, the chip for events.
+    const shown = scope.locator("[data-platform]");
+    if (platform) {
+      await expect(shown).toHaveCSS("border-radius", "0px");
+      await expect(shown.locator("[data-captured]")).toHaveCount(key === "onboarding" ? 0 : 4);
+      await expect(shown.locator("[data-path]")).toHaveCount(key === "shipment" ? 1 : 0);
+      await expect(shown.locator("[data-chip]")).toHaveText(key === "events" ? ["Purchased"] : []);
+      if (key === "events") await expect(shown.locator("[data-chip] span")).toHaveCSS("background-color", colours.rani);
+    } else {
+      await expect(scope.getByText("Your platform", { exact: true })).toBeHidden();
+    }
+    // No figures anywhere in the sketch.
+    expect(await scope.evaluate((el) => el.textContent ?? "")).not.toMatch(/\d/);
+  }
+
+  test("at 1440: the sketch beside the list, drawn like the product, one state per row", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/products/navdhan-sdk");
+    const list = (await hero(page).locator("ul").first().boundingBox())!;
+    const art = (await sketch(page).boundingBox())!;
+    expect(Math.round(list.width)).toBe(640);
+    expect(Math.round(art.width)).toBe(580);
+    expect(Math.round(art.height)).toBe(489);
+    expect(Math.round(art.x - (list.x + list.width)), "60 apart").toBe(60);
+    expect(Math.round(art.x + art.width)).toBe(1360);
+    // The widget: 310 × 413, 12 px corners, the raised shadow.
+    const widget = sketch(page).locator("[data-widget]");
+    const box = (await widget.boundingBox())!;
+    expect([Math.round(box.width), Math.round(box.height)]).toEqual([310, 413]);
+    expect([Math.round(box.x - art.x), Math.round(box.y - art.y)]).toEqual([252, 58]);
+    await expect(widget).toHaveCSS("border-radius", "12px");
+    // The raised shadow (--elevation-2), after Tailwind's empty ring layers.
+    await expect(widget).toHaveCSS("box-shadow", /rgba\(2, 39, 50, 0\.08\) 0px 2px 4px 0px, rgba\(2, 39, 50, 0\.12\) 0px 14px 36px 0px$/);
+    // Eligibility check is picked from the start.
+    await expect(pickRow(page, "Eligibility check")).toHaveAttribute("aria-pressed", "true");
+    await expect(sketch(page)).toHaveAttribute("data-state", "eligibility");
+    await expectState(sketch(page), "eligibility", true);
+    // Each row shows its own state; the picked row has the ink rule on its left.
+    for (const [i, name] of names.entries()) {
+      await pickRow(page, name).click();
+      await expect(pickRow(page, name)).toHaveAttribute("aria-pressed", "true");
+      await expect(pickRow(page, name)).toHaveCSS("border-left-color", colours.ink);
+      await expect(sketch(page)).toHaveAttribute("data-state", keys[i]);
+      await expectState(sketch(page), keys[i], true);
+    }
+    await expect(hero(page).locator("[aria-pressed='true']")).toHaveCount(1);
+    await expectNoAxeViolations(page);
+  });
+
+  test("by keyboard: Tab reaches the picked row, the arrow keys, Home and End move within the six and pick", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/products/navdhan-sdk");
+    // One tab stop in the group: the picked row.
+    expect(await hero(page).locator("[aria-pressed]").evaluateAll((els) => els.map((el) => (el as HTMLElement).tabIndex))).toEqual([-1, -1, 0, -1, -1, -1]);
+    await page.getByRole("link", { name: "Talk about an integration" }).first().focus();
+    await page.keyboard.press("Tab");
+    await expect(pickRow(page, "Eligibility check")).toBeFocused();
+    const step = async (key: string, name: string) => {
+      await page.keyboard.press(key);
+      await expect(pickRow(page, name)).toBeFocused();
+      await expect(pickRow(page, name)).toHaveAttribute("aria-pressed", "true");
+      await expect(sketch(page)).toHaveAttribute("data-state", keys[names.indexOf(name)]);
+    };
+    await step("ArrowDown", "Indicative offer");
+    await step("ArrowRight", "Application and status");
+    await step("ArrowDown", "Events for your product");
+    await step("ArrowDown", "Consented onboarding");
+    await step("ArrowUp", "Events for your product");
+    await step("ArrowLeft", "Application and status");
+    await step("Home", "Consented onboarding");
+    await step("End", "Events for your product");
+    expect(await hero(page).locator("[aria-pressed]").evaluateAll((els) => els.map((el) => (el as HTMLElement).tabIndex))).toEqual([-1, -1, -1, -1, -1, 0]);
+    // Tab leaves the group; Shift+Tab comes back to the picked row.
+    await page.keyboard.press("Tab");
+    await expect(hero(page).locator("[aria-pressed]:focus")).toHaveCount(0);
+    await page.keyboard.press("Shift+Tab");
+    await expect(pickRow(page, "Events for your product")).toBeFocused();
+    await expect(pickRow(page, "Events for your product")).toHaveAttribute("aria-pressed", "true");
+  });
+
+  test("hover picks, and keeps picking: down, up, three rounds, and again after a reload", async ({ page }) => {
+    test.setTimeout(60_000);
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/products/navdhan-sdk");
+    for (const pass of ["first load", "after a reload"]) {
+      if (pass === "after a reload") await page.reload();
+      await sketch(page).scrollIntoViewIfNeeded();
+      for (let round = 1; round <= 3; round++) {
+        for (const order of [names, [...names].reverse()]) {
+          for (const name of order) {
+            await pickRow(page, name).hover();
+            await expect(pickRow(page, name), `${pass}, round ${round}: ${name}`).toHaveAttribute("aria-pressed", "true");
+            await expect(sketch(page), `${pass}, round ${round}: ${name}`).toHaveAttribute("data-state", keys[names.indexOf(name)]);
+          }
+        }
+      }
+      // The pick stays when the pointer leaves.
+      await page.mouse.move(5, 5);
+      await expect(pickRow(page, names[0])).toHaveAttribute("aria-pressed", "true");
+    }
+  });
+
+  test("on an iPad in landscape a tap picks, and the sketch keeps its 580 px beside the list", async ({ browser }) => {
+    for (const [width, height] of [[1000, 800], [1024, 768], [1180, 820], [1366, 1024]] as const) {
+      const context = await browser.newContext({ viewport: { width, height }, hasTouch: true });
+      const page = await context.newPage();
+      await page.goto("/products/navdhan-sdk");
+      const list = (await hero(page).locator("ul").first().boundingBox())!;
+      const art = (await sketch(page).boundingBox())!;
+      expect(Math.round(art.width), `${width}`).toBe(580);
+      expect(art.x, `${width}: beside the list`).toBeGreaterThan(list.x + list.width);
+      // Its top level with the list's heading.
+      expect(Math.abs(art.y - (await hero(page).getByRole("heading", { name: "What you embed." }).boundingBox())!.y), `${width}: level with the list`).toBeLessThanOrEqual(1);
+      for (const name of ["Indicative offer", "Events for your product", "Consented onboarding"]) {
+        await pickRow(page, name).tap();
+        await expect(pickRow(page, name), `${width}: ${name}`).toHaveAttribute("aria-pressed", "true");
+        await expect(sketch(page), `${width}: ${name}`).toHaveAttribute("data-state", keys[names.indexOf(name)]);
+      }
+      expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth), `${width}`).toBe(0);
+      await context.close();
+    }
+  });
+
+  for (const [width, height, platform] of [[768, 1024, true], [820, 1180, true], [390, 844, false], [360, 800, false]] as const) {
+    test(`at ${width}: the rows open one at a time, each showing its state ${platform ? "in the platform" : "in the widget alone"}`, async ({ browser }) => {
+      const context = await browser.newContext({ viewport: { width, height }, hasTouch: true, isMobile: width < 768 });
+      const page = await context.newPage();
+      await page.goto("/products/navdhan-sdk");
+      await expect(sketch(page)).toBeHidden();
+      const row = (name: string) => hero(page).getByRole("button", { name: new RegExp(`^${name}`), expanded: undefined }).and(page.locator("[aria-expanded]"));
+      await expect(hero(page).locator("[aria-expanded='true']")).toHaveCount(1);
+      await expect(row("Eligibility check")).toHaveAttribute("aria-expanded", "true");
+      for (const [i, name] of names.entries()) {
+        if ((await row(name).getAttribute("aria-expanded")) !== "true") await row(name).tap();
+        await expect(row(name)).toHaveAttribute("aria-expanded", "true");
+        await expect(hero(page).locator("[aria-expanded='true']")).toHaveCount(1);
+        const piece = page.locator(`[id="${await row(name).getAttribute("aria-controls")}"] .embed-sketch`);
+        await expect(piece).toHaveAttribute("data-state", keys[i]);
+        await expectState(piece, keys[i], platform);
+        // Under its own row, inside the content.
+        const box = (await piece.boundingBox())!;
+        const rowBox = (await row(name).boundingBox())!;
+        expect(box.y).toBeGreaterThanOrEqual(rowBox.y + rowBox.height - 1);
+        expect(box.x + box.width).toBeLessThanOrEqual(width - (width < 768 ? 20 : 40) + 1);
+        const widget = (await piece.locator("[data-widget]").boundingBox())!;
+        expect(Math.round(widget.height)).toBe(413);
+        if (platform) expect(Math.round((await piece.locator("[data-platform]").boundingBox())!.width)).toBe(580);
+        else expect(widget.width).toBeLessThanOrEqual(310);
+      }
+      expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
+      await expectNoAxeViolations(page);
+      await context.close();
+    });
+  }
+
+  for (const [width, height] of [[1440, 900], [390, 844]] as const) {
+    test(`without script at ${width}: the rows and the eligibility check, complete`, async ({ browser }) => {
+      const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width, height } });
+      const page = await context.newPage();
+      await page.goto("/products/navdhan-sdk");
+      for (const name of names) await expect(hero(page).getByText(name, { exact: true }).filter({ visible: true }).first()).toBeVisible();
+      const shown = width >= 1000 ? sketch(page) : hero(page).locator(".embed-sketch").filter({ visible: true });
+      await expect(shown).toHaveCount(1);
+      await expect(shown).toHaveAttribute("data-state", "eligibility");
+      await expectState(shown, "eligibility", width >= 768);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
+      await context.close();
+    });
+  }
+});
+
+test.describe("\"cross-border\" never breaks at its hyphen in running copy (17 Nov)", () => {
+  // The widths where it broke before the <nb> marks: Home's foundations lead and About's hero lead.
+  for (const [path, widths] of [["/", [320, 380, 1030, 1210]], ["/about", [340, 1180, 1300]]] as const) {
+    test(`${path} at ${widths.join(", ")}`, async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await page.goto(path);
+      for (const width of widths) {
+        await page.setViewportSize({ width, height: 900 });
+        const broken = await page.evaluate(() => {
+          const found: string[] = [];
+          const walker = document.createTreeWalker(document.querySelector("main")!, NodeFilter.SHOW_TEXT);
+          for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+            const text = node.textContent ?? "";
+            for (let i = text.indexOf("cross-border"); i !== -1; i = text.indexOf("cross-border", i + 1)) {
+              if (!node.parentElement?.getClientRects().length) continue;
+              const before = document.createRange();
+              before.setStart(node, i);
+              before.setEnd(node, i + 6);
+              const after = document.createRange();
+              after.setStart(node, i + 6);
+              after.setEnd(node, i + 12);
+              const a = before.getClientRects();
+              const b = after.getClientRects();
+              if (a.length && b.length && Math.abs(a[a.length - 1].top - b[0].top) > 2) found.push(text.slice(Math.max(0, i - 30), i + 20));
+            }
+          }
+          return found;
+        });
+        expect(broken, `${path} at ${width}`).toEqual([]);
+      }
+    });
+  }
+});
+
+test.describe("The money path (step 8)", () => {
+  const pages = [
+    ["/products/kubar-protocol", "payment-heading"],
+    ["/how-it-works", "money-heading"],
+  ] as const;
+  const money = (page: Page) => page.locator("[data-money]");
+  const art = (page: Page) => money(page).locator(".money-art");
+  const drawing = (page: Page) => art(page).locator("> div").filter({ visible: true });
+  // The movement of one payment, or of its mark, as CSS animations: name, delay and duration in ms, easing.
+  const animations = (page: Page, selector: string) =>
+    art(page).evaluate((el, selector) => {
+      const shown = [...el.children].find((child) => child.getClientRects().length > 0)!;
+      return [...shown.querySelectorAll(selector)].flatMap((node) =>
+        node
+          .getAnimations({ subtree: true })
+          .filter((a) => a.playState === "running" || a.playState === "finished")
+          .map((a) => {
+            // A CSS animation's timing function is on its keyframes, not its effect.
+            const effect = a.effect as KeyframeEffect;
+            const timing = effect.getTiming();
+            return `${(a as CSSAnimation).animationName} ${Math.round(Number(timing.delay))} ${Math.round(Number(timing.duration))} ${effect.getKeyframes()[0].easing}`;
+          }),
+      );
+    }, selector);
+  const running = (page: Page) =>
+    art(page).evaluate((el) => el.getAnimations({ subtree: true }).filter((a) => a.playState === "running").length);
+
+  for (const [path, heading] of pages) {
+    test(`${path}: the plates in a row from 900, stacked below it; never sideways`, async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      for (const [width, height] of [[1440, 900], [1366, 768], [1180, 820], [1024, 768], [900, 800], [899, 800], [820, 1180], [768, 1024], [430, 932], [390, 844], [375, 667], [360, 800]] as const) {
+        await page.setViewportSize({ width, height });
+        await page.goto(path);
+        const box = (await drawing(page).boundingBox())!;
+        const names = await drawing(page).locator("p.t-ui-lg").evaluateAll((els) => els.map((el) => { const r = el.getBoundingClientRect(); return { text: el.textContent, x: r.x + r.width / 2, y: r.y }; }));
+        expect(names.map((n) => n.text), `${width}`).toEqual(["Buyer, Singapore", "Financier", "Exporter’s bank"]);
+        if (width >= 900) {
+          expect(Math.round(box.width), `${width}: 760 wide`).toBe(760);
+          expect(new Set(names.map((n) => Math.round(n.y))).size, `${width}: the plates in a row`).toBe(1);
+          expect(names[0].x < names[1].x && names[1].x < names[2].x, `${width}: buyer, financier, exporter's bank`).toBe(true);
+          const head = (await page.locator(`#${heading}`).boundingBox())!;
+          if (path === "/products/kubar-protocol" && width >= 1400) {
+            expect(box.x, `${width}: beside the heading`).toBeGreaterThan(head.x + head.width);
+            if (width === 1440) expect(Math.round(box.x)).toBe(560);
+          } else {
+            expect(box.y, `${width}: under the heading`).toBeGreaterThan(head.y + head.height);
+            const content = await page.evaluate(() => document.querySelector("main .page-container")!.getBoundingClientRect());
+            expect(Math.abs(box.x + box.width / 2 - (content.x + content.width / 2)), `${width}: centred in the section`).toBeLessThanOrEqual(1);
+          }
+        } else {
+          expect(Math.round(box.width), `${width}: the narrow drawing`).toBe(320);
+          expect(names[0].y < names[1].y && names[1].y < names[2].y, `${width}: stacked top to bottom`).toBe(true);
+          expect(Math.abs(box.x + box.width / 2 - width / 2), `${width}: centred`).toBeLessThanOrEqual(1);
+        }
+        // Every word inside the drawing; nothing past the screen.
+        const outside = await drawing(page).evaluate((el) => {
+          const frame = el.getBoundingClientRect();
+          return [...el.querySelectorAll("p")].filter((p) => { const r = p.getBoundingClientRect(); return r.left < frame.left - 0.5 || r.right > frame.right + 0.5 || r.bottom > frame.bottom + 0.5; }).map((p) => p.textContent);
+        });
+        expect(outside, `${width}`).toEqual([]);
+        expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth), `${width}`).toBe(0);
+      }
+    });
+  }
+
+  test("it plays once at 45% in view: payment 1, then 2, then 3, 1.1 s apart, and ends drawn", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/how-it-works");
+    await expect(art(page)).toHaveAttribute("data-phase", "armed");
+    // Before it plays: the arrows undrawn, their words at 35%, the marks empty, the face value's stop hidden.
+    await expect(drawing(page).locator(".money-line").first()).toHaveCSS("stroke-dashoffset", "1px");
+    await expect(drawing(page).locator(".money-words").first()).toHaveCSS("opacity", "0.35");
+    await expect(drawing(page).locator("[data-mark]").first()).toHaveCSS("fill", "rgb(255, 255, 255)");
+    await expect(drawing(page).locator(".money-stop")).toHaveCSS("opacity", "0");
+    await art(page).evaluate((el) => el.scrollIntoView({ block: "center", behavior: "instant" }));
+    await expect(art(page)).toHaveAttribute("data-phase", "playing");
+    for (let i = 0; i < 3; i++) {
+      const at = 80 + i * 1100;
+      expect(await animations(page, `[data-pay="${i}"] .money-line`), `payment ${i + 1}`).toEqual([`money-draw ${at} 700 ease`]);
+      expect(await animations(page, `[data-pay="${i}"] .money-dot`)).toEqual([`money-go ${at} 750 ease`]);
+      expect(await animations(page, `[data-pay="${i}"] .money-head`)).toEqual([`money-show ${at + 600} 200 ease`]);
+      expect((await animations(page, ".money-words")).filter((a) => a.includes(` ${at} `))).toEqual([`money-words ${at} 300 ease`]);
+      expect(await animations(page, `[data-mark="${i}"]`)).toEqual([`money-mark ${at + 700} 300 ease`]);
+    }
+    // The face value's stop: the ring shows with its arrowhead, its caption with its words, and the
+    // dot runs straight through (its run is the same as the other payments').
+    expect(await animations(page, '[data-pay="1"] .money-stop')).toEqual(["money-show 1780 200 ease"]);
+    await expect(drawing(page).locator(".money-words").nth(1).locator("[data-stop]")).toHaveText("Collection account, in the exporter’s name,swept to the financier");
+    // The dot is rani; the arrows are ink.
+    await expect(drawing(page).locator(".money-dot").first()).toHaveCSS("fill", "rgb(173, 36, 104)");
+    await expect.poll(() => running(page), { timeout: 6000 }).toBe(0);
+    for (const line of await drawing(page).locator(".money-line").all()) await expect(line).toHaveCSS("stroke-dashoffset", "0px");
+    for (const words of await drawing(page).locator(".money-words").all()) await expect(words).toHaveCSS("opacity", "1");
+    for (const mark of await drawing(page).locator("[data-mark]").all()) await expect(mark).toHaveCSS("fill", "rgb(2, 39, 50)");
+    await expect(drawing(page).locator(".money-stop")).toHaveCSS("opacity", "1");
+    await expectNoAxeViolations(page);
+    // Once played it stays drawn: the narrow layout, and the wide one again, show it still (a tablet turned).
+    for (const [width, height] of [[820, 1180], [1440, 900]] as const) {
+      await page.setViewportSize({ width, height });
+      await expect(drawing(page).locator(".money-line")).toHaveCount(3);
+      expect(await running(page), `${width}: no replay`).toBe(0);
+      for (const line of await drawing(page).locator(".money-line").all()) await expect(line, `${width}`).toHaveCSS("stroke-dashoffset", "0px");
+    }
+  });
+
+  test("the controls replay one payment or all three, every time: down, up, three rounds, and after a reload", async ({ page }) => {
+    test.setTimeout(180_000);
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/products/kubar-protocol");
+    const controls = money(page).locator("[data-replay]");
+    await expect(controls).toHaveText(["1Purchase price", "2Face value", "3Deferred purchase price", "All three"]);
+    for (const control of await controls.locator(".t-code").all()) await expect(control).toHaveCSS("font-family", /mono/i);
+    // Each payment's running line animations, as "delay".
+    const moving = () =>
+      art(page).evaluate((el) => {
+        const shown = [...el.children].find((child) => child.getClientRects().length > 0)!;
+        return [0, 1, 2].map((i) =>
+          shown
+            .querySelector(`[data-pay="${i}"] .money-line`)!
+            .getAnimations()
+            .filter((a) => a.playState === "running")
+            .map((a) => Math.round(Number((a.effect as KeyframeEffect).getTiming().delay))),
+        );
+      });
+    // The face value's stop: its ring's start, while it waits or shows.
+    const stop = () =>
+      art(page).evaluate((el) => {
+        const shown = [...el.children].find((child) => child.getClientRects().length > 0)!;
+        return shown
+          .querySelector(".money-stop")!
+          .getAnimations()
+          .filter((a) => a.playState === "running")
+          .map((a) => Math.round(Number((a.effect as KeyframeEffect).getTiming().delay)));
+      });
+    const press = async (n: number, where: string) => {
+      await controls.nth(n).click();
+      // The payments it replays start again from the beginning, 1.1 s apart; the others don't move.
+      // The stop goes with the face value: hidden again, then shown with its arrowhead.
+      const expected = [0, 1, 2].map((i) => (n === 3 ? [80 + i * 1100] : i === n ? [80] : []));
+      await expect.poll(moving, { message: where, timeout: 2000 }).toEqual(expected);
+      expect(await stop(), `${where}: the stop`).toEqual(n === 1 ? [680] : n === 3 ? [1780] : []);
+      await expect.poll(() => running(page), { message: `${where}: over`, timeout: 5000 }).toBe(0);
+      await expect(drawing(page).locator(".money-stop"), `${where}: the stop shows`).toHaveCSS("opacity", "1");
+    };
+    for (const pass of ["first load", "after a reload"]) {
+      if (pass === "after a reload") await page.reload();
+      await art(page).evaluate((el) => el.scrollIntoView({ block: "center", behavior: "instant" }));
+      await expect.poll(() => running(page), { timeout: 6000 }).toBe(0);
+      for (let round = 1; round <= 3; round++) {
+        for (const n of [0, 1, 2, 3, 3, 2, 1, 0]) await press(n, `${pass}, round ${round}, control ${n + 1}`);
+      }
+    }
+  });
+
+  test("by keyboard: each control is a stop and Enter replays", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/how-it-works");
+    await art(page).evaluate((el) => el.scrollIntoView({ block: "center", behavior: "instant" }));
+    await expect.poll(() => running(page), { timeout: 6000 }).toBe(0);
+    const controls = money(page).locator("[data-replay]");
+    await controls.first().focus();
+    for (const n of [1, 2, 3]) {
+      await page.keyboard.press("Tab");
+      await expect(controls.nth(n)).toBeFocused();
+    }
+    await page.keyboard.press("Enter");
+    await expect.poll(async () => (await animations(page, ".money-line")).length).toBe(3);
+    // On a phone the controls wrap inside the screen, centred, each at least 44 px tall.
+    for (const control of await controls.all()) {
+      const box = (await control.boundingBox())!;
+      expect(box.height).toBeGreaterThanOrEqual(44);
+      expect(box.x + box.width).toBeLessThanOrEqual(390 - 20 + 0.5);
+    }
+  });
+
+  for (const [path] of pages) {
+    test(`${path}: still with reduced motion, and without script: every arrow drawn, every mark filled, no controls`, async ({ browser }) => {
+      for (const options of [{ reducedMotion: "reduce" as const }, { javaScriptEnabled: false }]) {
+        for (const [width, height] of [[1440, 900], [390, 844]] as const) {
+          const context = await browser.newContext({ ...options, viewport: { width, height } });
+          const page = await context.newPage();
+          await page.goto(path);
+          await art(page).evaluate((el) => el.scrollIntoView({ block: "center", behavior: "instant" }));
+          const where = `${JSON.stringify(options)} at ${width}`;
+          await expect(art(page), where).toHaveAttribute("data-phase", "done");
+          for (const line of await drawing(page).locator(".money-line").all()) await expect(line, where).toHaveCSS("stroke-dashoffset", "0px");
+          for (const head of await drawing(page).locator(".money-head").all()) await expect(head, where).toHaveCSS("opacity", "1");
+          for (const mark of await drawing(page).locator("[data-mark]").all()) await expect(mark, where).toHaveCSS("fill", "rgb(2, 39, 50)");
+          // The face value's stop: the ring, white with an ink edge, on its line's midpoint, and its caption.
+          const ring = drawing(page).locator(".money-stop");
+          await expect(ring, where).toHaveCSS("opacity", "1");
+          await expect(ring, where).toHaveCSS("fill", "rgb(255, 255, 255)");
+          await expect(ring, where).toHaveCSS("stroke", "rgb(2, 39, 50)");
+          // (A line has no width or no height, so it is measured in the page.)
+          const centres = await drawing(page).evaluate((el) => {
+            const centre = (node: Element) => { const r = node.getBoundingClientRect(); return [r.x + r.width / 2, r.y + r.height / 2]; };
+            return [centre(el.querySelector('[data-pay="1"] .money-line')!), centre(el.querySelector(".money-stop")!)];
+          });
+          const [[lx, ly], [rx, ry]] = centres;
+          expect(Math.abs(rx - lx) + Math.abs(ry - ly), `${where}: the ring on its line's midpoint`).toBeLessThanOrEqual(1);
+          const dot = (await ring.boundingBox())!;
+          const caption = drawing(page).locator("[data-stop]");
+          await expect(caption, where).toBeVisible();
+          await expect(caption, where).toHaveCSS("opacity", "1");
+          if (width >= 900) {
+            // Centred under the ring, on two lines.
+            const box = (await caption.boundingBox())!;
+            expect(Math.abs(box.x + box.width / 2 - (dot.x + dot.width / 2)), where).toBeLessThanOrEqual(1);
+            expect(box.y, where).toBeGreaterThan(dot.y + dot.height);
+            expect(Math.round(box.height), where).toBe(40);
+          } else {
+            // Three lines under "Face value, on the due date", broken as the prototype breaks them.
+            const lines = await caption.evaluate((el) => {
+              const range = document.createRange();
+              const text = el.firstChild!;
+              const tops = new Map<number, string>();
+              for (let i = 0; i < text.textContent!.length; i++) {
+                range.setStart(text, i);
+                range.setEnd(text, i + 1);
+                const top = Math.round(range.getBoundingClientRect().top);
+                tops.set(top, (tops.get(top) ?? "") + text.textContent![i]);
+              }
+              return [...tops.values()].map((line) => line.trim());
+            });
+            expect(lines, where).toEqual(["Collection account, in the", "exporter’s name, swept to", "the financier"]);
+          }
+          await expect(drawing(page).getByText("Kubar holds none", { exact: true }), where).toBeVisible();
+          await expect(money(page).locator("[data-replay]").first(), where).toBeHidden();
+          expect(await art(page).evaluate((el) => el.getAnimations({ subtree: true }).length), where).toBe(0);
+          await context.close();
+        }
+      }
+    });
+  }
+
+  test("assistive technology reads the table, not the drawing", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    for (const [path] of pages) {
+      await page.goto(path);
+      await expect(art(page)).toHaveAttribute("aria-hidden", "true");
+      const table = money(page).getByRole("table", { name: "Three payments move between the buyer, the financier and the exporter’s bank. The buyer’s payment passes through a collection account in the exporter’s name. None touches Kubar." });
+      await expect(table.getByRole("row")).toHaveCount(4);
+      await expect(table.getByRole("row", { name: /^Purchase price, at purchase/ })).toContainText("Exporter’s bank");
+      await expect(table.getByRole("row", { name: /^Face value/ })).toContainText("Collection account, in the exporter’s name, swept to the financier");
+      await expect(money(page).locator(".sr-only > p", { hasText: "Kubar holds none" })).toHaveCount(1);
+      await art(page).evaluate((el) => el.scrollIntoView({ block: "center", behavior: "instant" }));
+      await expectNoAxeViolations(page);
+    }
+  });
+});
+
+test.describe("Kubar Protocol picks and motion (step 9)", () => {
+  const KP = "/products/kubar-protocol";
+
+  // Who holds what: each party's chips (the brief's map, the proceeds since 17 Nov) and its two sentences.
+  const parties = [
+    { name: "You, the financier", held: ["The receivable", "The proceeds", "The insurance policy", "The buyer’s credit risk"], not: ["Recourse to the exporter for the buyer’s credit"], holds: "The receivable and its proceeds, the insurance policy and the buyer’s credit risk", doesnt: "Recourse to the exporter for the buyer’s credit" },
+    { name: "The insurer", held: ["The buyer’s credit risk"], not: ["Disputes, returns, set-off and fraud"], holds: "The buyer’s credit risk on the covered share", doesnt: "Dispute or fraud risk" },
+    { name: "The exporter", held: ["Disputes, returns, set-off and fraud"], not: ["The receivable"], holds: "Disputes, returns, set-off and fraud on its own trades", doesnt: "The receivable, once sold" },
+    { name: "The exporter’s bank", held: ["The relationship with the exporter"], not: ["The receivable"], holds: "Its relationship with the exporter", doesnt: "The receivables sold" },
+    { name: "Kubar", held: ["Origination, the evidence package, servicing and reporting"], not: ["The proceeds", "The buyer’s credit risk"], holds: "Origination, the evidence package, servicing and reporting", doesnt: "Money or credit risk" },
+  ];
+  const institutions = [
+    ["Banks’ units at GIFT City (IFSC Banking Units)", "Programme financier: set a limit and buy every receivable that fits"],
+    ["IFSC finance companies and factors", "Programme financier; later, a lane for smaller receivables held on a finance company’s balance sheet"],
+    ["Banks, factors and finance companies abroad", "Bid for programmes on Kubar’s own venue once it is registered¹, with no entity at GIFT City, if they meet its admission rules"],
+    ["Credit insurers", "Cover the buyers in the financier’s name, with the evidence behind every receivable and a loss history over time"],
+    ["Funds", "Later, buying receivables from financiers"],
+  ];
+  const holdsList = (page: Page) => page.locator('[data-pick="holds"]');
+  const fitList = (page: Page) => page.locator('[data-pick="fit"]');
+  const holdsPick = (page: Page) => holdsList(page).locator("xpath=..");
+  const fitPick = (page: Page) => fitList(page).locator("xpath=..");
+  const party = (page: Page, name: string) => holdsList(page).getByRole("button", { name, exact: true });
+  const institution = (page: Page, name: string) => fitList(page).getByRole("button", { name, exact: true });
+
+  /** The chips by state, and the sentences on show. */
+  const board = (page: Page) =>
+    holdsPick(page).evaluate((el) => {
+      const chips = [...el.querySelectorAll<HTMLElement>(".hold-chip")];
+      const of = (state: string) => chips.filter((chip) => chip.dataset.state === state).map((chip) => chip.textContent);
+      const shown = [...el.querySelectorAll("dl")].find((dl) => getComputedStyle(dl).visibility === "visible")!;
+      return { held: of("held"), not: of("not"), say: [...shown.querySelectorAll("dd")].map((dd) => dd.textContent) };
+    });
+  async function expectParty(page: Page, i: number, where: string) {
+    const p = parties[i];
+    await expect(party(page, p.name), where).toHaveAttribute("aria-pressed", "true");
+    await expect(holdsList(page).locator('[aria-pressed="true"]'), where).toHaveCount(1);
+    expect(await board(page), where).toEqual({ held: p.held, not: p.not, say: [p.holds, p.doesnt] });
+  }
+  async function expectInstitution(page: Page, i: number, where: string) {
+    await expect(institution(page, institutions[i][0]), where).toHaveAttribute("aria-pressed", "true");
+    await expect(fitList(page).locator('[aria-pressed="true"]'), where).toHaveCount(1);
+    const shown = fitPick(page).locator("h3").filter({ visible: true });
+    await expect(shown, where).toHaveCount(1);
+    await expect(shown, where).toHaveText(institutions[i][1]);
+  }
+
+  test("who holds what, at 1440 as the frame draws it: the financier picked on load, its four held in petrol and recourse outlined in rani", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(KP);
+    await expectParty(page, 0, "on load");
+    // The list is 380 wide; the board starts 64 to its right (Figma 326:2432).
+    const list = (await holdsList(page).boundingBox())!;
+    const chips = (await holdsPick(page).locator(".hold-chip").first().boundingBox())!;
+    expect(Math.round(list.width)).toBe(380);
+    expect(Math.round(chips.x - (list.x + list.width))).toBe(64);
+    // The picked party in petrol with an arrow; a held chip petrol with a white dot; the one not held in rani.
+    await expect(party(page, "You, the financier")).toHaveCSS("background-color", "rgb(2, 39, 50)");
+    const chip = (text: string) => holdsPick(page).locator(".hold-chip", { hasText: text });
+    await expect(chip("The proceeds")).toHaveCSS("background-color", "rgb(2, 39, 50)");
+    await expect(chip("The proceeds").locator(".hold-dot")).toHaveCSS("fill", "rgb(255, 255, 255)");
+    await expect(chip("Recourse to the exporter")).toHaveCSS("border-top-color", "rgb(173, 36, 104)");
+    await expect(chip("Recourse to the exporter").locator(".hold-dot")).toHaveCSS("stroke", "rgb(173, 36, 104)");
+    await expect(chip("Recourse to the exporter").locator(".hold-dot")).toHaveCSS("fill", "rgba(0, 0, 0, 0)");
+    await expect(chip("Disputes, returns")).toHaveCSS("color", "rgb(78, 104, 111)");
+    // The colours change over 250 ms, as the prototype does.
+    await expect(chip("The proceeds")).toHaveCSS("transition-duration", "0.25s, 0.25s, 0.25s, 0.25s");
+    // Without script the cards stand in for it; with script they are hidden, and the chips are decoration.
+    await expect(page.locator('[data-ground="petrol"]').filter({ hasText: "You, the financier" })).toBeHidden();
+    await expect(holdsPick(page).locator("ul[aria-hidden='true'] .hold-chip")).toHaveCount(8);
+    await expectNoAxeViolations(page);
+  });
+
+  for (const [width, height] of [[1440, 900], [1180, 820]] as const) {
+    test(`who holds what at ${width}: hover picks every party, down, up, three rounds, and again after a reload; the board never moves`, async ({ page }) => {
+      test.setTimeout(90_000);
+      await page.setViewportSize({ width, height });
+      await page.goto(KP);
+      const places = () => holdsPick(page).evaluate((el) => [...el.querySelectorAll(".hold-chip")].map((chip) => { const r = chip.getBoundingClientRect(); return `${Math.round(r.x)},${Math.round(r.y)},${Math.round(r.width)}`; }).join(" ") + ` h${Math.round(el.getBoundingClientRect().height)}`);
+      for (const pass of ["first load", "after a reload"]) {
+        if (pass === "after a reload") await page.reload();
+        await holdsPick(page).scrollIntoViewIfNeeded();
+        const at = await places();
+        for (let round = 1; round <= 3; round++) {
+          for (const order of [[0, 1, 2, 3, 4], [4, 3, 2, 1, 0]]) {
+            for (const i of order) {
+              await party(page, parties[i].name).hover();
+              await expectParty(page, i, `${pass}, round ${round}: ${parties[i].name}`);
+              expect(await places(), `${pass}, round ${round}: ${parties[i].name}: every chip in its place`).toBe(at);
+            }
+          }
+        }
+        // The pick stays when the pointer leaves.
+        await page.mouse.move(5, 5);
+        await expectParty(page, 0, `${pass}: after the pointer leaves`);
+      }
+    });
+  }
+
+  test("where each institution fits, at 1440: the first picked on load, its role in H3; hover picks, down, up, three rounds, and after a reload", async ({ page }) => {
+    test.setTimeout(90_000);
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(KP);
+    await expectInstitution(page, 0, "on load");
+    const list = (await fitList(page).boundingBox())!;
+    const role = (await fitPick(page).locator("h3").filter({ visible: true }).boundingBox())!;
+    expect(Math.round(list.width)).toBe(480);
+    expect(Math.round(role.x - (list.x + list.width))).toBe(64);
+    await expect(fitPick(page).getByText("Role", { exact: true })).toBeVisible();
+    await expect(fitPick(page).locator("h3").filter({ visible: true })).toHaveCSS("font-size", "28px");
+    // The register stands in without script; with it, it is hidden.
+    await expect(page.locator("section", { has: page.locator("#fit-heading") }).locator("table")).toBeHidden();
+    const height = () => fitPick(page).evaluate((el) => Math.round(el.getBoundingClientRect().height));
+    for (const pass of ["first load", "after a reload"]) {
+      if (pass === "after a reload") await page.reload();
+      await fitPick(page).scrollIntoViewIfNeeded();
+      const h = await height();
+      for (let round = 1; round <= 3; round++) {
+        for (const order of [[0, 1, 2, 3, 4], [4, 3, 2, 1, 0]]) {
+          for (const i of order) {
+            await institution(page, institutions[i][0]).hover();
+            await expectInstitution(page, i, `${pass}, round ${round}: ${institutions[i][0]}`);
+            expect(await height(), `${pass}, round ${round}: the same height`).toBe(h);
+          }
+        }
+      }
+    }
+    // The role abroad carries footnote 1, which leads to the footnote under the venue.
+    await institution(page, institutions[2][0]).click();
+    const marker = fitPick(page).locator("h3").filter({ visible: true }).getByRole("link", { name: "Footnote 1" });
+    await expect(marker).toHaveAttribute("href", "#fn-1");
+    await marker.click();
+    await expect(page.locator("#fn-1")).toBeFocused();
+    await expectNoAxeViolations(page);
+  });
+
+  test("both picks by keyboard: Tab reaches the picked one, the arrow keys, Home and End move within the five and pick", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(KP);
+    for (const [list, names, check] of [
+      [holdsList, parties.map((p) => p.name), (i: number, where: string) => expectParty(page, i, where)],
+      [fitList, institutions.map(([name]) => name), (i: number, where: string) => expectInstitution(page, i, where)],
+    ] as const) {
+      // One tab stop in the group: the picked one.
+      expect(await list(page).locator("[aria-pressed]").evaluateAll((els) => els.map((el) => (el as HTMLElement).tabIndex))).toEqual([0, -1, -1, -1, -1]);
+      // Tab reaches the picked one: from the stop before the group.
+      await list(page).locator('[aria-pressed="true"]').focus();
+      await page.keyboard.press("Shift+Tab");
+      await expect(list(page).locator("[aria-pressed]:focus")).toHaveCount(0);
+      await page.keyboard.press("Tab");
+      await expect(list(page).locator('[aria-pressed="true"]')).toBeFocused();
+      const step = async (key: string, i: number) => {
+        await page.keyboard.press(key);
+        await expect(list(page).getByRole("button", { name: names[i], exact: true })).toBeFocused();
+        await check(i, `${key} to ${names[i]}`);
+      };
+      await step("ArrowDown", 1);
+      await step("ArrowRight", 2);
+      await step("ArrowUp", 1);
+      await step("ArrowLeft", 0);
+      await step("ArrowUp", 4);
+      await step("Home", 0);
+      await step("End", 4);
+      expect(await list(page).locator("[aria-pressed]").evaluateAll((els) => els.map((el) => (el as HTMLElement).tabIndex))).toEqual([-1, -1, -1, -1, 0]);
+      // Tab leaves the group; Shift+Tab comes back to the picked one.
+      await page.keyboard.press("Tab");
+      await expect(list(page).locator("[aria-pressed]:focus")).toHaveCount(0);
+      await page.keyboard.press("Shift+Tab");
+      await expect(list(page).getByRole("button", { name: names[4], exact: true })).toBeFocused();
+    }
+  });
+
+  for (const [width, height] of [[390, 844], [820, 1180]] as const) {
+    test(`at ${width} a tap picks, the pick sits over its board, and nothing moves under it`, async ({ browser }) => {
+      const context = await browser.newContext({ viewport: { width, height }, hasTouch: true, isMobile: width < 768 });
+      const page = await context.newPage();
+      await page.goto(KP);
+      // Stacked, as the prototype has it: the list, then the board (or the role) under it.
+      const list = (await holdsList(page).boundingBox())!;
+      const firstChip = (await holdsPick(page).locator(".hold-chip").first().boundingBox())!;
+      expect(firstChip.y).toBeGreaterThan(list.y + list.height);
+      const fit = (await fitList(page).boundingBox())!;
+      const label = (await fitPick(page).getByText("Role", { exact: true }).boundingBox())!;
+      expect(label.y).toBeGreaterThan(fit.y + fit.height);
+      const heights = () => page.evaluate(() => [...document.querySelectorAll('[data-pick]')].map((el) => Math.round(el.parentElement!.getBoundingClientRect().height)).join(" "));
+      const before = await heights();
+      for (const i of [3, 1, 4, 0]) {
+        await party(page, parties[i].name).tap();
+        await expectParty(page, i, `${width}: ${parties[i].name}`);
+        await institution(page, institutions[i][0]).tap();
+        await expectInstitution(page, i, `${width}: ${institutions[i][0]}`);
+        expect(await heights(), `${width}: the two picks keep their heights`).toBe(before);
+      }
+      // A long chip wraps inside the screen's margin.
+      const margin = width < 768 ? 20 : 40;
+      for (const chip of await holdsPick(page).locator(".hold-chip").all()) {
+        const box = (await chip.boundingBox())!;
+        expect(box.x + box.width, `${width}`).toBeLessThanOrEqual(width - margin + 0.5);
+      }
+      expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
+      await context.close();
+    });
+  }
+
+  test("without script: today's cards and register, every party and every institution; with reduced motion the picks still pick", async ({ browser }) => {
+    for (const [width, height] of [[1440, 900], [390, 844]] as const) {
+      const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width, height } });
+      const page = await context.newPage();
+      await page.goto(KP);
+      await expect(holdsPick(page)).toBeHidden();
+      await expect(fitPick(page)).toBeHidden();
+      const holds = page.locator("section", { has: page.locator("#holds-heading") });
+      for (const p of parties) {
+        await expect(holds.getByText(p.holds, { exact: true }).filter({ visible: true }), `${width}: ${p.name}`).toHaveCount(1);
+        await expect(holds.getByText(p.doesnt, { exact: true }).filter({ visible: true }), `${width}: ${p.name}`).toHaveCount(1);
+      }
+      const register = page.locator("section", { has: page.locator("#fit-heading") }).locator("table");
+      await expect(register).toBeVisible();
+      await expect(register.getByRole("row")).toHaveCount(6);
+      await expect(register.getByRole("link", { name: "Footnote 1" })).toHaveAttribute("href", "#fn-1");
+      await context.close();
+    }
+    const context = await browser.newContext({ reducedMotion: "reduce", viewport: { width: 1440, height: 900 } });
+    const page = await context.newPage();
+    await page.goto(KP);
+    await party(page, "Kubar").click();
+    await expectParty(page, 4, "reduced motion");
+    await expect(holdsPick(page).locator(".hold-chip").first()).toHaveCSS("transition-duration", "0s");
+    await institution(page, "Funds").click();
+    await expectInstitution(page, 4, "reduced motion");
+    await context.close();
+  });
+
+  /** The running or waiting transitions and animations under a drawing: what moves, from when, for how long. */
+  const motion = (page: Page, selector: string) =>
+    page.locator(selector).first().evaluate((el) =>
+      el
+        .getAnimations({ subtree: true })
+        .filter((a) => a.playState === "running")
+        .map((a) => {
+          const target = (a.effect as KeyframeEffect).target as Element;
+          const timing = (a.effect as KeyframeEffect).getTiming();
+          const name = "transitionProperty" in a ? (a as CSSTransition).transitionProperty : (a as CSSAnimation).animationName;
+          const tag = target.getAttribute("class")?.split(" ").find((c) => /^(limit|tl|draw)-/.test(c)) ?? target.tagName;
+          return `${tag} ${name} ${Math.round(Number(timing.delay))}+${Math.round(Number(timing.duration))}`;
+        })
+        .sort(),
+    );
+  const idle = (page: Page, selector: string) =>
+    expect.poll(() => page.locator(selector).first().evaluate((el) => el.getAnimations({ subtree: true }).filter((a) => a.playState === "running").length), { timeout: 8000 }).toBe(0);
+
+  test("cover in your name plays once in three phases: the box draws, the receivables settle as the headroom shortens, RCV-0003 comes to rest", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(KP);
+    const limit = page.locator(".buyer-limit");
+    await expect(limit).toHaveAttribute("data-phase", "armed");
+    // Waiting: the edges undrawn, the receivables and the labels not there yet, the bracket at the whole limit's height.
+    await expect(limit.locator(".limit-draw-mask").first()).toHaveCSS("stroke-dashoffset", "1px");
+    for (const part of [".limit-sheet", ".limit-next", ".limit-floor", "li.limit-label"]) await expect(limit.locator(part).first(), part).toHaveCSS("opacity", "0");
+    await limit.evaluate((el) => el.scrollIntoView({ block: "center", behavior: "instant" }));
+    await expect(limit).toHaveAttribute("data-phase", "playing");
+    const moving = await motion(page, ".buyer-limit");
+    // The box over 600 ms (each of its eight edges), then the floor; then the parts in order.
+    expect(moving.filter((m) => m.startsWith("limit-draw-mask"))).toEqual(Array(8).fill("limit-draw-mask stroke-dashoffset 0+600"));
+    expect(moving).toEqual(expect.arrayContaining([
+      "limit-floor opacity 600+320",
+      "limit-sheet transform 600+320",
+      "limit-sheet transform 920+320",
+      "limit-next transform 1240+600",
+      "limit-post limit-post 600+640",
+      "limit-foot limit-foot 600+640",
+    ]));
+    await idle(page, ".buyer-limit");
+    // At rest, as drawn (the bracket's two steps hold their last keyframe, the drawn shape).
+    for (const part of [".limit-sheet", ".limit-next", ".limit-post", ".limit-foot"]) {
+      for (const el of await limit.locator(part).all()) expect(await el.evaluate((node) => getComputedStyle(node).transform), part).toMatch(/^(none|matrix\(1, 0, 0, 1, 0, 0\))$/);
+    }
+    for (const el of await limit.locator("li.limit-label").all()) await expect(el).toHaveCSS("opacity", "1");
+    await expectNoAxeViolations(page);
+  });
+
+  test("what you buy plays once: the paid-out bar down, the bracket across, the received bar up, then the deferred price, each label with its bar", async ({ page }) => {
+    for (const [width, height, expected] of [
+      [1440, 900, ["tl-down transform 0+600", "tl-label opacity 0+600", "tl-across transform 600+600", "tl-label opacity 600+600", "tl-up transform 1200+600", "tl-label opacity 1200+600", "tl-down transform 1800+600", "tl-label opacity 1800+600"]],
+      [390, 844, ["tl-down transform 0+600", "tl-up transform 600+600", "tl-down transform 1200+600"]],
+    ] as const) {
+      await page.setViewportSize({ width, height });
+      await page.goto(KP);
+      const timeline = page.locator("[data-phase]", { has: page.getByText("When the money moves · your side", { exact: true }) }).first();
+      await expect(timeline).toHaveAttribute("data-phase", "armed");
+      // Waiting: the bars of the drawing on show have no height yet (offsetWidth: a transform doesn't change it).
+      expect(await timeline.evaluate((el) => [...el.querySelectorAll<HTMLElement>(":is(.tl-down, .tl-up)")].filter((bar) => bar.offsetWidth > 0).map((bar) => getComputedStyle(bar).transform)), `${width}`).toEqual(Array(3).fill("matrix(1, 0, 0, 0, 0, 0)"));
+      await timeline.evaluate((el) => el.scrollIntoView({ block: "center", behavior: "instant" }));
+      await expect(timeline).toHaveAttribute("data-phase", "playing");
+      const moving = await timeline.evaluate((el) =>
+        [...el.querySelectorAll(":is(.tl-down, .tl-up, .tl-across, .tl-label)")]
+          .filter((node) => node.getClientRects().length > 0)
+          .flatMap((node) => node.getAnimations().filter((a) => a.playState === "running").map((a) => {
+            const timing = (a.effect as KeyframeEffect).getTiming();
+            const tag = node.getAttribute("class")!.split(" ").find((c) => c.startsWith("tl-"));
+            return `${tag} ${(a as CSSTransition).transitionProperty} ${Math.round(Number(timing.delay))}+${Math.round(Number(timing.duration))}`;
+          })),
+      );
+      expect(moving.sort(), `${width}`).toEqual([...expected].sort());
+      await expect.poll(() => timeline.evaluate((el) => el.getAnimations({ subtree: true }).filter((a) => a.playState === "running").length), { timeout: 8000 }).toBe(0);
+      expect(await timeline.evaluate((el) => [...el.querySelectorAll<HTMLElement>(":is(.tl-down, .tl-up, .tl-across)")].filter((bar) => bar.offsetWidth > 0).map((bar) => getComputedStyle(bar).transform)), `${width}`).toEqual(Array(width >= 1280 ? 4 : 3).fill("none"));
+    }
+  });
+
+  for (const [path, selector, expected] of [
+    [KP, "section:has(#programme1-heading) .draw-scene", ["draw-solid stroke-dashoffset 0+600"]],
+    ["/about", "section:has(#gift-heading) .draw-scene", ["draw-mask stroke-dashoffset 0+600", "draw-solid stroke-dashoffset 600+600", "draw-solid stroke-dashoffset 1200+600"]],
+  ] as const) {
+    test(`${path}: the arrows draw once in view, 600 ms each, in reading order`, async ({ page }) => {
+      for (const [width, height] of [[1440, 900], [390, 844]] as const) {
+        await page.setViewportSize({ width, height });
+        await page.goto(path);
+        const stage = page.locator(selector);
+        await expect(stage, `${width}`).toHaveAttribute("data-phase", "armed");
+        const lines = stage.locator(":is(.draw-solid, .draw-mask)");
+        const shown = await stage.evaluate((el) => [...el.querySelectorAll(":is(.draw-solid, .draw-mask)")].filter((line) => (line.closest("svg") as Element).getClientRects().length > 0).length);
+        expect(shown, `${width}`).toBe(expected.length);
+        await expect(lines.first()).toHaveCSS("stroke-dashoffset", "1px");
+        await stage.evaluate((el) => el.scrollIntoView({ block: "center", behavior: "instant" }));
+        await expect(stage, `${width}`).toHaveAttribute("data-phase", "playing");
+        const moving = await stage.evaluate((el) =>
+          [...el.querySelectorAll(":is(.draw-solid, .draw-mask)")]
+            .filter((line) => (line.closest("svg") as Element).getClientRects().length > 0)
+            .flatMap((line) => line.getAnimations().filter((a) => a.playState === "running").map((a) => {
+              const timing = (a.effect as KeyframeEffect).getTiming();
+              return `${line.getAttribute("class")!.split(" ")[0]} ${(a as CSSTransition).transitionProperty} ${Math.round(Number(timing.delay))}+${Math.round(Number(timing.duration))}`;
+            })),
+        );
+        expect(moving, `${width}`).toEqual([...expected]);
+        await expect.poll(() => stage.evaluate((el) => el.getAnimations({ subtree: true }).filter((a) => a.playState === "running").length), { timeout: 8000 }).toBe(0);
+        for (const head of await stage.locator(".draw-head").all()) expect(await head.evaluate((el) => getComputedStyle(el).opacity), `${width}`).toBe("1");
+      }
+    });
+  }
+
+  test("still with reduced motion and without script: the box, the timeline, the corridor and the three zones as drawn", async ({ browser }) => {
+    for (const options of [{ reducedMotion: "reduce" as const }, { javaScriptEnabled: false }]) {
+      for (const [width, height] of [[1440, 900], [390, 844]] as const) {
+        const context = await browser.newContext({ ...options, viewport: { width, height } });
+        const page = await context.newPage();
+        const where = `${JSON.stringify(options)} at ${width}`;
+        for (const [path, selector] of [[KP, ".buyer-limit"], [KP, "[data-phase]:has(.tl-down)"], [KP, "section:has(#programme1-heading) .draw-scene"], ["/about", "section:has(#gift-heading) .draw-scene"]] as const) {
+          await page.goto(path);
+          const stage = page.locator(selector).first();
+          await stage.evaluate((el) => el.scrollIntoView({ block: "center", behavior: "instant" }));
+          await expect(stage, `${where} ${selector}`).toHaveAttribute("data-phase", "done");
+          expect(await stage.evaluate((el) => el.getAnimations({ subtree: true }).length), `${where} ${selector}`).toBe(0);
+          const state = await stage.evaluate((el) => {
+            const parts = [...el.querySelectorAll(":is(.limit-sheet, .limit-next, .limit-floor, .limit-post, .tl-down, .tl-up, .tl-across, .tl-label, .draw-head, li.limit-label)")];
+            return {
+              hidden: parts.filter((p) => getComputedStyle(p).opacity !== "1").length,
+              moved: parts.filter((p) => !["none", "matrix(1, 0, 0, 1, 0, 0)"].includes(getComputedStyle(p).transform)).length,
+              undrawn: [...el.querySelectorAll(":is(.draw-solid, .draw-mask, .limit-draw-mask)")].filter((p) => getComputedStyle(p).strokeDashoffset !== "0px").length,
+            };
+          });
+          expect(state, `${where} ${selector}`).toEqual({ hidden: 0, moved: 0, undrawn: 0 });
+        }
+        await context.close();
+      }
+    }
+  });
+});
+
+test.describe("NavDhan SDK's pinned journey (step 10)", () => {
+  const SDK = "/products/navdhan-sdk";
+  const steps = [
+    "Your exporter books and documents a shipment in your platform, as it does today.",
+    "NavDhan SDK checks the shipment against the programme’s rules and shows an indicative offer.",
+    "With the exporter’s consent, the shipment data and documents go to Kubar Protocol, which assembles the evidence package.",
+    "A financier buys the receivable and pays the exporter’s own bank.",
+    "On the due date the buyer pays the account on its invoice, and the payment reaches the financier. Your platform shows each step as it happens.",
+  ];
+  const RANI = "rgb(173, 36, 104)";
+  const MUTED = "rgb(78, 104, 111)";
+  const INK = "rgb(2, 39, 50)";
+  const story = (page: Page) => page.locator('.story[data-variant="sdk"]');
+  const on = (page: Page) => story(page).locator(".story-on");
+  const register = (page: Page) => story(page).locator(".story-ledger");
+  const overflow = (page: Page) => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+
+  /** The journey once still: the state, the current card, and on the lanes the rows drawn, the band's row and the rani number. */
+  async function journeyAt(page: Page) {
+    await expect.poll(() => on(page).evaluate((el) => el.getAnimations({ subtree: true }).filter((a) => a.playState === "running").length)).toBe(0);
+    return on(page).evaluate(async (el) => {
+      // Still twice running, a frame apart: a state that has just changed starts its transitions on the next frame.
+      for (let calm = 0; calm < 2; ) {
+        await new Promise((resolve) => requestAnimationFrame(resolve));
+        calm = el.getAnimations({ subtree: true }).some((a) => a.playState === "running") ? 0 : calm + 1;
+      }
+      const lanes = el.querySelector(".run-lanes")!;
+      const numbers = [...lanes.querySelectorAll<HTMLElement>(".run-no")];
+      const band = lanes.querySelector(".run-current")!.getBoundingClientRect();
+      const mid = (r: DOMRect) => r.top + r.height / 2;
+      const cards = [...el.querySelectorAll<HTMLElement>(".story-card")];
+      return {
+        state: el.getAttribute("data-story-state"),
+        current: cards.flatMap((card, i) => (card.getAttribute("aria-current") === "step" ? [i + 1] : [])),
+        counters: cards.map((card) => getComputedStyle(card.querySelector("p")!).color),
+        drawn: [...lanes.querySelectorAll(".run-row")].map((row) => getComputedStyle(row).opacity),
+        band: numbers.findIndex((no) => Math.abs(mid(no.getBoundingClientRect()) - mid(band)) < 1) + 1,
+        rani: numbers.filter((no) => getComputedStyle(no).color === "rgb(173, 36, 104)").map((no) => no.textContent),
+      };
+    });
+  }
+  const expected = (n: number) => ({
+    state: String(n),
+    current: [n],
+    counters: steps.map((_, i) => (i + 1 === n ? RANI : MUTED)),
+    drawn: steps.map((_, i) => (i < n ? "1" : "0")),
+    band: n,
+    rani: [`0${n}`],
+  });
+
+  test("five cards in reading order, \"01 of 05\" and the sentence; the lanes beside them as the frame draws them (331:1202)", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(SDK);
+    await storyLive(page);
+    await expect(page.locator(".story")).toHaveCount(1);
+    const cards = on(page).locator("ol > li .story-card");
+    await expect(cards).toHaveCount(5);
+    for (const [i, step] of steps.entries()) {
+      await expect(cards.nth(i).locator("p").first()).toHaveText(`0${i + 1} of 05`);
+      await expect(cards.nth(i).locator("p").first()).toHaveClass(/t-tag/);
+      await expect(cards.nth(i).locator("p").nth(1)).toHaveText(step);
+      await expect(cards.nth(i).locator("p").nth(1)).toHaveClass(/t-body-lg/);
+    }
+    // The register waits as the fallback; the lanes are decoration.
+    await expect(register(page)).toBeHidden();
+    await expect(on(page).locator(".run-lanes")).toHaveAttribute("aria-hidden", "true");
+    await scrollToState(page, 3);
+    await expect(on(page)).toHaveAttribute("data-story-state", "3");
+    expect(await journeyAt(page)).toEqual(expected(3));
+    // The frame's measurements at 1440, relative to the lanes.
+    const g = await on(page).evaluate((el) => {
+      const r = (node: Element | null) => {
+        const b = node!.getBoundingClientRect();
+        return { x: b.x, y: b.y, w: b.width, h: b.height, cx: b.x + b.width / 2, cy: b.y + b.height / 2 };
+      };
+      const lanes = el.querySelector(".run-lanes")!;
+      const o = r(lanes);
+      const at = (node: Element | null) => {
+        const b = r(node);
+        return [b.x - o.x, b.y - o.y, b.w, b.h].map(Math.round);
+      };
+      const row = (n: number) => lanes.querySelector(`.run-row[data-row="${n}"]`)!;
+      const centre = (node: Element) => [Math.round(r(node).cx - o.x), Math.round(r(node).cy - o.y)];
+      return {
+        lanes: [Math.round(o.x), Math.round(o.w), Math.round(o.h)],
+        card: at(el.querySelector(".story-card")),
+        skip: at(el.querySelector(".story-pin a")),
+        parties: [...lanes.querySelectorAll(".run-party")].map(at),
+        lifelines: [...lanes.querySelectorAll(":scope > span.w-px")].map((line) => at(line)[0]),
+        rules: [...lanes.querySelectorAll(":scope > span.h-px")].map((line) => at(line)[1]),
+        band: at(lanes.querySelector(".run-current")),
+        mark: at(lanes.querySelector(".run-current > span")),
+        numbers: [...lanes.querySelectorAll(".run-no")].map((no) => [at(no)[0], centre(no)[1]]),
+        squares: [1, 2, 4, 5].map((n) => [...row(n).querySelectorAll(":scope > span.bg-ink")].map(centre)),
+        labels: [2, 3, 4, 5].map((n) => at(row(n).querySelector(".t-ui-sm")).slice(0, 2)),
+        arrows: [3, 4, 5].map((n) => {
+          const arrow = row(n).querySelector(":scope > span.h-\\[10px\\]")!;
+          const line = arrow.querySelector("line")!;
+          return { at: [at(arrow)[0], at(arrow)[0] + at(arrow)[2], centre(arrow)[1]], back: getComputedStyle(arrow).scale.startsWith("-1"), dash: line.getAttribute("stroke-dasharray"), colour: getComputedStyle(line).stroke };
+        }),
+      };
+    });
+    expect(g.lanes).toEqual([544, 816, 472]);
+    expect(g.card.slice(0, 1).concat(g.card.slice(2, 3))).toEqual([-464, 400]);
+    expect(g.skip[1], "the skip link 44 above the lanes").toBe(-44);
+    expect(g.skip[0]).toBe(0);
+    expect(g.parties).toEqual([[88, 0, 176, 76], [344, 0, 176, 76], [600, 0, 176, 76]]);
+    expect(g.lifelines).toEqual([176, 432, 688]);
+    expect(g.rules).toEqual([168, 244, 320, 396]);
+    expect(g.band).toEqual([48, 244, 768, 76]);
+    expect(g.mark).toEqual([43, 244, 5, 76]);
+    expect(g.numbers).toEqual([[0, 130], [0, 206], [0, 282], [0, 358], [0, 434]]);
+    // Row 1 and 2: a square on your platform; 4 and 5: a square on the financier, on the row's line.
+    expect(g.squares).toEqual([[[176, 130]], [[176, 206]], [[688, 370]], [[688, 446]]]);
+    for (const [n, [x, y]] of [[2, [190, 197]], [3, [188, 258]], [4, [444, 334]], [5, [188, 410]]] as const) {
+      const [lx, ly] = g.labels[n - 2];
+      expect(Math.abs(lx - x), `row ${n} label x`).toBeLessThanOrEqual(1);
+      expect(Math.abs(ly - y), `row ${n} label y`).toBeLessThanOrEqual(1);
+    }
+    expect(g.arrows).toEqual([
+      { at: [176, 432, 294], back: false, dash: "6 4", colour: MUTED },
+      { at: [432, 683, 370], back: false, dash: null, colour: INK },
+      { at: [176, 432, 446], back: true, dash: "6 4", colour: MUTED },
+    ]);
+    // Kubar Protocol: petrol, with the mark; the other two white with an ink edge.
+    const kubar = on(page).locator(".run-party").nth(1);
+    await expect(kubar).toHaveCSS("background-color", INK);
+    await expect(kubar.locator("svg")).toBeVisible();
+    await expect(on(page).locator(".run-party").first()).toHaveCSS("border-top-color", INK);
+    await expect(on(page).locator(".run-party")).toHaveText(["Your platform", "Kubar Protocol", "The financier"]);
+    await expect(on(page).locator(".run-row .t-ui-sm")).toHaveText(["NavDhan SDK", "With the exporter’s consent", "The evidence package", "Each step as it happens"]);
+    await expectNoAxeViolations(page);
+  });
+
+  for (const [width, height] of [[1440, 900], [1180, 820], [390, 844]] as const) {
+    test(`at ${width} row n lights with card n: down, up, three rounds, and again after a reload`, async ({ browser }) => {
+      test.setTimeout(120_000);
+      const context = await browser.newContext({ viewport: { width, height }, hasTouch: width < 1200, isMobile: width < 768 });
+      const page = await context.newPage();
+      await page.goto(SDK);
+      for (const pass of ["first load", "after a reload"]) {
+        if (pass === "after a reload") await page.reload();
+        await storyLive(page);
+        for (let round = 1; round <= 3; round++) {
+          for (const order of [[1, 2, 3, 4, 5], [5, 4, 3, 2, 1]]) {
+            for (const n of order) {
+              await scrollToState(page, n);
+              await expect(on(page), `${pass}, round ${round}`).toHaveAttribute("data-story-state", String(n));
+              expect(await journeyAt(page), `${pass}, round ${round}, state ${n}`).toEqual(expected(n));
+              await expect(on(page).locator(".story-card[data-current]"), `${pass}: one card raised`).toHaveCount(1);
+            }
+          }
+        }
+      }
+      expect(await overflow(page)).toBe(0);
+      await context.close();
+    });
+  }
+
+  test("it pins at every size it must, also as the address bar hides and shows, and lets go after the last card", async ({ page }) => {
+    for (const [width, height] of [[1440, 790], [1366, 650], [1536, 730], [1280, 590], [1024, 768], [1180, 820], [820, 1050], [768, 1024], [390, 664], [375, 667], [360, 800]] as const) {
+      const where = `${width}x${height}`;
+      await page.setViewportSize({ width, height });
+      await page.goto(SDK);
+      await storyLive(page);
+      await expect(story(page), where).toHaveAttribute("data-story-fits", "true");
+      const lanes = on(page).locator(".run-lanes");
+      await scrollToState(page, 2);
+      await expect(on(page), where).toHaveAttribute("data-story-state", "2");
+      await scrollToState(page, 3);
+      await expect(on(page), where).toHaveAttribute("data-story-state", "3");
+      const pinned = Math.round((await lanes.boundingBox())!.y);
+      // Pinned under the header: 24 px and the skip link (44) on laptops; the pin's 16 and the link's 36 below.
+      const header = await page.evaluate(() => parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--header-height")));
+      expect(pinned, `${where} pinned under the header`).toBe(header + (width >= 1024 ? 68 : 52));
+      await page.setViewportSize({ width, height: height + 56 });
+      await scrollToState(page, 4);
+      await expect(on(page), `${where} + 56`).toHaveAttribute("data-story-state", "4");
+      await expect(on(page)).toBeVisible();
+      expect(Math.round((await lanes.boundingBox())!.y), `${where} + 56 pinned`).toBe(pinned);
+      await page.setViewportSize({ width, height });
+      await scrollToState(page, 5);
+      await expect(on(page), where).toHaveAttribute("data-story-state", "5");
+      expect(Math.round((await lanes.boundingBox())!.y), `${where} pinned at 05`).toBe(pinned);
+      // The skip link stays with the lanes.
+      expect((await on(page).getByRole("link", { name: "Skip the five steps" }).boundingBox())!.y, where).toBeLessThan(pinned);
+      await page.evaluate(() => {
+        const last = document.querySelectorAll(".story-on .story-card")[4].parentElement!.getBoundingClientRect();
+        window.scrollTo({ top: last.bottom + scrollY - 40, behavior: "instant" });
+      });
+      expect((await lanes.boundingBox())!.y, `${where} released`).toBeLessThan(pinned - 100);
+      expect(await overflow(page), where).toBe(0);
+    }
+  });
+
+  test("on phones every state holds for a third of the screen and the current card stays clear of the lanes; the narrow lanes keep their words readable", async ({ browser }) => {
+    for (const [width, height] of [[390, 844], [360, 800], [375, 667]] as const) {
+      const where = `${width}x${height}`;
+      const context = await browser.newContext({ viewport: { width, height }, hasTouch: true, isMobile: true });
+      const page = await context.newPage();
+      await page.goto(SDK);
+      await storyLive(page);
+      const section = await page.evaluate(() => {
+        const box = document.querySelector('.story[data-variant="sdk"]')!.getBoundingClientRect();
+        const on = document.querySelector('.story[data-variant="sdk"] .story-on')!;
+        const lanes = on.querySelector(".run-lanes")!;
+        const lines = (node: Element) => {
+          const range = document.createRange();
+          range.selectNodeContents(node);
+          return new Set([...range.getClientRects()].map((rect) => Math.round(rect.top))).size;
+        };
+        return {
+          top: box.top + scrollY,
+          height: box.height,
+          slots: [...on.querySelectorAll(".story-card")].map((card) => card.parentElement!.getBoundingClientRect().height),
+          parties: [...lanes.querySelectorAll(".run-party")].map((party) => [getComputedStyle(party).fontSize, lines(party)]),
+          labels: [...lanes.querySelectorAll(".run-row .t-ui-sm")].map((label) => [getComputedStyle(label).fontSize, lines(label), Math.round(label.getBoundingClientRect().right)]),
+          numbers: [...lanes.querySelectorAll(".run-no")].map((no) => getComputedStyle(no).fontSize),
+          right: Math.round(lanes.getBoundingClientRect().right),
+        };
+      });
+      // The party names at 12 px on one line each; the labels at 13, inside the drawing; the numbers at the tag's 11.
+      expect(section.parties, where).toEqual(Array(3).fill(["12px", 1]));
+      for (const [size, count, right] of section.labels) {
+        expect([size, count], where).toEqual(["13px", 1]);
+        expect(right, where).toBeLessThanOrEqual(section.right);
+      }
+      expect(section.numbers, where).toEqual(Array(5).fill("11px"));
+      for (const slot of section.slots.slice(1, 4)) expect(slot, where).toBeGreaterThanOrEqual(height / 3 - 0.5);
+      let worst = 0;
+      const seen = new Set<string>();
+      for (let y = section.top - 400; y < section.top + section.height; y += 40) {
+        await page.evaluate((y) => window.scrollTo({ top: y, behavior: "instant" }), y);
+        const at = await page.evaluate(
+          () =>
+            new Promise<{ state: string; under: number; stuck: boolean; shown: boolean }>((resolve) =>
+              requestAnimationFrame(() =>
+                requestAnimationFrame(() => {
+                  const on = document.querySelector('.story[data-variant="sdk"] .story-on')!;
+                  const pin = on.querySelector(".story-pin")!.getBoundingClientRect();
+                  const card = on.querySelector(".story-card[data-current]")!.getBoundingClientRect();
+                  resolve({ state: on.getAttribute("data-story-state")!, under: pin.bottom - card.top, stuck: Math.abs(pin.top - 65) < 1.5, shown: pin.top >= 65 && pin.bottom <= innerHeight });
+                }),
+              ),
+            ),
+        );
+        if (at.shown) seen.add(at.state);
+        if (at.stuck) worst = Math.max(worst, at.under);
+      }
+      expect([...seen].sort(), where).toEqual(["1", "2", "3", "4", "5"]);
+      expect(worst, `${where}: the current card's top is never under the lanes`).toBeLessThanOrEqual(1);
+      expect(await overflow(page), where).toBe(0);
+      await context.close();
+    }
+  });
+
+  test("laptops: the lanes fit their column, the party names keep one line and nothing scrolls sideways", async ({ page }) => {
+    for (const width of [1024, 1080, 1133, 1180, 1200, 1280, 1366, 1920]) {
+      await page.setViewportSize({ width, height: 800 });
+      await page.goto(SDK);
+      await storyLive(page);
+      expect(await overflow(page), `${width}`).toBe(0);
+      const fit = await on(page).evaluate((el) => {
+        const lanes = el.querySelector(".run-lanes")!.getBoundingClientRect();
+        const content = el.closest(".page-container")!;
+        const style = getComputedStyle(content);
+        const right = content.getBoundingClientRect().right - parseFloat(style.paddingRight);
+        return {
+          inside: lanes.right <= right + 0.5,
+          names: [...el.querySelectorAll(".run-party")].map((party) => [...party.childNodes].filter((node) => node.nodeType === 3).map((node) => {
+            const range = document.createRange();
+            range.selectNodeContents(node);
+            return range.getClientRects().length;
+          })[0]),
+          labels: [...el.querySelectorAll(".run-row .t-ui-sm")].every((label) => label.getBoundingClientRect().right <= lanes.right),
+        };
+      });
+      expect(fit, `${width}`).toEqual({ inside: true, names: [1, 1, 1], labels: true });
+    }
+  });
+
+  test("with reduced motion, on a short screen or without script, the register shows as today, with every word", async ({ browser }) => {
+    const cases = [
+      { reducedMotion: "reduce" as const, viewport: { width: 1440, height: 900 } },
+      { reducedMotion: "reduce" as const, viewport: { width: 390, height: 844 } },
+      { viewport: { width: 1280, height: 520 } },
+      { viewport: { width: 375, height: 548 } },
+      { viewport: { width: 844, height: 390 } },
+      { javaScriptEnabled: false, viewport: { width: 1440, height: 900 } },
+      { javaScriptEnabled: false, viewport: { width: 390, height: 844 } },
+    ];
+    for (const options of cases) {
+      const where = JSON.stringify(options);
+      const context = await browser.newContext(options);
+      const page = await context.newPage();
+      await page.goto(SDK);
+      if (options.javaScriptEnabled !== false && !options.reducedMotion) await expect(story(page), where).toHaveAttribute("data-story-fits", "false");
+      await expect(on(page), where).toBeHidden();
+      await expect(register(page), where).toBeVisible();
+      const rows = register(page).locator("table tr");
+      await expect(rows, where).toHaveCount(5);
+      for (const [i, step] of steps.entries()) await expect(rows.nth(i), where).toContainText(step);
+      await expect(page.getByRole("link", { name: "See how it works" }), where).toBeVisible();
+      expect(await overflow(page), where).toBe(0);
+      await context.close();
+    }
+  });
+
+  test("Skip the five steps sits above the lanes and goes to the next section; See how it works follows the cards", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(SDK);
+    await storyLive(page);
+    const skip = on(page).getByRole("link", { name: "Skip the five steps" });
+    await expect(skip).toHaveAttribute("href", "#rules");
+    await expect(skip).toHaveClass(/tap-area/);
+    // The first stop in the journey: Tab from the section's heading reaches it.
+    await page.locator("#runs-heading").evaluate((el) => {
+      el.setAttribute("tabindex", "-1");
+      (el as HTMLElement).focus();
+    });
+    await page.keyboard.press("Tab");
+    await expect(skip).toBeFocused();
+    await page.keyboard.press("Tab");
+    await expect(page.getByRole("link", { name: "See how it works" })).toBeFocused();
+    await expect(page.getByRole("link", { name: "See how it works" })).toHaveAttribute("href", "/how-it-works");
+    // Below the last card, in the cards' column.
+    const last = (await on(page).locator(".story-card").last().boundingBox())!;
+    const link = (await page.getByRole("link", { name: "See how it works" }).boundingBox())!;
+    expect(link.y).toBeGreaterThan(last.y + last.height);
+    expect(Math.round(link.x)).toBe(Math.round(last.x));
+    await skip.click();
+    await expect(page).toHaveURL(/#rules$/);
+    await expect(page.locator("#rules-heading")).toBeInViewport();
+  });
+
+  test("one pinned journey a page", async ({ page }) => {
+    for (const path of publicRoutes) {
+      await page.goto(path);
+      expect(await page.locator(".story").count(), path).toBeLessThanOrEqual(1);
+    }
+  });
+});
+
+test.describe("Pinned journeys: every step lights with the drawing pinned, and the last holds for 200 px (18 Nov)", () => {
+  test.describe.configure({ timeout: 120_000 });
+  const journeys = [
+    { name: "Home", path: "/", steps: 8 },
+    { name: "NavDhan SDK", path: "/products/navdhan-sdk", steps: 5 },
+    { name: "How it works", path: "/how-it-works", steps: 8 },
+  ];
+  for (const [width, height] of [[1440, 900], [1180, 820], [390, 844]] as const) {
+    for (const journey of journeys) {
+      test(`${journey.name} at ${width}×${height}`, async ({ browser }) => {
+        const context = await browser.newContext({ viewport: { width, height }, hasTouch: width < 1200, isMobile: width < 768 });
+        const page = await context.newPage();
+        await page.goto(journey.path);
+        await storyLive(page);
+        /** Scroll to y; the state then, and whether the drawing sits at its sticky top or is on screen. */
+        const at = (y: number) =>
+          page.evaluate(
+            (y) =>
+              new Promise<{ state: number; stuck: boolean; shown: boolean }>((resolve) => {
+                window.scrollTo({ top: y, behavior: "instant" });
+                // Two frames: the observer answers the scroll on the next one.
+                requestAnimationFrame(() =>
+                  requestAnimationFrame(() => {
+                    const on = document.querySelector(".story-on")!;
+                    const pin = on.querySelector<HTMLElement>(".story-pin")!;
+                    const box = pin.getBoundingClientRect();
+                    resolve({
+                      state: Number(on.getAttribute("data-story-state")),
+                      stuck: Math.abs(box.top - parseFloat(getComputedStyle(pin).top)) < 1,
+                      shown: box.bottom > 0 && box.top < innerHeight,
+                    });
+                  }),
+                );
+              }),
+            y,
+          );
+        const [from, to] = await page.evaluate(() => {
+          const box = document.querySelector(".story")!.getBoundingClientRect();
+          return [Math.round(box.top + scrollY - innerHeight), Math.round(box.bottom + scrollY)];
+        });
+        // Down through the journey, 16 px at a time.
+        const pinned = new Set<number>();
+        const arriving = new Set<number>();
+        let lastFrom = -1;
+        let letGo = -1;
+        for (let y = from; y <= to; y += 16) {
+          const s = await at(y);
+          if (s.stuck) pinned.add(s.state);
+          else if (s.shown && lastFrom < 0) arriving.add(s.state);
+          if (s.state === journey.steps && lastFrom < 0) lastFrom = y;
+          if (lastFrom >= 0 && y > lastFrom && !s.stuck && letGo < 0) letGo = y;
+        }
+        const all = Array.from({ length: journey.steps }, (_, i) => i + 1);
+        // Home's and NavDhan SDK's phones hold the first step while the drawing arrives, by the design of
+        // 16 Nov (a card turns current one slot below the drawing); every other step lights with it pinned.
+        const firstArrives = width < 768 && journey.path !== "/how-it-works";
+        expect([...pinned].sort((a, b) => a - b), "the steps current with the drawing pinned").toEqual(firstArrives ? all.slice(1) : all);
+        if (firstArrives) expect(arriving.has(1), "the first step, as the drawing arrives").toBe(true);
+        // The last step: from where it turns current to where the drawing lets go, to the pixel.
+        expect(lastFrom, "the last step turns current").toBeGreaterThan(from);
+        expect(letGo, "the drawing lets go after it").toBeGreaterThan(lastFrom);
+        const first = async (lo: number, hi: number, holds: (s: { state: number; stuck: boolean }) => boolean) => {
+          while (hi - lo > 1) {
+            const mid = Math.floor((lo + hi) / 2);
+            if (holds(await at(mid))) hi = mid;
+            else lo = mid;
+          }
+          return hi;
+        };
+        const start = await first(lastFrom - 16, lastFrom, (s) => s.state === journey.steps);
+        const end = await first(letGo - 16, letGo, (s) => !s.stuck);
+        expect(end - start, "the scroll the last step holds with the drawing pinned").toBeGreaterThanOrEqual(200);
+        await context.close();
+      });
+    }
+  }
+
+  test("Home's lanes number their rows at 11 px on phones and tablets, as NavDhan SDK's narrow lanes do", async ({ page }) => {
+    for (const [width, size] of [[390, "11px"], [360, "11px"], [820, "11px"], [1440, "13px"]] as const) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto("/");
+      const numbers = page.locator(".story-on .lane-no");
+      await expect(numbers, `${width}`).toHaveText(["01", "02", "03", "04", "05", "06", "07", "08"]);
+      for (const no of await numbers.all()) {
+        await expect(no, `${width}`).toBeVisible();
+        await expect(no, `${width}`).toHaveCSS("font-size", size);
+      }
+      // Clear of the first lifeline, on its row's middle.
+      const fit = await page.locator(".story-on .lanes").evaluate((lanes) => {
+        const first = lanes.querySelector(":scope > span.w-px")!.getBoundingClientRect().left;
+        return [...lanes.querySelectorAll(".lane-no")].every((no) => no.getBoundingClientRect().right < first);
+      });
+      expect(fit, `${width}`).toBe(true);
+    }
+  });
+});
+
+test.describe("How it works: the unpaid flow draws with the scroll, the fork is a pick, the terms show six (step 11)", () => {
+  const HIW = "/how-it-works";
+  const INK = "rgb(2, 39, 50)";
+  const MUTED = "rgb(78, 104, 111)";
+  // Each step's beat: 01 to 03, then the fork (4), then the branches' first steps (04 and 06), then 05.
+  const BEATS: Record<string, number> = { "01": 1, "02": 2, "03": 3, "04": 5, "05": 6, "06": 5 };
+  const flow = (page: Page) => page.locator(".unpaid-flow");
+  const button = (page: Page, name: string) => flow(page).getByRole("button", { name, exact: true });
+
+  /** The flow once still: the beats drawn, and each step's look (raised, its words' colour) and each line's. */
+  const state = async (page: Page, wait = true) => {
+    // Still twice running, a frame apart (not without script: no frames are asked for there).
+    if (wait) await expect.poll(() => flow(page).evaluate((el) => el.getAnimations({ subtree: true }).filter((a) => a.playState === "running").length)).toBe(0);
+    if (wait) await page.waitForTimeout(50);
+    return flow(page).evaluate((el) => {
+      const boxes = Object.fromEntries(
+        [...el.querySelectorAll<HTMLElement>(".flow-box")].map((box) => [
+          box.querySelector("span")!.textContent,
+          { on: Number(el.getAttribute("data-lit")) >= Number(box.dataset.beat), raised: getComputedStyle(box, "::before").opacity, words: getComputedStyle(box.querySelector("p")!).color, shown: box.getClientRects().length > 0 },
+        ]),
+      );
+      const lines = [...el.querySelectorAll<SVGPathElement>(".flow-line")].filter((line) => line.getClientRects().length > 0).map((line) => getComputedStyle(line).strokeDashoffset);
+      return { lit: Number(el.getAttribute("data-lit")), boxes, lines };
+    });
+  };
+  /** Scroll so the flow's top sits at y on the screen. */
+  const flowTopAt = (page: Page, y: number) =>
+    flow(page).evaluate((el, y) => window.scrollTo({ top: el.getBoundingClientRect().top + scrollY - y, behavior: "instant" }), y);
+
+  test("at 1440 the path draws with the scroll: 01 to 03 light in order, then the fork, then the branch, and it runs back up", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(HIW);
+    // Beat n once the flow's top is n marks of 7svh (63 px) above the line at 80% of the screen (720).
+    const at = async (n: number) => {
+      await flowTopAt(page, 720 - 63 * n - 30);
+      await expect(flow(page), `beat ${n}`).toHaveAttribute("data-lit", String(n));
+      const s = await state(page);
+      for (const [no, beat] of Object.entries(BEATS)) {
+        const lit = beat <= n;
+        expect(s.boxes[no].on, `beat ${n}: ${no}`).toBe(lit);
+        // The picked branch's steps: raised with their words in ink once lit, flat in the secondary colour before.
+        if (no !== "06") expect([s.boxes[no].raised, s.boxes[no].words], `beat ${n}: ${no}`).toEqual(lit ? ["1", INK] : ["0", MUTED]);
+      }
+      return s;
+    };
+    for (const n of [0, 1, 2, 3, 4, 5, 6]) await at(n);
+    // Every line drawn at the end; on the way up the path runs back.
+    expect((await state(page)).lines.every((offset) => offset === "0px" || offset === "0")).toBe(true);
+    for (const n of [5, 3, 1, 0]) await at(n);
+    expect((await state(page)).lines.every((offset) => offset === "1px" || offset === "1")).toBe(true);
+    // Past the flow, scrolled out of the top, it stays drawn.
+    await flowTopAt(page, -1200);
+    await expect(flow(page)).toHaveAttribute("data-lit", "6");
+  });
+
+  test("at 1440 the fork's labels are buttons by their arrows, No dispute picked: its branch lit, the other at 30% and inert", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(HIW);
+    await flowTopAt(page, 100);
+    await expect(flow(page)).toHaveAttribute("data-lit", "6");
+    await expect(button(page, "No dispute")).toHaveAttribute("aria-pressed", "true");
+    await expect(button(page, "A dispute")).toHaveAttribute("aria-pressed", "false");
+    await expect(flow(page).locator(".flow-label")).toHaveCount(2);
+    for (const label of await flow(page).locator(".flow-label").all()) await expect(label).toBeHidden();
+    // As the frame places them (333:2784): 164 in and 164 down; the other's right edge 1116 in.
+    const origin = (await flow(page).locator(".flow-box").first().boundingBox())!;
+    const no = (await button(page, "No dispute").boundingBox())!;
+    const yes = (await button(page, "A dispute").boundingBox())!;
+    expect([Math.round(no.x - origin.x), Math.round(no.height)]).toEqual([164, 38]);
+    expect(Math.abs(no.y - origin.y - 164), "164 down, to a pixel").toBeLessThanOrEqual(1.5);
+    expect(Math.round(yes.x + yes.width - origin.x)).toBe(1116);
+    expect(Math.round(yes.y)).toBe(Math.round(no.y));
+    await expect(button(page, "No dispute")).toHaveCSS("background-color", INK);
+    await expect(button(page, "A dispute")).toHaveCSS("background-color", "rgb(255, 255, 255)");
+    const branch = (b: number) => flow(page).locator(`.flow-branch[data-branch="${b}"]`);
+    const dimmed = async (b: number) => {
+      await expect(branch(b)).toHaveCSS("opacity", "0.3");
+      await expect(branch(b)).toHaveAttribute("inert", "");
+      await expect(flow(page).locator(`.fork-half[data-branch="${b}"]`)).toHaveCSS("opacity", "0.3");
+      await expect(flow(page).locator(`.fork-arrow[data-branch="${b}"]`)).toHaveCSS("opacity", "0.3");
+      await expect(branch(1 - b)).toHaveCSS("opacity", "1");
+      expect(await branch(1 - b).getAttribute("inert")).toBeNull();
+    };
+    await dimmed(1);
+    await expectNoAxeViolations(page);
+    await button(page, "A dispute").click();
+    await expect(button(page, "A dispute")).toHaveAttribute("aria-pressed", "true");
+    await dimmed(0);
+    await expectNoAxeViolations(page);
+  });
+
+  for (const [width, height] of [[1440, 900], [1180, 820]] as const) {
+    test(`at ${width} hover picks a case, down, up, three rounds, and again after a reload; the pick stays when the pointer leaves`, async ({ page }) => {
+      await page.setViewportSize({ width, height });
+      await page.goto(HIW);
+      const names = ["No dispute", "A dispute"];
+      for (const pass of ["first load", "after a reload"]) {
+        if (pass === "after a reload") await page.reload();
+        await flowTopAt(page, 100);
+        for (let round = 1; round <= 3; round++) {
+          for (const order of [[0, 1], [1, 0]]) {
+            for (const i of order) {
+              await button(page, names[i]).hover();
+              const where = `${pass}, round ${round}: ${names[i]}`;
+              await expect(button(page, names[i]), where).toHaveAttribute("aria-pressed", "true");
+              await expect(button(page, names[1 - i]), where).toHaveAttribute("aria-pressed", "false");
+              await expect(flow(page), where).toHaveAttribute("data-case", i === 0 ? "no" : "yes");
+              await expect(flow(page).locator(`.flow-branch[data-branch="${1 - i}"]`), where).toHaveCSS("opacity", "0.3");
+            }
+          }
+        }
+        await page.mouse.move(5, 5);
+        await expect(button(page, "No dispute"), `${pass}: the pick stays`).toHaveAttribute("aria-pressed", "true");
+      }
+    });
+  }
+
+  test("by keyboard: Tab reaches the picked case, the arrow keys, Home and End move between the two and pick", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(HIW);
+    await flowTopAt(page, 100);
+    expect(await flow(page).locator("button[aria-pressed]").evaluateAll((els) => els.map((el) => (el as HTMLElement).tabIndex))).toEqual([0, -1]);
+    await button(page, "No dispute").focus();
+    await page.keyboard.press("Shift+Tab");
+    await page.keyboard.press("Tab");
+    await expect(button(page, "No dispute")).toBeFocused();
+    for (const [key, name] of [["ArrowRight", "A dispute"], ["ArrowLeft", "No dispute"], ["ArrowDown", "A dispute"], ["Home", "No dispute"], ["End", "A dispute"]] as const) {
+      await page.keyboard.press(key);
+      await expect(button(page, name), key).toBeFocused();
+      await expect(button(page, name), key).toHaveAttribute("aria-pressed", "true");
+    }
+    // One tab stop: Tab leaves the pair for what follows the flow.
+    await page.keyboard.press("Tab");
+    await expect(flow(page).locator("button:focus")).toHaveCount(0);
+  });
+
+  for (const [width, height] of [[390, 844], [820, 1180]] as const) {
+    test(`at ${width} the steps stack, the two buttons sit between step 03 and the branch, only the picked branch shows, and a tap picks`, async ({ browser }) => {
+      const context = await browser.newContext({ viewport: { width, height }, hasTouch: true, isMobile: width < 768 });
+      const page = await context.newPage();
+      await page.goto(HIW);
+      await flowTopAt(page, -900);
+      const box = async (no: string) => (await flow(page).locator(".flow-box", { hasText: new RegExp(`^${no}`) }).boundingBox())!;
+      const [s1, s2, s3, s4, s5] = await Promise.all(["01", "02", "03", "04", "05"].map(box));
+      for (const [a, b] of [[s1, s2], [s2, s3], [s4, s5]]) expect(b.y).toBeGreaterThan(a.y + a.height);
+      const no = (await button(page, "No dispute").boundingBox())!;
+      const yes = (await button(page, "A dispute").boundingBox())!;
+      expect(no.y, "the buttons under step 03").toBeGreaterThan(s3.y + s3.height);
+      expect(s4.y, "the branch under the buttons").toBeGreaterThan(no.y + no.height);
+      expect(Math.round(yes.y)).toBe(Math.round(no.y));
+      // Centred under the arrow from step 03.
+      expect(Math.abs((no.x + yes.x + yes.width) / 2 - (s3.x + s3.width / 2))).toBeLessThan(2);
+      // Only the picked branch shows: 04 and 05, not 06; a tap on "A dispute" shows 06 alone.
+      const shown = async () => (await state(page)).boxes;
+      expect(Object.entries(await shown()).filter(([, b]) => b.shown).map(([n]) => n)).toEqual(["01", "02", "03", "04", "05"]);
+      const before = await page.evaluate(() => document.documentElement.scrollHeight);
+      await button(page, "A dispute").tap();
+      await expect(button(page, "A dispute")).toHaveAttribute("aria-pressed", "true");
+      expect(Object.entries(await shown()).filter(([, b]) => b.shown).map(([n]) => n)).toEqual(["01", "02", "03", "06"]);
+      // Lit as the reader has scrolled: everything above the line.
+      expect((await shown())["06"].on).toBe(true);
+      await button(page, "No dispute").tap();
+      await expect(button(page, "No dispute")).toHaveAttribute("aria-pressed", "true");
+      expect(await page.evaluate(() => document.documentElement.scrollHeight)).toBe(before);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0);
+      await context.close();
+    });
+  }
+
+  test("at 390 each step lights as it crosses the line 80% down the screen, and the path runs back up", async ({ browser }) => {
+    const context = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+    const page = await context.newPage();
+    await page.goto(HIW);
+    const line = 844 * 0.8;
+    for (const no of ["01", "02", "03", "04", "05", "04", "02"]) {
+      const box = flow(page).locator(".flow-box", { hasText: new RegExp(`^${no}`) });
+      // Just above the line, then just below it.
+      for (const [offset, lit] of [[-20, true], [20, false]] as const) {
+        await box.evaluate((el, y) => window.scrollTo({ top: el.getBoundingClientRect().top + scrollY - y, behavior: "instant" }), line + offset);
+        await expect.poll(async () => (await state(page)).boxes[no].on, `${no} ${lit ? "past" : "before"} the line`).toBe(lit);
+      }
+    }
+    await context.close();
+  });
+
+  test("without script or with reduced motion: everything lit, both branches under their labels, as before", async ({ browser }) => {
+    for (const options of [{ javaScriptEnabled: false }, { reducedMotion: "reduce" as const }]) {
+      for (const [width, height] of [[1440, 900], [390, 844]] as const) {
+        const where = `${JSON.stringify(options)} at ${width}`;
+        const context = await browser.newContext({ ...options, viewport: { width, height } });
+        const page = await context.newPage();
+        await page.goto(HIW);
+        await flow(page).scrollIntoViewIfNeeded();
+        await expect(flow(page).locator(".flow-pick"), where).toBeHidden();
+        await expect(flow(page).locator(".flow-label"), where).toHaveText(["No dispute", "A dispute"]);
+        for (const label of await flow(page).locator(".flow-label").all()) await expect(label, where).toBeVisible();
+        const s = await state(page, options.javaScriptEnabled !== false);
+        for (const [no, look] of Object.entries(s.boxes)) expect([no, look.shown, look.raised, look.words], where).toEqual([no, true, "1", INK]);
+        expect(s.lines.every((offset) => offset === "0px" || offset === "0"), where).toBe(true);
+        for (const b of [0, 1]) await expect(flow(page).locator(`.flow-branch[data-branch="${b}"]`), where).toHaveCSS("opacity", "1");
+        await context.close();
+      }
+    }
+  });
+
+  test("the terms: six rows, then Show all 19 terms opens the rest in place and goes to the first of them", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(HIW);
+    const rows = page.locator("tr[id^=term-]");
+    await expect(rows).toHaveCount(19);
+    await expect(rows.filter({ visible: true })).toHaveCount(6);
+    await expect(rows.filter({ visible: true }).last()).toHaveAttribute("id", "term-without-recourse-for-the-buyers-credit");
+    const control = page.getByRole("button", { name: "Show all 19 terms" });
+    // 24 px under the six rows (333:2955).
+    const table = (await page.locator("table").filter({ has: page.locator("#term-itfs") }).boundingBox())!;
+    expect(Math.round((await control.boundingBox())!.y - (table.y + table.height))).toBe(24);
+    await control.click();
+    await expect(control).toHaveCount(0);
+    await expect(rows.filter({ visible: true })).toHaveCount(19);
+    await expect(page.locator("#term-purchase-price")).toBeFocused();
+    await expectNoAxeViolations(page);
+  });
+
+  test("a link to a folded term opens the list and lands on its row, on arrival and on the page", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(`${HIW}#term-itfs`);
+    await expect(page.locator("#term-itfs")).toBeVisible();
+    await expect(page.locator("#term-itfs")).toBeInViewport();
+    await expect(page.locator("tr[id^=term-]").filter({ visible: true })).toHaveCount(19);
+    // On the page: a link followed after it has loaded.
+    await page.goto(HIW);
+    await page.waitForLoadState("networkidle");
+    await expect(page.locator("#term-edpms")).toBeHidden();
+    await page.evaluate(() => {
+      const link = document.createElement("a");
+      link.href = "#term-edpms";
+      link.textContent = "EDPMS";
+      document.querySelector("main")!.insertAdjacentElement("afterbegin", link);
+      link.click();
+    });
+    await expect(page.locator("#term-edpms")).toBeVisible();
+    await expect(page.locator("#term-edpms")).toBeInViewport();
+  });
+
+  test("without script all 19 terms show and the control is hidden", async ({ browser }) => {
+    const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
+    const page = await context.newPage();
+    await page.goto(HIW);
+    await expect(page.locator("tr[id^=term-]").filter({ visible: true })).toHaveCount(19);
+    await expect(page.getByRole("button", { name: "Show all 19 terms" })).toBeHidden();
+    await context.close();
   });
 });

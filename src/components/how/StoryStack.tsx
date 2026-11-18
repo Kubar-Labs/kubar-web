@@ -79,13 +79,13 @@ function Relying({ copy, idPrefix, className }: { copy: EvidenceCopy; idPrefix: 
         <p className="t-fine text-ink-muted">{copy.from}</p>
         <p className="t-body-sm text-ink">{copy.proves}</p>
       </div>
-      <ul className="grid gap-4 pt-5 md:grid-cols-2 md:gap-x-6 lg:grid-cols-4 lg:gap-5 lg:pt-4">
+      <ul className="grid gap-4 pt-5 md:grid-cols-2 md:gap-x-6 xl:grid-cols-4 xl:gap-5 xl:pt-4">
         {copy.relying.map((line, i) => (
-          <li key={line} data-from={RELIES[i]} className="flex items-start gap-3 lg:flex-col lg:gap-2 lg:pl-1.5">
-            <svg aria-hidden="true" width={10} height={28} viewBox="0 0 10 28" className="hidden shrink-0 overflow-visible lg:block">
+          <li key={line} data-from={RELIES[i]} className="flex items-start gap-3 xl:flex-col xl:gap-2 xl:pl-1.5">
+            <svg aria-hidden="true" width={10} height={28} viewBox="0 0 10 28" className="hidden shrink-0 overflow-visible xl:block">
               <Arrow id={`${idPrefix}-down-${i}`} kind="data" {...DOWN} />
             </svg>
-            <svg aria-hidden="true" width={22} height={10} viewBox="0 0 22 10" className="mt-[3px] shrink-0 overflow-visible lg:hidden">
+            <svg aria-hidden="true" width={22} height={10} viewBox="0 0 22 10" className="mt-[3px] shrink-0 overflow-visible xl:hidden">
               <Arrow id={`${idPrefix}-side-${i}`} kind="data" {...SIDE} />
             </svg>
             <span className="t-ui text-ink">{line}</span>
@@ -111,7 +111,7 @@ export function StoryStack({ copy }: { copy: EvidenceCopy }) {
           // On phones the stack is small: the list beside it carries the numbers.
           numberClassName="max-md:hidden"
         />
-        <ol className="stack-rows flex min-w-0 flex-1 flex-col md:absolute lg:block">
+        <ol className="stack-rows flex min-w-0 flex-1 flex-col md:absolute xl:block">
           {rows.map(({ doc, i }) => {
             const current = i === last;
             return (
@@ -120,7 +120,7 @@ export function StoryStack({ copy }: { copy: EvidenceCopy }) {
                 tabIndex={-1}
                 data-doc={doc.no}
                 data-from={LANDS[doc.no]}
-                className="relative flex cursor-default items-start gap-2 outline-offset-2 md:items-center md:gap-2.5 lg:h-[12.5%] lg:gap-3"
+                className="relative flex cursor-default items-start gap-2 outline-offset-2 md:items-center md:gap-2.5 lg:gap-3 xl:h-[12.5%]"
               >
                 <span aria-hidden="true" className={cn("iso-leader hidden md:block", current && "is-current")} />
                 <span className={cn("t-code shrink-0 whitespace-nowrap md:w-[49px]", current ? "text-accent" : "text-ink-muted")}>
@@ -132,20 +132,22 @@ export function StoryStack({ copy }: { copy: EvidenceCopy }) {
           })}
         </ol>
       </div>
-      <Relying copy={copy} idPrefix="story-pin" className="hidden pt-2 lg:block" />
+      {/* Pinned with the stack only from 1200: beside 360 px cards there is no room for them, so from
+          1024 to 1199 they follow the cards, as on tablets. */}
+      <Relying copy={copy} idPrefix="story-pin" className="hidden pt-2 xl:block" />
     </PickStage>
   );
 }
 
 /**
- * What follows the cards: below desktop, the financier's line and the four
+ * What follows the cards: below 1200, the financier's line and the four
  * relying lines (they can't stay pinned with the stack there); at every
  * width, the two notes under the stack.
  */
 export function StoryStackAfter({ copy, className }: { copy: EvidenceCopy; className?: string }) {
   return (
     <div className={cn("flex flex-col gap-6", className)}>
-      <Relying copy={copy} idPrefix="story-after" className="lg:hidden" />
+      <Relying copy={copy} idPrefix="story-after" className="xl:hidden" />
       <div className="flex flex-col gap-3">
         {copy.after.map((line) => (
           <p key={line} className="t-body-sm text-ink-muted lg:max-w-[660px]">

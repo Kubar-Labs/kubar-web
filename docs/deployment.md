@@ -52,7 +52,7 @@ curl -I http://kubar.tech
 curl -I https://www.kubar.tech
 curl -I https://kubar.tech
 curl -I https://kubar.tech/opengraph-image
-curl -I https://kubar.tech/media/kubar-labs-social-bd9a99c9.png
+curl -I https://kubar.tech/media/kubar-labs-social-86333cc0.png
 ```
 
 Expected results are an HTTP-to-HTTPS redirect, a redirect from `www` to the

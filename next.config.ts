@@ -26,6 +26,9 @@ const contentSecurityPolicy = [
 ].join("; ");
 
 const nextConfig: NextConfig = {
+  // The preview build has its own directory, so it never replaces the build in
+  // .next that the browser tests, Lighthouse and the JavaScript budget measure.
+  ...(process.env.LOCAL_PREVIEW === "1" ? { distDir: ".next-preview" } : {}),
   poweredByHeader: false,
   reactCompiler: true,
   experimental: {
@@ -47,7 +50,7 @@ const nextConfig: NextConfig = {
       { source: "/privacy", destination: "/legal/privacy", permanent: true },
       {
         source: "/opengraph-image",
-        destination: "/media/kubar-labs-social-bd9a99c9.png",
+        destination: "/media/kubar-labs-social-86333cc0.png",
         permanent: true,
       },
       {

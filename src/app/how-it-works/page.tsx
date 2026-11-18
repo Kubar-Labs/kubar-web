@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Fragment } from "react";
 import { useTranslations } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import { createPageMetadata } from "@/app/page-metadata";
@@ -24,7 +25,7 @@ import { TextLink } from "@/components/ui/TextLink";
  * steps; the rail as the pinned story at every width (section 3a), told on
  * the evidence stack, whose documents land state by state (section 13 A);
  * "If a buyer doesn't pay" as a flow with a fork; the signs map. No Illustrative tag (15 Nov): the lead says
- * "illustrative" in words. From 1200 up the page keeps its 1440
+ * "illustrative" in words. From 1024 up the page keeps its 1440
  * composition, the drawings taking their column's width (section 11).
  */
 
@@ -39,6 +40,8 @@ export default function HowItWorks() {
   const t = useTranslations("howItWorks");
   const footnotes = useTranslations("footnotes");
   const common = useTranslations("common");
+  // The money path's data path is labelled as on the stories ("Data path · Kubar").
+  const story = useTranslations("story");
   const states = t.raw("rail.states") as LedgerState[];
   const evidence = t.raw("evidence") as EvidenceCopy;
   const routes = t.raw("next.routes") as { tag: string; label: string; href: string }[];
@@ -90,19 +93,22 @@ export default function HowItWorks() {
 
       <Section id="money" labelledBy="money-heading" className="flex flex-col gap-10 lg:gap-16">
         <SectionHead id="money-heading" heading={t("money.heading")} layout="wide" />
+        {/* Centred in the section (Figma 333:2868). */}
         <MoneyPath
-          wide
           parties={t.raw("money.parties") as string[]}
           payments={t.raw("money.payments") as string[]}
           routes={t.raw("money.routes") as [string, string][]}
+          sweep={t("money.sweep")}
           kubarNote={t("money.kubarNote")}
+          dataPath={story("dataPath")}
           under={t("money.under")}
           columns={t.raw("money.columns") as { payment: string; from: string; to: string }}
+          controls={t.raw("money.controls") as string[]}
           alt={t("money.alt")}
         />
       </Section>
 
-      <Section labelledBy="unpaid-heading" className="flex flex-col gap-10 lg:gap-16">
+      <Section labelledBy="unpaid-heading" ground="inset" className="flex flex-col gap-10 lg:gap-16">
         <SectionHead id="unpaid-heading" heading={t("unpaid.heading")} layout="wide" />
         <div className="flex flex-col gap-10 lg:gap-8">
           <UnpaidFlow steps={t.raw("unpaid.rows") as UnpaidStep[]} none={t("unpaid.none")} />
@@ -113,7 +119,7 @@ export default function HowItWorks() {
       <Section labelledBy="who-heading" className="flex flex-col gap-10 lg:gap-16">
         <SectionHead id="who-heading" heading={t("who.heading")} layout="wide" />
         <div className="flex flex-col items-start gap-8 lg:gap-16">
-          {/* From 1200 up the map shows; the register stays as a table for screen readers at every
+          {/* From 1024 up the map shows; the register stays as a table for screen readers at every
               width, and is what tablets and phones show. */}
           <SignsMap className="hidden w-full lg:block" rows={t.raw("who.rows") as string[][]} copy={t.raw("who.map") as SignsMapCopy} />
           <Register
@@ -129,13 +135,22 @@ export default function HowItWorks() {
 
       <Section id="terms" labelledBy="terms-heading" className="flex flex-col gap-10 lg:gap-16">
         <SectionHead id="terms-heading" heading={t("terms.heading")} layout="wide" />
+        {/* The first six terms; "Show all 19 terms" opens the rest in place (step 11, 333:2955). */}
         <Terms
           className="lg:max-w-[954px]"
+          shown={6}
+          showAll={t("terms.showAll")}
           rows={(t.raw("terms.rows") as [string, string][]).map(([term, meaning]) => {
             const [before, after] = meaning.split("<marker></marker>");
             return [
               term,
-              after === undefined ? meaning : <>{before}<FootnoteMarker n={1} target={FN_STATUS} refId="fnref-1-terms" />{after}</>,
+              after === undefined ? meaning : (
+                <Fragment key={term}>
+                  {before}
+                  <FootnoteMarker n={1} target={FN_STATUS} refId="fnref-1-terms" />
+                  {after}
+                </Fragment>
+              ),
             ];
           })}
         />

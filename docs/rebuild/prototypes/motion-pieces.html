@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<!-- Reference prototype for the next build (16 Nov 2026). Motion, order and small-screen layout only: copy and tokens come from the repo. -->
+<title>Kubar Motion Pieces</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: five working pieces from the site, one per section, in the site's own register look. Three kinds of interaction only: play once on scroll, pick, and a pinned step-through. Single light look by choice: the site has no dark mode. */
+:root{--page:#FFFFFF;--inset:#ECECE8;--ink:#022732;--muted:#4E686F;--rule:#CCD4D6;--rani:#AD2468;--face-l:#F0F2F3;--face-r:#F7F9F9;--on-ink:#FFFFFF;
+  --sans:"Schibsted Grotesk",ui-sans-serif,system-ui,sans-serif;--mono:"Geist Mono",ui-monospace,SFMono-Regular,Menlo,monospace}
+*{box-sizing:border-box}
+body{background:var(--page);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1280px;margin:0 auto;padding-left:max(20px, env(safe-area-inset-left, 0px));padding-right:max(20px, env(safe-area-inset-right, 0px))}
+@media (min-width:900px){.wrap{padding-left:max(48px, env(safe-area-inset-left, 0px));padding-right:max(48px, env(safe-area-inset-right, 0px))}}
+h1,h2{font-weight:500;margin:0;text-wrap:balance;letter-spacing:-0.01em}
+h1{font-size:clamp(28px,3.4vw,40px);line-height:1.1} h2{font-size:clamp(26px,3vw,40px);line-height:1.12}
+.where{font-family:var(--mono);font-size:13px;color:var(--muted);margin:0 0 12px}
+.muted{color:var(--muted)} .fine{font-size:13px;color:var(--muted)}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:left}
+:focus-visible{outline:2px solid var(--rani);outline-offset:2px}
+.top .wrap{padding-block:40px 8px} .top p{max-width:46em;color:var(--muted);margin:12px 0 0}
+.sec .wrap{padding-block:56px} .sec.in{background:var(--inset)}
+.sec h2{margin-bottom:32px;max-width:18em}
+.draw svg{display:block;width:100%;height:auto;margin:0 auto}
+svg text{font-family:var(--sans);fill:var(--ink)} svg .m{fill:var(--muted)} svg .mono{font-family:var(--mono);fill:var(--muted);font-size:13px}
+svg .fl{fill:var(--face-l)} svg .fr{fill:var(--face-r)} svg .ft{fill:var(--page)} svg .ft.cur{fill:var(--ink)} svg .fl,svg .fr,svg .ft{stroke:var(--rule)}
+/* A · money path */
+.pay .ln{stroke:var(--ink);stroke-width:1.5;stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset .7s ease}
+.pay .hd{fill:var(--ink);opacity:0;transition:opacity .2s .6s} .pay .dot{fill:var(--rani);opacity:0}
+.pay text,.pay .no{opacity:.35;transition:opacity .3s}
+.pay.on .ln{stroke-dashoffset:0} .pay.on .hd{opacity:1} .pay.on text,.pay.on .no{opacity:1}
+.pay.on .dot{animation:go .75s ease forwards} @keyframes go{0%{opacity:1;transform:translate(0,0)}90%{opacity:1}100%{opacity:0;transform:translate(var(--dx,0),var(--dy,0))}}
+.mark{fill:var(--page);stroke:var(--muted);transition:fill .3s .7s,stroke .3s .7s} .mark.on{fill:var(--ink);stroke:var(--ink)}
+.ctl{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:20px}
+.ctl button{border:1px solid var(--ink);padding:8px 14px;font-size:15px;font-weight:500;background:var(--page)} .ctl button:hover{background:var(--ink);color:var(--on-ink)} .ctl .bn{font-family:var(--mono);font-size:13px;margin-right:8px;opacity:.7}
+.cap{color:var(--muted);font-size:15px;text-align:center;max-width:44em;margin:16px auto 0}
+/* pickers */
+.pick{display:grid;gap:24px;align-items:start} @media (min-width:900px){.pick{grid-template-columns:minmax(0,380px) minmax(0,1fr);gap:64px}}
+.plist{border-top:2px solid var(--ink);display:grid}
+.plist button{padding:14px 16px;border-bottom:1px solid var(--rule);font-weight:500;font-size:18px;display:flex;justify-content:space-between;gap:12px}
+.plist button[aria-pressed="true"]{background:var(--ink);color:var(--on-ink)} .plist button[aria-pressed="true"]::after{content:"→"}
+.board{display:flex;flex-wrap:wrap;gap:10px}
+.tok{padding:10px 14px;border:1px solid var(--rule);color:var(--muted);font-size:15px;font-weight:500;display:flex;gap:8px;align-items:center;transition:background .25s,color .25s,border-color .25s}
+.tok::before{content:"";width:8px;height:8px;border-radius:50%;border:1.5px solid transparent;flex:none}
+.tok.held{background:var(--ink);border-color:var(--ink);color:var(--on-ink)} .tok.held::before{background:var(--on-ink)}
+.tok.not{border:1.5px solid var(--rani);color:var(--ink)} .tok.not::before{border-color:var(--rani)}
+.say{border-top:1px solid var(--rule);margin-top:24px;padding-top:20px;display:grid;gap:14px} .say p{margin:0} .say small{display:block;font-size:13px;color:var(--muted)}
+.role{font-size:clamp(20px,2.4vw,28px);line-height:1.25;font-weight:500;margin:0;min-height:4.2em}
+/* C · journey */
+.story{display:grid} .stage{background:var(--inset);padding:16px}
+.heads{display:grid;grid-template-columns:repeat(3,1fr);gap:0;align-items:stretch} .heads span{justify-self:center;display:grid;place-items:center;border:1px solid var(--ink);background:var(--page);padding:8px 6px;font-weight:500;font-size:clamp(12px,1.3vw,15px);text-align:center;min-width:76%}
+.heads span.k{background:var(--ink);color:var(--on-ink)}
+.lanes svg{display:block;width:100%;height:auto} .lanes .band{fill:var(--page);opacity:0;transition:opacity .3s} .lanes .row.cur .band{opacity:1}
+.lanes .bar{fill:var(--rani);opacity:0} .lanes .row.cur .bar{opacity:1}
+.lanes .it{opacity:0;transition:opacity .4s} .lanes .row.done .it,.lanes .row.cur .it{opacity:1}
+.lanes .num{font-family:var(--mono);fill:var(--muted)} .lanes .row.cur .num{fill:var(--rani)}
+.lanes .d{stroke:var(--muted);stroke-width:1.5;stroke-dasharray:6 4;fill:none} .lanes .s{stroke:var(--ink);stroke-width:1.5;fill:none} .lanes .lab{fill:var(--muted)}
+.cardslot{display:flex;align-items:flex-start;min-height:230px}
+.card{width:100%;background:var(--page);border:1px solid var(--rule);padding:20px;display:grid;gap:10px;opacity:.45;transition:opacity .3s,box-shadow .3s}
+.card.on{opacity:1;box-shadow:0 2px 4px rgba(2,39,50,.06),0 14px 36px rgba(2,39,50,.10)}
+.card .ct{font-family:var(--mono);font-size:13px;color:var(--muted)} .card.on .ct{color:var(--rani)} .card p{margin:0;font-size:clamp(17px,1.5vw,20px);line-height:1.4}
+@media (max-width:899.98px){.stagepin{position:sticky;top:env(safe-area-inset-top, 0px);z-index:5;background:var(--page);padding-bottom:14px}.stage{padding:12px 10px}.heads,.lanes{max-width:440px;margin-inline:auto}.cards{padding-bottom:6svh}}
+@media (min-width:900px){.story{grid-template-columns:minmax(280px,400px) minmax(0,1fr);gap:24px;align-items:start}.stagepin{position:sticky;top:24px;order:2}.cards{padding-block:120px}.cardslot{min-height:240px}}
+/* D · unpaid */
+.uf{display:grid;gap:28px;align-items:start}
+.step{position:relative;border:1px solid var(--rule);background:var(--page);padding:16px 18px;display:grid;gap:8px;align-content:start;color:var(--rule);box-shadow:0 1px 2px rgba(2,39,50,.05),0 8px 20px rgba(2,39,50,.06);transition:color .35s,opacity .35s}
+.step>*{opacity:.3;transition:opacity .35s} .step.lit{color:var(--ink)} .step.lit>*{opacity:1}
+.step .hd{display:flex;justify-content:space-between;gap:12px;font-size:13px;color:var(--muted)} .step .hd b{font-family:var(--mono);font-weight:500;color:var(--rani)} .step p{margin:0;color:var(--ink)}
+.conn::before,.conn::after{content:"";position:absolute}
+.conn::before{left:28px;top:100%;height:21px;border-left:1.5px solid currentColor}
+.conn::after{left:24.25px;top:calc(100% + 20px);border-top:8px solid currentColor;border-left:4.5px solid transparent;border-right:4.5px solid transparent}
+.fbs{display:flex;flex-wrap:wrap;gap:8px}
+.fb{border:1px solid var(--ink);padding:8px 14px;font-weight:500;font-size:15px;background:var(--page)} .fb[aria-pressed="true"]{background:var(--ink);color:var(--on-ink)}
+.ufl{display:none}
+.uf[data-case="no"] .by,.uf[data-case="yes"] .bn{display:none}
+@media (min-width:1100px){
+ .uf{display:block;position:relative;height:392px}
+ .uf .step{position:absolute;width:23.4375%;min-height:112px}
+ .uf .s1{left:0;top:0}.uf .s2{left:28.125%;top:0}.uf .s3{left:56.25%;top:0}.uf .s4{left:0;top:232px}.uf .s5{left:28.125%;top:232px}.uf .s6{left:76.5625%;top:232px}
+ .uf .conn::before,.uf .conn::after{display:none}
+ .fbs{display:contents} .fb{position:absolute;top:177px;opacity:0;transition:opacity .3s,background .2s,color .2s} .fb.lit{opacity:1} .fb.no{left:12.8%} .fb.yes{right:12.8%}
+ .ufl{display:block;position:absolute;left:0;top:0;overflow:visible}
+ .uf[data-case="no"] .by,.uf[data-case="yes"] .bn{display:grid;opacity:.3}
+ .ufl .seg{stroke:var(--ink);stroke-width:1.5;fill:none;stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset .45s ease} .ufl .seg.lit{stroke-dashoffset:0}
+ .ufl .ah{fill:var(--ink);opacity:0;transition:opacity .2s .35s} .ufl .ah.lit{opacity:1}
+ .ufl g{transition:opacity .3s} .uf[data-case="no"] .ufl .ry,.uf[data-case="yes"] .ufl .rn{opacity:.3}
+}
+.note{margin-top:32px;max-width:46em} .note b{font-weight:500;display:block;margin-bottom:6px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}.pay .ln{stroke-dashoffset:0}.pay .hd,.pay text,.pay .no{opacity:1}}
+</style>
+
+<section class="top"><div class="wrap"><h1>Five pieces, working</h1><p>For review before the build. Each is a section of the live site made to move or to answer. Scroll, and tap where a control shows. The words are the site's own.</p></div></section>
+
+<section class="sec in"><div class="wrap">
+  <p class="where">Kubar Protocol and How it works</p><h2>The money moves only between banks.</h2>
+  <div class="draw"><svg id="money" role="img" aria-label="Three payments move between the buyer, the financier and the exporter’s bank. None touches Kubar."></svg></div>
+  <div class="ctl" id="moneyCtl"></div>
+  <p class="cap">Every payment carries the receivable’s reference, and Kubar matches each one to its receivable.</p>
+</div></section>
+
+<section class="sec"><div class="wrap">
+  <p class="where">Kubar Protocol</p><h2>You hold the receivable, the policy and the account.</h2>
+  <div class="pick"><div class="plist" id="holdList"></div><div><div class="board" id="holdBoard"></div><div class="say" id="holdSay"></div></div></div>
+</div></section>
+
+<section class="sec"><div class="wrap">
+  <p class="where">NavDhan SDK</p><h2>How it runs on your platform.</h2>
+  <div class="story">
+    <div class="stagepin"><div class="stage"><div class="heads"><span>Your platform</span><span class="k">Kubar Protocol</span><span>The financier</span></div><div class="lanes" id="lanes"></div></div></div>
+    <div class="cards" id="runCards"></div>
+  </div>
+</div></section>
+
+<section class="sec in" id="unpaid"><div class="wrap">
+  <p class="where">How it works</p><h2>If a buyer doesn’t pay.</h2>
+  <div class="flow" id="flow"></div>
+  <div class="note"><b>Kubar holds none of the risk</b><span class="muted">This is how a programme runs with cover in the financier’s name. Where a programme starts on exporters’ own policies, the terms are set out before any receivable is sold.</span></div>
+</div></section>
+
+<section class="sec"><div class="wrap">
+  <p class="where">Kubar Protocol</p><h2>Where each institution fits.</h2>
+  <div class="pick"><div class="plist" id="fitList"></div><div><p class="fine" style="margin:0 0 10px">Role</p><p class="role" id="fitRole"></p></div></div>
+</div></section>
+
+<script>
+const K=Math.tan(Math.PI/6), P=a=>a.map(p=>p.map(v=>+v.toFixed(1)).join(',')).join(' ');
+function plate(cx,cy,a,t,cur){const h=a*K;return `<ellipse cx="${cx}" cy="${cy+h+t+2}" rx="${a*.8}" ry="${a*.15}" fill="#022732" opacity=".14" filter="url(#b)"/><polygon class="fl" points="${P([[cx-a,cy],[cx,cy+h],[cx,cy+h+t],[cx-a,cy+t]])}"/><polygon class="fr" points="${P([[cx,cy+h],[cx+a,cy],[cx+a,cy+t],[cx,cy+h+t]])}"/><polygon class="ft${cur?' cur':''}" points="${P([[cx,cy-h],[cx+a,cy],[cx,cy+h],[cx-a,cy]])}"/>`}
+/* A · money path: one drawing for wide screens, one for narrow */
+(function(){const svg=document.getElementById('money'),mq=matchMedia('(max-width:899.98px)');let timers=[],seen=false;
+ const L=[['1',['Purchase price, at purchase (90% of face)'],['Purchase price, at purchase','(90% of face)']],['2',['Face value, on the due date'],['Face value, on the due date','Collection account, in the','exporter’s name, swept to','the financier']],['3',['Deferred purchase price:','the balance, less discount and charges'],['Deferred purchase price:','the balance, less discount','and charges']]];
+ const N=[['b','Buyer, Singapore'],['f','Financier'],['e','Exporter’s bank']];
+ function draw(){const c=mq.matches;let s='<defs><filter id="b" x="-40%" y="-150%" width="180%" height="400%"><feGaussianBlur stdDeviation="7"/></filter></defs>';
+  const pay=(x1,y1,x2,y2)=>{const v=x1===x2,hd=v?[[x2-4.5,y2-8],[x2+4.5,y2-8],[x2,y2]]:[[x2-8,y2-4.5],[x2,y2],[x2-8,y2+4.5]];return `<line class="ln" pathLength="1" x1="${x1}" y1="${y1}" x2="${v?x2:x2-6}" y2="${v?y2-6:y2}"/><polygon class="hd" points="${P(hd)}"/><circle class="dot" cx="${x1}" cy="${y1}" r="4"/>`};
+  const stop=(x,y)=>`<circle class="hd" cx="${x}" cy="${y}" r="4.5" style="fill:#fff;stroke:#022732;stroke-width:1.5"/>`,cap=(x,y)=>['Collection account, in the exporter’s name,','swept to the financier'].map((l,j)=>`<text x="${x}" y="${y+j*17}" text-anchor="middle" font-size="13">${l}</text>`).join('');
+  let W,H,ky,kx,marks;
+  if(!c){W=760;H=400;const X={b:120,f:380,e:640},cy=200,a=92,t=22;
+   N.forEach(([k,n])=>{s+=plate(X[k],cy,a,t,k==='f')+`<text x="${X[k]}" y="${cy+a*K+t+34}" text-anchor="middle" font-size="18" font-weight="500">${n}</text>`});
+   s+=`<polygon points="${P([[X.f,cy-22],[X.f+38,cy],[X.f,cy+22],[X.f-38,cy]])}" fill="#fff" stroke="#CCD4D6"/>`;
+   [[0,X.f+30,X.e-30,58],[1,X.b+30,X.f-30,96],[2,X.f+30,X.e-30,134]].forEach(([i,x1,x2,y])=>{const ls=L[i][1];s+=`<g class="pay" data-i="${i}" style="--dx:${x2-x1-8}px;--dy:0px"><text class="no mono" x="${x1-18}" y="${y+4}">${L[i][0]}</text>${pay(x1,y,x2,y)}${i===1?stop((x1+x2)/2,y)+cap((x1+x2)/2,y+22):''}`+ls.map((l,j)=>`<text x="${(x1+x2)/2}" y="${y-9-(ls.length-1-j)*17}" text-anchor="middle" font-size="13">${l}</text>`).join('')+'</g>'});
+   ky=356;kx=[28,104,732];marks=[250,400,550];
+  }else{W=350;H=648;const cx=84,Y={b:50,f:250,e:486},a=60,t=16,h=a*K,lx=126;
+   N.forEach(([k,n])=>{s+=plate(cx,Y[k],a,t,k==='f')+`<text x="${cx}" y="${Y[k]+h+t+28}" text-anchor="middle" font-size="16" font-weight="500">${n}</text>`});
+   s+=`<polygon points="${P([[cx,Y.f-14],[cx+25,Y.f],[cx,Y.f+14],[cx-25,Y.f]])}" fill="#fff" stroke="#CCD4D6"/>`;
+   const y2a=Y.b+h+t+40,y2b=Y.f-h-8,y1a=Y.f+h+t+40,y1b=Y.e-h-8;
+   [[1,cx,y2a,y2b,y2a+12],[0,cx-16,y1a,y1b,y1a+14],[2,cx+16,y1a,y1b,y1a+58]].forEach(([i,x,ya,yb,ly])=>{s+=`<g class="pay" data-i="${i}" style="--dx:0px;--dy:${yb-ya-8}px">${pay(x,ya,x,yb)}${i===1?stop(x,(ya+yb)/2):''}<text class="no mono" x="${lx}" y="${ly}">${L[i][0]}</text>`+L[i][2].map((l,j)=>`<text x="${lx+16}" y="${ly+j*17}" font-size="13">${l}</text>`).join('')+'</g>'});
+   ky=608;kx=[0,64,350];marks=[124,208,292];
+  }
+  s+=`<rect x="${kx[0]}" y="${ky-14}" width="${c?54:64}" height="28" fill="#022732"/><text x="${kx[0]+(c?27:32)}" y="${ky+5}" text-anchor="middle" font-size="13" font-weight="500" style="fill:#fff">Kubar</text><text class="m" x="${kx[1]}" y="${ky-14}" font-size="13">Data path · Kubar</text><line x1="${kx[1]}" y1="${ky}" x2="${kx[2]}" y2="${ky}" stroke="#4E686F" stroke-width="1.5" stroke-dasharray="6 4"/><rect x="${kx[2]-118}" y="${ky-36}" width="118" height="24" fill="#fff"/><text class="m" x="${kx[2]-59}" y="${ky-19.5}" text-anchor="middle" font-size="13">Kubar holds none</text>`;
+  marks.forEach((x,i)=>{s+=`<rect class="mark" data-i="${i}" x="${x-4}" y="${ky-4}" width="8" height="8"/><text class="mono" x="${x-4}" y="${ky+24}">${i+1}</text>`});
+  svg.setAttribute('viewBox',`0 0 ${W} ${H}`);svg.style.maxWidth=c?'380px':'820px';svg.innerHTML=s;if(seen)play(0)}
+ function play(from,one){const to=one?from:2;timers.forEach(clearTimeout);timers=[];svg.querySelectorAll('.pay,.mark').forEach(e=>{const i=+e.dataset.i;if(i>=from&&i<=to)e.classList.remove('on')});for(let i=from;i<=to;i++)timers.push(setTimeout(()=>svg.querySelectorAll(`[data-i="${i}"]`).forEach(e=>e.classList.add('on')),80+(i-from)*1100))}
+ const ctl=document.getElementById('moneyCtl'); ctl.innerHTML=['Purchase price','Face value','Deferred purchase price'].map((n,i)=>`<button data-n="${i}" data-one="1"><span class="bn">${i+1}</span>${n}</button>`).join('')+'<button data-n="0">All three</button>'; ctl.addEventListener('click',e=>{const b=e.target.closest('button'); if(b) play(+b.dataset.n,!!b.dataset.one)});
+ draw();mq.addEventListener('change',draw);
+ new IntersectionObserver((es,o)=>{es.forEach(e=>{if(e.isIntersecting){seen=true;play(0);o.disconnect()}})},{threshold:.45}).observe(svg);
+})();
+/* B and E · pickers */
+function picker(listEl,items,onPick){listEl.innerHTML=items.map((n,i)=>`<button aria-pressed="${i===0}" data-i="${i}">${n}</button>`).join('');listEl.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;listEl.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));onPick(+b.dataset.i)});onPick(0)}
+(function(){const T=['The receivable','The proceeds','The insurance policy','The buyer’s credit risk','Disputes, returns, set-off and fraud','The relationship with the exporter','Origination, the evidence package, servicing and reporting','Recourse to the exporter for the buyer’s credit'];
+ const R=[['You, the financier',[0,1,2,3],[7],'The receivable and its proceeds, the insurance policy and the buyer’s credit risk','Recourse to the exporter for the buyer’s credit'],['The insurer',[3],[4],'The buyer’s credit risk on the covered share','Dispute or fraud risk'],['The exporter',[4],[0],'Disputes, returns, set-off and fraud on its own trades','The receivable, once sold'],['The exporter’s bank',[5],[0],'Its relationship with the exporter','The receivables sold'],['Kubar',[6],[1,3],'Origination, the evidence package, servicing and reporting','Money or credit risk']];
+ const board=document.getElementById('holdBoard'),say=document.getElementById('holdSay'); board.innerHTML=T.map(t=>`<span class="tok">${t}</span>`).join('');
+ picker(document.getElementById('holdList'),R.map(r=>r[0]),i=>{const r=R[i];[...board.children].forEach((el,j)=>{el.className='tok'+(r[1].includes(j)?' held':r[2].includes(j)?' not':'')});say.innerHTML=`<p><small>Holds</small>${r[3]}</p><p><small>Doesn’t hold</small>${r[4]}</p>`});
+})();
+(function(){const F=[['Banks’ units at GIFT City (IFSC Banking Units)','Programme financier: set a limit and buy every receivable that fits'],['IFSC finance companies and factors','Programme financier; later, a lane for smaller receivables held on a finance company’s balance sheet'],['Banks, factors and finance companies abroad','Bid for programmes on Kubar’s own venue once it is registered, with no entity at GIFT City, if they meet its admission rules'],['Credit insurers','Cover the buyers in the financier’s name, with the evidence behind every receivable and a loss history over time'],['Funds','Later, buying receivables from financiers']];
+ picker(document.getElementById('fitList'),F.map(f=>f[0]),i=>{document.getElementById('fitRole').textContent=F[i][1]});
+})();
+/* C · journey: lanes redrawn for narrow screens so the words stay readable */
+(function(){const S=['Your exporter books and documents a shipment in your platform, as it does today.','NavDhan SDK checks the shipment against the programme’s rules and shows an indicative offer.','With the exporter’s consent, the shipment data and documents go to Kubar Protocol, which assembles the evidence package.','A financier buys the receivable and pays the exporter’s own bank.','On the due date the buyer pays the account on its invoice, and the payment reaches the financier. Your platform shows each step as it happens.'];
+ const mq=matchMedia('(max-width:899.98px)'),lanes=document.getElementById('lanes');let rows=[],cur=-1;
+ const cardsEl=document.getElementById('runCards'); cardsEl.innerHTML=S.map((t,i)=>`<div class="cardslot"><article class="card"><span class="ct">0${i+1} of 05</span><p>${t}</p></article></div>`).join('');
+ const cards=[...cardsEl.querySelectorAll('.card')],stage=document.querySelector('.stage');
+ function set(i){if(i===cur)return;cur=i;cards.forEach((c,j)=>c.classList.toggle('on',j===i));rows.forEach((r,j)=>{r.classList.toggle('cur',j===i);r.classList.toggle('done',j<i)})}
+ function draw(){const c=mq.matches,W=c?340:600,RH=c?48:64,X=[W/6,W/2,W*5/6],H=5*RH+10,ay=c?31:38,ly=c?17:24,fs=c?12:13,sy=RH/2-2;
+  const sq=(x,y)=>`<rect x="${x-4}" y="${y-4}" width="8" height="8" fill="#022732"/>`;
+  const arrow=(x1,x2,y,cls)=>{const d=x2>x1?1:-1;return `<line class="${cls}" x1="${x1}" y1="${y}" x2="${x2}" y2="${y}"/><polyline class="${cls}" stroke-dasharray="none" points="${x2-6*d},${y-4.5} ${x2},${y} ${x2-6*d},${y+4.5}"/>`};
+  const lab=(x,y,t)=>`<text class="lab" x="${x}" y="${y}" font-size="${fs}">${t}</text>`;
+  const it=[sq(X[0],sy),sq(X[0],sy)+lab(X[0]+12,sy+4,'NavDhan SDK'),arrow(X[0],X[1],ay,'d')+lab(X[0]+10,ly,'With the exporter’s consent'),arrow(X[1],X[2],ay,'s')+sq(X[2],ay)+lab(X[1]+10,ly,'The evidence package'),arrow(X[1],X[0],ay,'d')+sq(X[2],ay)+lab(X[0]+10,ly,'Each step as it happens')];
+  let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Five steps across your platform, Kubar Protocol and the financier">`; X.forEach(x=>{s+=`<line x1="${x}" y1="0" x2="${x}" y2="${H}" stroke="#CCD4D6"/>`});
+  for(let i=0;i<5;i++) s+=`<g class="row" data-i="${i}" transform="translate(0,${i*RH+6})"><rect class="band" x="${c?22:24}" y="0" width="${W-(c?22:24)}" height="${RH-4}"/><rect class="bar" x="${c?16:18}" y="0" width="4" height="${RH-4}"/><text class="num" x="0" y="${RH/2+2}" font-size="${c?11:13}">0${i+1}</text><g class="it">${it[i]}</g></g>`;
+  lanes.innerHTML=s+'</svg>';rows=[...lanes.querySelectorAll('.row')];const k=cur;cur=-1;set(Math.max(k,0))}
+ function upd(){const st=stage.getBoundingClientRect();let best=0;if(innerWidth<900){best=cards.length-1;for(let i=0;i<cards.length;i++){const r=cards[i].getBoundingClientRect();if(r.top>=st.bottom-r.height*.3){best=i;break}}}else{const tg=st.top+st.height*.5;let bd=1e9;cards.forEach((c,i)=>{const r=c.getBoundingClientRect(),d=Math.abs((r.top+r.bottom)/2-tg);if(d<bd){bd=d;best=i}})}set(best)}
+ draw();mq.addEventListener('change',()=>{draw();upd()});addEventListener('scroll',()=>requestAnimationFrame(upd),{passive:true});addEventListener('resize',upd);upd();
+})();
+/* D · unpaid: the site's own flow. The path draws with the scroll; the reader picks the case. */
+(function(){const R=[['01','Kubar','Flags the late payment straight away'],['02','Kubar','Checks with the exporter for any dispute'],['03','Kubar','Sends the insurer the notices the policy requires'],['04','The financier, as the insured','Lodges the claim with the evidence package behind it'],['05','The insurer','Pays claims on the covered share'],['06','The exporter','Answers only for its own side of the trade: disputes, returns, set-off, fraud and its warranties']];
+ const card=(r,cls)=>`<div class="step ${cls}"><div class="hd"><b>${r[0]}</b><span>${r[1]}</span></div><p>${r[2]}</p></div>`;
+ const uf=document.getElementById('flow'); uf.className='uf'; uf.dataset.case='no';
+ uf.innerHTML='<svg class="ufl" aria-hidden="true"></svg>'+card(R[0],'s1 conn')+card(R[1],'s2 conn')+card(R[2],'s3 conn')+'<div class="fbs" role="group" aria-label="Which case"><button class="fb no" aria-pressed="true">No dispute</button><button class="fb yes" aria-pressed="false">A dispute</button></div>'+card(R[3],'s4 bn conn')+card(R[4],'s5 bn')+card(R[5],'s6 by');
+ const svg=uf.querySelector('.ufl'),still=matchMedia('(prefers-reduced-motion:reduce)').matches,wide=()=>innerWidth>=1100,O={s1:1,s2:2,s3:3,s4:5,s5:6,s6:5};
+ function lines(){if(!wide()){svg.innerHTML='';return}const W=uf.clientWidth,k=W/1280,H=392,X=x=>+(x*k).toFixed(1),h3=Math.max(112,uf.querySelector('.s3').offsetHeight);
+  svg.setAttribute('width',W);svg.setAttribute('height',H);svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  const seg=(o,pts)=>`<polyline class="seg" data-o="${o}" pathLength="1" points="${pts.map(p=>p.join(',')).join(' ')}"/>`;
+  const hr=(o,x,y)=>`<polygon class="ah" data-o="${o}" points="${x-8},${y-4.5} ${x},${y} ${x-8},${y+4.5}"/>`,hd=(o,x,y)=>`<polygon class="ah" data-o="${o}" points="${x-4.5},${y-8} ${x+4.5},${y-8} ${x},${y}"/>`;
+  svg.innerHTML=seg(2,[[X(308),56],[X(352)-6,56]])+hr(2,X(352),56)+seg(3,[[X(668),56],[X(712)-6,56]])+hr(3,X(712),56)+seg(4,[[X(870),h3+6],[X(870),160]])
+   +`<g class="rn">${seg(4,[[X(870),160],[X(150),160],[X(150),218]])}${hd(4,X(150),224)}${seg(6,[[X(308),288],[X(352)-6,288]])}${hr(6,X(352),288)}</g>`
+   +`<g class="ry">${seg(4,[[X(870),160],[X(1130),160],[X(1130),218]])}${hd(4,X(1130),224)}</g>`}
+ function paint(){const w=wide(),vh=innerHeight,ft=uf.getBoundingClientRect().top;let n=6;if(!still&&w)n=Math.max(0,Math.min(6,Math.floor((vh*.82-ft)/(vh*.5)*7)));
+  uf.querySelectorAll('.step').forEach(e=>{const key=[...e.classList].find(c=>/^s\d$/.test(c));e.classList.toggle('lit',still||(w?O[key]<=n:e.getBoundingClientRect().top<vh*.8))});
+  uf.querySelectorAll('[data-o]').forEach(e=>e.classList.toggle('lit',+e.dataset.o<=n));uf.querySelectorAll('.fb').forEach(b=>b.classList.toggle('lit',n>=4))}
+ const bNo=uf.querySelector('.fb.no'),bYes=uf.querySelector('.fb.yes');function pick(d){uf.dataset.case=d?'yes':'no';bNo.setAttribute('aria-pressed',!d);bYes.setAttribute('aria-pressed',d);paint()}bNo.onclick=()=>pick(false);bYes.onclick=()=>pick(true);
+ lines();paint();addEventListener('scroll',()=>requestAnimationFrame(paint),{passive:true});addEventListener('resize',()=>{lines();paint()});
+})();
+</script>
+
+</body>
+</html>

@@ -8,18 +8,26 @@ import { cn } from "@/lib/utils";
  * Section head (Figma C4 91:288): at desktop the heading (400 wide) with its
  * lead beside it (680), 80 apart; "stacked" keeps the lead under the heading
  * for sections that put their whole body beside the head (400 + 800).
- * "wide" is a heading with no lead, up to 800. Below desktop everything stacks.
+ * "wide" is a heading with no lead, up to 800. Below the laptop width everything
+ * stacks. From 1024 to 1199 the heading column is 320 and the gap 48, so the
+ * body keeps its room on an iPad in landscape.
+ *
+ * Pacing (SPEC section 8): a section may sit on the inset ground, the full
+ * width of the screen, as the frames draw the sections a reader studies.
+ * Two in a row share one ground.
  */
 type SectionProps = {
   id?: string;
   labelledBy?: string;
+  /** "inset": the quiet ground (--color-inset), edge to edge. */
+  ground?: "page" | "inset";
   className?: string;
   children: React.ReactNode;
 };
 
-export function Section({ id, labelledBy, className, children }: SectionProps) {
+export function Section({ id, labelledBy, ground = "page", className, children }: SectionProps) {
   return (
-    <section id={id} aria-labelledby={labelledBy}>
+    <section id={id} aria-labelledby={labelledBy} className={ground === "inset" ? "bg-inset" : undefined}>
       <div className={cn("page-container py-(--section-space)", className)}>{children}</div>
     </section>
   );
@@ -38,14 +46,14 @@ export function SectionHead({ id, heading, lead, layout = "beside", className }:
     <div
       className={cn(
         "flex flex-col gap-5",
-        layout === "beside" && "lg:flex-row lg:gap-20",
-        layout === "stacked" && "lg:w-[400px] lg:shrink-0",
+        layout === "beside" && "lg:flex-row lg:gap-12 xl:gap-20",
+        layout === "stacked" && "lg:w-[320px] lg:shrink-0 xl:w-[400px]",
         className,
       )}
     >
       <h2
         id={id}
-        className={cn("t-h2 text-ink", layout === "wide" ? "lg:max-w-[800px]" : layout === "beside" && "lg:w-[400px] lg:shrink-0")}
+        className={cn("t-h2 text-ink", layout === "wide" ? "lg:max-w-[800px]" : layout === "beside" && "lg:w-[320px] lg:shrink-0 xl:w-[400px]")}
       >
         {heading}
       </h2>

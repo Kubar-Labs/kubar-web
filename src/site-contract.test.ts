@@ -49,7 +49,8 @@ describe("routes and redirects (HANDOFF section 5)", () => {
 });
 
 describe("copy matches docs/rebuild/copy word for word", () => {
-  const allMessages = JSON.stringify(messages);
+  // <nb> keeps a word on one line (a typesetting mark, not words), so it is left out of the comparisons.
+  const allMessages = JSON.stringify(messages).replace(/<\/?nb>/g, "");
 
   /** Every tagged line of a copy file, without its tag and trailing notes. */
   function copyLines(file: string) {
@@ -166,7 +167,9 @@ describe("copy matches docs/rebuild/copy word for word", () => {
     const skip = new Set(["Capability", "Step"]);
     for (const line of pageFragments("03-navdhan-sdk.md")) {
       if (skip.has(line)) continue;
-      expect(flat.includes(JSON.stringify(line).slice(1, -1)), `missing: ${line}`).toBe(true);
+      // The journey's cards count "01 of 05" to "05 of 05" (step 10).
+      const expected = line.replace(/^(\d\d) of 05$/, "{n} of 05");
+      expect(flat.includes(JSON.stringify(expected).slice(1, -1)), `missing: ${line}`).toBe(true);
     }
     expect(allMessages).not.toMatch(/In build|Where it stands/);
   });
@@ -245,7 +248,7 @@ describe("copy matches docs/rebuild/copy word for word", () => {
   });
 
   it("keeps every record document with its Proves line (copy deck 4.2)", () => {
-    expect(messages.record.documents).toHaveLength(6);
+    expect(messages.record.documents).toHaveLength(8);
     for (const doc of messages.record.documents) expect(doc.proves.length).toBeGreaterThan(10);
   });
 
@@ -254,9 +257,9 @@ describe("copy matches docs/rebuild/copy word for word", () => {
   });
 });
 
-describe("metadata (HANDOFF section 5)", () => {
-  it("matches every page's title and description to the handoff table", () => {
-    const table = read("docs/rebuild/HANDOFF.md")
+describe("metadata (SPEC section 4)", () => {
+  it("matches every page's title and description to the spec's table", () => {
+    const table = read("docs/rebuild/SPEC.md")
       .split("\n")
       .filter((line) => /^\| .+ \| \/\S* \| /.test(line))
       .map((line) => line.split("|").map((cell) => cell.trim()))
@@ -274,9 +277,24 @@ describe("metadata (HANDOFF section 5)", () => {
     };
     for (const [, , route, title, description] of table) {
       expect(metas[route].title, route).toBe(title);
-      // The handoff table types a straight apostrophe; the site sets a typographic one.
+      // The spec's table types a straight apostrophe; the site sets a typographic one.
       expect(metas[route].description.replace(/’/g, "'"), route).toBe(description);
     }
+  });
+
+  it("keeps \"cross-border\" on one line wherever it is running copy (<nb>)", () => {
+    // Titles, descriptions and alt text are not laid out on the page.
+    const unset = new Set(["site.homeTitle", "site.socialImageAlt", "about.meta.description"]);
+    const loose: string[] = [];
+    const walk = (value: unknown, path: string) => {
+      if (typeof value === "string") {
+        if (!unset.has(path) && value.replace(/<nb>cross-border<\/nb>/g, "").includes("cross-border")) loose.push(path);
+      } else if (value && typeof value === "object") {
+        for (const [key, child] of Object.entries(value)) walk(child, path ? `${path}.${key}` : key);
+      }
+    };
+    walk(messages, "");
+    expect(loose).toEqual([]);
   });
 
   it("points the social card and the /opengraph-image redirect at one existing file", async () => {

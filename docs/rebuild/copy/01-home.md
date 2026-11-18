@@ -5,38 +5,45 @@ Extracted from Figma, Home · 1440 (frame 160:6), 13 Nov 2026, in reading order.
 ## Hero
 (15 Nov, REDRAW-2026-11-14.md section 13 B: the two figure captions in The gap are Sans/Body; "Drawn to scale…" is Sans/Fine, not mono; "Skip the story" has no arrow.)
 [Display] Building the institutional exchange¹ for cross-border trade finance.
+(16 Nov: the hero has a subline directly under the headline at every width; it replaces "Starting with the asset…". Figma 340:3704 at 1440, 166:3367 at 768, 162:1313 at 390. Below the laptop width the order is headline, subline, picture, routes. No other hero has a subline.)
+[BodyL] Indian export receivables, originated, insured and documented so an international financier can buy them again and again.
 [UIL] For financial institutions            → /products/kubar-protocol
 [UIL] For trade platforms                   → /products/navdhan-sdk
-(15 Nov, REDRAW-2026-11-14.md section 10: no Illustrative tag; the record's line says "An example" in words. Its accessible description: "An example record of one export receivable, with six documents filed.")
+(16 Nov: the hero stays the record, now with eight documents so it matches How it works and leads into it. Figma 245:3225 at 1440, 248:3239 at 768, 353:3704 at 390. Eight sheets, 08 on top and current, with "FILED" on the top sheet only. Eight rows beside them, one line each: number and name. Under the sheets, for the picked document, "From" and "Proves", then the link; 08 is picked on load. Its accessible description: "An example record of one export receivable, with eight documents filed.")
 [Tag] Record RCV-0001
-[Record] An example: a $225,000 rice invoice to a buyer in the UAE, due 75 days after shipment.
-(14 Nov: the record becomes the isometric stack of six sheets with a row tied to each, 06 on top, so its column heads "No.", "Document", "Source" and "Status" are not shown.)
+[Record] An example: a $225,000 rice invoice to a buyer in Singapore, due 75 days after shipment.
 [Code] 01
 [UI] Commercial invoice
-[BodyS] The exporter
-[State] Filed
 [Code] 02
 [UI] Shipping bill
-[BodyS] Indian Customs
-[State] Filed
 [Code] 03
-[UI] Electronic bill of lading
-[BodyS] The carrier
-[State] Filed
+[UI] Bill of lading
 [Code] 04
-[UI] Credit-insurance cover
-[BodyS] The insurer, in the financier’s name
-[State] Filed
+[UI] Inspection report
 [Code] 05
-[UI] Assignment notice, acknowledged
-[BodyS] The buyer
-[State] Filed
+[UI] No-objection
 [Code] 06
+[UI] Credit-insurance cover
+[Code] 07
+[UI] Sweep instruction                      (17 Nov: the payment model's document 07; see the note under the list below)
+[Code] 08
 [UI] Purchase confirmation
+[State] Filed                              (on the top sheet, 08, only)
+[Fine] From
 [BodyS] The financier
-[State] Filed                              (row 06 is current: inset ground, rani marker, rani status)
 [Fine] Proves
 [BodyS] The financier bought the receivable, without recourse for the buyer’s credit
+[UI] See how it works                      → /how-it-works
+Each document's source and what it proves, shown under the sheets when its row is picked:
+01 Commercial invoice | The exporter | What was sold, to whom, for how much and when it’s due, and the collection account the buyer pays
+02 Shipping bill | Indian Customs | The goods were cleared for export, as invoiced
+03 Bill of lading | The carrier | The goods were shipped on board
+04 Inspection report | The inspection agency | The goods are as contracted, where the programme requires a check
+05 No-objection | The exporter’s bank | The exporter’s bank has no claim on this receivable
+06 Credit-insurance cover | The insurer, in the financier’s name | The buyer’s credit is covered, in the financier’s name
+07 Sweep instruction | The payment provider | Each payment into the collection account passes to the financier; the exporter can’t redirect it
+08 Purchase confirmation | The financier | The financier bought the receivable, without recourse for the buyer’s credit
+(17 Nov, the payment model: the buyer pays a collection account in the exporter’s name, shown on the invoice, and a standing sweep passes each payment to the financier; the exporter can’t redirect it. Nothing is asked of the buyer; the step before purchase is the exporter’s bank’s no-objection. The record stays at eight documents.)
 (After step 3, REDRAW-2026-11-14.md section 10: "05 Purchased" under the record is cut.)
 (14 Nov: the record's summary is one sentence and "State 05 of 08" is gone. The status footnote ¹ is no longer in the hero; marker ¹ on "exchange" links to the one under the foundations. REDRAW-2026-11-14.md, sections 6 and 9.6.)
 
@@ -47,7 +54,7 @@ Extracted from Figma, Home · 1440 (frame 160:6), 13 Nov 2026, in reading order.
 [Figure] About $80bn
 [BodyS] a year of Indian SME and mid-market export receivables is financeable: Kubar’s estimate for FY 2025–26.²
 [Figure] $126.92M
-[BodyS] financed in total on GIFT City’s trade-finance platforms (ITFS): 2,857 transactions to June 2026.³
+[BodyS] financed in total on GIFT City’s trade-finance platforms (ITFS): 2,857 transactions to June 2026. The average transaction was about $44k.³      (17 Nov: the last sentence added; the footnote is unchanged)
         (drawing: a full-width 8 px bar for $80bn over a hairline track holding a 1 px tick for $126.92M, both to scale)
 [Code] Drawn to scale. $126.92M is about 0.16% of the bar above.
 [UI] How we estimate this                  (a disclosure link with a plus; footnote ² opens under it. New words, approved 14 Nov)
@@ -60,6 +67,8 @@ Extracted from Figma, Home · 1440 (frame 160:6), 13 Nov 2026, in reading order.
 
 ## One receivable  (the pinned story; see ../HANDOFF.md, Motion)
 [H2] Follow one receivable from shipment to settlement.
+(16 Nov: the section's lead, beside the heading; it was the band's line.)
+[BodyL] Kubar is in the data path of every step and in the money path of none.
 (14 Nov, option B: only the lanes drawing is pinned; each state is a card that scrolls past it, so the panel's "State" label goes and each card carries its own counter, "05 of 08". REDRAW-2026-11-14.md, section 3a.)
 (After step 3, REDRAW-2026-11-14.md section 10: "Illustrative" is cut from the story; each card's state word loses its number; the "Party ·" line and the story's own "See how it works" link are cut, since the band right after it has the same link.)
 [Tag] Record RCV-0001
@@ -72,25 +81,26 @@ Extracted from Figma, Home · 1440 (frame 160:6), 13 Nov 2026, in reading order.
 [Label] Kubar holds none                    (secondary colour; rule 11.4)
 [Body] The financier pays 90% of face to the exporter’s own bank
 [UI] Skip the story                         (anchor to the next section)
-(14 Nov: the story panel's three-line legend is removed; "Data path: documents and records" and "Money path: only between banks" move to the Who takes part map.)
+(14 Nov: the story panel's three-line legend is removed; its data and money lines move to the Who takes part map.)
 [UI] Exporter
 [UI] Kubar                                  (the one filled column: petrol ground, white mark and name)
 [UI] Insurer
-[UI] Buyer, UAE
+[UI] Buyer, Singapore                       (16 Nov: the example's buyer is in Singapore. Where a lane head is too narrow for one line it takes two, "Buyer," over "Singapore"; the type is never shrunk and the word never cut)
 [UI] Financier
 [UI] Exporter’s bank
 [Code] 01 … 08                              (state rows)
 [BodyS] Shipment, invoice                   (step 01, data path)
 [BodyS] Evidence package checked            (02)
 [BodyS] Limit and headroom                  (03)
-[BodyS] Acknowledgement                     (04)
+[BodyS] No-objection                        (04; 17 Nov: its dashed arrow runs from the Exporter’s bank to Kubar)
 [BodyS] Evidence package                    (05, data path)
 [BodyS] 90% of face                         (05, money path)
 
 The 1440 frame shows the story at state 05. The text for all eight states is the ledger used at 768 and 390 (and with reduced motion), listed under "Only at 768 and 390" below; the story panel steps through the same eight.
 
 ## Band · closing line  (petrol ground)
-[Line] Kubar is in the data path of every step and in the money path of none.
+(16 Nov: a new line; the old one is the story section's lead. The link stays.)
+[Line] Every receivable that settles adds to a priced loss history, and that history is what brings in the next financier.
 [UIL] See how it works                      → /how-it-works
 
 ## Foundations first
@@ -107,18 +117,21 @@ The 1440 frame shows the story at state 05. The text for all eight states is the
 [BodyS] Running
 [BodyS] Running
 [BodyS] The rules exist; the asset doesn’t yet          (rani)
-(After step 3, REDRAW-2026-11-14.md section 10: the panel title "Five foundations, built from the bottom up" is cut.)
+(After step 3, REDRAW-2026-11-14.md section 10: the panel title over the blocks is cut.)
+(17 Nov: six foundations, top to bottom; distribution is new, between the venue and the record. Figma 246:3160: at 1440 the sentences run to three lines, so each label sits 14 px under the one above and its leader takes a short 45° dogleg into the title.)
 [UIL] The venue, last
 [BodyS] An ITFS for institutional financiers only, with Kubar as its neutral operator¹
 [Tag] Planned¹                              (secondary colour; the marker is rani)
+[UIL] Distribution through trade platforms
+[BodyS] Exporters rarely come to a trade-finance platform on their own. NavDhan SDK takes the programme into the trade platforms they already use, and brings the trading history between exporter and buyer with it.
 [UIL] A record of performance
 [BodyS] Every receivable that settles adds to a priced loss history
 [UIL] A clean payment path
-[BodyS] The buyer pays the financier’s account; the exporter’s bank closes the shipping bill
+[BodyS] A buyer won’t change how it pays because its supplier sold the invoice. The buyer pays a collection account in the exporter’s name; a standing sweep passes the payment to the financier, and the exporter’s bank closes the shipping bill.
 [UIL] Standing buyers
-[BodyS] A financier underwrites a programme once and buys every receivable that fits inside its limit
-[UIL] A common standard for what qualifies
-[BodyS] Every receivable has a shipping bill, an invoice that names the financier’s account, a buyer on an approved insurance limit and the buyer’s acknowledgement
+[BodyS] No international financier underwrites one invoice at a time. Here it underwrites a programme once and buys every receivable that fits inside its limit.
+[UIL] A common standard an insurer can price
+[BodyS] An insurer can’t price cover on an invoice alone. Every receivable carries one record, from shipment to settlement: its documents, the buyer’s insurance limit and how it paid.
 [Fine] ¹
 [Fine] Kubar’s own ITFS registration is targeted for 2027; until then Kubar acts as the financier’s origination and servicing agent.
 [Fine] Back to text
@@ -140,11 +153,11 @@ The 1440 frame shows the story at state 05. The text for all eight states is the
 [BodyS] Ship, invoice and keep their own banks
 [UI] How it works                           → /how-it-works
 [UI] Buyers
-[BodyS] Pay the financier’s account, on the terms they already have
+[BodyS] Pay the account on the invoice, on the terms they already have; nothing new to sign
 [UI] Kubar                                  (name only: no mark in this row)
 [BodyS] Runs the programme: origination, the evidence package, servicing and reporting. No money and no credit risk
 [UI] About                                  → /about
-[Fine] Money path: only between banks       (legend: solid line)
+[Fine] Money path: never through Kubar      (legend: solid line)
 [Fine] Data path: documents and records     (legend: dashed line)
 
 ## Standing
@@ -188,16 +201,16 @@ The 1440 frame shows the story at state 05. The text for all eight states is the
 ## Only at 768 and 390
 
 Hero, under the display:
-[BodyL] Starting with the asset: export receivables an international financier can buy again and again, insured in its own name.
-[UI] Follow one receivable                  (anchor to the ledger)
+(16 Nov: the subline is the same at every width now; see the Hero section above. The page's meta description and the social card carry the same sentence.)
+[UI] Follow one receivable                  (anchor to the story; below 1024 only, under the routes)
 
 The eight-state ledger (replaces the lanes and story panel at 768 and 390, and everywhere when reduced motion is on). Each state: number, name, what happens, party, data path. Money path cells follow the lanes.
-01 Shipped. The exporter ships the rice and invoices the buyer, with the instruction to pay the financier’s account. Party: Exporter. Data path: Kubar. Shipment and invoice data received.
+01 Shipped. The exporter ships the rice and invoices the buyer, with its collection account on the invoice. Party: Exporter. Data path: Kubar. Shipment and invoice data received.
 02 Documented. Shipping bill, invoice and bill of lading are checked against each other and filed in one evidence package. Data path: Evidence package assembled and checked.
 03 Insured. The buyer’s limit with the insurer is checked; the cover is in the financier’s name. Data path: Limit and headroom confirmed.
-04 Acknowledged. The buyer acknowledges that it will pay the financier. Party: Buyer. Data path: Acknowledgement filed.
+04 No-objection. The exporter’s bank confirms it has no objection to the sale. Party: Exporter’s bank. Data path: No-objection filed.
 05 Purchased. The financier buys the receivable, without recourse for the buyer’s credit. Party: Financier. Data path: Package delivered; purchase recorded. Money path: Kubar holds none. The financier pays 90% of face to the exporter’s own bank.
-06 Settled. On the due date the buyer pays, and the exporter’s bank closes the shipping bill. Party: Buyer, financier, exporter’s bank. Data path: Payment matched; closure tracked. Money path: The buyer pays the financier’s collection account; the financier pays the exporter the balance, less its discount and charges. (Copy deck 4.2; Vaibhav, 13 Nov 2026: the ledger and the story panel show the settlement payments the lanes diagram draws. The story panel's counter at state 08 reads "08 of 08".)
+06 Settled. On the due date the buyer pays the collection account on its invoice, and the exporter’s bank closes the shipping bill. Party: Buyer, financier, exporter’s bank. Data path: Payment matched; closure tracked. Money path: The buyer pays the exporter’s collection account; the sweep passes it to the financier, which pays the exporter the balance, less its discount and charges. (Copy deck 4.2; Vaibhav, 13 Nov 2026: the ledger and the story panel show the settlement payments the lanes diagram draws. The story panel's counter at state 08 reads "08 of 08".)
 07 Recorded. The outcome joins the record of how the asset performs. Data path: Added to the loss history.
 08 Transferred, later¹. On the venue, a receivable can move to another institutional financier, with a registry entry. [State] Planned (muted).
 
