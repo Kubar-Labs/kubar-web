@@ -1,6 +1,6 @@
 # kubar.tech: the spec, as built and released
 
-This is the one current description of kubar.tech, the public site of Kubar Labs, in `Kubar-Labs/kubar-web`. It describes the site as it was released to production on 15 November 2026 (`main`) and, dated 16 to 18 Nov, the build that follows it on the branch `next-build` (steps 0 to 12 and 8.5, accepted by Vaibhav; not yet released).
+This is the one current description of kubar.tech, the public site of Kubar Labs, in `Kubar-Labs/kubar-web`. It describes the site as it was released to production on 15 November 2026 (`main`) and, dated 16 to 18 Nov, the build that follows it on the branch `next-build` (steps 0 to 12 and 8.5, accepted by Vaibhav), merged into `main` for release after the release sweep of 18 Nov.
 
 It replaces two files, which are kept unchanged in `archive/`:
 
@@ -355,7 +355,7 @@ Mobile, p75: LCP ≤ 2.0 s, INP ≤ 200 ms, CLS ≤ 0.05. Fonts ≤ 300 KB in to
 
 At release: Lighthouse mobile LCP 0.9 to 1.1 s and CLS 0 on all eight routes; own JavaScript 153.8 to 162.7 KB a route (Home 162.7 KB, accepted by Vaibhav on 15 Nov).
 
-The browser tests hold Home, Kubar Protocol and How it works to the same 170 KB (`e2e/acceptance.spec.ts`). After step 11 (18 Nov): Home 163.5 KB, Kubar Protocol 169.8, How it works 169.8, NavDhan SDK 166.6. To keep How it works inside it, the unpaid flow and the terms are drawn on the server and only their controls run in the browser (`UnpaidStage`, `FoldOpen`, both left out of the React Compiler with "use no memo"; nothing in them relies on memoization).
+The browser tests hold Home, Kubar Protocol and How it works to the same 170 KB (`e2e/acceptance.spec.ts`). After step 11 (18 Nov): Home 163.5 KB, Kubar Protocol 169.8, How it works 169.8, NavDhan SDK 166.6. Lighthouse at the release sweep (18 Nov, on mains): 100 on all eight routes, LCP 1.21 to 1.36 s, CLS 0. LCP is 0.3 s more than at step 10 on every route, the legal pages included: with step 11 the site's CSS passed Next's 100 KB chunk size, so the font faces load as a second stylesheet of 1.3 KB, and Lighthouse's simulation of the local http server charges it a connection of its own. To keep How it works inside it, the unpaid flow and the terms are drawn on the server and only their controls run in the browser (`UnpaidStage`, `FoldOpen`, both left out of the React Compiler with "use no memo"; nothing in them relies on memoization).
 
 ## 15 · Checks
 
@@ -408,7 +408,7 @@ A phone on the same Wi-Fi can open the preview build (`LOCAL_PREVIEW=1 npx next 
 
 - 15 Nov 2026: Vaibhav checked the build on his iPhone and iPad; nothing to change. Released to production from `main`.
 - After the release, on `main`: the contact Worker logs the send binding's error; the content security policy allows Cloudflare Web Analytics; partnerships@ is allowed as a destination.
-- 16 to 18 Nov 2026, on `next-build`: steps 0 to 12 of the next build and step 8.5 (the payment model's words), each accepted by Vaibhav; the release sweep run on 18 Nov. Nothing pushed, merged or deployed; the release waits for his word.
+- 16 to 18 Nov 2026, on `next-build`: steps 0 to 12 of the next build and step 8.5 (the payment model's words), each accepted by Vaibhav. 18 Nov: the release sweep passed, and on Vaibhav's word the branch was merged into `main` for release.
 - Open: a vector of the T-Hub mark.
 
 ## Appendix · Where the old sections went
