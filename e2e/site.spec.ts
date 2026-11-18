@@ -2719,6 +2719,86 @@ test.describe("The foundations stack carries from page to page (SPEC section 12)
     // React hides the old stack's group at once, so its picture never lingers over Home.
     expect(await page.evaluate(() => document.getAnimations().filter((a) => (a.effect as KeyframeEffect | null)?.pseudoElement === "::view-transition-group(foundations)" && Number(a.effect!.getTiming().duration) > 0).length)).toBe(0);
   });
+
+  test("a page change the browser gives up on leaves no uncaught error, nothing on <html> and no sideways scroll; the next one runs", async ({ playwright }) => {
+    test.setTimeout(60_000);
+    // Scrollbars shown, as on a desktop, so the page is held to the width beside them.
+    const { launchOptions, baseURL } = test.info().project.use;
+    const browser = await playwright.chromium.launch({ ...launchOptions, ignoreDefaultArgs: ["--hide-scrollbars"] });
+    try {
+      const context = await browser.newContext({ baseURL, viewport: { width: 1440, height: 900 } });
+      const page = await context.newPage();
+      const errors: string[] = [];
+      page.on("pageerror", (error) => errors.push(String(error)));
+      page.on("console", (message) => {
+        if (message.type() === "error") errors.push(message.text());
+      });
+      // As in a tab that draws no frames or whose timers are throttled: React's update is done,
+      // but the transition's is held for 5 s, past Chrome's 4 s limit, so Chrome aborts it
+      // ("Transition was aborted because of timeout in DOM update").
+      await page.addInitScript(() => {
+        type Outcome = { ready: string | null; finished: boolean };
+        const w = window as unknown as { __hold: boolean; __outcomes: Outcome[] };
+        w.__hold = false;
+        w.__outcomes = [];
+        const start = Document.prototype.startViewTransition;
+        Document.prototype.startViewTransition = function (this: Document, arg?: ViewTransitionUpdateCallback | StartViewTransitionOptions) {
+          const update = typeof arg === "function" ? arg : arg?.update;
+          const hold = w.__hold;
+          const held = async () => {
+            await update?.();
+            if (hold) await new Promise((resolve) => setTimeout(resolve, 5000));
+          };
+          const transition = start.call(this, typeof arg === "function" ? held : { ...arg, update: held });
+          const outcome: Outcome = { ready: null, finished: false };
+          w.__outcomes.push(outcome);
+          transition.ready.then(
+            () => (outcome.ready = "ready"),
+            (error: DOMException) => (outcome.ready = error.name),
+          );
+          transition.finished.finally(() => (outcome.finished = true)).catch(() => {});
+          return transition;
+        } as typeof Document.prototype.startViewTransition;
+      });
+      const outcomes = () => page.evaluate(() => (window as unknown as { __outcomes: { ready: string | null; finished: boolean }[] }).__outcomes);
+      watchPrefetches(page);
+      await page.goto("/about");
+      await page.evaluate(() => ((window as unknown as { __hold: boolean }).__hold = true));
+      await toKubarProtocol(page);
+      // Chrome gives up after 4 s; the held update ends a second later.
+      await expect
+        .poll(async () => (await outcomes()).some((o) => o.ready === "TimeoutError") && (await outcomes()).every((o) => o.finished), { timeout: 15_000 })
+        .toBe(true);
+      await page.evaluate(() => ((window as unknown as { __hold: boolean }).__hold = false));
+
+      expect(errors).toEqual([]);
+      // Nothing left on <html>: no animation on a view-transition pseudo-element, no view-transition-name.
+      expect(
+        await page.evaluate(() =>
+          document
+            .getAnimations()
+            .map((a) => (a.effect as KeyframeEffect | null)?.pseudoElement ?? "")
+            .filter((pseudo) => pseudo.startsWith("::view-transition")),
+        ),
+      ).toEqual([]);
+      expect(await page.evaluate(() => document.documentElement.style.viewTransitionName)).toBe("");
+      // The scrollbar takes its width, and the page stays within the rest, top to bottom.
+      expect(await page.evaluate(() => innerWidth - document.documentElement.clientWidth)).toBeGreaterThan(0);
+      for (const at of [0, 0.25, 0.5, 0.75, 1]) {
+        await page.evaluate((at) => window.scrollTo({ top: at * (document.documentElement.scrollHeight - innerHeight), behavior: "instant" }), at);
+        expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth), `sideways scroll at ${at * 100}% down`).toBe(0);
+      }
+
+      // The next page change runs its transition.
+      const before = (await outcomes()).length;
+      await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+      await toAbout(page);
+      await expect.poll(async () => (await outcomes()).slice(before).some((o) => o.ready === "ready" && o.finished)).toBe(true);
+      expect(errors).toEqual([]);
+    } finally {
+      await browser.close();
+    }
+  });
 });
 
 test.describe("A page change opens the new page at its top", () => {

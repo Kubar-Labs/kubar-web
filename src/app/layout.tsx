@@ -7,6 +7,7 @@ import { AbbreviationTips } from "@/components/ui/AbbreviationTips";
 import { FootnoteLinks } from "@/components/ui/FootnoteLinks";
 import { organisationLogo, socialImage } from "@/app/page-metadata";
 import { fontVariables } from "./fonts";
+import { viewTransitionGuard } from "./view-transition-guard";
 import "./globals.css";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -84,10 +85,14 @@ export default async function RootLayout({
             start from a hidden or displaced state, so they may only start where frames are being
             drawn. This marks the document on its first frame, before anything is painted. In a
             background tab or a hidden pane no frame comes, the mark is never set, and the
-            drawings stay as the server drew them: complete. */}
+            drawings stay as the server drew them: complete.
+            Then the guard for a page change whose view transition the browser gives up on
+            (view-transition-guard.ts). */}
         <script
           dangerouslySetInnerHTML={{
-            __html: "document.documentElement.setAttribute('data-js','');requestAnimationFrame(function(){document.documentElement.setAttribute('data-frames','')})",
+            __html:
+              "document.documentElement.setAttribute('data-js','');requestAnimationFrame(function(){document.documentElement.setAttribute('data-frames','')});" +
+              viewTransitionGuard,
           }}
         />
         <script
