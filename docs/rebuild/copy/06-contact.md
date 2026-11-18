@@ -66,7 +66,7 @@ The 1440 frame shows the form filled in as an example (Arjun Mehta, arjun.mehta@
 States to build from the Forms board (Figma 153:53): rest, hover, focus, filled, error (field message under the field, and an error summary at the top of the form that takes focus and links to each field), sending, sent (form message replaces the form), and failed (form message above the button with outreach@kubar.tech as the fallback).
 
 ## Direct
-(Build step 7, section 13 C2: the separate Direct section and its label "Direct" are gone. The addresses below sit beside the form from 1200 up, and under it below that.)
+(Build step 7, section 13 C2: the separate Direct section and its label "Direct" are gone. The addresses below sit beside the form from 1200 up (from 1024 since 16 Nov, when the laptop layout moved there), and under it below that.)
 [Tag] For | [Tag] Write to
 Partnerships and investors | partnerships@kubar.tech
 Everything else, including press | outreach@kubar.tech

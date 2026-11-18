@@ -44,7 +44,7 @@ Beside it, the money timeline (drawn to scale on a day axis; Figma component "Mo
 [Code] Due date · day 75
 [Fine] Days after shipment. The purchase date is illustrative: it follows the documents, the insurer’s limit check and the exporter’s bank’s no-objection.
 
-At 768 and 390 the small drawing (the day 0 and day 75 bars, 350 wide) sits above the words as a list; its labels there: "Day 0", "Paid out · at purchase", "Received · day 75", "Paid out · later", "Meanwhile", "Day 75".
+At 768 and 390 (and from 1024 to 1279, beside the sheet) the small drawing (the day 0 and day 75 bars, 350 wide) sits above the words as a list; its labels there: "Day 0", "Paid out · at purchase", "Received · day 75", "Paid out · later", "Meanwhile", "Day 75".
 
 ## How a programme runs
 [H2] How a programme runs.
@@ -193,7 +193,7 @@ Kubar | Origination, the evidence package, servicing and reporting | Money or cr
 ## Where you fit
 [H2] Where each institution fits.
 [Tag] Institution | [Tag] Role                         (the Status column is removed)
-(17 Nov, next build step 9: a pick, Figma 332:2432. The five institutions on the left, the first picked on load; on the right "Role" and the picked institution's role in H3, with its footnote marker where it has one. Without script the register below shows all five.)
+(17 Nov, next build step 9: a pick, Figma 332:2432. The five institutions on the left, the first picked on load; on the right "Role" and the picked institution's role in H3, with its footnote marker where it has one. Without script the register below shows every institution.)
 Banks’ units at GIFT City (IFSC Banking Units) | Programme financier: set a limit and buy every receivable that fits
 IFSC finance companies and factors | Programme financier; later, a lane for smaller receivables held on a finance company’s balance sheet
 Banks, factors and finance companies abroad | Bid for programmes on Kubar’s own venue once it is registered¹, with no entity at GIFT City, if they meet its admission rules

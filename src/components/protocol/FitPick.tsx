@@ -18,7 +18,7 @@ import { cx as cn } from "@/lib/cx";
  * the height of the longest and nothing under it moves.
  *
  * With script only (`with-script`): without it the page shows today's
- * register, all five at once.
+ * register, every institution at once.
  */
 export function FitPick({
   institutions,

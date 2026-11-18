@@ -185,7 +185,7 @@ export default function KubarProtocol() {
 
       <Section labelledBy="fit-heading" className="flex flex-col gap-10 lg:gap-16">
         <SectionHead id="fit-heading" heading={t("fit.heading")} layout="wide" />
-        {/* A pick with script (step 9); without it, today's register, all five at once. */}
+        {/* A pick with script (step 9); without it, today's register, every institution at once. */}
         <FitPick
           institutions={(t.raw("fit.rows") as string[][]).map(([institution]) => institution)}
           label={(t.raw("fit.columns") as string[])[1]}

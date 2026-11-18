@@ -128,7 +128,7 @@ Buyer | Pays the account on the invoice, on its usual terms | Nothing new to sig
 Trade platform | Brings exporters and their shipment data through NavDhan SDK | Its agreement with Kubar
 Kubar | Designs the pool, checks and documents each receivable, matches payments, services and reports | The mandate from the financier
 (first column [UI], the others [BodyS])
-(Build step 5, Vaibhav, 15 Nov: from 1200 up the register is drawn as a map, Figma 287:2806; below 1200 the stacked register stays, and the table stays in the page for screen readers at every width. Seven cards, each with the party's name and its "Does" sentence above, unchanged. The map's own strings, all taken from the table's wording:
+(Build step 5, Vaibhav, 15 Nov: from 1200 up the register is drawn as a map, Figma 287:2806 (from 1024 since 16 Nov, when the laptop layout moved there); below that the stacked register stays, and the table stays in the page for screen readers at every width. Seven cards, each with the party's name and its "Does" sentence above, unchanged. The map's own strings, all taken from the table's wording:
   five agreements, a label on each line: "The policy" (Insurer–Financier), "The mandate" (Financier–Kubar), "Purchase agreement" (Financier–Exporter), "Agreement with Kubar" (Trade platform–Kubar), "Services agreement" (Kubar–Exporter);
   two papers a party signs alone, a tag in its card: "Programme terms" (Financier) and "Its no-objection" (Exporter’s bank); 17 Nov: the buyer signs nothing on its own, so its card has no tag;
   the key: "A line is an agreement between the two parties it joins." and "A tag is a paper one party signs on its own.")

@@ -47,7 +47,7 @@ Extracted from Figma, NavDhan SDK · 1440 (frame 170:6), 13 Nov 2026, in reading
 [State] Purchased
 
 ## For your exporters
-(Build step 6, section 13 C1: this and "For your platform" sit side by side as one two-column block from 1200 up, and stacked below that. The words don't change.)
+(Build step 6, section 13 C1: this and "For your platform" sit side by side as one two-column block from 1024 up (1200 at the release; the laptop layout starts at 1024 since 16 Nov), and stacked below that. The words don't change.)
 [H2] Dollar finance beyond their bank limit.
 [BodyL] Your exporters can sell their export receivables to institutional financiers, beyond the limits their own banks set, without recourse for the buyer’s credit. They keep their own bank, and their buyers keep their terms.
 
