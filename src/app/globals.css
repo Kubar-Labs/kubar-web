@@ -1482,14 +1482,17 @@
   /* The pinned story, option B (StoryView.tsx, Lanes.tsx; REDRAW section
      3a). The lanes drawing is sized here: rows from the viewport in svh,
      columns from the drawing's own width. Phones and tablets: party boxes
-     40 px high, rows of 22 to 40 px, the drawing at most 45% of 100svh.
-     Desktop: party boxes 56 px, rows of 44 to 74 px, the drawing filling the
-     height under the header less 48 px. */
+     40 px high, rows of 22 to 40 px, the drawing at most 45% of 100svh; the
+     columns take the full width (--cols) and the rows' band and hairlines
+     start 22 px in (--gutter), after their numbers. Desktop: party boxes
+     56 px, rows of 44 to 74 px, the drawing filling the height under the
+     header less 48 px, and the columns after a 36 px gutter. */
   .lanes {
     --party-h: 50px;
     --box-h: 40px;
     --box-inset: 2px;
-    --gutter: 0px;
+    --gutter: 22px;
+    --cols: 0px;
     --row-h: clamp(22px, (45svh - 40px - 24px) / 8, 40px);
     --dy: 6px;
     position: relative;
@@ -1515,6 +1518,7 @@
       --box-h: 56px;
       --box-inset: 4px;
       --gutter: 36px;
+      --cols: 36px;
       --row-h: clamp(44px, (100svh - var(--header-height) - 64px - 48px) / 8, 74px);
       --dy: 7px;
     }
@@ -1680,6 +1684,30 @@
   .run-lanes {
     position: relative;
     height: calc(var(--run-party-h) + 5 * var(--run-row-h));
+  }
+  /* The last card's slot (StoryView, 18 Nov): long enough that the last state holds for 200 px of
+     scroll with the drawing still pinned. StoryView measures it (--last-room). Before it does, and
+     without script, a floor stands in on laptops, reckoned the same way: 240 px, and the drawing's
+     pinned height and the 24 px over it, less the 45% of the screen under the header where a card
+     turns current. How it works' relying lines are taken at their 1440 height (162 px). */
+  .story-last {
+    min-height: max(var(--last-floor, 0px), var(--last-room, 0px));
+  }
+  @media (min-width: 1024px) {
+    .story[data-variant="home"] {
+      --last-floor: calc(328px + clamp(352px, 100svh - var(--header-height) - 112px, 592px) - 0.45 * (100svh - var(--header-height)));
+    }
+    .story[data-variant="sdk"] {
+      --last-floor: calc(264px + var(--run-pin) - 0.45 * (100svh - var(--header-height)));
+    }
+    .story[data-variant="howItWorks"] {
+      --last-floor: calc(288px + clamp(346px, 100svh - var(--header-height) - 110px, 418px) - 0.45 * (100svh - var(--header-height)));
+    }
+  }
+  @media (min-width: 1200px) {
+    .story[data-variant="howItWorks"] {
+      --last-floor: calc(450px + clamp(250px, 100svh - var(--header-height) - 256px, 526px) - 0.45 * (100svh - var(--header-height)));
+    }
   }
   /* A party's box: 176 wide, or its column less the inset where the column is narrower. */
   .run-party {

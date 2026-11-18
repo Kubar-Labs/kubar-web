@@ -32,6 +32,13 @@ import { cx as cn } from "@/lib/cx";
  * with five cards: "01 of 05" and the step's sentence. Its skip link sits
  * above the lanes, pinned with them; it has no record row. Without script
  * its register shows instead (globals.css), so the drawing is complete.
+ *
+ * The last state holds with the drawing still pinned for at least 200 px of
+ * scroll (18 Nov), at every size where it pins: the last card's slot is
+ * measured here to be that long (--last-room; globals.css, .story-last), and
+ * on phones, where Home's and NavDhan SDK's drawing lets go as the last card
+ * reaches it, it lets go later where that would come sooner (--release).
+ * How the other states turn current is unchanged.
  */
 export type LedgerState = {
   no: string;
@@ -47,6 +54,10 @@ const TABLET = "(min-width: 768px)";
 /** Where the content reaches 1040 px: How it works pins the relying lines with its stack from here. */
 const WIDE = "(min-width: 1200px)";
 const PHONE = "(max-width: 767.98px)";
+/** The scroll the last state holds with the drawing pinned: 200 px and some to spare on laptops and
+ * tablets; on phones only what is needed past 200, since the last card then passes under the drawing. */
+const HOLD = 240;
+const PHONE_HOLD = 204;
 
 /** The 22 px line before "Data path" and "Money path" on a card. */
 function PathGlyph({ kind }: { kind: "data" | "money" }) {
@@ -63,6 +74,16 @@ function PathGlyph({ kind }: { kind: "data" | "money" }) {
 
 function headerHeight() {
   return parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--header-height")) || 0;
+}
+
+/** 100svh in px: the screen's height with a phone's address bar shown, which stays put as it hides. */
+function smallViewportHeight() {
+  const probe = document.createElement("div");
+  probe.style.cssText = "position:fixed;top:0;left:0;width:0;height:100svh;visibility:hidden;pointer-events:none";
+  document.body.appendChild(probe);
+  const height = probe.getBoundingClientRect().height;
+  probe.remove();
+  return height;
 }
 
 export function StoryView({
@@ -153,21 +174,25 @@ export function StoryView({
   // Which state is current: the card crossing the 45% line.
   useEffect(() => {
     const list = stepsRef.current;
-    if (!fits || !list) return;
+    const story = list?.closest<HTMLElement>(".story");
+    const pin = pinRef.current;
+    if (!fits || !list || !story || !pin) return;
     const steps = [...list.children] as HTMLElement[];
+    const last = steps[steps.length - 1];
     let observer: IntersectionObserver | null = null;
     let frame = 0;
     const build = () => {
       frame = 0;
       observer?.disconnect();
       const height = window.innerHeight;
-      const top = headerHeight() + (window.matchMedia(DESKTOP).matches ? 0 : (pinRef.current?.offsetHeight ?? 0));
+      const top = headerHeight() + (window.matchMedia(DESKTOP).matches ? 0 : pin.offsetHeight);
       // Home and NavDhan SDK on phones: a card turns current one slot's height below the drawing, so the card
       // before it is still clear of the drawing when it hands over; never lower than 48 px above
       // the foot of the screen. Everywhere else: 45% of the way down the space left for the text.
       const phone = !long && window.matchMedia(PHONE).matches;
       const tallest = Math.max(...steps.slice(0, -1).map((step) => step.offsetHeight));
-      const line = Math.round(phone ? top + Math.min(height - top - 48, tallest) : top + 0.45 * (height - top));
+      const lineAt = (screen: number) => Math.round(phone ? top + Math.min(screen - top - 48, tallest) : top + 0.45 * (screen - top));
+      const line = lineAt(height);
       observer = new IntersectionObserver(
         (entries) => {
           for (const entry of entries) {
@@ -181,19 +206,30 @@ export function StoryView({
         { rootMargin: `${-line}px 0px ${-(height - line - 1)}px 0px` },
       );
       for (const step of steps) observer.observe(step);
+
+      // The last state turns current as its card reaches the line and holds until the drawing lets
+      // go: when the cards' column ends under it (laptops and tablets), or as the last card reaches
+      // it (Home and NavDhan SDK on phones). Reckoned on 100svh, so the room doesn't change as an
+      // address bar shows and hides; the line only moves lower then, and the state holds longer.
+      const reach = lineAt(smallViewportHeight()) - (parseFloat(getComputedStyle(pin).top) || 0) - pin.offsetHeight;
+      if (phone) {
+        story.style.setProperty("--release", `${last.offsetHeight - Math.max(0, PHONE_HOLD - reach)}px`);
+        story.style.setProperty("--last-room", "0px");
+      } else {
+        story.style.setProperty("--last-room", `${Math.ceil(HOLD - reach)}px`);
+      }
       list.dataset.live = "true";
     };
     const schedule = () => {
       if (!frame) frame = requestAnimationFrame(build);
     };
     schedule();
-    // The line moves when the viewport resizes (an address bar too) and when the pin's height changes.
+    // The line moves when the viewport resizes (an address bar too) and when the pin's height changes;
+    // the release on phones follows the last card's height (see the pin below).
     window.addEventListener("resize", schedule);
     const pinObserver = new ResizeObserver(schedule);
-    if (pinRef.current) pinObserver.observe(pinRef.current);
-    // The last card's height, for the pin's release on phones (see the pin below).
-    const last = steps[steps.length - 1];
-    const lastObserver = new ResizeObserver(() => list.closest<HTMLElement>(".story")?.style.setProperty("--last-card", `${last.offsetHeight}px`));
+    pinObserver.observe(pin);
+    const lastObserver = new ResizeObserver(schedule);
     lastObserver.observe(last);
     return () => {
       window.removeEventListener("resize", schedule);
@@ -207,7 +243,7 @@ export function StoryView({
   const idRow = (className: string) => <p className={cn("t-tag text-ink", className)}>{t("record")}</p>;
 
   return (
-    <div className="story" data-variant={variant} data-story-fits={fits ? "true" : "false"} style={{ ["--last-card" as string]: "203px" }}>
+    <div className="story" data-variant={variant} data-story-fits={fits ? "true" : "false"} style={{ ["--release" as string]: "203px" }}>
       <div data-no-abbr data-story-state={state} className="story-on">
         {/* The drawing and the cards share a box that ends with the last card,
             so the drawing stops being pinned as the last card leaves. NavDhan SDK
@@ -233,8 +269,9 @@ export function StoryView({
               // Home and NavDhan SDK on phones: the drawing lets go as the last card reaches it, not after the card
               // has slid under it. A sticky box may not leave its container by its margin, so a
               // bottom margin the height of the last card releases it that much sooner; the cards'
-              // column takes the same margin back, and the layout is unchanged.
-              !long && "max-md:mb-(--last-card)",
+              // column takes the same margin back, and the layout is unchanged. On a short phone the
+              // margin is less, so the last state still holds for 200 px (--release, set above).
+              !long && "max-md:mb-(--release)",
             )}
           >
             {sdk ? (
@@ -250,7 +287,10 @@ export function StoryView({
             {lanes}
           </div>
 
-          <div className={cn("flex flex-col lg:col-start-1 lg:row-start-1", !long && "max-md:-mt-(--last-card)")}>
+          {/* NavDhan SDK: on laptops the first card starts beside the lanes' first row, under the
+              skip link and the party boxes, so the first state too holds with the lanes pinned, as
+              Home's does under its record row and skip link. */}
+          <div className={cn("flex flex-col lg:col-start-1 lg:row-start-1", !long && "max-md:-mt-(--release)", sdk && "lg:pt-[calc(44px+var(--run-party-h))]")}>
             {sdk ? null : (
               <>
                 {idRow("mb-4 hidden border-b border-rule-strong pb-2.5 lg:block")}
@@ -278,10 +318,9 @@ export function StoryView({
                     // the scroll its state holds for. Home gives each 36svh, a little
                     // over a third of the screen, which keeps the section short; How
                     // it works, whose cards are long, about 60svh. The last slot is
-                    // just long enough for its card to reach the line before the
-                    // drawing leaves with it. NavDhan SDK's cards step as Home's; its
-                    // lanes are shorter than the screen, so its last slot reads their
-                    // height (--run-pin, globals.css).
+                    // long enough that its state holds for 200 px with the drawing still
+                    // pinned (story-last: measured above, with a floor in globals.css).
+                    // NavDhan SDK's cards step as Home's.
                     className={cn(
                       "lg:pb-6",
                       n < states.length
@@ -290,9 +329,7 @@ export function StoryView({
                           : // Home on phones: 8 px between cards, and from the second state on a slot of
                             // at least a third of the screen, which is the scroll its state holds for.
                             cn("pb-2 md:pb-[min(96px,12svh)] lg:min-h-[36svh]", n > 1 && "max-md:min-h-[calc(100svh/3)]")
-                        : sdk
-                          ? "lg:min-h-[calc(var(--run-pin)+48px-0.45*(100svh-var(--header-height)))]"
-                          : "lg:min-h-[calc(0.55*(100svh-var(--header-height))+24px)]",
+                        : "story-last",
                     )}
                   >
                     <div

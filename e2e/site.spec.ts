@@ -4168,3 +4168,100 @@ test.describe("NavDhan SDK's pinned journey (step 10)", () => {
     }
   });
 });
+
+test.describe("Pinned journeys: every step lights with the drawing pinned, and the last holds for 200 px (18 Nov)", () => {
+  test.describe.configure({ timeout: 120_000 });
+  const journeys = [
+    { name: "Home", path: "/", steps: 8 },
+    { name: "NavDhan SDK", path: "/products/navdhan-sdk", steps: 5 },
+    { name: "How it works", path: "/how-it-works", steps: 8 },
+  ];
+  for (const [width, height] of [[1440, 900], [1180, 820], [390, 844]] as const) {
+    for (const journey of journeys) {
+      test(`${journey.name} at ${width}×${height}`, async ({ browser }) => {
+        const context = await browser.newContext({ viewport: { width, height }, hasTouch: width < 1200, isMobile: width < 768 });
+        const page = await context.newPage();
+        await page.goto(journey.path);
+        await storyLive(page);
+        /** Scroll to y; the state then, and whether the drawing sits at its sticky top or is on screen. */
+        const at = (y: number) =>
+          page.evaluate(
+            (y) =>
+              new Promise<{ state: number; stuck: boolean; shown: boolean }>((resolve) => {
+                window.scrollTo({ top: y, behavior: "instant" });
+                // Two frames: the observer answers the scroll on the next one.
+                requestAnimationFrame(() =>
+                  requestAnimationFrame(() => {
+                    const on = document.querySelector(".story-on")!;
+                    const pin = on.querySelector<HTMLElement>(".story-pin")!;
+                    const box = pin.getBoundingClientRect();
+                    resolve({
+                      state: Number(on.getAttribute("data-story-state")),
+                      stuck: Math.abs(box.top - parseFloat(getComputedStyle(pin).top)) < 1,
+                      shown: box.bottom > 0 && box.top < innerHeight,
+                    });
+                  }),
+                );
+              }),
+            y,
+          );
+        const [from, to] = await page.evaluate(() => {
+          const box = document.querySelector(".story")!.getBoundingClientRect();
+          return [Math.round(box.top + scrollY - innerHeight), Math.round(box.bottom + scrollY)];
+        });
+        // Down through the journey, 16 px at a time.
+        const pinned = new Set<number>();
+        const arriving = new Set<number>();
+        let lastFrom = -1;
+        let letGo = -1;
+        for (let y = from; y <= to; y += 16) {
+          const s = await at(y);
+          if (s.stuck) pinned.add(s.state);
+          else if (s.shown && lastFrom < 0) arriving.add(s.state);
+          if (s.state === journey.steps && lastFrom < 0) lastFrom = y;
+          if (lastFrom >= 0 && y > lastFrom && !s.stuck && letGo < 0) letGo = y;
+        }
+        const all = Array.from({ length: journey.steps }, (_, i) => i + 1);
+        // Home's and NavDhan SDK's phones hold the first step while the drawing arrives, by the design of
+        // 16 Nov (a card turns current one slot below the drawing); every other step lights with it pinned.
+        const firstArrives = width < 768 && journey.path !== "/how-it-works";
+        expect([...pinned].sort((a, b) => a - b), "the steps current with the drawing pinned").toEqual(firstArrives ? all.slice(1) : all);
+        if (firstArrives) expect(arriving.has(1), "the first step, as the drawing arrives").toBe(true);
+        // The last step: from where it turns current to where the drawing lets go, to the pixel.
+        expect(lastFrom, "the last step turns current").toBeGreaterThan(from);
+        expect(letGo, "the drawing lets go after it").toBeGreaterThan(lastFrom);
+        const first = async (lo: number, hi: number, holds: (s: { state: number; stuck: boolean }) => boolean) => {
+          while (hi - lo > 1) {
+            const mid = Math.floor((lo + hi) / 2);
+            if (holds(await at(mid))) hi = mid;
+            else lo = mid;
+          }
+          return hi;
+        };
+        const start = await first(lastFrom - 16, lastFrom, (s) => s.state === journey.steps);
+        const end = await first(letGo - 16, letGo, (s) => !s.stuck);
+        expect(end - start, "the scroll the last step holds with the drawing pinned").toBeGreaterThanOrEqual(200);
+        await context.close();
+      });
+    }
+  }
+
+  test("Home's lanes number their rows at 11 px on phones and tablets, as NavDhan SDK's narrow lanes do", async ({ page }) => {
+    for (const [width, size] of [[390, "11px"], [360, "11px"], [820, "11px"], [1440, "13px"]] as const) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto("/");
+      const numbers = page.locator(".story-on .lane-no");
+      await expect(numbers, `${width}`).toHaveText(["01", "02", "03", "04", "05", "06", "07", "08"]);
+      for (const no of await numbers.all()) {
+        await expect(no, `${width}`).toBeVisible();
+        await expect(no, `${width}`).toHaveCSS("font-size", size);
+      }
+      // Clear of the first lifeline, on its row's middle.
+      const fit = await page.locator(".story-on .lanes").evaluate((lanes) => {
+        const first = lanes.querySelector(":scope > span.w-px")!.getBoundingClientRect().left;
+        return [...lanes.querySelectorAll(".lane-no")].every((no) => no.getBoundingClientRect().right < first);
+      });
+      expect(fit, `${width}`).toBe(true);
+    }
+  });
+});
